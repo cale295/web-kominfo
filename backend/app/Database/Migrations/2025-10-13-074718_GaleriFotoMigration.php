@@ -48,7 +48,7 @@ class GaleriFotoMigration extends Migration
             
         ]);
         ## Tambahkan foreign key
-        $this->forge->addForeignKey('id_album', 'm_album', 'id_album', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_album', 'm_album_foto', 'id_album', 'CASCADE', 'CASCADE');
 
         $this->forge->addKey('id_foto', true);
         $this->forge->createTable('t_galeri_foto');
