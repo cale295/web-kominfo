@@ -26,17 +26,17 @@ function Navbar() {
             DINAS KOMUNIKASI DAN INFORMATIKA <br /> KOTA TANGERANG{" "}
           </h1>{" "}
         </div>{" "}
-        <div className="flex space-x-3 absolute top-6 right-16">
+        <div className="flex space-x-5 absolute top-6 right-16">
           {" "}
           <img
             src="/assets/indo.png"
             alt="Bahasa Indonesia"
-            className="w-8 h-8 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition"
+            className="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition"
           />{" "}
           <img
             src="/assets/britain.jpg"
             alt="English"
-            className="w-8 h-8 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition"
+            className="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition"
           />{" "}
         </div>{" "}
       </div>{" "}
