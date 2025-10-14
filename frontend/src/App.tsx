@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import HeroSection from './components/Hero'
 import ServiceGrid from './components/Services'
 import TangerangNewsApp from './components/News'
+import HubungiKami from './components/contact'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <HeroSection />
       <ServiceGrid />
       <TangerangNewsApp />
+      <HubungiKami />
     </div>
   )
 }
