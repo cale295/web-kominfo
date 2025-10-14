@@ -21,7 +21,6 @@ class BeritaModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     
-    // Perbaikan: Tambahkan semua field yang boleh diisi user/aplikasi
     protected $allowedFields    = ['id_kategori', 'id_pengguna', 'judul', 'slug', 'isi', 'gambar', 'status', 'jumlah_pembaca'];
 
     protected bool $allowEmptyInserts = false;
@@ -49,7 +48,7 @@ class BeritaModel extends Model
         'id_kategori' => [
             'required' => 'Kategori wajib dipilih.',
         ],
-        // ... Pesan untuk kolom lain ...
+        
     ];
 
     // Sisanya biarkan default

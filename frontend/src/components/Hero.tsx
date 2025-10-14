@@ -12,7 +12,7 @@ const HeroSection: React.FC = () => {
 
         <div className="flex items-center space-x-5 mr-10">
           <div className="flex items-center bg-white rounded-full border-2 border-blue-800 px-4 py-2 w-[300px]">
-          <input
+          <input 
             type="text"
             placeholder="Apa yang kamu cari"
             className="flex-1 outline-none text-gray-700 placeholder-gray-400"
