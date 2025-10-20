@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AlbumFotoModels extends Model
+class KategoriDokumenModel extends Model
 {
-    protected $table            = 'm_album_foto';
-    protected $primaryKey       = 'id_album';
+    protected $table            = 'm_kategori_dokumen';
+    protected $primaryKey       = 'id_kategori';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nama_album', 'deskripsi', 'gambar_sampul'];
+    protected $allowedFields    = ['nama_kategori', 'deskripsi_kategori'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -28,14 +28,9 @@ class AlbumFotoModels extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = 
-    ['nama_album' => 'required|min_length[3]|max_length[100]', 
-    'deskripsi' => 'required|min_length[3]|max_length[255]', 
-    'gambar_sampul' => 'required'];
-    protected $validationMessages   = 
-    ['nama_album' => ['required' => 'Nama Album harus diisi', 'min_length' => 'Nama Album minimal 3 karakter', 'max_length' => 'Nama Album maksimal 100 karakter'], 
-    'deskripsi' => ['required' => 'Deskripsi harus diisi', 'min_length' => 'Deskripsi minimal 3 karakter', 'max_length' => 'Deskripsi maksimal 255 karakter'], 
-    'gambar_sampul' => ['required' => 'Gambar Sampul harus diisi']];
+    protected $validationRules      = ['nama_kategori' => 'required'|'min_length[3]max_length[100]', 'deskripsi_kategori' => 'allowed'|'min_length[3]max_length[100]'];
+    protected $validationMessages =
+        ['nama_kategori' => ['required' => 'Kategori Dokumen Harus Diisi']];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 

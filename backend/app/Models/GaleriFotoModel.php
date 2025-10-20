@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class GaleriFotoModel extends Model
 {
     protected $table            = 't_galeri_fotophp';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'id_foto';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;

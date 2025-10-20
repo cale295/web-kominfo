@@ -33,7 +33,7 @@ class UserModel extends Model
         'nama_lengkap' => 'required|min_length[3]|max_length[100]', 
         'username' => 'required|min_length[3]|max_length[50]', 
         'password' => 'required|min_length[8]|max_length[255]', 
-        'email' => 'required|min_length[6]|max_length[255]|is_unique[tabel_user.email]',
+        'email' => 'required|min_length[6]|max_length[255]|is_unique[m_user.email]',
     ];
     protected $validationMessages   = 
     [

@@ -1,16 +1,14 @@
 <?php
 
 namespace App\Controllers\Api;
-
-use App\Models\GaleriFotoModel;
 use CodeIgniter\RESTful\ResourceController;
-use Config\Format;
-
-class GaleriFotoControll extends ResourceController
+//untuk mengambil data
+use App\Models\UserModel;
+class UserController extends ResourceController
 {
-    protected $modelName = GaleriFotoModel::class;
+
+    protected $modelName = UserModel::class;
     protected $format = 'json';
-    
     public function index()
     {
         return $this->respond($this->model->findAll());
