@@ -3,7 +3,7 @@ import { Youtube, Facebook, Instagram, Twitter } from "lucide-react";
 import "../index.css";
 function Navbar() {
   return (
-    <nav className="bg-gradient-to-r from-blue-800 to-blue-950 text-white rounded-t-[3rem] overflow-hidden shadow-md">
+    <nav className="bg-gradient-to-r from-blue-800 to-blue-950 text-white rounded-t-4xl overflow-hidden shadow-md">
       {" "}
       <div className="flex items-center px-16 py-6 relative">
         {" "}

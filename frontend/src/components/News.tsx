@@ -244,7 +244,7 @@ export default function TangerangNewsApp() {
           {/* Right Section - Tabs */}
           <div className="lg:col-span-2">
             {/* Tab Navigation */}
-            <div className="flex gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button
                 onClick={() => setActiveTab("agenda")}
                 className={`group px-8 py-3 rounded-2xl font-bold transition-all duration-300 flex items-center gap-2 ${
