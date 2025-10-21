@@ -3,256 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Sidebar</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <title>Dashboard - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
             overflow-x: hidden;
-        }
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-header {
-            padding: 20px;
-            color: #fff;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .sidebar-scrollable-content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            max-height: calc(100vh - 140px);
-        }
-        .sidebar-scrollable-content::-webkit-scrollbar {
-            width: 6px;
-        }
-        .sidebar-scrollable-content::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-        }
-        .sidebar-scrollable-content::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 3px;
-        }
-        .sidebar-scrollable-content::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.5);
-        }
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        .sidebar .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
-        .sidebar .nav-link.active {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            font-weight: 600;
-        }
-        .sidebar .nav-link i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-        .sidebar-header {
-            padding: 20px;
-            color: #fff;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .submenu {
-            padding-left: 20px;
-        }
-        .submenu .nav-link {
-            font-size: 0.9rem;
-            padding: 8px 20px;
-        }
-        .collapse-icon {
-            float: right;
-            transition: transform 0.3s;
-        }
-        .collapsed .collapse-icon {
-            transform: rotate(-90deg);
+            background-color: #f8f9fa;
         }
         .main-content {
             margin-left: 250px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+        .stats-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .stats-card .card-body {
             padding: 20px;
         }
-        .logout-btn {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 250px;
-            background: linear-gradient(180deg, transparent 0%, rgba(30, 60, 114, 0.95) 30%, rgba(30, 60, 114, 1) 100%);
-            padding: 15px 10px 20px;
-            z-index: 10;
+        .stats-card h2 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 10px;
         }
-        .role-selector {
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
+        .stats-card .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .page-header {
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .info-alert {
+            border-left: 4px solid #0dcaf0;
+            background-color: #cff4fc;
             border-radius: 8px;
-            margin: 10px;
         }
         @media (max-width: 768px) {
-            .sidebar {
-                width: 250px;
-                margin-left: -250px;
-            }
-            .sidebar.show {
-                margin-left: 0;
-            }
             .main-content {
                 margin-left: 0;
+                padding: 15px;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 px-0 sidebar">
-            <div class="sidebar-header">
-                <h5 class="mb-0"><i class="bi bi-building"></i> Admin Panel</h5>
-                <small class="text-white-50" id="userName">Administrator</small>
-            </div>
-
-            <div class="sidebar-scrollable-content">
-                <!-- Role Selector (untuk demo) -->
-                <div class="role-selector">
-                    <label class="text-white-50 small">Test Role:</label>
-                    <select class="form-select form-select-sm" id="roleSelector">
-                        <option value="super_admin">Super Admin</option>
-                        <option value="admin">Admin</option>
-                        <option value="editor">Editor</option>
-                    </select>
+<div class="d-flex">
+    <!-- Include Sidebar -->
+    <?= view('components/sidebar') ?>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2 class="mb-2">Dashboard</h2>
+            <p class="text-muted mb-0">
+                Selamat datang, <strong><?= esc(session()->get('full_name')) ?></strong>! 
+                <span class="badge bg-primary ms-2"><?= ucfirst(str_replace('_', ' ', session()->get('role'))) ?></span>
+            </p>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-newspaper"></i> Total Berita
+                        </h5>
+                        <h2>245</h2>
+                        <small>Berita dipublikasikan</small>
+                    </div>
                 </div>
-                
-                <ul class="nav flex-column py-3" id="menuContainer">
-                    <!-- Menu akan di-generate oleh JavaScript -->
-                </ul>
             </div>
-            
-            <div class="logout-btn">
-                <a href="#" class="nav-link text-danger">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-calendar-event"></i> Agenda
+                        </h5>
+                        <h2>18</h2>
+                        <small>Kegiatan mendatang</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-images"></i> Foto
+                        </h5>
+                        <h2>532</h2>
+                        <small>Total foto galeri</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-file-earmark"></i> Dokumen
+                        </h5>
+                        <h2>89</h2>
+                        <small>Dokumen tersedia</small>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- Main Content -->
-        <div class="col-md-9 col-lg-10 main-content">
-            <h2>Dashboard</h2>
-            <p class="text-muted">Selamat datang, <strong id="displayName">Administrator</strong> (Role: <span id="displayRole">Super Admin</span>)</p>
-            
-            <div class="row mt-4">
-                <div class="col-md-3">
-                    <div class="card text-white bg-primary mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="bi bi-newspaper"></i> Total Berita</h5>
-                            <h2>245</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-success mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="bi bi-calendar-event"></i> Agenda</h5>
-                            <h2>18</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-warning mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="bi bi-images"></i> Foto</h5>
-                            <h2>532</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="bi bi-file-earmark"></i> Dokumen</h5>
-                            <h2>89</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="alert alert-info mt-4">
-                <i class="bi bi-info-circle"></i> <strong>Info:</strong> 
-                Gunakan dropdown "Test Role" di sidebar untuk melihat perbedaan menu berdasarkan role (Super Admin/Admin/Editor).
-            </div>
+        <!-- Info Alert -->
+        <div class="alert info-alert">
+            <i class="bi bi-info-circle"></i> <strong>Informasi:</strong> 
+            Menu yang ditampilkan disesuaikan dengan hak akses role Anda. 
+            Role saat ini: <strong><?= ucfirst(str_replace('_', ' ', session()->get('role'))) ?></strong>
+        </div>
 
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5>Struktur Menu Berdasarkan Role</h5>
+        <!-- Role-based Menu Structure Table -->
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-table"></i> Struktur Menu Berdasarkan Role
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="40%">Menu</th>
+                                <th class="text-center">Super Admin</th>
+                                <th class="text-center">Admin</th>
+                                <th class="text-center">Editor</th>
+                                <th class="text-center">User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="bi bi-speedometer2"></i> Dashboard</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-newspaper"></i> Manajemen Berita</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">└ Kategori/Tema/Tag Berita</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-calendar-event"></i> Agenda & Galeri</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-file-earmark-text"></i> Dokumen</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-gear"></i> Layanan & Menu</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-people"></i> Pengguna & Akses</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-file-earmark-text"></i> Artikel Saya</td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-sliders"></i> Pengaturan</td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-check-circle-fill text-success fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                                <td class="text-center"><i class="bi bi-x-circle-fill text-danger fs-5"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Menu</th>
-                                    <th>Super Admin</th>
-                                    <th>Admin</th>
-                                    <th>Editor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Dashboard</td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>Manajemen Berita</td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>Kategori/Tema/Tag Berita</td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-x-circle-fill text-danger"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>Agenda & Galeri</td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>Layanan & Menu</td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-x-circle-fill text-danger"></i></td>
-                                </tr>
-                                <tr>
-                                    <td>Pengguna & Akses</td>
-                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-x-circle-fill text-danger"></i></td>
-                                    <td><i class="bi bi-x-circle-fill text-danger"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Aktivitas Terakhir
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-plus-circle text-success fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">Berita baru ditambahkan</div>
+                            <small class="text-muted">5 menit yang lalu</small>
+                        </div>
+                    </div>
+                    <div class="list-group-item d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-pencil-square text-primary fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">Agenda diperbarui</div>
+                            <small class="text-muted">1 jam yang lalu</small>
+                        </div>
+                    </div>
+                    <div class="list-group-item d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-upload text-info fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">Dokumen baru diunggah</div>
+                            <small class="text-muted">3 jam yang lalu</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -260,154 +261,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// Konfigurasi menu dengan permission
-const menuItems = [
-    {
-        title: 'Dashboard',
-        icon: 'bi-speedometer2',
-        url: '#dashboard',
-        roles: ['super_admin', 'admin', 'editor'],
-        active: true
-    },
-    {
-        title: 'Manajemen Berita',
-        icon: 'bi-newspaper',
-        roles: ['super_admin', 'admin', 'editor'],
-        submenu: [
-            { title: 'Daftar Berita', url: '#berita-list', roles: ['super_admin', 'admin', 'editor'] },
-            { title: 'Tambah Berita', url: '#berita-add', roles: ['super_admin', 'admin', 'editor'] },
-            { title: 'Kategori Berita', url: '#berita-kategori', roles: ['super_admin', 'admin'] },
-            { title: 'Tema Berita', url: '#berita-tema', roles: ['super_admin', 'admin'] },
-            { title: 'Tag Berita', url: '#berita-tag', roles: ['super_admin', 'admin'] },
-            { title: 'Berita Utama', url: '#berita-featured', roles: ['super_admin', 'admin', 'editor'] }
-        ]
-    },
-    {
-        title: 'Agenda Kegiatan',
-        icon: 'bi-calendar-event',
-        roles: ['super_admin', 'admin', 'editor'],
-        submenu: [
-            { title: 'Daftar Agenda', url: '#agenda-list', roles: ['super_admin', 'admin', 'editor'] },
-            { title: 'Tambah Agenda', url: '#agenda-add', roles: ['super_admin', 'admin', 'editor'] },
-            { title: 'Kalender', url: '#agenda-calendar', roles: ['super_admin', 'admin', 'editor'] }
-        ]
-    },
-    {
-        title: 'Galeri',
-        icon: 'bi-images',
-        roles: ['super_admin', 'admin', 'editor'],
-        submenu: [
-            { title: 'Album Foto', url: '#galeri-album', roles: ['super_admin', 'admin', 'editor'] },
-            { title: 'Foto Galeri', url: '#galeri-foto', roles: ['super_admin', 'admin', 'editor'] },
-            { title: 'Upload Foto', url: '#galeri-upload', roles: ['super_admin', 'admin', 'editor'] }
-        ]
-    },
-    {
-        title: 'Dokumen',
-        icon: 'bi-file-earmark-text',
-        roles: ['super_admin', 'admin', 'editor'],
-        submenu: [
-            { title: 'Daftar Dokumen', url: '#dokumen-list', roles: ['super_admin', 'admin', 'editor'] },
-            { title: 'Kategori Dokumen', url: '#dokumen-kategori', roles: ['super_admin', 'admin'] },
-            { title: 'Upload Dokumen', url: '#dokumen-upload', roles: ['super_admin', 'admin', 'editor'] }
-        ]
-    },
-    {
-        title: 'Layanan',
-        icon: 'bi-gear',
-        url: '#layanan',
-        roles: ['super_admin', 'admin']
-    },
-    {
-        title: 'Pengaturan Menu',
-        icon: 'bi-menu-button-wide',
-        url: '#menu',
-        roles: ['super_admin', 'admin']
-    },
-    {
-        title: 'Pengguna & Akses',
-        icon: 'bi-people',
-        roles: ['super_admin'],
-        submenu: [
-            { title: 'Manajemen User', url: '#user-list', roles: ['super_admin'] },
-            { title: 'Hak Akses', url: '#user-access', roles: ['super_admin'] }
-        ]
-    },
-    {
-        title: 'Pengaturan',
-        icon: 'bi-sliders',
-        url: '#settings',
-        roles: ['super_admin', 'admin']
-    }
-];
-
-let currentRole = 'super_admin';
-
-// Fungsi untuk cek akses
-function hasAccess(roles) {
-    return roles.includes(currentRole);
-}
-
-// Fungsi render menu
-function renderMenu() {
-    const container = document.getElementById('menuContainer');
-    container.innerHTML = '';
-    
-    menuItems.forEach((item, index) => {
-        if (!hasAccess(item.roles)) return;
-        
-        const li = document.createElement('li');
-        li.className = 'nav-item';
-        
-        if (item.submenu) {
-            const collapseId = `collapse-${index}`;
-            li.innerHTML = `
-                <a class="nav-link collapsed" data-bs-toggle="collapse" href="#${collapseId}" role="button">
-                    <i class="${item.icon}"></i>${item.title}
-                    <i class="bi bi-chevron-down collapse-icon"></i>
-                </a>
-                <div class="collapse" id="${collapseId}">
-                    <ul class="nav flex-column submenu" id="submenu-${index}"></ul>
-                </div>
-            `;
-            
-            const submenuContainer = li.querySelector(`#submenu-${index}`);
-            item.submenu.forEach(sub => {
-                if (!hasAccess(sub.roles)) return;
-                
-                const subLi = document.createElement('li');
-                subLi.className = 'nav-item';
-                subLi.innerHTML = `<a class="nav-link" href="${sub.url}">${sub.title}</a>`;
-                submenuContainer.appendChild(subLi);
-            });
-        } else {
-            const activeClass = item.active ? 'active' : '';
-            li.innerHTML = `
-                <a class="nav-link ${activeClass}" href="${item.url}">
-                    <i class="${item.icon}"></i>${item.title}
-                </a>
-            `;
-        }
-        
-        container.appendChild(li);
-    });
-}
-
-// Event listener untuk role selector
-document.getElementById('roleSelector').addEventListener('change', (e) => {
-    currentRole = e.target.value;
-    let displayText = currentRole.replace('_', ' ').split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
-    document.getElementById('displayRole').textContent = displayText;
-    renderMenu();
-});
-
-// Initial render
-renderMenu();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
