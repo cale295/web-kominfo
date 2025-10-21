@@ -7,10 +7,22 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
+// routes untuk login dan register
+$routes->get('/', 'AuthController::index');
+$routes->get('/login', 'AuthController::index');
+$routes->post('/login', 'AuthController::login');
+$routes->get('/logout', 'AuthController::logout');
+
+//routes untuk dashboard
+$routes->get('/dashboard', 'DashboardController::index');
+
 // =========================================================
 // API GROUP - WAJIB DILINDUNGI DENGAN FILTER OTENTIKASI (JWT/Token)
 // =========================================================
-$routes->group('api', function($routes){
+$routes->group('api', function ($routes) {
+
+
+
     
     // --- 1. Rute Otentikasi/Login (Tidak perlu Filter Auth) ---
     // ASUMSI: Anda memiliki AuthController untuk login dan mendapatkan token

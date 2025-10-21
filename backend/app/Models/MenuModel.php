@@ -6,77 +6,85 @@ use CodeIgniter\Model;
 
 class MenuModel extends Model
 {
-    // ... (Properti Model lainnya, sudah benar) ...
-    protected $table          = 'm_menu';
-    protected $primaryKey     = 'id_menu'; // PK: id_menu
-    protected $returnType     = 'array';
-    protected $allowedFields  = ['menu_name', 'menu_url', 'menu_icon', 'order_number', 'parent_id']; // Parent ID: parent_id
+    // Properti Dasar Model
+    protected $table            = 'm_menu';
+    protected $primaryKey       = 'id_menu'; // Kolom Primary Key
+    protected $returnType       = 'array';
+    protected $allowedFields    = ['menu_name', 'menu_url', 'menu_icon', 'order_number', 'parent_id', 'status']; 
+    
+    // Properti Lainnya (Disusun rapi)
+    protected $useTimestamps    = false;
+    protected $dateFormat       = 'datetime';
+    protected $createdField     = 'created_at';
+    protected $updatedField     = 'updated_at';
+    protected $deletedField     = 'deleted_at';
+    protected bool $allowEmptyInserts = false;
+    protected bool $updateOnlyChanged = true;
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+    protected $allowCallbacks       = true;
+    protected $beforeInsert         = [];
+    protected $afterInsert          = [];
+    protected $beforeUpdate         = [];
+    protected $afterUpdate          = [];
+    protected $beforeFind           = [];
+    protected $afterFind            = [];
+    protected $beforeDelete         = [];
+    protected $afterDelete          = [];
 
-    public function getallmenu(){
-        return $this->orderBy('parent_id','asc')->orderBy('order_number','asc')->findAll();
+
+    // =========================================================
+    // FUNGSI PENGAMBIL DATA
+    // =========================================================
+
+    public function getAllMenu()
+    {
+        // Mengambil semua data, diurutkan untuk membantu rekursi
+        return $this->orderBy('parent_id', 'ASC')
+                    ->orderBy('order_number', 'ASC')
+                    ->findAll();
     }
 
+    // =========================================================
+    // FUNGSI REKURSIF PEMBANGUN POHON
+    // =========================================================
+
     /**
-     * Fungsi yang sudah diperbaiki
-     * @param array $elements 
-     * @param int $parent_id
-     * @return array
+     * Mengubah daftar menu datar menjadi struktur hierarki (Tree Structure).
+     * @param array $elements Daftar menu datar.
+     * @param int|string $parentId ID Induk awal (0 atau "0").
+     * @return array Struktur menu berjenjang.
      */
     public function buildTree(array $elements, $parentId = 0) 
     {
         $branch = [];
 
+        // Konversi parentId awal ke string jika data dari DB berupa string (misalnya "0")
+        $targetParentId = (string)$parentId; 
+        
         foreach ($elements as $element) {
-            // TIDAK PERLU lagi casting (array)$element karena returnType sudah di set 'array'
-            // $element = (array)$element; 
             
-            // Perbaikan 1: Menggunakan 'parent_id' (sesuai allowedFields)
-            // Cek apakah item ini adalah anak dari parentId yang dicari
-            if ($element['parent_id'] == $parentId) { 
+            // Perbaikan Kritis: Gunakan perbandingan non-strict (==) atau 
+            // pastikan tipe datanya sama. Karena DB mengembalikan ID sebagai string, 
+            // kita bandingkan dengan string.
+            if ($element['parent_id'] == $targetParentId) { 
                 
-                // Perbaikan 2: Menggunakan 'id_menu' (sesuai primaryKey)
                 // Cari anak-anak item ini secara rekursif
+                // Menggunakan 'id_menu' sebagai Parent ID baru
                 $children = $this->buildTree($elements, $element['id_menu']);
                 
                 if ($children) {
-                    $element['children'] = $children;
+                    // Perbaikan: Ganti 'children' menjadi 'sub_menu' (lebih deskriptif)
+                    // Anda harus memastikan nama key ini ('sub_menu') yang digunakan di React
+                    $element['sub_menu'] = $children;
                 }
+                
                 $branch[] = $element;
             }
         }
 
         return $branch;
-    
-
-    // ... (Properti Model lainnya) ...
-}
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
-
-    protected array $casts = [];
-    protected array $castHandlers = [];
-
-    // Dates
-    protected $useTimestamps = false;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
-
-    // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
-
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
+    }
 }

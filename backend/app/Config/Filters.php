@@ -18,6 +18,8 @@ class Filters extends BaseFilters
         'csrf'          => CSRF::class,
         'toolbar'       => DebugToolbar::class,
         'honeypot'      => Honeypot::class,
+        'roleauth'      => \App\Filters\RoleAuthFilter::class,
+        'auth' => \App\Filters\AuthFilter::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
         'cors'          => \App\Filters\Cors::class, // pastikan file Cors.php ada di App\Filters
