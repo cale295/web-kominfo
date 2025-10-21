@@ -1,118 +1,64 @@
 <?php
 
-namespace App\Controllers;
-
-use App\Controllers\BaseController;
+namespace App\Controllers\Api;
+use CodeIgniter\RESTful\ResourceController;
+//untuk mengambil data
 use App\Models\UserModel;
-
-class UserController extends BaseController
+class UserController extends ResourceController
 {
-    protected $userModel;
 
-    public function __construct()
-    {
-        $this->userModel = new UserModel();
-    }
-
-    // ========================================================
-    // GET /user → tampilkan semua user
-    // ========================================================
+    protected $modelName = UserModel::class;
+    protected $format = 'json';
     public function index()
     {
-        $data['users'] = $this->userModel->findAll();
-        return view('pages/user/index', $data);
+        return $this->respond($this->model->findAll());
+
     }
 
-    // ========================================================
-    // GET /user/new → tampilkan form tambah user
-    // ========================================================
-    public function new()
-    {
-        return view('pages/user/create');
-    }
-
-    // ========================================================
-    // POST /user → simpan user baru
-    // ========================================================
-    public function create()
-    {
-        $data = [
-            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
-            'username'     => $this->request->getPost('username'),
-            'password'     => $this->request->getPost('password'),
-            'email'        => $this->request->getPost('email'),
-            'role'         => $this->request->getPost('role'),
-        ];
-
-        if (!$this->userModel->insert($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
-        }
-
-        return redirect()->to('/user')->with('success', 'User berhasil ditambahkan.');
-    }
-
-    // ========================================================
-    // GET /user/{id} → detail user
-    // ========================================================
+    //untuk show
     public function show($id = null)
     {
-        $data['user'] = $this->userModel->find($id);
+        $user = $this->model->find($id);
 
-        if (!$data['user']) {
-            return redirect()->to('/user')->with('error', 'User tidak ditemukan.');
+        if (!$user) {
+            return $this->failNotFound('User tidak ditemukan');
         }
 
-        return view('pages/user/show', $data);
+        return $this->respond($user);
     }
 
-    // ========================================================
-    // GET /user/{id}/edit → form edit user
-    // ========================================================
-    public function edit($id = null)
+    public function create()
     {
-        $data['user'] = $this->userModel->find($id);
+        $json = $this->request->getBody();
+        $data = json_decode($json, true) ?? [];
 
-        if (!$data['user']) {
-            return redirect()->to('/user')->with('error', 'User tidak ditemukan.');
+        if ($this->model->insert($data) === false) {
+            return $this->fail($this->model->errors(), 400);
         }
 
-        return view('pages/user/edit', $data);
+        return $this->respondCreated($data, 'berhasil ditambahkan');
+
     }
 
-    // ========================================================
-    // PUT /user/{id} → update user
-    // ========================================================
     public function update($id = null)
     {
-        $data = [
-            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
-            'username'     => $this->request->getPost('username'),
-            'email'        => $this->request->getPost('email'),
-            'role'         => $this->request->getPost('role'),
-        ];
+        $json = $this->request->getBody();
+        $data = json_decode($json, true) ?? [];
 
-        $password = $this->request->getPost('password');
-        if (!empty($password)) {
-            $data['password'] = $password;
+        if (!$this->model->update($id, $data)) {
+            return $this->fail($this->model->errors(), 400);
         }
 
-        if (!$this->userModel->update($id, $data)) {
-            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
-        }
-
-        return redirect()->to('/user')->with('success', 'User berhasil diperbarui.');
+        return $this->respondUpdated($data);
     }
 
-    // ========================================================
-    // DELETE /user/{id} → hapus user
-    // ========================================================
     public function delete($id = null)
     {
-        if (!$this->userModel->find($id)) {
-            return redirect()->to('/user')->with('error', 'User tidak ditemukan.');
+        if (!$this->model->find($id)) {
+            return $this->failNotFound('User dengan id ' . $id . 'tidak ditemukan');
         }
 
-        $this->userModel->delete($id);
-        return redirect()->to('/user')->with('success', 'User berhasil dihapus.');
+        $this->model->delete($id);
+        return $this->respondDeleted(['id' => $id, 'message' => 'berhasil dihapus']);
     }
 }
