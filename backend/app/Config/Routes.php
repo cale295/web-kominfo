@@ -13,6 +13,10 @@ $routes->get('/login', 'AuthController::index');
 $routes->post('/login', 'AuthController::login');
 $routes->get('/logout', 'AuthController::logout');
 
+// routes untuk user
+$routes->resource('user');
+
+
 //routes untuk dashboard
 $routes->get('/dashboard', 'DashboardController::index');
 
