@@ -11,13 +11,40 @@
             overflow-x: hidden;
         }
         .sidebar {
-            min-height: 100vh;
+            width: 250px;
+            height: 100vh;
             background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 20px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: calc(100vh - 140px);
+        }
+        .sidebar-scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar-scrollable-content::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        .sidebar-scrollable-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        .sidebar-scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
         }
         .sidebar .nav-link {
             color: rgba(255,255,255,0.8);
@@ -25,6 +52,7 @@
             border-radius: 8px;
             margin: 4px 8px;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         .sidebar .nav-link:hover {
             background: rgba(255,255,255,0.1);
@@ -64,10 +92,13 @@
             padding: 20px;
         }
         .logout-btn {
-            position: absolute;
-            bottom: 20px;
-            width: calc(100% - 20px);
-            left: 10px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 250px;
+            background: linear-gradient(180deg, transparent 0%, rgba(30, 60, 114, 0.95) 30%, rgba(30, 60, 114, 1) 100%);
+            padding: 15px 10px 20px;
+            z-index: 10;
         }
         .role-selector {
             background: rgba(255,255,255,0.1);
@@ -100,19 +131,21 @@
                 <small class="text-white-50" id="userName">Administrator</small>
             </div>
 
-            <!-- Role Selector (untuk demo) -->
-            <div class="role-selector">
-                <label class="text-white-50 small">Test Role:</label>
-                <select class="form-select form-select-sm" id="roleSelector">
-                    <option value="admin">Admin</option>
-                    <option value="editor">Editor</option>
-                    <option value="user">User</option>
-                </select>
+            <div class="sidebar-scrollable-content">
+                <!-- Role Selector (untuk demo) -->
+                <div class="role-selector">
+                    <label class="text-white-50 small">Test Role:</label>
+                    <select class="form-select form-select-sm" id="roleSelector">
+                        <option value="super_admin">Super Admin</option>
+                        <option value="admin">Admin</option>
+                        <option value="editor">Editor</option>
+                    </select>
+                </div>
+                
+                <ul class="nav flex-column py-3" id="menuContainer">
+                    <!-- Menu akan di-generate oleh JavaScript -->
+                </ul>
             </div>
-            
-            <ul class="nav flex-column py-3" id="menuContainer">
-                <!-- Menu akan di-generate oleh JavaScript -->
-            </ul>
             
             <div class="logout-btn">
                 <a href="#" class="nav-link text-danger">
@@ -124,7 +157,7 @@
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10 main-content">
             <h2>Dashboard</h2>
-            <p class="text-muted">Selamat datang, <strong id="displayName">Administrator</strong> (Role: <span id="displayRole">Admin</span>)</p>
+            <p class="text-muted">Selamat datang, <strong id="displayName">Administrator</strong> (Role: <span id="displayRole">Super Admin</span>)</p>
             
             <div class="row mt-4">
                 <div class="col-md-3">
@@ -163,7 +196,7 @@
             
             <div class="alert alert-info mt-4">
                 <i class="bi bi-info-circle"></i> <strong>Info:</strong> 
-                Gunakan dropdown "Test Role" di sidebar untuk melihat perbedaan menu berdasarkan role (Admin/Editor/User).
+                Gunakan dropdown "Test Role" di sidebar untuk melihat perbedaan menu berdasarkan role (Super Admin/Admin/Editor).
             </div>
 
             <div class="card mt-4">
@@ -176,9 +209,9 @@
                             <thead>
                                 <tr>
                                     <th>Menu</th>
+                                    <th>Super Admin</th>
                                     <th>Admin</th>
                                     <th>Editor</th>
-                                    <th>User</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -192,16 +225,22 @@
                                     <td>Manajemen Berita</td>
                                     <td><i class="bi bi-check-circle-fill text-success"></i></td>
                                     <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-x-circle-fill text-danger"></i></td>
+                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
                                 </tr>
                                 <tr>
                                     <td>Kategori/Tema/Tag Berita</td>
                                     <td><i class="bi bi-check-circle-fill text-success"></i></td>
-                                    <td><i class="bi bi-x-circle-fill text-danger"></i></td>
+                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
                                     <td><i class="bi bi-x-circle-fill text-danger"></i></td>
                                 </tr>
                                 <tr>
                                     <td>Agenda & Galeri</td>
+                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                    <td><i class="bi bi-check-circle-fill text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>Layanan & Menu</td>
                                     <td><i class="bi bi-check-circle-fill text-success"></i></td>
                                     <td><i class="bi bi-check-circle-fill text-success"></i></td>
                                     <td><i class="bi bi-x-circle-fill text-danger"></i></td>
@@ -229,82 +268,82 @@ const menuItems = [
         title: 'Dashboard',
         icon: 'bi-speedometer2',
         url: '#dashboard',
-        roles: ['admin', 'editor', 'user'],
+        roles: ['super_admin', 'admin', 'editor'],
         active: true
     },
     {
         title: 'Manajemen Berita',
         icon: 'bi-newspaper',
-        roles: ['admin', 'editor'],
+        roles: ['super_admin', 'admin', 'editor'],
         submenu: [
-            { title: 'Daftar Berita', url: '#berita-list', roles: ['admin', 'editor'] },
-            { title: 'Tambah Berita', url: '#berita-add', roles: ['admin', 'editor'] },
-            { title: 'Kategori Berita', url: '#berita-kategori', roles: ['admin'] },
-            { title: 'Tema Berita', url: '#berita-tema', roles: ['admin'] },
-            { title: 'Tag Berita', url: '#berita-tag', roles: ['admin'] },
-            { title: 'Berita Utama', url: '#berita-featured', roles: ['admin', 'editor'] }
+            { title: 'Daftar Berita', url: '#berita-list', roles: ['super_admin', 'admin', 'editor'] },
+            { title: 'Tambah Berita', url: '#berita-add', roles: ['super_admin', 'admin', 'editor'] },
+            { title: 'Kategori Berita', url: '#berita-kategori', roles: ['super_admin', 'admin'] },
+            { title: 'Tema Berita', url: '#berita-tema', roles: ['super_admin', 'admin'] },
+            { title: 'Tag Berita', url: '#berita-tag', roles: ['super_admin', 'admin'] },
+            { title: 'Berita Utama', url: '#berita-featured', roles: ['super_admin', 'admin', 'editor'] }
         ]
     },
     {
         title: 'Agenda Kegiatan',
         icon: 'bi-calendar-event',
-        roles: ['admin', 'editor'],
+        roles: ['super_admin', 'admin', 'editor'],
         submenu: [
-            { title: 'Daftar Agenda', url: '#agenda-list', roles: ['admin', 'editor'] },
-            { title: 'Tambah Agenda', url: '#agenda-add', roles: ['admin', 'editor'] },
-            { title: 'Kalender', url: '#agenda-calendar', roles: ['admin', 'editor'] }
+            { title: 'Daftar Agenda', url: '#agenda-list', roles: ['super_admin', 'admin', 'editor'] },
+            { title: 'Tambah Agenda', url: '#agenda-add', roles: ['super_admin', 'admin', 'editor'] },
+            { title: 'Kalender', url: '#agenda-calendar', roles: ['super_admin', 'admin', 'editor'] }
         ]
     },
     {
         title: 'Galeri',
         icon: 'bi-images',
-        roles: ['admin', 'editor'],
+        roles: ['super_admin', 'admin', 'editor'],
         submenu: [
-            { title: 'Album Foto', url: '#galeri-album', roles: ['admin', 'editor'] },
-            { title: 'Foto Galeri', url: '#galeri-foto', roles: ['admin', 'editor'] },
-            { title: 'Upload Foto', url: '#galeri-upload', roles: ['admin', 'editor'] }
+            { title: 'Album Foto', url: '#galeri-album', roles: ['super_admin', 'admin', 'editor'] },
+            { title: 'Foto Galeri', url: '#galeri-foto', roles: ['super_admin', 'admin', 'editor'] },
+            { title: 'Upload Foto', url: '#galeri-upload', roles: ['super_admin', 'admin', 'editor'] }
         ]
     },
     {
         title: 'Dokumen',
         icon: 'bi-file-earmark-text',
-        roles: ['admin', 'editor'],
+        roles: ['super_admin', 'admin', 'editor'],
         submenu: [
-            { title: 'Daftar Dokumen', url: '#dokumen-list', roles: ['admin', 'editor'] },
-            { title: 'Kategori Dokumen', url: '#dokumen-kategori', roles: ['admin'] },
-            { title: 'Upload Dokumen', url: '#dokumen-upload', roles: ['admin', 'editor'] }
+            { title: 'Daftar Dokumen', url: '#dokumen-list', roles: ['super_admin', 'admin', 'editor'] },
+            { title: 'Kategori Dokumen', url: '#dokumen-kategori', roles: ['super_admin', 'admin'] },
+            { title: 'Upload Dokumen', url: '#dokumen-upload', roles: ['super_admin', 'admin', 'editor'] }
         ]
     },
     {
         title: 'Layanan',
         icon: 'bi-gear',
         url: '#layanan',
-        roles: ['admin']
+        roles: ['super_admin', 'admin']
     },
     {
         title: 'Pengaturan Menu',
         icon: 'bi-menu-button-wide',
         url: '#menu',
-        roles: ['admin']
+        roles: ['super_admin', 'admin']
     },
     {
         title: 'Pengguna & Akses',
         icon: 'bi-people',
-        roles: ['admin'],
+        roles: ['super_admin'],
         submenu: [
-            { title: 'Manajemen User', url: '#user-list', roles: ['admin'] },
-            { title: 'Hak Akses', url: '#user-access', roles: ['admin'] }
+            { title: 'Manajemen User', url: '#user-list', roles: ['super_admin'] },
+            { title: 'Hak Akses', url: '#user-access', roles: ['super_admin'] }
         ]
     },
     {
         title: 'Pengaturan',
         icon: 'bi-sliders',
         url: '#settings',
-        roles: ['admin']
+        roles: ['super_admin', 'admin']
     }
 ];
 
-let currentRole = 'admin';
+let currentRole = 'super_admin';
 
 // Fungsi untuk cek akses
 function hasAccess(roles) {
@@ -359,7 +398,10 @@ function renderMenu() {
 // Event listener untuk role selector
 document.getElementById('roleSelector').addEventListener('change', (e) => {
     currentRole = e.target.value;
-    document.getElementById('displayRole').textContent = currentRole.charAt(0).toUpperCase() + currentRole.slice(1);
+    let displayText = currentRole.replace('_', ' ').split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+    document.getElementById('displayRole').textContent = displayText;
     renderMenu();
 });
 
