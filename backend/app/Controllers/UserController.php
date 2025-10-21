@@ -15,24 +15,24 @@ class UserController extends BaseController
     }
 
     // ========================================================
-    // GET /user → tampilkan semua user
+    // GET /manage_user → tampilkan semua user
     // ========================================================
     public function index()
     {
         $data['users'] = $this->userModel->findAll();
-        return view('pages/user/index', $data);
+        return view('pages/manage_user/index', $data);
     }
 
     // ========================================================
-    // GET /user/new → tampilkan form tambah user
+    // GET /manage_user/new → tampilkan form tambah user
     // ========================================================
     public function new()
     {
-        return view('pages/user/create');
+        return view('pages/manage_user/create');
     }
 
     // ========================================================
-    // POST /user → simpan user baru
+    // POST /manage_user → simpan user baru
     // ========================================================
     public function create()
     {
@@ -48,39 +48,39 @@ class UserController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
         }
 
-        return redirect()->to('/user')->with('success', 'User berhasil ditambahkan.');
+        return redirect()->to('/manage_user')->with('success', 'User berhasil ditambahkan.');
     }
 
     // ========================================================
-    // GET /user/{id} → detail user
+    // GET /manage_user/{id} → detail user
     // ========================================================
     public function show($id = null)
     {
         $data['user'] = $this->userModel->find($id);
 
         if (!$data['user']) {
-            return redirect()->to('/user')->with('error', 'User tidak ditemukan.');
+            return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
         }
 
-        return view('pages/user/show', $data);
+        return view('pages/manage_user/show', $data);
     }
 
     // ========================================================
-    // GET /user/{id}/edit → form edit user
+    // GET /manage_user/{id}/edit → form edit user
     // ========================================================
     public function edit($id = null)
     {
         $data['user'] = $this->userModel->find($id);
 
         if (!$data['user']) {
-            return redirect()->to('/user')->with('error', 'User tidak ditemukan.');
+            return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
         }
 
-        return view('pages/user/edit', $data);
+        return view('pages/manage_user/edit', $data);
     }
 
     // ========================================================
-    // PUT /user/{id} → update user
+    // PUT /manage_user/{id} → update user
     // ========================================================
     public function update($id = null)
     {
@@ -100,19 +100,19 @@ class UserController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
         }
 
-        return redirect()->to('/user')->with('success', 'User berhasil diperbarui.');
+        return redirect()->to('/manage_user')->with('success', 'User berhasil diperbarui.');
     }
 
     // ========================================================
-    // DELETE /user/{id} → hapus user
+    // DELETE /manage_user/{id} → hapus user
     // ========================================================
     public function delete($id = null)
     {
         if (!$this->userModel->find($id)) {
-            return redirect()->to('/user')->with('error', 'User tidak ditemukan.');
+            return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
         }
 
         $this->userModel->delete($id);
-        return redirect()->to('/user')->with('success', 'User berhasil dihapus.');
+        return redirect()->to('/manage_user')->with('success', 'User berhasil dihapus.');
     }
 }
