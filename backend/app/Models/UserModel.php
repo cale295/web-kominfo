@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table            = 'm_user';
+    protected $table            = 'm_users';
     protected $primaryKey       = 'id_user';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nama_lengkap', 'username', 'password', 'email', 'role'];
+    protected $allowedFields    = ['full_name', 'username', 'password', 'email', 'role'];
 
     // Tambahan opsional
     protected bool $allowEmptyInserts = false;
@@ -27,14 +27,14 @@ class UserModel extends Model
 
     // Validation rules
     protected $validationRules = [
-        'nama_lengkap' => 'required|min_length[3]|max_length[100]',
+        'full_name' => 'required|min_length[3]|max_length[100]',
         'username'     => 'required|min_length[3]|max_length[50]',
         'password'     => 'required|min_length[8]|max_length[255]',
         'email'        => 'required|min_length[6]|max_length[255]|valid_email|is_unique[m_user.email]',
     ];
 
     protected $validationMessages = [
-        'nama_lengkap' => [
+        'full_name' => [
             'required'   => 'Nama lengkap harus diisi.',
             'min_length' => 'Nama lengkap minimal 3 karakter.',
             'max_length' => 'Nama lengkap maksimal 100 karakter.',

@@ -39,7 +39,7 @@ class AuthController extends Controller
             if (password_verify($password, $user['password'])) {
                 $sessionData = [
                     'id_user'      => $user['id_user'],
-                    'nama_lengkap' => $user['nama_lengkap'],
+                    'full_name' => $user['full_name'],
                     'username'     => $user['username'],
                     'email'        => $user['email'],
                     'role'         => $user['role'],

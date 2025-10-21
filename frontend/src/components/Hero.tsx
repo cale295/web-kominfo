@@ -4,13 +4,13 @@ import { Search, Accessibility } from "lucide-react";
 const HeroSection: React.FC = () => {
   return (
     <div className="bg-gray-50 py-4">
-      <header className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 py-6 md:px-6">
-        <button className="w-full md:w-auto flex items-center justify-center gap-2 bg-yellow-400 text-blue-800 font-semibold px-5 py-3 rounded-full shadow hover:bg-yellow-300 transition">
+      <header className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6 ">
+        <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-yellow-400 text-blue-800 font-semibold px-5 py-3 rounded-4xl sm:rounded-r-full shadow hover:bg-yellow-300 transition">
           <Accessibility className="w-6 h-6" />
           <span>DISABILITAS</span>
         </button>
 
-        <div className="flex items-center gap-2 w-full md:w-auto md:max-w-sm">
+        <div className="flex items-center gap-2 w-full md:w-auto md:max-w-sm px-4">
           <div className="flex-grow flex items-center bg-white rounded-full border-2 border-blue-800 px-4 py-2">
             <input 
               type="text"
