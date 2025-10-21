@@ -11,29 +11,40 @@ class BeritaModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
 
-    // Aktifkan Timestamps agar created_at dan updated_at terisi otomatis
-    protected $useTimestamps    = true; 
-    protected $dateFormat       = 'datetime';
-    protected $createdField     = 'created_at';
-    protected $updatedField     = 'updated_at';
-    protected $deletedField     = 'deleted_at'; // Hanya jika useSoftDeletes diaktifkan
-
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    
-    protected $allowedFields    = ['id_kategori', 'id_pengguna', 'judul', 'slug', 'isi', 'gambar', 'status', 'jumlah_pembaca'];
 
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
+    // Kolom yang boleh diisi (disamakan dengan struktur tabel)
+    protected $allowedFields    = [
+        'id_tema',
+        'judul',
+        'isi_berita',
+        'id_kategori',
+        'id_user',
+        'tanggal_publikasi',
+        'status',
+        'jumlah_pembaca',
+        'berita_sisipan',
+        'written_by',
+        'sumber',
+        'id_tag',
+        'featured_image',
+        'galeri_foto'
+    ];
 
-    // Tambahkan Aturan Validasi untuk kolom wajib (Wajib!)
+    protected $useTimestamps    = false; // Tidak ada kolom created_at/updated_at
+    protected $dateFormat       = 'datetime';
+
+    // Validasi dasar
     protected $validationRules = [
-        'id_kategori'   => 'required|integer',
-        'id_pengguna'   => 'required|integer',
-        'judul'         => 'required|min_length[5]|max_length[255]',
-        'slug'          => 'required|is_unique[tabel_berita.slug,id_berita,{id_berita}]', // Cek unik saat buat/edit
-        'isi'           => 'required',
-        'status'        => 'required|in_list[draft,published,archived]',
+        'judul'             => 'required|min_length[5]|max_length[255]',
+        'isi_berita'        => 'required',
+        'status'            => 'required|in_list[Publish,Draf,Unpublished]',
+        'id_user'           => 'required|integer',
+        'id_kategori'       => 'permit_empty|integer',
+        'id_tema'           => 'permit_empty|integer',
+        'id_tag'            => 'permit_empty|integer',
+        'jumlah_pembaca'    => 'permit_empty|integer',
     ];
 
     protected $validationMessages = [
@@ -41,19 +52,16 @@ class BeritaModel extends Model
             'required' => 'Judul berita wajib diisi.',
             'min_length' => 'Judul minimal 5 karakter.',
         ],
-        'slug' => [
-            'required' => 'Slug wajib diisi.',
-            'is_unique' => 'Slug sudah digunakan, coba ubah sedikit.',
+        'isi_berita' => [
+            'required' => 'Isi berita wajib diisi.',
         ],
-        'id_kategori' => [
-            'required' => 'Kategori wajib dipilih.',
+        'status' => [
+            'required' => 'Status wajib diisi (Publish / Draf / Unpublished).',
+            'in_list' => 'Status tidak valid.',
         ],
-        
     ];
 
-    // Sisanya biarkan default
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
-    protected $allowCallbacks       = true;
-
+    protected bool $skipValidation       = false;
+    protected bool $cleanValidationRules = true;
 }
+

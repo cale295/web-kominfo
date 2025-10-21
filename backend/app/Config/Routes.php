@@ -5,55 +5,45 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
 
-// routes untuk login dan register
 $routes->get('/', 'AuthController::index');
+
+// Login & Logout
 $routes->get('/login', 'AuthController::index');
 $routes->post('/login', 'AuthController::login');
 $routes->get('/logout', 'AuthController::logout');
 
-// routes untuk user
-$routes->resource('user');
-
-
-//routes untuk dashboard
+// Dashboard
 $routes->get('/dashboard', 'DashboardController::index');
 
+// Resource Web (non-API)
+$routes->resource('user', ['controller' => 'UserController']);
+$routes->resource('berita', ['controller' => 'BeritaController']);
+
 // =========================================================
-// API GROUP - WAJIB DILINDUNGI DENGAN FILTER OTENTIKASI (JWT/Token)
+// API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
 
-
-
-    
-    // --- 1. Rute Otentikasi/Login (Tidak perlu Filter Auth) ---
-    // ASUMSI: Anda memiliki AuthController untuk login dan mendapatkan token
+    // Auth
     $routes->post('login', 'Api\AuthController::login');
-    $routes->post('register', 'Api\AuthController::register'); // Jika ada
-    
-    // --- 2. Rute Pengambilan Izin Pengguna (Perlu Filter Auth) ---
-    // Rute ini dipanggil frontend untuk mengontrol tampilan menu/tombol
-    // Asumsi: Method getUserPermissions ada di AuthController atau UserController
-    $routes->get('user/permissions', 'Api\AuthController::getUserPermissions'); 
+    $routes->post('register', 'Api\AuthController::register');
 
+    // User Permissions
+    $routes->get('user/permissions', 'Api\AuthController::getUserPermissions');
 
-    // --- 3. Rute CRUD Resource (Wajib Dilindungi dengan Filter Auth dan Filter Hak Akses) ---
-    // Di sini, ResourceController Anda harus mewarisi dari BaseApiController
-    $routes->resource('users', ['controller' => 'Api\UserControl']);
+    // CRUD Resources
+    $routes->resource('users', ['controller' => 'Api\UserController']);
     $routes->resource('kategori_berita', ['controller' => 'Api\KategoriBeritaController']);
     $routes->resource('berita', ['controller' => 'Api\BeritaController']);
-    $routes->resource('galeri_foto', ['controller' => 'Api\GaleriFotoControll']);
-    $routes->resource('menu', ['controller' => 'Api\MenuContoller']);
-    
-    
-    // --- 4. Rute Administrasi Hak Akses (Hanya untuk Superadmin) ---
-    // Kita asumsikan Controller ini ada di folder Admin dan diakses oleh Superadmin
+    $routes->resource('galeri_foto', ['controller' => 'Api\GaleriFotoController']);
+    $routes->resource('menu', ['controller' => 'Api\MenuController']);
+
+    // Admin
     $routes->group('admin', function($routes) {
         $routes->resource('hak_akses', ['controller' => 'Api\Admin\HakAksesController']);
     });
-    
-    // Rute OPTIONS (Jika diperlukan untuk CORS)
+
+    // CORS options
     $routes->options('(:any)', 'Home::option');
 });

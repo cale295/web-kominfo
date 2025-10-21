@@ -7,7 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\MenuModel;
 
-class MenuContoller extends ResourceController
+class MenuController extends ResourceController
 {
     protected $menuModel;
 
