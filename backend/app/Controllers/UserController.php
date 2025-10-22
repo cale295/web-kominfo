@@ -24,9 +24,9 @@ public function index()
 
     // Hitung total per role
     $totalUsers = count($users);
-    $admin = $this->userModel->where('role', 'superadmin')->countAllResults();
-    $editor = $this->userModel->where('role', 'admin')->countAllResults();
-    $user = $this->userModel->where('role', 'editor')->countAllResults();
+    $admin = $this->userModel->where('role', 'admin')->countAllResults();
+    $editor = $this->userModel->where('role', 'editor')->countAllResults();
+    $superadmin = $this->userModel->where('role', 'superadmin')->countAllResults();
 
     // Kirim ke view
     $data = [
@@ -35,7 +35,7 @@ public function index()
         'totalUsers' => $totalUsers,
         'admin' => $admin,
         'editor' => $editor,
-        'user' => $user
+        'superadmin' => $superadmin
     ];
 
     // Tampilkan ke halaman index

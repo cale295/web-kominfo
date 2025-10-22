@@ -105,8 +105,8 @@
             <div class="stats-card card bg-danger text-white">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1">Admin</h6>
-                        <h2 class="mb-0"><?= $admin ?></h2>
+                        <h6 class="mb-1">superadmin</h6>
+                        <h2 class="mb-0"><?= $superadmin ?></h2>
                     </div>
                     <i class="bi bi-shield-fill-check" style="font-size:2.5rem;opacity:.8;"></i>
                 </div>
@@ -116,8 +116,8 @@
             <div class="stats-card card bg-info text-white">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1">Editor</h6>
-                        <h2 class="mb-0"><?= $editor ?></h2>
+                        <h6 class="mb-1">admin</h6>
+                        <h2 class="mb-0"><?= $admin ?></h2>
                     </div>
                     <i class="bi bi-person-badge" style="font-size:2.5rem;opacity:.8;"></i>
                 </div>
@@ -127,8 +127,8 @@
             <div class="stats-card card bg-success text-white">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1">User</h6>
-                        <h2 class="mb-0"><?= $user ?></h2>
+                        <h6 class="mb-1">editor</h6>
+                        <h2 class="mb-0"><?= $editor ?></h2>
                     </div>
                     <i class="bi bi-pencil-square" style="font-size:2.5rem;opacity:.8;"></i>
                 </div>
