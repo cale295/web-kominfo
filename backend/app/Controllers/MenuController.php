@@ -120,25 +120,34 @@ class MenuController extends BaseController
     // GET /menu/{id}/edit → form edit menu
     // ========================================================
     public function edit($id = null)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin mengedit menu.');
-        }
-
-        $menu = $this->menuModel->find($id);
-        if (!$menu) {
-            return redirect()->to('/menu')->with('error', 'Menu tidak ditemukan.');
-        }
-
-        $data = [
-            'title' => 'Edit Menu',
-            'menu'  => $menu,
-        ];
-
-        return view('admin/menu/edit', $data);
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin mengedit menu.');
     }
 
+    if (empty($id)) {
+        return redirect()->to('/menu')->with('error', 'ID menu tidak valid.');
+    }
+
+    // Coba dengan where dulu untuk debugging
+    $menu = $this->menuModel->where('id', $id)->first();
+    
+    if (!$menu) {
+        // Cek apakah ada data di tabel
+        $count = $this->menuModel->countAll();
+        log_message('debug', "Total menu di database: $count");
+        
+        return redirect()->to('/menu')->with('error', 'Menu tidak ditemukan.');
+    }
+
+    $data = [
+        'title' => 'Edit Menu',
+        'menu'  => $menu,
+    ];
+
+    return view('pages/menu/edit', $data);
+}
     // ========================================================
     // PUT /menu/{id} → update menu
     // ========================================================
