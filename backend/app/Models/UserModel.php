@@ -87,4 +87,17 @@ protected $validationMessages = [
         }
         return $data;
     }
+
+    protected function beforeUpdate(array $data)
+{
+    $id = $data['id'][0] ?? null;
+
+    // Hilangkan is_unique saat update
+    if ($id) {
+        $this->validationRules['email'] = 'required|min_length[6]|max_length[255]|valid_email|is_unique[m_users.email,id_user,'.$id.']';
+    }
+
+    return $data;
+}
+
 }
