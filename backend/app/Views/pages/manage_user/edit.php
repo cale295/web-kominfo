@@ -139,9 +139,15 @@
                 <select name="role" id="role"
                     class="form-select <?= session('errors.role') ? 'is-invalid' : '' ?>" required>
                     <option value="">-- Pilih Role --</option>
+<<<<<<< HEAD
                     <option value="superadmin" <?= old('role', $user['role']) === 'superadmin' ? 'selected' : '' ?>>Super Admin</option>
                     <option value="admin" <?= old('role', $user['role']) === 'admin' ? 'selected' : '' ?>>Admin</option>
                     <option value="editor" <?= old('role', $user['role']) === 'editor' ? 'selected' : '' ?>>Editor</option>
+=======
+                    <option value="superadmin" <?= old('role', $user['role']) == 'superadmin' ? 'selected' : '' ?>>Super Admin</option>
+                    <option value="admin" <?= old('role', $user['role']) == 'admin' ? 'selected' : '' ?>>Admin</option>
+                    <option value="editor" <?= old('role', $user['role']) == 'editor' ? 'selected' : '' ?>>Editor</option>
+>>>>>>> 3868209bfb9dae62ec7d459ed0aa07edd1f6bda2
                 </select>
                 <?php if (session('errors.role')): ?>
                     <div class="invalid-feedback"><?= session('errors.role') ?></div>
