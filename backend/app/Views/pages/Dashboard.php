@@ -1,21 +1,6 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Admin Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<?= $this->extend('layouts/main') ?>
+<?= $this->section('styles') ?>
     <style>
-        body {
-            overflow-x: hidden;
-            background-color: #f8f9fa;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 30px;
-            min-height: 100vh;
-        }
         .stats-card {
             border-radius: 12px;
             border: none;
@@ -50,30 +35,18 @@
             background-color: #cff4fc;
             border-radius: 8px;
         }
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-                padding: 15px;
-            }
-        }
     </style>
-</head>
-<body>
+<?= $this->endSection() ?>
 
-<div class="d-flex">
-    <!-- Include Sidebar -->
-    <?= view('components/sidebar') ?>
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h2 class="mb-2">Dashboard</h2>
-            <p class="text-muted mb-0">
-                Selamat datang, <strong><?= esc(session()->get('full_name')) ?></strong>! 
-                <span class="badge bg-primary ms-2"><?= ucfirst(str_replace('_', ' ', session()->get('role'))) ?></span>
-            </p>
-        </div>
+<?= $this->section('content') ?>
+<!-- Page Header -->
+<div class="page-header">
+    <h2 class="mb-2">Dashboard</h2>
+    <p class="text-muted mb-0">
+        Selamat datang, <strong><?= esc(session()->get('full_name')) ?></strong>! 
+        <span class="badge bg-primary ms-2"><?= ucfirst(str_replace('_', ' ', session()->get('role'))) ?></span>
+    </p>
+</div>
         
         <!-- Statistics Cards -->
         <div class="row mb-4">
@@ -261,7 +234,4 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+<?= $this->endSection() ?>

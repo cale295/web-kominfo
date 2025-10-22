@@ -12,91 +12,86 @@ $menuItems = [
         'title' => 'Dashboard',
         'icon' => 'bi-speedometer2',
         'url' => '/dashboard',
-        'roles' => ['Admin', 'Editor', 'User'] // Sesuai database
+        'roles' => ['superadmin', 'admin', 'editor']
     ],
     [
         'title' => 'Manajemen Berita',
         'icon' => 'bi-newspaper',
-        'roles' => ['Admin', 'Editor'],
+        'roles' => ['admin', 'editor'],
         'submenu' => [
-            ['title' => 'Daftar Berita', 'url' => '/berita', 'roles' => ['Admin', 'Editor']],
-            ['title' => 'Tambah Berita', 'url' => '/berita/create', 'roles' => ['Admin', 'Editor']],
-            ['title' => 'Kategori Berita', 'url' => '/berita/kategori', 'roles' => ['Admin']],
-            ['title' => 'Tema Berita', 'url' => '/berita/tema', 'roles' => ['Admin']],
-            ['title' => 'Tag Berita', 'url' => '/berita/tag', 'roles' => ['Admin']],
-            ['title' => 'Berita Utama', 'url' => '/berita/featured', 'roles' => ['Admin', 'Editor']]
+            ['title' => 'Daftar Berita', 'url' => '/berita', 'roles' => ['admin', 'editor']],
+            ['title' => 'Tambah Berita', 'url' => '/berita/create', 'roles' => ['admin', 'editor']],
+            ['title' => 'Kategori Berita', 'url' => '/berita/kategori', 'roles' => ['admin']],
+            ['title' => 'Tema Berita', 'url' => '/berita/tema', 'roles' => ['admin']],
+            ['title' => 'Tag Berita', 'url' => '/berita/tag', 'roles' => ['admin']],
+            ['title' => 'Berita Utama', 'url' => '/berita/featured', 'roles' => ['admin', 'editor']]
         ]
     ],
     [
         'title' => 'Agenda Kegiatan',
         'icon' => 'bi-calendar-event',
-        'roles' => ['Admin', 'Editor'],
+        'roles' => ['admin', 'editor'],
         'submenu' => [
-            ['title' => 'Daftar Agenda', 'url' => '/agenda', 'roles' => ['Admin', 'Editor']],
-            ['title' => 'Tambah Agenda', 'url' => '/agenda/create', 'roles' => ['Admin', 'Editor']],
-            ['title' => 'Kalender', 'url' => '/agenda/calendar', 'roles' => ['Admin', 'Editor']]
+            ['title' => 'Daftar Agenda', 'url' => '/agenda', 'roles' => ['admin', 'editor']],
+            ['title' => 'Tambah Agenda', 'url' => '/agenda/create', 'roles' => ['admin', 'editor']],
+            ['title' => 'Kalender', 'url' => '/agenda/calendar', 'roles' => ['admin', 'editor']]
         ]
     ],
     [
         'title' => 'Galeri',
         'icon' => 'bi-images',
-        'roles' => ['Admin', 'Editor'],
+        'roles' => ['admin', 'editor'],
         'submenu' => [
-            ['title' => 'Album Foto', 'url' => '/galeri/album', 'roles' => ['Admin', 'Editor']],
-            ['title' => 'Foto Galeri', 'url' => '/galeri/foto', 'roles' => ['Admin', 'Editor']],
-            ['title' => 'Upload Foto', 'url' => '/galeri/upload', 'roles' => ['Admin', 'Editor']]
+            ['title' => 'Album Foto', 'url' => '/galeri/album', 'roles' => ['admin', 'editor']],
+            ['title' => 'Foto Galeri', 'url' => '/galeri/foto', 'roles' => ['admin', 'editor']],
+            ['title' => 'Upload Foto', 'url' => '/galeri/upload', 'roles' => ['admin', 'editor']]
         ]
     ],
     [
         'title' => 'Dokumen',
         'icon' => 'bi-file-earmark-text',
-        'roles' => ['Admin', 'Editor'],
+        'roles' => ['admin', 'editor'],
         'submenu' => [
-            ['title' => 'Daftar Dokumen', 'url' => '/dokumen', 'roles' => ['Admin', 'Editor']],
-            ['title' => 'Kategori Dokumen', 'url' => '/dokumen/kategori', 'roles' => ['Admin']],
-            ['title' => 'Upload Dokumen', 'url' => '/dokumen/upload', 'roles' => ['Admin', 'Editor']]
+            ['title' => 'Daftar Dokumen', 'url' => '/dokumen', 'roles' => ['admin', 'editor']],
+            ['title' => 'Kategori Dokumen', 'url' => '/dokumen/kategori', 'roles' => ['admin']],
+            ['title' => 'Upload Dokumen', 'url' => '/dokumen/upload', 'roles' => ['admin', 'editor']]
         ]
     ],
     [
         'title' => 'Layanan',
         'icon' => 'bi-gear',
         'url' => '/layanan',
-        'roles' => ['Admin']
+        'roles' => ['admin']
     ],
     [
         'title' => 'Pengaturan Menu',
         'icon' => 'bi-menu-button-wide',
         'url' => '/menu',
-        'roles' => ['Admin']
+        'roles' => ['superadmin']
     ],
     [
         'title' => 'Pengguna & Akses',
         'icon' => 'bi-people',
-        'roles' => ['Admin'],
+        'roles' => ['superadmin'],
         'submenu' => [
-            ['title' => 'Manajemen User', 'url' => '/users', 'roles' => ['Admin']],
-            ['title' => 'Hak Akses', 'url' => '/users/access', 'roles' => ['Admin']]
+            ['title' => 'Manajemen User', 'url' => '/manage_user', 'roles' => ['superadmin']],
+            ['title' => 'Hak Akses', 'url' => '/manage_user/access', 'roles' => ['superadmin']]
         ]
-    ],
-    [
-        'title' => 'Artikel Saya',
-        'icon' => 'bi-file-earmark-text',
-        'url' => '/my-posts',
-        'roles' => ['User']
     ],
     [
         'title' => 'Pengaturan',
         'icon' => 'bi-sliders',
         'url' => '/settings',
-        'roles' => ['Admin']
+        'roles' => ['superadmin', 'admin']
     ],
     [
         'title' => 'Profil',
         'icon' => 'bi-person',
         'url' => '/profile',
-        'roles' => ['Admin', 'Editor', 'User']
+        'roles' => ['superadmin', 'admin', 'editor']
     ]
 ];
+
 
 // Get current URI for active menu
 $uri = service('uri');

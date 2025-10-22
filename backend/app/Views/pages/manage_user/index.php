@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen User</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<?= $this->extend('layouts/main') ?>
+<?= $this->section('styles') ?>
     <style>
         /* Reset & Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -81,8 +75,8 @@
         .rounded-circle{ border-radius:50% !important; }
         strong{ font-weight:600; }
     </style>
-</head>
-<body>
+<?= $this->endSection() ?>
+<?= $this->section('content') ?>
 <div class="container">
     <!-- Header -->
     <div class="row mb-4">
@@ -242,12 +236,4 @@
         </div>
     </div>
 </div>
-
-<!-- Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-<script>
-    // JS Ajax / Render Table Placeholder
-    
-</script>
-</body>
-</html>
+<?= $this->endSection() ?>
