@@ -139,7 +139,7 @@ public function edit($id = null)
     $menus = $this->menuModel->findAll(); // untuk dropdown parent
 =======
     if (empty($id)) {
-        return redirect()->to('/menu')->with('error', 'ID menu tidak valid.');
+        return redirect()->toy('/menu')->with('error', 'ID menu tidak valid.');
     }
 
     // Coba dengan where dulu untuk debugging
@@ -222,7 +222,10 @@ public function edit($id = null)
     // Toggle status aktif/nonaktif menu
     // ========================================================
     public function toggleStatus($id)
-{
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/menu')->with('error', 'Kamu tidak punya i{
     $menuModel = new MenuModel();
     $menu = $menuModel->find($id);
 
@@ -239,13 +242,7 @@ public function edit($id = null)
     ]);
 }
 
-
-    // ========================================================
-    // Fungsi bantu untuk ambil akses role
-    // ========================================================
-    private function getAccess($role)
-    {
-        $access = $this->accessRightsModel
+ = $this->accessRightsModel
             ->where('role', $role)
             ->where('module_name', $this->module)
             ->first();
