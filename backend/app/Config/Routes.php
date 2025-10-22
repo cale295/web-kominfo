@@ -21,12 +21,19 @@ $routes->resource('manage_user', ['controller' => 'UserController']);
 $routes->resource('berita', ['controller' => 'BeritaController']);
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
 
+//menu 
+$routes->resource('menu', ['controller' => 'MenuController']);
+$routes->get('menu/toggleStatus/(:num)', 'MenuController::toggleStatus/$1');
+$routes->post('menu/toggleStatus/(:num)', 'MenuController::toggleStatus/$1');
+
+
 // ===============================
 // ROUTE UNTUK MANAJEMEN HAK AKSES
 // ===============================
 $routes->get('access_rights', 'AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
 $routes->get('access_rights/edit/(:num)', 'AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
 $routes->put('access_rights/update/(:num)', 'AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
+
 
 
 
