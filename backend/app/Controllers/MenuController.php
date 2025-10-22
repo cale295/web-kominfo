@@ -191,22 +191,23 @@ class MenuController extends BaseController
     // Toggle status aktif/nonaktif menu
     // ========================================================
     public function toggleStatus($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin mengubah status menu.');
-        }
+{
+    $menuModel = new MenuModel();
+    $menu = $menuModel->find($id);
 
-        $menu = $this->menuModel->find($id);
-        if (!$menu) {
-            return redirect()->back()->with('error', 'Menu tidak ditemukan.');
-        }
-
-        $newStatus = ($menu['status'] === 'active') ? 'inactive' : 'active';
-        $this->menuModel->update($id, ['status' => $newStatus]);
-
-        return redirect()->back()->with('success', "Status menu '{$menu['menu_name']}' telah diubah menjadi {$newStatus}.");
+    if (!$menu) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Menu tidak ditemukan']);
     }
+
+    $newStatus = ($menu['status'] === 'active') ? 'inactive' : 'active';
+    $menuModel->update($id, ['status' => $newStatus]);
+
+    return $this->response->setJSON([
+        'success' => true,
+        'newStatus' => $newStatus
+    ]);
+}
+
 
     // ========================================================
     // Fungsi bantu untuk ambil akses role
