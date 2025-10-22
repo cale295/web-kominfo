@@ -125,32 +125,82 @@ class UserController extends BaseController
     // ========================================================
     // PUT /manage_user/{id} → update user
     // ========================================================
-    public function update($id = null)
-    {
-        $access = $this->getAccess(session()->get('role'));
+public function update($id = null)
+{
+    $access = $this->getAccess(session()->get('role'));
 
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengubah user.');
-        }
-
-        $data = [
-            'full_name' => $this->request->getPost('full_name'),
-            'username'  => $this->request->getPost('username'),
-            'email'     => $this->request->getPost('email'),
-            'role'      => $this->request->getPost('role'),
-        ];
-
-        $password = $this->request->getPost('password');
-        if (!empty($password)) {
-            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
-        }
-
-        if (!$this->userModel->update($id, $data)) {
-            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
-        }
-
-        return redirect()->to('/manage_user')->with('success', 'User berhasil diperbarui.');
+    // 🔒 Cek hak akses update
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengubah user.');
     }
+
+    // 🔍 Ambil data user lama
+    $user = $this->userModel->find($id);
+    if (!$user) {
+        return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
+    }
+
+    // 🔄 Ambil data dari form
+    $data = [
+        'full_name' => $this->request->getPost('full_name'),
+        'username'  => $this->request->getPost('username'),
+        'email'     => $this->request->getPost('email'),
+        'role'      => $this->request->getPost('role'),
+    ];
+
+    $password = $this->request->getPost('password');
+    $password_confirm = $this->request->getPost('password_confirm');
+
+    // ✅ Aturan dasar
+$validationRules = [
+    'full_name' => 'required|min_length[3]|max_length[100]',
+    'username'  => "required|min_length[3]|max_length[50]|is_unique[m_users.username,id_user,{$id}]",
+    'email'     => "required|valid_email|is_unique[m_users.email,id_user,{$id}]",
+];
+
+
+    // ✅ Username — hanya cek unik jika berubah
+    if ($data['username'] !== $user['username']) {
+        $validationRules['username'] = 'required|min_length[3]|max_length[50]|is_unique[m_users.username,id_user,' . $id . ']';
+    } else {
+        $validationRules['username'] = 'required|min_length[3]|max_length[50]';
+    }
+
+    // ✅ Email — hanya cek unik jika berubah
+    if ($data['email'] !== $user['email']) {
+        $validationRules['email'] = 'required|valid_email|is_unique[m_users.email,id_user,' . $id . ']';
+    } else {
+        $validationRules['email'] = 'required|valid_email';
+    }
+
+    // ✅ Jika password diisi, validasi tambahan
+    if (!empty($password)) {
+        $validationRules['password'] = 'required|min_length[6]|max_length[255]';
+        $validationRules['password_confirm'] = 'matches[password]';
+    }
+
+    // 🔍 Jalankan validasi
+    if (!$this->validate($validationRules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+
+    // 🔐 Update password jika diisi
+    if (!empty($password)) {
+        $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+    } else {
+        unset($data['password']); // pastikan tidak menimpa password lama
+    }
+
+    // 💾 Simpan perubahan ke database
+    if (!$this->userModel->update($id, $data)) {
+        return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
+    }
+
+    return redirect()->to('/manage_user')->with('success', 'User berhasil diperbarui.');
+}
+
+
+
 
     // ========================================================
     // DELETE /manage_user/{id} → hapus user
