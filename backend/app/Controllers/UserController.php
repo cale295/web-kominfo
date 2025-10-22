@@ -17,11 +17,31 @@ class UserController extends BaseController
     // ========================================================
     // GET /manage_user → tampilkan semua user
     // ========================================================
-    public function index()
-    {
-        $data['users'] = $this->userModel->findAll();
-        return view('pages/manage_user/index', $data);
-    }
+public function index()
+{
+    // Ambil semua data user dari database
+    $users = $this->userModel->findAll();
+
+    // Hitung total per role
+    $totalUsers = count($users);
+    $admin = $this->userModel->where('role', 'superadmin')->countAllResults();
+    $editor = $this->userModel->where('role', 'admin')->countAllResults();
+    $user = $this->userModel->where('role', 'editor')->countAllResults();
+
+    // Kirim ke view
+    $data = [
+        'title' => 'Manajemen User',
+        'users' => $users,
+        'totalUsers' => $totalUsers,
+        'admin' => $admin,
+        'editor' => $editor,
+        'user' => $user
+    ];
+
+    // Tampilkan ke halaman index
+    return view('pages/manage_user/index', $data);
+}
+
 
     // ========================================================
     // GET /manage_user/new → tampilkan form tambah user

@@ -1,12 +1,12 @@
 <?php
 // ========================================
-// 1. MODEL: App/Models/AccessRightModel.php
+// 1. MODEL: App/Models/HakAksesModel.php
 // ========================================
 namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AccessRightModel extends Model
+class HakAksesModel extends Model
 {
     protected $table = 't_access_rights';
     protected $primaryKey = 'id_access';
@@ -69,7 +69,7 @@ class AccessRightModel extends Model
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Models\AccessRightModel;
+use App\Models\HakAksesModel;
 
 class AccessRights extends BaseController
 {
@@ -77,7 +77,7 @@ class AccessRights extends BaseController
     
     public function __construct()
     {
-        $this->accessModel = new AccessRightModel();
+        $this->accessModel = new HakAksesModel();
         
         // Middleware: Cek jika bukan Super Admin
         if (session()->get('role') !== 'Super Admin') {
