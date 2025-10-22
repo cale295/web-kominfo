@@ -23,11 +23,47 @@ class AccessRightsController extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
-        $data['title'] = 'Manajemen Hak Akses';
-        $data['accessList'] = $this->accessModel->findAll();
+        $accessModel = new AccessRightsModel();
 
-        return view('pages/access_rights/index', $data);
+    $filter = $this->request->getGet('filter');
+    $sort = $this->request->getGet('sort');
+
+    $query = $accessModel->select('*');
+
+    // Filter
+    if ($filter) {
+        $query->groupStart()
+              ->like('role', $filter)
+              ->orLike('module_name', $filter)
+              ->groupEnd();
     }
+
+    // Sort
+    switch ($sort) {
+        case 'role_asc':
+            $query->orderBy('role', 'ASC');
+            break;
+        case 'role_desc':
+            $query->orderBy('role', 'DESC');
+            break;
+        case 'module_asc':
+            $query->orderBy('module_name', 'ASC');
+            break;
+        case 'module_desc':
+            $query->orderBy('module_name', 'DESC');
+            break;
+    }
+
+    $data = [
+        'title' => 'Manajemen Hak Akses',
+        'accessList' => $query->findAll(),
+        'filter' => $filter,
+        'sort' => $sort
+    ];
+
+    return view('pages/access_rights/index', $data);
+    }
+    
 
     // ======== FORM EDIT ========
     public function edit($id)

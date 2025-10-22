@@ -11,6 +11,40 @@
     </div>
 <?php endif; ?>
 
+<!-- Filter & Sort -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="filter" class="form-label fw-semibold">Filter</label>
+                <input type="text" class="form-control" name="filter" id="filter" 
+                       placeholder="Cari role atau module..." 
+                       value="<?= esc($filter ?? '') ?>">
+            </div>
+            <div class="col-md-4">
+                <label for="sort" class="form-label fw-semibold">Urutkan Berdasarkan</label>
+                <select class="form-select" name="sort" id="sort">
+                    <option value="">Pilih...</option>
+                    <option value="role_asc" <?= (isset($sort) && $sort == 'role_asc') ? 'selected' : '' ?>>Role (A-Z)</option>
+                    <option value="role_desc" <?= (isset($sort) && $sort == 'role_desc') ? 'selected' : '' ?>>Role (Z-A)</option>
+                    <option value="module_asc" <?= (isset($sort) && $sort == 'module_asc') ? 'selected' : '' ?>>Module (A-Z)</option>
+                    <option value="module_desc" <?= (isset($sort) && $sort == 'module_desc') ? 'selected' : '' ?>>Module (Z-A)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-1"></i> Terapkan
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="/access_rights" class="btn btn-secondary w-100">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Card Table -->
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-primary text-white d-flex align-items-center">
