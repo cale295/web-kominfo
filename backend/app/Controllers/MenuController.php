@@ -30,7 +30,7 @@ class MenuController extends BaseController
             return view('pages/menu/index', [
                 'title' => 'Manajemen Menu',
                 'menus' => [],
-                'error' => '⚠️ Kamu tidak memiliki hak akses ke modul ini.'
+                'error' => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
             ]);
         }
 
@@ -119,57 +119,30 @@ class MenuController extends BaseController
     // ========================================================
     // GET /menu/{id}/edit → form edit menu
     // ========================================================
-<<<<<<< HEAD
 public function edit($id = null)
-=======
-    public function edit($id = null)
->>>>>>> da32d849efc6cd40ca16307f00c15624e8e5d59e
 {
     $access = $this->getAccess(session()->get('role'));
     if (!$access || !$access['can_update']) {
         return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin mengedit menu.');
     }
 
-<<<<<<< HEAD
     $menu = $this->menuModel->find($id); // pastikan primary key = id_menu
     if (!$menu) {
         return redirect()->to('/menu')->with('error', 'Menu tidak ditemukan.');
     }
 
     $menus = $this->menuModel->findAll(); // untuk dropdown parent
-=======
-    if (empty($id)) {
-        return redirect()->toy('/menu')->with('error', 'ID menu tidak valid.');
-    }
-
-    // Coba dengan where dulu untuk debugging
-    $menu = $this->menuModel->where('id', $id)->first();
-    
-    if (!$menu) {
-        // Cek apakah ada data di tabel
-        $count = $this->menuModel->countAll();
-        log_message('debug', "Total menu di database: $count");
-        
-        return redirect()->to('/menu')->with('error', 'Menu tidak ditemukan.');
-    }
->>>>>>> da32d849efc6cd40ca16307f00c15624e8e5d59e
 
     $data = [
         'title' => 'Edit Menu',
         'menu'  => $menu,
-<<<<<<< HEAD
         'menus' => $menus,
         'can_update' => $access['can_update'],
-=======
->>>>>>> da32d849efc6cd40ca16307f00c15624e8e5d59e
     ];
 
     return view('pages/menu/edit', $data);
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> da32d849efc6cd40ca16307f00c15624e8e5d59e
     // ========================================================
     // PUT /menu/{id} → update menu
     // ========================================================
@@ -222,10 +195,7 @@ public function edit($id = null)
     // Toggle status aktif/nonaktif menu
     // ========================================================
     public function toggleStatus($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/menu')->with('error', 'Kamu tidak punya i{
+{
     $menuModel = new MenuModel();
     $menu = $menuModel->find($id);
 
@@ -242,7 +212,13 @@ public function edit($id = null)
     ]);
 }
 
- = $this->accessRightsModel
+
+    // ========================================================
+    // Fungsi bantu untuk ambil akses role
+    // ========================================================
+    private function getAccess($role)
+    {
+        $access = $this->accessRightsModel
             ->where('role', $role)
             ->where('module_name', $this->module)
             ->first();
