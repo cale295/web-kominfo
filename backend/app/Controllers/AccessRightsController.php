@@ -55,4 +55,5 @@ class AccessRightsController extends BaseController
         $this->accessModel->update($id, $data);
         return redirect()->to('/access_rights')->with('success', 'Hak akses berhasil diperbarui.');
     }
+    
 }

@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Hak Akses</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="p-4">
+<?= $this->extend('layouts/main') ?>
+<?= $this->section('content') ?>
 
 <h3>Edit Hak Akses: <?= esc($access['module_name']) ?> (<?= esc($access['role']) ?>)</h3>
 
@@ -24,6 +18,4 @@
     <button type="submit" class="btn btn-success mt-3">Simpan</button>
     <a href="/access_rights" class="btn btn-secondary mt-3">Kembali</a>
 </form>
-
-</body>
-</html>
+<?= $this->endSection() ?>

@@ -33,7 +33,6 @@
             transition: margin-left 0.3s ease, width 0.3s ease;
         }
         
-        /* Responsive untuk mobile */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -67,7 +66,6 @@
             display: none;
         }
         
-        /* Scrollbar styling untuk sidebar */
         .sidebar::-webkit-scrollbar {
             width: 6px;
         }
@@ -102,7 +100,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle sidebar untuk mobile
         const toggleBtn = document.getElementById('toggleSidebar');
         const sidebar = document.querySelector('.sidebar');
         
@@ -111,7 +108,6 @@
                 sidebar.classList.toggle('active');
             });
             
-            // Tutup sidebar ketika klik di luar sidebar pada mobile
             document.addEventListener('click', function(e) {
                 if (window.innerWidth <= 768) {
                     if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {

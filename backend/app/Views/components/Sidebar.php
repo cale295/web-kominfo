@@ -75,7 +75,7 @@ $menuItems = [
         'roles' => ['superadmin'],
         'submenu' => [
             ['title' => 'Manajemen User', 'url' => '/manage_user', 'roles' => ['superadmin']],
-            ['title' => 'Hak Akses', 'url' => '/manage_user/access', 'roles' => ['superadmin']]
+            ['title' => 'Hak Akses', 'url' => '/access_rights', 'roles' => ['superadmin']]
         ]
     ],
     [

@@ -8,7 +8,7 @@
 // File ini optional karena delete sudah ada di index.php dan show.php
 // Tapi bisa digunakan jika ingin delete via direct URL
 
-$userId = isset($_GET['id']) ? $_GET['id'] : null;
+$userId = isset($_GET['id_user']) ? $_GET['id_user'] : null;
 
 if (!$userId) {
     header('Location: index.php?error=invalid_id');

@@ -25,7 +25,8 @@ $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController'
 // ROUTE UNTUK MANAJEMEN HAK AKSES
 // ===============================
 $routes->get('access_rights', 'AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
-
+$routes->get('access_rights/edit/(:num)', 'AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
+$routes->put('access_rights/update/(:num)', 'AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
 
 
 
