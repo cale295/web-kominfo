@@ -191,7 +191,6 @@
                     <option value="superadmin" <?= old('role', $user['role']) == 'superadmin' ? 'selected' : '' ?>>Super Admin</option>
                     <option value="admin" <?= old('role', $user['role']) == 'admin' ? 'selected' : '' ?>>Admin</option>
                     <option value="editor" <?= old('role', $user['role']) == 'editor' ? 'selected' : '' ?>>Editor</option>
-                    <option value="user" <?= old('role', $user['role']) == 'user' ? 'selected' : '' ?>>User</option>
                 </select>
                 <small class="form-text">Tentukan level akses pengguna</small>
                 <?php if (session('errors.role')): ?>
