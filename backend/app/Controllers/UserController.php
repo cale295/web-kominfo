@@ -4,13 +4,13 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\UserModel;
-use App\Models\AccessRightsModel; // Tambahkan model ini untuk hak akses
+use App\Models\AccessRightsModel;
 
 class UserController extends BaseController
 {
     protected $userModel;
     protected $accessRightsModel;
-    protected $module = 'manage_user'; // <=== ini module_name untuk access_rights
+    protected $module = 'manage_user'; // Nama modul untuk hak akses
 
     public function __construct()
     {
@@ -23,7 +23,6 @@ class UserController extends BaseController
     // ========================================================
     public function index()
     {
-        // ✅ Cek akses dulu (misal hanya yang punya can_read boleh lihat)
         $role = session()->get('role');
         $access = $this->accessRightsModel
             ->where('role', $role)
@@ -34,16 +33,13 @@ class UserController extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat data user.');
         }
 
-        // Ambil semua data user dari database
         $users = $this->userModel->findAll();
 
-        // Hitung total per role
         $totalUsers = count($users);
         $admin = $this->userModel->where('role', 'admin')->countAllResults();
         $editor = $this->userModel->where('role', 'editor')->countAllResults();
         $superadmin = $this->userModel->where('role', 'superadmin')->countAllResults();
 
-        // Kirim ke view
         $data = [
             'title' => 'Manajemen User',
             'users' => $users,
@@ -53,7 +49,6 @@ class UserController extends BaseController
             'superadmin' => $superadmin
         ];
 
-        // Tampilkan ke halaman index
         return view('pages/manage_user/index', $data);
     }
 
@@ -63,10 +58,7 @@ class UserController extends BaseController
     public function new()
     {
         $role = session()->get('role');
-        $access = $this->accessRightsModel
-            ->where('role', $role)
-            ->where('module_name', $this->module)
-            ->first();
+        $access = $this->getAccess($role);
 
         if (!$access || !$access['can_create']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin menambah user.');
@@ -81,10 +73,7 @@ class UserController extends BaseController
     public function create()
     {
         $role = session()->get('role');
-        $access = $this->accessRightsModel
-            ->where('role', $role)
-            ->where('module_name', $this->module)
-            ->first();
+        $access = $this->getAccess($role);
 
         if (!$access || !$access['can_create']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin menambah user.');
@@ -105,5 +94,91 @@ class UserController extends BaseController
         return redirect()->to('/manage_user')->with('success', 'User berhasil ditambahkan.');
     }
 
-    // dst... (update dan delete tinggal ditambah pengecekan akses seperti di atas)
+    // ========================================================
+    // GET /manage_user/{id}/edit → form edit user
+    // ========================================================
+    public function edit($id = null)
+    {
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengedit user.');
+        }
+
+        $user = $this->userModel->find($id);
+        if (!$user) {
+            return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
+        }
+
+        $data = [
+            'title' => 'Edit User',
+            'user'  => $user
+        ];
+
+        return view('pages/manage_user/edit', $data);
+    }
+
+    // ========================================================
+    // PUT /manage_user/{id} → update user
+    // ========================================================
+    public function update($id = null)
+    {
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengubah user.');
+        }
+
+        $data = [
+            'full_name' => $this->request->getPost('full_name'),
+            'username'  => $this->request->getPost('username'),
+            'email'     => $this->request->getPost('email'),
+            'role'      => $this->request->getPost('role'),
+        ];
+
+        $password = $this->request->getPost('password');
+        if (!empty($password)) {
+            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
+        if (!$this->userModel->update($id, $data)) {
+            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
+        }
+
+        return redirect()->to('/manage_user')->with('success', 'User berhasil diperbarui.');
+    }
+
+    // ========================================================
+    // DELETE /manage_user/{id} → hapus user
+    // ========================================================
+    public function delete($id = null)
+    {
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+
+        if (!$access || !$access['can_delete']) {
+            return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin menghapus user.');
+        }
+
+        $user = $this->userModel->find($id);
+        if (!$user) {
+            return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
+        }
+
+        $this->userModel->delete($id);
+        return redirect()->to('/manage_user')->with('success', 'User berhasil dihapus.');
+    }
+
+    // ========================================================
+    // Fungsi bantu untuk ambil akses per modul
+    // ========================================================
+    private function getAccess($role)
+    {
+        return $this->accessRightsModel
+            ->where('role', $role)
+            ->where('module_name', $this->module)
+            ->first();
+    }
 }
