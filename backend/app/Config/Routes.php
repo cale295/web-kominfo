@@ -17,7 +17,7 @@ $routes->get('/logout', 'AuthController::logout');
 $routes->get('/dashboard', 'DashboardController::index');
 
 // Resource Web (non-API)
-$routes->resource('user', ['controller' => 'UserController']);
+$routes->resource('manage_user', ['controller' => 'UserController']);
 $routes->resource('berita', ['controller' => 'BeritaController']);
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
 
