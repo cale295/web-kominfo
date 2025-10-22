@@ -119,25 +119,29 @@ class MenuController extends BaseController
     // ========================================================
     // GET /menu/{id}/edit → form edit menu
     // ========================================================
-    public function edit($id = null)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin mengedit menu.');
-        }
-
-        $menu = $this->menuModel->find($id);
-        if (!$menu) {
-            return redirect()->to('/menu')->with('error', 'Menu tidak ditemukan.');
-        }
-
-        $data = [
-            'title' => 'Edit Menu',
-            'menu'  => $menu,
-        ];
-
-        return view('admin/menu/edit', $data);
+public function edit($id = null)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin mengedit menu.');
     }
+
+    $menu = $this->menuModel->find($id); // pastikan primary key = id_menu
+    if (!$menu) {
+        return redirect()->to('/menu')->with('error', 'Menu tidak ditemukan.');
+    }
+
+    $menus = $this->menuModel->findAll(); // untuk dropdown parent
+
+    $data = [
+        'title' => 'Edit Menu',
+        'menu'  => $menu,
+        'menus' => $menus,
+        'can_update' => $access['can_update'],
+    ];
+
+    return view('pages/menu/edit', $data);
+}
 
     // ========================================================
     // PUT /menu/{id} → update menu

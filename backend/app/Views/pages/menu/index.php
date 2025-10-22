@@ -66,7 +66,7 @@
                                                     <i class="bi <?= ($parent['status'] === 'active') ? 'bi-toggle-on text-success' : 'bi-toggle-off' ?>"></i>
                                                 </button>
                                             </form>
-                                            <a href="<?= site_url('menu/edit/' . $parent['id_menu']) ?>" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Edit Menu">
+                                            <a href="<?= site_url('menu/' . $parent['id_menu'].'/edit') ?>" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Edit Menu">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                         <?php endif; ?>
@@ -97,7 +97,7 @@
                                                         <i class="bi <?= ($child['status'] === 'active') ? 'bi-toggle-on text-success' : 'bi-toggle-off' ?>"></i>
                                                     </button>
                                                 </form>
-                                                <a href="<?= site_url('menu/edit/' . $child['id_menu']) ?>" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Edit Menu">
+                                                <a href="<?= site_url('menu/' . $child['id_menu'].'/edit') ?>" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Edit Menu">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             <?php endif; ?>

@@ -25,6 +25,10 @@ $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController'
 $routes->resource('menu', ['controller' => 'MenuController']);
 $routes->get('menu/toggleStatus/(:num)', 'MenuController::toggleStatus/$1');
 $routes->post('menu/toggleStatus/(:num)', 'MenuController::toggleStatus/$1');
+$routes->get('menu/edit/(:num)', 'MenuController::edit/$1');
+$routes->get('menu/(:num)/edit', 'MenuController::edit/$1');
+
+
 
 
 // ===============================
