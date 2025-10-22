@@ -3,130 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail User</title>
+    <title>Tambah User Baru</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <div class="container-fluid py-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>Detail User</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <div class="text-center mb-3">
-                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" 
-                                         style="width: 120px; height: 120px;">
-                                        <i class="bi bi-person-fill" style="font-size: 4rem; color: #6c757d;"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <table class="table table-borderless">
-                                    <tr>
-                                        <td width="35%" class="fw-bold text-muted">ID User</td>
-                                        <td width="5%">:</td>
-                                        <td><?= esc($user['id']) ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold text-muted">Nama Lengkap</td>
-                                        <td>:</td>
-                                        <td class="fs-5 fw-bold"><?= esc($user['nama_lengkap']) ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold text-muted">Username</td>
-                                        <td>:</td>
-                                        <td><?= esc($user['username']) ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold text-muted">Email</td>
-                                        <td>:</td>
-                                        <td>
-                                            <i class="bi bi-envelope me-1"></i>
-                                            <a href="mailto:<?= esc($user['email']) ?>"><?= esc($user['email']) ?></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold text-muted">Role</td>
-                                        <td>:</td>
-                                        <td>
-                                            <?php if ($user['role'] == 'admin'): ?>
-                                                <span class="badge bg-danger fs-6">
-                                                    <i class="bi bi-shield-fill-check me-1"></i>Admin
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="badge bg-info fs-6">
-                                                    <i class="bi bi-person-fill me-1"></i>User
-                                                </span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                    <?php if (isset($user['created_at'])): ?>
-                                    <tr>
-                                        <td class="fw-bold text-muted">Dibuat Pada</td>
-                                        <td>:</td>
-                                        <td>
-                                            <i class="bi bi-calendar-event me-1"></i>
-                                            <?= date('d M Y H:i', strtotime($user['created_at'])) ?>
-                                        </td>
-                                    </tr>
-                                    <?php endif; ?>
-                                    <?php if (isset($user['updated_at'])): ?>
-                                    <tr>
-                                        <td class="fw-bold text-muted">Diupdate Pada</td>
-                                        <td>:</td>
-                                        <td>
-                                            <i class="bi bi-calendar-check me-1"></i>
-                                            <?= date('d M Y H:i', strtotime($user['updated_at'])) ?>
-                                        </td>
-                                    </tr>
-                                    <?php endif; ?>
-                                </table>
-                            </div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-person-plus-fill me-2"></i>Tambah User Baru</h4>
+                </div>
+                <div class="card-body">
+
+                    <!-- Tampilkan pesan error jika ada -->
+                    <?php if (session()->getFlashdata('errors')) : ?>
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                <?php foreach (session()->getFlashdata('errors') as $error) : ?>
+                                    <li><?= esc($error) ?></li>
+                                <?php endforeach ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+
+                    <form action="<?= base_url('manage_user') ?>" method="post">
+                        <?= csrf_field() ?>
+
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">Nama Lengkap</label>
+                            <input type="text" name="full_name" id="full_name" class="form-control" value="<?= old('full_name') ?>" required>
                         </div>
 
-                        <hr>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" name="username" id="username" class="form-control" value="<?= old('username') ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="password" id="password" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" name="email" id="email" class="form-control" value="<?= old('email') ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select name="role" id="role" class="form-select" required>
+                                <option value="">-- Pilih Role --</option>
+                                <option value="superadmin" <?= old('role') == 'superadmin' ? 'selected' : '' ?>>Superadmin</option>
+                                <option value="admin" <?= old('role') == 'admin' ? 'selected' : '' ?>>Admin</option>
+                                <option value="editor" <?= old('role') == 'editor' ? 'selected' : '' ?>>Editor</option>
+                            </select>
+                        </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="<?= base_url('user') ?>" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left me-1"></i>Kembali
+                            <a href="<?= base_url('manage_user') ?>" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Kembali
                             </a>
-                            <div>
-                                <a href="<?= base_url('user/' . $user['id'] . '/edit') ?>" class="btn btn-warning me-2">
-                                    <i class="bi bi-pencil-square me-1"></i>Edit
-                                </a>
-                                <button type="button" 
-                                        class="btn btn-danger" 
-                                        onclick="confirmDelete(<?= $user['id'] ?>)">
-                                    <i class="bi bi-trash me-1"></i>Hapus
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save me-1"></i> Simpan
+                            </button>
                         </div>
-                    </div>
+                    </form>
+
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Form Delete (Hidden) -->
-    <form id="deleteForm" method="POST" style="display: none;">
-        <?= csrf_field() ?>
-        <input type="hidden" name="_method" value="DELETE">
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    function confirmDelete(userId) {
-        if (confirm('Apakah Anda yakin ingin menghapus user ini?\n\nNama: <?= esc($user['nama_lengkap']) ?>\nUsername: <?= esc($user['username']) ?>')) {
-            const form = document.getElementById('deleteForm');
-            form.action = '<?= base_url('user') ?>/' + userId;
-            form.submit();
-        }
-    }
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

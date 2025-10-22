@@ -57,7 +57,7 @@ public function index()
     public function create()
     {
         $data = [
-            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
+            'full_name' => $this->request->getPost('full_name'),
             'username'     => $this->request->getPost('username'),
             'password'     => $this->request->getPost('password'),
             'email'        => $this->request->getPost('email'),
@@ -105,7 +105,7 @@ public function index()
     public function update($id = null)
     {
         $data = [
-            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
+            'full_name' => $this->request->getPost('full_name'),
             'username'     => $this->request->getPost('username'),
             'email'        => $this->request->getPost('email'),
             'role'         => $this->request->getPost('role'),

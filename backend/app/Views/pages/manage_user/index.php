@@ -169,7 +169,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <a href="create.php" class="btn btn-gradient w-100">
+                    <a href="<?= base_url( 'manage_user/new') ?>" class="btn btn-gradient w-100">
                         <i class="bi bi-plus-circle"></i> Tambah User Baru
                     </a>
                 </div>
@@ -205,7 +205,7 @@
                     <td><?= esc($user['role']) ?></td>
                     <td>
                         <div class="btn-group">
-                            <a href="<?= base_url('manage_user/'.$user['id_user']) ?>" class="btn btn-info btn-sm">Detail</a>
+                            <a href="<?= base_url('manage_user/show/'.$user['id_user']) ?>" class="btn btn-info btn-sm">Detail</a>
                             <a href="<?= base_url('manage_user/'.$user['id_user'].'/edit') ?>" class="btn btn-warning btn-sm">Edit</a>
                             <form action="<?= base_url('manage_user/'.$user['id_user']) ?>" method="post" style="display:inline;">
                                 <?= csrf_field() ?>
