@@ -46,9 +46,10 @@
                 <div class="mb-3">
                     <label for="parent_id" class="form-label">Parent Menu</label>
                     <select class="form-select" id="parent_id" name="parent_id">
-                        <option value="0" <?= $menu['parent_id'] == 0 ? 'selected' : '' ?>>Menu Utama</option>
+                        <option value="0" <?= $menu['parent_id'] == 0 ? 'selected' : '' ?>>Menu Utama (tanpa parent)</option>
                         <?php foreach ($menus as $m): ?>
-                            <?php if ($m['id_menu'] != $menu['id_menu']): // hindari memilih dirinya sendiri ?>
+                            <?php // Perubahan: Hanya tampilkan menu jika merupakan parent (parent_id == 0) dan bukan menu yang sedang diedit ?>
+                            <?php if ($m['parent_id'] == 0 && $m['id_menu'] != $menu['id_menu']): ?>
                                 <option value="<?= $m['id_menu'] ?>" <?= $menu['parent_id'] == $m['id_menu'] ? 'selected' : '' ?>>
                                     <?= esc($m['menu_name']) ?>
                                 </option>
