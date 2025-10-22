@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Api;
 
+use App\Models\AccessRightsModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\HakAksesModel;
@@ -20,7 +21,7 @@ class BaseApiController extends ResourceController
     public function __construct()
     {
         // Inisialisasi Model Hak Akses
-        $this->hakAksesModel = new HakAksesModel();
+        $this->hakAksesModel = new AccessRightsModel();
     }
     
     /**

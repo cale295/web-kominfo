@@ -21,6 +21,14 @@ $routes->resource('manage_user', ['controller' => 'UserController']);
 $routes->resource('berita', ['controller' => 'BeritaController']);
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
 
+// ===============================
+// ROUTE UNTUK MANAJEMEN HAK AKSES
+// ===============================
+$routes->get('access_rights', 'AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
+
+
+
+
 // =========================================================
 // API ROUTES
 // =========================================================

@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Api;
 
+use App\Models\AccessRightsModel;
 use App\Models\GaleriFotoModel;
 use App\Models\HakAksesModel; // <-- TAMBAHAN: Import Model Hak Akses
 use CodeIgniter\RESTful\ResourceController;
@@ -20,7 +21,7 @@ class GaleriFotoController extends ResourceController
     public function __construct()
     {
         // INISIALISASI MODEL HAK AKSES
-        $this->hakAksesModel = new HakAksesModel();
+        $this->hakAksesModel = new AccessRightsModel();
     }
     
     /**

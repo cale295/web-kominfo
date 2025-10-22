@@ -11,13 +11,21 @@ class RoleAuthFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         $session = session();
-        if ($session->get('role') !== 'admin') {
-            return redirect()->to('/login')->with('error', 'Anda tidak memiliki akses ke halaman ini');
+
+        // Cek apakah user sudah login
+        if (!$session->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
+        // Jika role dibatasi
+        if ($arguments && !in_array($session->get('role'), $arguments)) {
+            // Redirect ke dashboard kalau role tidak sesuai
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak!');
         }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Tidak perlu diisi untuk sekarang
+        // Tidak perlu isi
     }
 }
