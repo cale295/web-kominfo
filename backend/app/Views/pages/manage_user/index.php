@@ -87,6 +87,8 @@
             <p class="text-muted">Kelola data pengguna sistem Anda</p>
         </div>
     </div>
+        <!-- 🔥 ALERTS muncul di sini -->
+    <?= $this->include('layouts/alerts') ?>
 
     <!-- Statistics Cards -->
     <div class="row mb-4">

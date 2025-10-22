@@ -24,29 +24,31 @@ class UserController extends BaseController
     public function index()
     {
         $role = session()->get('role');
-        $access = $this->accessRightsModel
-            ->where('role', $role)
-            ->where('module_name', $this->module)
-            ->first();
+        $access = $this->getAccess($role);
 
-        if (!$access || !$access['can_read']) {
+        // Jika tidak ada data akses sama sekali
+        if (!$access) {
+            return view('pages/manage_user/index', [
+                'title' => 'Manajemen User',
+                'users' => [],
+                'error' => '⚠️ Kamu tidak memiliki hak akses ke modul ini.'
+            ]);
+        }
+
+        // Jika role tidak punya izin membaca
+        if (!$access['can_read']) {
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat data user.');
         }
 
         $users = $this->userModel->findAll();
 
-        $totalUsers = count($users);
-        $admin = $this->userModel->where('role', 'admin')->countAllResults();
-        $editor = $this->userModel->where('role', 'editor')->countAllResults();
-        $superadmin = $this->userModel->where('role', 'superadmin')->countAllResults();
-
         $data = [
             'title' => 'Manajemen User',
             'users' => $users,
-            'totalUsers' => $totalUsers,
-            'admin' => $admin,
-            'editor' => $editor,
-            'superadmin' => $superadmin
+            'totalUsers' => count($users),
+            'admin' => $this->userModel->where('role', 'admin')->countAllResults(),
+            'editor' => $this->userModel->where('role', 'editor')->countAllResults(),
+            'superadmin' => $this->userModel->where('role', 'superadmin')->countAllResults()
         ];
 
         return view('pages/manage_user/index', $data);
@@ -57,10 +59,13 @@ class UserController extends BaseController
     // ========================================================
     public function new()
     {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
+        $access = $this->getAccess(session()->get('role'));
 
-        if (!$access || !$access['can_create']) {
+        if (!$access) {
+            return redirect()->to('/manage_user')->with('error', 'Data hak akses tidak ditemukan.');
+        }
+
+        if (!$access['can_create']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin menambah user.');
         }
 
@@ -72,8 +77,7 @@ class UserController extends BaseController
     // ========================================================
     public function create()
     {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
+        $access = $this->getAccess(session()->get('role'));
 
         if (!$access || !$access['can_create']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin menambah user.');
@@ -99,8 +103,7 @@ class UserController extends BaseController
     // ========================================================
     public function edit($id = null)
     {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
+        $access = $this->getAccess(session()->get('role'));
 
         if (!$access || !$access['can_update']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengedit user.');
@@ -124,8 +127,7 @@ class UserController extends BaseController
     // ========================================================
     public function update($id = null)
     {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
+        $access = $this->getAccess(session()->get('role'));
 
         if (!$access || !$access['can_update']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengubah user.');
@@ -155,8 +157,7 @@ class UserController extends BaseController
     // ========================================================
     public function delete($id = null)
     {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
+        $access = $this->getAccess(session()->get('role'));
 
         if (!$access || !$access['can_delete']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin menghapus user.');
@@ -172,7 +173,7 @@ class UserController extends BaseController
     }
 
     // ========================================================
-    // Fungsi bantu untuk ambil akses per modul
+    // FUNGSI BANTU UNTUK AMBIL AKSES ROLE
     // ========================================================
     private function getAccess($role)
     {
