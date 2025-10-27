@@ -184,18 +184,10 @@
                                             <i class="bi bi-pencil"></i>
                                             Edit
                                         </a>
-                                        <form action="<?= base_url('manage_user/' . $user['id_user']) ?>"
-                                            method="post"
-                                            style="display:inline;">
-                                            <?= csrf_field() ?>
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <button type="submit"
-                                                class="btn-action btn-delete"
-                                                onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')"
-                                                title="Hapus User">
-                                                <i class="bi bi-trash"></i>
-                                                Hapus
-                                            </button>
+                <form action="<?= site_url('manage_user/'.$user['id_user']) ?>" method="post" style="display:inline;">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin hapus?')">Hapus</button>
+                </form>
                                         </form>
                                     </div>
                                 </td>

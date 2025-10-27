@@ -16,15 +16,20 @@ $routes->get('/logout', 'AuthController::logout');
 // Dashboard
 $routes->get('/dashboard', 'DashboardController::index');
 
+// Berita Kategori Tema
+$routes->resource('tema', ['controller' => 'TemaKategoriController', 'except' => ['show']]);
+
 // Resource Web (non-API)
 $routes->resource('manage_user', ['controller' => 'UserController']);
-$routes->post('manage_user/delete_selected', 'UserController::deleteSelected');
+
+// berita
 $routes->resource('berita', ['controller' => 'BeritaController']);
+
+// Kategori Berita
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
 
-
+// Agenda
 $routes->resource('agenda', ['controller' => 'AgendaController','except' => ['show']]);
-$routes->get('agenda/delete/(:num)', 'AgendaController::delete/$1');
 
 
 //menu 
