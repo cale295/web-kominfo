@@ -48,10 +48,10 @@
                                     <a href="<?= site_url('agenda/' . $agenda['id_agenda'].'/edit') ?>" class="btn btn-sm btn-warning">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <a href="<?= site_url('agenda/delete/' . $agenda['id_agenda']) ?>" class="btn btn-sm btn-danger"
-                                       onclick="return confirm('Yakin ingin menghapus agenda ini?')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                <form action="<?= site_url('agenda/'.$agenda['id_agenda']) ?>" method="post" style="display:inline;">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin hapus?')">Hapus</button>
+                                </form>
                                 </td>
                                 <td>
                                     <?php if ($agenda['status'] === 'active'): ?>
