@@ -25,7 +25,6 @@
             background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
             min-height: 100vh;
             position: relative;
-            overflow: hidden;
         }
 
         /* Background Pattern */
