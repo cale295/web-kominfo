@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('styles') ?>
-<link rel="stylesheet" href="<?= base_url('css/pages/manage_user/index.css') ?>">s
+<link rel="stylesheet" href="<?= base_url('css/pages/manage_user/index.css') ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>

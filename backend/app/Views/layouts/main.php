@@ -86,9 +86,7 @@
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
-    <button class="toggle-sidebar" id="toggleSidebar">
-        <i class="bi bi-list"></i>
-    </button>
+    
     
     <div class="d-flex">
         <?= view('components/sidebar') ?>

@@ -1,10 +1,7 @@
 <?php
 $session = session();
-$role = $session->get('role'); // Akan dapat: Admin, Editor, atau User dari database
+$role = $session->get('role'); 
 $fullName = $session->get('full_name');
-
-// Debug - hapus setelah berhasil
-// echo "<!-- Current Role: " . $role . " -->";
 
 // Konfigurasi menu dengan permission (sesuaikan dengan role dari database)
 $menuItems = [
@@ -118,6 +115,7 @@ $currentPath = '/' . $uri->getPath();
         display: flex;
         flex-direction: column;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: transform 0.3s ease;
     }
 
     /* Header Sidebar */
@@ -331,10 +329,10 @@ $currentPath = '/' . $uri->getPath();
 
     /* Logout Button */
     .logout-btn {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         left: 0;
-        width: 280px;
+        width: 100%;
         background: linear-gradient(180deg, transparent 0%, rgba(30, 58, 138, 0.95) 30%, rgba(30, 58, 138, 1) 100%);
         padding: 20px 12px;
         z-index: 10;
@@ -363,24 +361,116 @@ $currentPath = '/' . $uri->getPath();
         margin-right: 8px;
     }
 
-    /* Divider */
-    .menu-divider {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-        margin: 12px 20px;
+    /* Mobile Top Bar */
+    .sidebar-toggle-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: linear-gradient(135deg, var(--sidebar-primary) 0%, var(--sidebar-secondary) 100%);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1050;
+        padding: 12px 16px;
+        display: none;
+    }
+
+    .sidebar-toggle-container .d-flex {
+        height: 100%;
+    }
+
+    .sidebar-toggle-container .user-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        border: 2px solid var(--sidebar-accent);
+    }
+
+    .sidebar-toggle-container .user-name {
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .sidebar-toggle-container .user-role {
+        color: var(--sidebar-accent);
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 2px 6px;
+        background: rgba(251, 191, 36, 0.2);
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    /* Hamburger Toggle Button */
+    #sidebarToggle {
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+
+    #sidebarToggle:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: scale(1.05);
+    }
+
+    #sidebarToggle i {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    /* Overlay untuk mobile */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+        opacity: 1;
     }
 
     /* Mobile Responsive */
     @media (max-width: 768px) {
+        .sidebar-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
         .sidebar {
-            margin-left: -280px;
-            transition: margin-left 0.3s ease;
+            transform: translateX(-100%);
+            top: 70px;
+            height: calc(100vh - 70px);
         }
+
         .sidebar.show {
-            margin-left: 0;
+            transform: translateX(0);
         }
-        .logout-btn {
-            width: 280px;
+
+        /* Adjust body padding for mobile top bar */
+        body {
+            padding-top: 70px;
         }
     }
 
@@ -410,7 +500,25 @@ $currentPath = '/' . $uri->getPath();
     .sidebar .nav-item:nth-child(8) { animation-delay: 0.4s; }
 </style>
 
-<div class="sidebar">
+<!-- Mobile Top Bar -->
+<div class="sidebar-toggle-container d-md-none">
+    <div class="d-flex align-items-center flex-grow-1">
+        <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fbbf24&bold=true&format=svg" 
+             alt="Avatar" class="user-avatar me-3">
+        <div class="flex-grow-1">
+            <div class="user-name"><?= esc($fullName) ?></div>
+            <span class="user-role"><?= esc(strtoupper($role)) ?></span>
+        </div>
+    </div>
+    <button class="btn btn-primary" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+    </button>
+</div>
+
+<!-- Overlay untuk mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="sidebar" id="sidebar">
     <!-- Header -->
     <div class="sidebar-header">
         <h5>
@@ -421,7 +529,7 @@ $currentPath = '/' . $uri->getPath();
     </div>
 
     <!-- User Info -->
-    <div class="user-info-box">
+    <div class="user-info-box d-md-block d-none">
         <div class="d-flex align-items-center">
             <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fbbf24&bold=true&format=svg" 
                  alt="Avatar" class="user-avatar me-3">
@@ -491,3 +599,43 @@ $currentPath = '/' . $uri->getPath();
         </a>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    // Toggle sidebar
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+    }
+
+    // Close sidebar when clicking overlay
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        });
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        }
+    });
+
+    // Prevent sidebar clicks from closing it
+    sidebar.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});
+</script>
