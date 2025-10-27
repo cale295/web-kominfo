@@ -76,6 +76,7 @@ class AgendaController extends BaseController
             'activity_name' => 'required|min_length[3]',
             'start_date'    => 'required|valid_date',
             'end_date'      => 'required|valid_date',
+            'image'         => 'permit_empty|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]',
         ]);
 
         if (!$validation) {
@@ -90,6 +91,15 @@ class AgendaController extends BaseController
             'location'      => $this->request->getPost('location'),
             'status'        => $this->request->getPost('status') ?? 'active',
         ];
+
+        // Upload gambar jika ada
+        if ($img = $this->request->getFile('image')) {
+            if ($img->isValid() && !$img->hasMoved()) {
+                $newName = $img->getRandomName();
+                $img->move('uploads/agenda/', $newName);
+                $data['image'] = $newName;
+            }
+        }
 
         $this->agendaModel->insert($data);
         return redirect()->to('/agenda')->with('success', 'Agenda berhasil ditambahkan!');
@@ -127,6 +137,7 @@ class AgendaController extends BaseController
             'activity_name' => 'required|min_length[3]',
             'start_date'    => 'required|valid_date',
             'end_date'      => 'required|valid_date',
+            'image'         => 'permit_empty|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]',
         ]);
 
         if (!$validation) {
@@ -142,6 +153,21 @@ class AgendaController extends BaseController
             'status'        => $this->request->getPost('status') ?? 'inactive',
         ];
 
+        // Handle upload gambar baru
+        if ($img = $this->request->getFile('image')) {
+            if ($img->isValid() && !$img->hasMoved()) {
+                $newName = $img->getRandomName();
+                $img->move('uploads/agenda/', $newName);
+                $data['image'] = $newName;
+
+                // hapus gambar lama
+                $old = $this->agendaModel->find($id);
+                if ($old && !empty($old['image']) && file_exists('uploads/agenda/' . $old['image'])) {
+                    unlink('uploads/agenda/' . $old['image']);
+                }
+            }
+        }
+
         $this->agendaModel->update($id, $data);
         return redirect()->to('/agenda')->with('success', 'Agenda berhasil diperbarui.');
     }
@@ -154,6 +180,11 @@ class AgendaController extends BaseController
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_delete']) {
             return redirect()->to('/agenda')->with('error', 'Kamu tidak punya izin menghapus agenda.');
+        }
+
+        $agenda = $this->agendaModel->find($id);
+        if ($agenda && !empty($agenda['image']) && file_exists('uploads/agenda/' . $agenda['image'])) {
+            unlink('uploads/agenda/' . $agenda['image']);
         }
 
         if ($this->agendaModel->delete($id)) {

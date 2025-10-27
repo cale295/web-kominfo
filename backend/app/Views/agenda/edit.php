@@ -30,6 +30,16 @@
                 <input type="hidden" name="_method" value="PUT">
 
                 <div class="mb-3">
+                <label for="image" class="form-label">Foto Agenda</label>
+                <?php if (!empty($agenda['image'])): ?>
+                <div class="mb-2">
+                <img src="<?= base_url('uploads/agenda/' . $agenda['image']) ?>" alt="Foto Agenda" width="150" class="rounded shadow-sm">
+                </div>
+                <?php endif; ?>
+                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+            </div>
+
+                <div class="mb-3">
                     <label for="activity_name" class="form-label">Nama Kegiatan</label>
                     <input type="text" name="activity_name" id="activity_name"
                            class="form-control"

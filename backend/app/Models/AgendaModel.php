@@ -19,7 +19,8 @@ class AgendaModel extends Model
         'start_date',
         'end_date',
         'location',
-        'status'
+        'status',
+        'image',
     ];
 
 

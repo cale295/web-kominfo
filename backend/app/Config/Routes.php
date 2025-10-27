@@ -21,7 +21,10 @@ $routes->resource('manage_user', ['controller' => 'UserController']);
 $routes->post('manage_user/delete_selected', 'UserController::deleteSelected');
 $routes->resource('berita', ['controller' => 'BeritaController']);
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
+
+
 $routes->resource('agenda', ['controller' => 'AgendaController','except' => ['show']]);
+$routes->get('agenda/delete/(:num)', 'AgendaController::delete/$1');
 
 
 //menu 
@@ -48,6 +51,11 @@ $routes->put('access_rights/update/(:num)', 'AccessRightsController::update/$1',
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //Agenda
+    $routes->get('agenda', 'Api\ApiAgendaController::index');   
+    $routes->post('agenda', 'Api\ApiAgendaController::create');
+    $routes->get('agenda/(:num)', 'Api\ApiAgendaController::show/$1');
 
     // Auth
     $routes->post('login', 'Api\AuthController::login');

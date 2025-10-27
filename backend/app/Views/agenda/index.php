@@ -19,6 +19,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
+                        <th>Foto</th>
                         <th>Nama Kegiatan</th>
                         <th>Lokasi</th>
                         <th>Mulai</th>
@@ -32,6 +33,13 @@
                         <?php foreach ($agendas as $i => $agenda): ?>
                             <tr>
                                 <td><?= $i + 1 ?></td>
+                                <td>
+                                    <?php if (!empty($agenda['image'])): ?>
+                                        <img src="<?= base_url('uploads/agenda/' . $agenda['image']) ?>" width="60" class="rounded">
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= esc($agenda['activity_name']) ?></td>
                                 <td><?= esc($agenda['location']) ?></td>
                                 <td><?= date('d M Y H:i', strtotime($agenda['start_date'])) ?></td>
