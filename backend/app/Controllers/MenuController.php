@@ -21,37 +21,46 @@ class MenuController extends BaseController
     // ========================================================
     // GET /menu → tampilkan semua menu
     // ========================================================
-    public function index()
-    {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
+public function index()
+{
+    $role = session()->get('role');
+    $access = $this->getAccess($role);
 
-        if (!$access) {
-            return view('pages/menu/index', [
-                'title' => 'Manajemen Menu',
-                'menus' => [],
-                'error' => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
-            ]);
-        }
-
-        if (!$access['can_read']) {
-            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat menu.');
-        }
-
-        $menus = $this->menuModel->orderBy('parent_id', 'ASC')
-                                 ->orderBy('order_number', 'ASC')
-                                 ->findAll();
-
-        $data = [
+    // Jika role tidak punya akses sama sekali
+    if (!$access) {
+        return view('pages/menu/index', [
             'title' => 'Manajemen Menu',
-            'menus' => $menus,
-            'can_create' => $access['can_create'],
-            'can_update' => $access['can_update'],
-            'can_delete' => $access['can_delete'],
-        ];
-
-        return view('pages/menu/index', $data);
+            'menus' => [],
+            'can_create' => false,
+            'can_update' => false,
+            'can_delete' => false,
+            'error' => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
+        ]);
     }
+
+    // Jika role tidak punya izin read
+    if (!$access['can_read']) {
+        return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat menu.');
+    }
+
+    // Ambil semua menu, urut berdasarkan parent_id & order_number
+    $menus = $this->menuModel->orderBy('parent_id', 'ASC')
+                             ->orderBy('order_number', 'ASC')
+                             ->findAll();
+
+    // Data untuk dikirim ke view
+    $data = [
+        'title' => 'Manajemen Menu',
+        'menus' => $menus,
+        'can_create' => $access['can_create'], // selalu ada
+        'can_update' => $access['can_update'], // selalu ada
+        'can_delete' => $access['can_delete'], // selalu ada
+        'error' => null, // default null jika tidak ada error
+    ];
+
+    return view('pages/menu/index', $data);
+}
+
 
     public function show($id = null)
 {

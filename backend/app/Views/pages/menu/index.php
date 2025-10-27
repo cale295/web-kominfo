@@ -40,6 +40,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
+    <?= $this->include('layouts/alerts') ?>
 
     <!-- Data Table Card -->
     <div class="card card-gov">

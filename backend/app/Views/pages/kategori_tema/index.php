@@ -12,6 +12,8 @@
             <th>Aksi</th>
         </tr>
     </thead>
+    <?= $this->include('layouts/alerts') ?>
+
     <tbody>
         <?php foreach($temas as $tema): ?>
         <tr>

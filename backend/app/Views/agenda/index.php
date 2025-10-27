@@ -12,6 +12,7 @@
     <?php if (session()->getFlashdata('success')): ?>
         <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
     <?php endif; ?>
+    <?= $this->include('layouts/alerts') ?>
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
