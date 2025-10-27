@@ -1,0 +1,358 @@
+:root {
+    --primary-gov: #1e40af;
+    --secondary-gov: #0c4a6e;
+    --success-gov: #047857;
+    --danger-gov: #be123c;
+    --accent-gov: #fbbf24;
+}
+
+/* Page Header */
+.page-header-gov {
+    background: linear-gradient(135deg, var(--success-gov) 0%, #065f46 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(4, 120, 87, 0.15);
+    margin-bottom: 30px;
+    border-left: 6px solid var(--accent-gov);
+}
+
+.page-header-gov h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.page-header-gov h3 i {
+    color: var(--accent-gov);
+}
+
+.page-header-gov p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.btn-back-gov {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-back-gov:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    transform: translateX(-4px);
+}
+
+/* Form Card */
+.form-card-gov {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    background: white;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-card-gov .card-body {
+    padding: 40px;
+}
+
+/* Alert Danger */
+.alert-danger-gov {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: none;
+    border-left: 5px solid var(--danger-gov);
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 2px 12px rgba(190, 18, 60, 0.15);
+    margin-bottom: 24px;
+}
+
+.alert-danger-gov ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.alert-danger-gov li {
+    color: #991b1b;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.alert-danger-gov li:last-child {
+    margin-bottom: 0;
+}
+
+.alert-danger-gov::before {
+    content: '\F33A';
+    font-family: 'bootstrap-icons';
+    font-size: 1.5rem;
+    color: var(--danger-gov);
+    float: left;
+    margin-right: 12px;
+}
+
+/* Form Elements */
+.form-label-gov {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-label-gov i {
+    color: var(--success-gov);
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+.form-label-gov .required {
+    color: var(--danger-gov);
+    margin-left: 4px;
+}
+
+.form-control-gov,
+.form-select-gov {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+}
+
+.form-control-gov:focus,
+.form-select-gov:focus {
+    border-color: var(--success-gov);
+    box-shadow: 0 0 0 4px rgba(4, 120, 87, 0.1);
+    background-color: white;
+    outline: none;
+}
+
+.form-control-gov::placeholder {
+    color: #94a3b8;
+}
+
+/* Input Group with Icon */
+.input-group-gov {
+    position: relative;
+}
+
+.input-group-gov .input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 1.1rem;
+    z-index: 5;
+}
+
+.input-group-gov .form-control-gov,
+.input-group-gov .form-select-gov {
+    padding-left: 45px;
+}
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #64748b;
+    font-size: 1.2rem;
+    z-index: 5;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: var(--success-gov);
+}
+
+/* Form Text Helper */
+.form-text-gov {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+}
+
+.form-text-gov i {
+    margin-right: 6px;
+    color: var(--success-gov);
+}
+
+/* Role Select Preview */
+.role-preview {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    display: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.role-preview.show {
+    display: block;
+}
+
+.role-preview.superadmin {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 2px solid #fca5a5;
+}
+
+.role-preview.admin {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e3a8a;
+    border: 2px solid #93c5fd;
+}
+
+.role-preview.editor {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 2px solid #6ee7b7;
+}
+
+/* Form Section */
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 30px 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.form-section-title i {
+    color: var(--success-gov);
+    margin-right: 10px;
+}
+
+/* Buttons */
+.btn-submit-gov {
+    background: linear-gradient(135deg, var(--success-gov) 0%, #065f46 100%);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(4, 120, 87, 0.25);
+}
+
+.btn-submit-gov:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(4, 120, 87, 0.35);
+    background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+    color: white;
+}
+
+.btn-submit-gov i {
+    margin-right: 8px;
+}
+
+.btn-cancel-gov {
+    background: white;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-gov:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+    text-decoration: none;
+}
+
+.btn-cancel-gov i {
+    margin-right: 8px;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    margin-top: 8px;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+    display: none;
+}
+
+.password-strength.show {
+    display: block;
+}
+
+.password-strength-bar {
+    height: 100%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.password-strength-text {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header-gov {
+        padding: 20px;
+    }
+
+    .form-card-gov .card-body {
+        padding: 24px;
+    }
+
+    .btn-submit-gov,
+    .btn-cancel-gov {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-card-gov {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.alert-danger-gov {
+    animation: fadeInUp 0.4s ease-out;
+}

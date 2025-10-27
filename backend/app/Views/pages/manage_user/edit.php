@@ -1,191 +1,260 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('styles') ?>
-<style>
-    body { background-color: #f8f9fa; }
-    .container { max-width: 900px; margin: 40px auto; }
-    .card { border: none; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .form-label { font-weight: 600; }
-    .breadcrumb { background: transparent; margin-bottom: 1rem; }
-    .btn-primary {
-        background: linear-gradient(90deg, #0d6efd, #6610f2);
-        border: none;
-    }
-    .btn-primary:hover {
-        background: linear-gradient(90deg, #0b5ed7, #520dc2);
-    }
-    .password-toggle {
-        position: relative;
-    }
-    .password-toggle .toggle-btn {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: #6c757d;
-        cursor: pointer;
-    }
-</style>
+<link rel="stylesheet" href="<?= base_url('css/pages/manage_user/edit.css') ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="container">
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="<?= base_url('manage_user') ?>">Manajemen User</a></li>
-            <li class="breadcrumb-item active">Edit User</li>
-        </ol>
-    </nav>
-
-    <!-- Header -->
-    <div class="mb-4">
-        <h3><i class="bi bi-pencil-square text-primary"></i> Edit User</h3>
-        <p class="text-muted mb-0">Perbarui informasi pengguna di bawah ini.</p>
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="page-header-gov">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h3>
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit Pengguna
+                </h3>
+                <p>Perbarui informasi dan pengaturan pengguna</p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <a href="<?= base_url('manage_user') ?>" class="btn btn-back-gov">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                </a>
+            </div>
+        </div>
     </div>
 
-    <!-- Alert error -->
+    <!-- Alerts -->
     <?php if (session()->getFlashdata('errors')): ?>
-        <div class="alert alert-danger">
-            <strong><i class="bi bi-exclamation-triangle"></i> Terjadi kesalahan:</strong>
-            <ul class="mb-0">
+        <div class="alert alert-danger-gov alert-dismissible fade show" role="alert">
+            <strong>Terdapat kesalahan pada form:</strong>
+            <ul class="mt-2">
                 <?php foreach (session()->getFlashdata('errors') as $error): ?>
                     <li><?= esc($error) ?></li>
                 <?php endforeach; ?>
             </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
-    <!-- Alert success -->
     <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success">
-            <i class="bi bi-check-circle"></i> <?= session()->getFlashdata('success') ?>
+        <div class="alert alert-success-gov alert-dismissible fade show" role="alert">
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
-    <!-- Form -->
-    <div class="card p-4">
-        <form action="<?= base_url('manage_user/' . $user['id_user']) ?>" method="post" id="updateUserForm">
-            <?= csrf_field() ?>
-            <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
-
-            <!-- Nama Lengkap -->
-            <div class="mb-3">
-                <label for="full_name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                <input type="text" name="full_name" id="full_name"
-                    class="form-control <?= session('errors.full_name') ? 'is-invalid' : '' ?>"
-                    value="<?= old('full_name', $user['full_name']) ?>" required>
-                <?php if (session('errors.full_name')): ?>
-                    <div class="invalid-feedback"><?= session('errors.full_name') ?></div>
-                <?php endif; ?>
+    <!-- Form Card -->
+    <div class="card form-card-gov">
+        <div class="card-body">
+            <!-- User Info Badge -->
+            <div class="row g-3 user-info-badge">
+                <div class="col-md-4">
+                    <div class="badge-label">User ID</div>
+                    <div class="badge-value">#<?= $user['id_user'] ?></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="badge-label">Username</div>
+                    <div class="badge-value"><?= esc($user['username']) ?></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="badge-label">Role Saat Ini</div>
+                    <div class="badge-value"><?= ucfirst($user['role']) ?></div>
+                </div>
             </div>
 
-            <!-- Username -->
-            <div class="mb-3">
-                <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
-                <input type="text" name="username" id="username"
-                    class="form-control <?= session('errors.username') ? 'is-invalid' : '' ?>"
-                    value="<?= old('username', $user['username']) ?>" required>
-                <small class="text-muted">Username harus unik dan tidak boleh mengandung spasi.</small>
-                <?php if (session('errors.username')): ?>
-                    <div class="invalid-feedback"><?= session('errors.username') ?></div>
-                <?php endif; ?>
-            </div>
+            <form action="<?= base_url('manage_user/' . $user['id_user']) ?>" method="post" id="updateUserForm">
+                <?= csrf_field() ?>
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
 
-            <!-- Email -->
-            <div class="mb-3">
-                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                <input type="email" name="email" id="email"
-                    class="form-control <?= session('errors.email') ? 'is-invalid' : '' ?>"
-                    value="<?= old('email', $user['email']) ?>" required>
-                <small class="text-muted">Pastikan email valid dan unik.</small>
-                <?php if (session('errors.email')): ?>
-                    <div class="invalid-feedback"><?= session('errors.email') ?></div>
-                <?php endif; ?>
-            </div>
+                <!-- Personal Information -->
+                <div class="form-section-title">
+                    <i class="bi bi-person-badge"></i>
+                    Informasi Personal
+                </div>
 
-            <!-- Password Baru -->
-            <div class="mb-3 password-toggle">
-                <label for="password" class="form-label">Password Baru</label>
-                <input type="password" name="password" id="password"
-                    class="form-control <?= session('errors.password') ? 'is-invalid' : '' ?>"
-                    placeholder="Kosongkan jika tidak ingin mengubah password">
-                <button type="button" class="toggle-btn" onclick="togglePassword('password')">
-                        <i class="bi bi-eye" id="password-icon"></i>
-                </button>
-                <?php if (session('errors.password')): ?>
-                    <div class="invalid-feedback"><?= session('errors.password') ?></div>
-                <?php endif; ?>
-            </div>
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <label for="full_name" class="form-label form-label-gov">
+                            <i class="bi bi-person"></i>
+                            Nama Lengkap
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-person-fill input-icon"></i>
+                            <input type="text" 
+                                   name="full_name" 
+                                   id="full_name"
+                                   class="form-control form-control-gov" 
+                                   value="<?= old('full_name', $user['full_name']) ?>" 
+                                   required>
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Nama lengkap sesuai identitas resmi
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Konfirmasi Password -->
-            <div class="mb-3 password-toggle">
-                <label for="password_confirm" class="form-label">Konfirmasi Password Baru</label>
-                <input type="password" name="password_confirm" id="password_confirm"
-                    class="form-control" placeholder="Ulangi password baru">
-                <button type="button" class="toggle-btn" onclick="togglePassword('password_confirm')">
-                    <i class="bi bi-eye" id="password_confirm-icon"></i>
-                </button>
-            </div>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="username" class="form-label form-label-gov">
+                            <i class="bi bi-at"></i>
+                            Username
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-person-circle input-icon"></i>
+                            <input type="text" 
+                                   name="username" 
+                                   id="username"
+                                   class="form-control form-control-gov" 
+                                   value="<?= old('username', $user['username']) ?>" 
+                                   required>
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Username harus unik dan tanpa spasi
+                        </div>
+                    </div>
 
-            <!-- Role -->
-            <div class="mb-4">
-                <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
-                <select name="role" id="role"
-                    class="form-select <?= session('errors.role') ? 'is-invalid' : '' ?>" required>
-                    <option value="">-- Pilih Role --</option>
-                    <option value="superadmin" <?= old('role', $user['role']) === 'superadmin' ? 'selected' : '' ?>>Super Admin</option>
-                    <option value="admin" <?= old('role', $user['role']) === 'admin' ? 'selected' : '' ?>>Admin</option>
-                    <option value="editor" <?= old('role', $user['role']) === 'editor' ? 'selected' : '' ?>>Editor</option>
-                </select>
-                <?php if (session('errors.role')): ?>
-                    <div class="invalid-feedback"><?= session('errors.role') ?></div>
-                <?php endif; ?>
-            </div>
+                    <div class="col-md-6 mb-4">
+                        <label for="email" class="form-label form-label-gov">
+                            <i class="bi bi-envelope"></i>
+                            Email
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-envelope-fill input-icon"></i>
+                            <input type="email" 
+                                   name="email" 
+                                   id="email"
+                                   class="form-control form-control-gov" 
+                                   value="<?= old('email', $user['email']) ?>" 
+                                   required>
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Email harus valid dan unik
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Tombol -->
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Simpan Perubahan</button>
-                <a href="<?= base_url('manage_user') ?>" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Kembali</a>
-            </div>
-        </form>
+                <!-- Security Settings -->
+                <div class="form-section-title">
+                    <i class="bi bi-shield-lock"></i>
+                    Keamanan & Password
+                </div>
+
+                <div class="info-box">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <div class="info-box-text">
+                            <strong>Informasi:</strong> Kosongkan field password jika tidak ingin mengubah password pengguna. 
+                            Password harus minimal 6 karakter untuk keamanan yang lebih baik.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="password" class="form-label form-label-gov">
+                            <i class="bi bi-key"></i>
+                            Password Baru
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-lock-fill input-icon"></i>
+                            <input type="password" 
+                                   name="password" 
+                                   id="password"
+                                   class="form-control form-control-gov" 
+                                   placeholder="Biarkan kosong jika tidak diubah">
+                            <i class="bi bi-eye password-toggle-icon" id="togglePassword"></i>
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Minimal 6 karakter
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="password_confirm" class="form-label form-label-gov">
+                            <i class="bi bi-shield-check"></i>
+                            Konfirmasi Password
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-lock-fill input-icon"></i>
+                            <input type="password" 
+                                   name="password_confirm" 
+                                   id="password_confirm"
+                                   class="form-control form-control-gov" 
+                                   placeholder="Ulangi password baru">
+                            <i class="bi bi-eye password-toggle-icon" id="togglePasswordConfirm"></i>
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Harus sama dengan password baru
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access Rights -->
+                <div class="form-section-title">
+                    <i class="bi bi-shield-check"></i>
+                    Hak Akses & Role
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <label for="role" class="form-label form-label-gov">
+                            <i class="bi bi-award"></i>
+                            Role Pengguna
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-diagram-3 input-icon"></i>
+                            <select name="role" 
+                                    id="role" 
+                                    class="form-select form-select-gov" 
+                                    required>
+                                <option value="">-- Pilih Role --</option>
+                                <option value="superadmin" <?= old('role', $user['role']) === 'superadmin' ? 'selected' : '' ?>>
+                                    🔴 Super Admin - Akses penuh sistem
+                                </option>
+                                <option value="admin" <?= old('role', $user['role']) === 'admin' ? 'selected' : '' ?>>
+                                    🔵 Admin - Kelola konten & pengguna
+                                </option>
+                                <option value="editor" <?= old('role', $user['role']) === 'editor' ? 'selected' : '' ?>>
+                                    🟢 Editor - Kelola konten
+                                </option>
+                            </select>
+                        </div>
+                        <div id="rolePreview" class="role-preview" style="display: none;"></div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Ubah role sesuai dengan tanggung jawab pengguna
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top form-actions">
+                    <a href="<?= base_url('manage_user') ?>" class="btn btn-cancel-gov me-2">
+                        <i class="bi bi-x-circle"></i>
+                        Batal
+                    </a>
+                    <button type="submit" class="btn btn-submit-gov">
+                        <i class="bi bi-check-circle"></i>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+<?= $this->endSection() ?>
 
-<script>
-function togglePassword(inputId) {
-    const input = document.getElementById(inputId);
-    const icon = document.getElementById(inputId + '-icon');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('bi-eye', 'bi-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.replace('bi-eye-slash', 'bi-eye');
-    }
-}
-
-// Validasi konfirmasi password
-document.getElementById('updateUserForm').addEventListener('submit', function(e) {
-    const pass = document.getElementById('password').value;
-    const confirm = document.getElementById('password_confirm').value;
-    if (pass !== '' || confirm !== '') {
-        if (pass !== confirm) {
-            e.preventDefault();
-            alert('Password dan konfirmasi tidak cocok!');
-            return false;
-        }
-        if (pass.length < 6) {
-            e.preventDefault();
-            alert('Password minimal 6 karakter!');
-            return false;
-        }
-    }
-});
-</script>
+<?= $this->section('scripts') ?>
+<script src="<?= base_url('js/pages/manage_user/edit.js') ?>"></script>
 <?= $this->endSection() ?>

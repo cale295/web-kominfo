@@ -1,0 +1,178 @@
+:root {
+    --primary-gov: #1e40af;
+    --secondary-gov: #0c4a6e;
+    --success-gov: #047857;
+    --warning-gov: #b45309;
+    --danger-gov: #be123c;
+    --info-gov: #0369a1;
+    --accent-gov: #fbbf24;
+}
+
+/* Header Halaman */
+.page-header-gov {
+    background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
+    color: white;
+    padding: 30px 35px;
+    border-radius: 16px;
+    box-shadow: 0 4px S20px rgba(30, 64, 175, 0.15);
+    margin-bottom: 30px;
+    border-left: 6px solid var(--accent-gov);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.page-header-gov h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+}
+
+.page-header-gov h3 i {
+    color: var(--accent-gov);
+    margin-right: 15px;
+    font-size: 2.2rem;
+}
+
+.page-header-gov p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* Kartu Utama */
+.form-card-gov {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    background: white;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.form-card-header {
+    background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
+    color: white;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+}
+
+.form-card-header i {
+    color: var(--accent-gov);
+    font-size: 1.5rem;
+    margin-right: 12px;
+}
+
+.form-card-header span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+}
+
+/* Form Switch (Toggle) */
+.form-check.form-switch {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.form-check.form-switch:hover {
+    background-color: #f8fafc;
+}
+
+.form-check-input {
+    width: 3.2em;
+    height: 1.6em;
+    cursor: pointer;
+    background-color: #e2e8f0;
+    border-color: #e2e8f0;
+}
+
+.form-check-input:checked {
+    background-color: var(--success-gov);
+    border-color: var(--success-gov);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 4px rgba(4, 120, 87, 0.2);
+    border-color: var(--success-gov);
+}
+
+.form-check-label {
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.form-check-label i {
+    font-size: 1.1rem;
+    color: var(--primary-gov);
+}
+
+/* Tombol Aksi */
+.btn-save-gov {
+    background: linear-gradient(135deg, var(--success-gov) 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(4, 120, 87, 0.25);
+}
+
+.btn-save-gov:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(4, 120, 87, 0.35);
+}
+
+.btn-cancel-gov {
+    background: white;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-gov:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+}
+
+.btn-back-gov {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-back-gov:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Animasi */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

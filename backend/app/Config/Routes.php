@@ -18,6 +18,7 @@ $routes->get('/dashboard', 'DashboardController::index');
 
 // Resource Web (non-API)
 $routes->resource('manage_user', ['controller' => 'UserController']);
+$routes->post('manage_user/delete_selected', 'UserController::deleteSelected');
 $routes->resource('berita', ['controller' => 'BeritaController']);
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
 

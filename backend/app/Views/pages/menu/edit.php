@@ -1,77 +1,194 @@
 <?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="mb-1 fw-bold">Edit Menu</h3>
-            <p class="text-muted mb-0">Perbarui informasi menu.</p>
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="<?= base_url('css/pages/menu/edit.css') ?>">
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="page-header-gov">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h3>
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit Menu
+                </h3>
+                <p>Perbarui informasi dan konfigurasi menu sistem</p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <a href="<?= site_url('menu') ?>" class="btn btn-back-gov">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                </a>
+            </div>
         </div>
-        <a href="<?= site_url('menu') ?>" class="btn btn-secondary shadow-sm">
-            <i class="bi bi-arrow-left me-2"></i>Kembali
-        </a>
     </div>
 
+    <!-- Error Alert -->
     <?php if (session()->getFlashdata('errors')): ?>
-        <div class="alert alert-danger">
-            <ul class="mb-0">
+        <div class="alert alert-danger-gov alert-dismissible fade show" role="alert">
+            <strong>Terdapat kesalahan pada form:</strong>
+            <ul class="mt-2">
                 <?php foreach(session()->getFlashdata('errors') as $error): ?>
                     <li><?= esc($error) ?></li>
                 <?php endforeach; ?>
             </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
-    <div class="card shadow-sm border-0">
+    <!-- Form Card -->
+    <div class="card form-card-gov">
         <div class="card-body">
-            <form action="<?= site_url('menu/update/' . $menu['id_menu']) ?>" method="post">
+            <form action="<?= site_url('menu/update/' . $menu['id_menu']) ?>" method="post" id="menuForm">
                 <?= csrf_field() ?>
                 <input type="hidden" name="_method" value="PUT">
 
-                <div class="mb-3">
-                    <label for="menu_name" class="form-label">Nama Menu</label>
-                    <input type="text" class="form-control" id="menu_name" name="menu_name" value="<?= esc($menu['menu_name']) ?>" required>
+                <!-- Informasi Dasar -->
+                <div class="form-section-title">
+                    <i class="bi bi-info-circle"></i>
+                    Informasi Dasar Menu
                 </div>
 
-                <div class="mb-3">
-                    <label for="menu_url" class="form-label">URL</label>
-                    <input type="text" class="form-control" id="menu_url" name="menu_url" value="<?= esc($menu['menu_url']) ?>">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="menu_name" class="form-label form-label-gov">
+                            <i class="bi bi-tag"></i>
+                            Nama Menu
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-card-text input-icon"></i>
+                            <input type="text" 
+                                   class="form-control form-control-gov" 
+                                   id="menu_name" 
+                                   name="menu_name" 
+                                   value="<?= esc($menu['menu_name']) ?>" 
+                                   placeholder="Contoh: Dashboard, Berita, dll"
+                                   required>
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Nama yang akan ditampilkan di menu navigasi
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="menu_url" class="form-label form-label-gov">
+                            <i class="bi bi-link-45deg"></i>
+                            URL / Route
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-globe input-icon"></i>
+                            <input type="text" 
+                                   class="form-control form-control-gov" 
+                                   id="menu_url" 
+                                   name="menu_url" 
+                                   value="<?= esc($menu['menu_url']) ?>"
+                                   placeholder="/dashboard atau https://example.com">
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Kosongkan jika menu memiliki submenu
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="menu_icon" class="form-label">Icon (kelas bootstrap/icons)</label>
-                    <input type="text" class="form-control" id="menu_icon" name="menu_icon" value="<?= esc($menu['menu_icon']) ?>">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="menu_icon" class="form-label form-label-gov">
+                            <i class="bi bi-app-indicator"></i>
+                            Icon Bootstrap
+                        </label>
+                        <div class="input-group-gov">
+                            <i class="bi bi-palette input-icon"></i>
+                            <input type="text" 
+                                   class="form-control form-control-gov" 
+                                   id="menu_icon" 
+                                   name="menu_icon" 
+                                   value="<?= esc($menu['menu_icon']) ?>"
+                                   placeholder="bi-speedometer2">
+                        </div>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Gunakan kelas dari Bootstrap Icons
+                        </div>
+                        <!-- Icon Preview -->
+                        <div class="icon-preview-box">
+                            <div class="preview-icon">
+                                <i class="<?= esc($menu['menu_icon']) ?>" id="iconPreview"></i>
+                            </div>
+                            <div class="preview-text">Preview Icon</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="status" class="form-label form-label-gov">
+                            <i class="bi bi-toggle-on"></i>
+                            Status Menu
+                            <span class="required">*</span>
+                        </label>
+                        <select class="form-select form-select-gov" id="status" name="status" required>
+                            <option value="active" <?= $menu['status'] === 'active' ? 'selected' : '' ?>>
+                                ✓ Aktif - Menu ditampilkan
+                            </option>
+                            <option value="inactive" <?= $menu['status'] === 'inactive' ? 'selected' : '' ?>>
+                                ✗ Nonaktif - Menu disembunyikan
+                            </option>
+                        </select>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Status aktif akan menampilkan menu di sistem
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="parent_id" class="form-label">Parent Menu</label>
-                    <select class="form-select" id="parent_id" name="parent_id">
-                        <option value="0" <?= $menu['parent_id'] == 0 ? 'selected' : '' ?>>Menu Utama (tanpa parent)</option>
-                        <?php foreach ($menus as $m): ?>
-                            <?php // Perubahan: Hanya tampilkan menu jika merupakan parent (parent_id == 0) dan bukan menu yang sedang diedit ?>
-                            <?php if ($m['parent_id'] == 0 && $m['id_menu'] != $menu['id_menu']): ?>
-                                <option value="<?= $m['id_menu'] ?>" <?= $menu['parent_id'] == $m['id_menu'] ? 'selected' : '' ?>>
-                                    <?= esc($m['menu_name']) ?>
-                                </option>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </select>
+                <!-- Struktur Menu -->
+                <div class="form-section-title">
+                    <i class="bi bi-diagram-3"></i>
+                    Struktur & Hierarki Menu
                 </div>
 
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-select" id="status" name="status" required>
-                        <option value="active" <?= $menu['status'] === 'active' ? 'selected' : '' ?>>Aktif</option>
-                        <option value="inactive" <?= $menu['status'] === 'inactive' ? 'selected' : '' ?>>Nonaktif</option>
-                    </select>
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <label for="parent_id" class="form-label form-label-gov">
+                            <i class="bi bi-folder-symlink"></i>
+                            Parent Menu (Induk)
+                        </label>
+                        <select class="form-select form-select-gov" id="parent_id" name="parent_id">
+                            <option value="0" <?= $menu['parent_id'] == 0 ? 'selected' : '' ?>>
+                                📌 Menu Utama (Tanpa Parent)
+                            </option>
+                            <?php foreach ($menus as $m): ?>
+                                <?php if ($m['parent_id'] == 0 && $m['id_menu'] != $menu['id_menu']): ?>
+                                    <option value="<?= $m['id_menu'] ?>" <?= $menu['parent_id'] == $m['id_menu'] ? 'selected' : '' ?>>
+                                        📁 <?= esc($m['menu_name']) ?>
+                                    </option>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text-gov">
+                            <i class="bi bi-lightbulb"></i>
+                            Pilih parent jika menu ini merupakan submenu
+                        </div>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save me-2"></i>Simpan Perubahan
-                </button>
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-end mt-4 pt-3 border-top">
+                    <a href="<?= site_url('menu') ?>" class="btn btn-cancel-gov">
+                        <i class="bi bi-x-circle me-2"></i>Batal
+                    </a>
+                    <button type="submit" class="btn btn-submit-gov">
+                        <i class="bi bi-check-circle me-2"></i>Simpan Perubahan
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </div>
+<?= $this->endSection() ?>
 
+<?= $this->section('scripts') ?>
+<script src="<?= base_url('js/pages/menu/edit.js') ?>"></script>
 <?= $this->endSection() ?>

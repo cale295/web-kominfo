@@ -1,0 +1,452 @@
+:root {
+    --primary-gov: #1e40af;
+    --secondary-gov: #0c4a6e;
+    --success-gov: #047857;
+    --warning-gov: #b45309;
+    --danger-gov: #be123c;
+    --info-gov: #0369a1;
+    --accent-gov: #fbbf24;
+}
+
+/* Page Header */
+.page-header-gov {
+    background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
+    color: white;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(30, 64, 175, 0.15);
+    margin-bottom: 30px;
+    border-left: 6px solid var(--accent-gov);
+    position: relative;
+}
+
+.page-header-gov h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.page-header-gov h1 i {
+    color: var(--accent-gov);
+    margin-right: 12px;
+}
+
+.page-header-gov p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.05rem;
+}
+
+.btn-back {
+    position: absolute;
+    top: 35px;
+    right: 35px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-back i {
+    margin-right: 6px;
+}
+
+/* Detail Card */
+.detail-card-gov {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.detail-card-gov .card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid #e2e8f0;
+    padding: 20px 30px;
+}
+
+.card-header-title {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.card-header-title i {
+    color: var(--primary-gov);
+    margin-right: 12px;
+    font-size: 1.5rem;
+}
+
+.detail-card-gov .card-body {
+    padding: 0;
+}
+
+/* Profile Section */
+.profile-header {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    padding: 40px 30px;
+    text-align: center;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 3rem;
+    color: white;
+    box-shadow: 0 8px 24px rgba(30, 64, 175, 0.25);
+    border: 4px solid white;
+}
+
+.profile-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.profile-username {
+    font-size: 1rem;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+.profile-username code {
+    background: rgba(30, 64, 175, 0.1);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: var(--primary-gov);
+}
+
+/* Role Badge */
+.role-badge-large {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.role-superadmin {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 2px solid #fca5a5;
+}
+
+.role-admin {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    color: #075985;
+    border: 2px solid #7dd3fc;
+}
+
+.role-editor {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 2px solid #6ee7b7;
+}
+
+/* Detail Table */
+.detail-table {
+    margin: 0;
+}
+
+.detail-table tr {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-table tr:last-child {
+    border-bottom: none;
+}
+
+.detail-table th {
+    width: 200px;
+    padding: 20px 30px;
+    background: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+.detail-table td {
+    padding: 20px 30px;
+    color: #1e293b;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+.detail-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    margin-right: 12px;
+}
+
+.icon-id {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    color: var(--info-gov);
+}
+
+.icon-name {
+    background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+    color: #7c3aed;
+}
+
+.icon-username {
+    background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+    color: var(--warning-gov);
+}
+
+.icon-email {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: var(--success-gov);
+}
+
+.icon-role {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: var(--danger-gov);
+}
+
+/* Action Buttons */
+.action-buttons {
+    padding: 30px;
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-action-detail {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: 2px solid;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.btn-action-detail i {
+    margin-right: 8px;
+}
+
+.btn-back-detail {
+    background: white;
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
+.btn-back-detail:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #475569;
+    transform: translateY(-2px);
+}
+
+.btn-edit-detail {
+    background: white;
+    border-color: var(--warning-gov);
+    color: var(--warning-gov);
+}
+
+.btn-edit-detail:hover {
+    background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+    border-color: var(--warning-gov);
+    color: var(--warning-gov);
+    transform: translateY(-2px);
+}
+
+.btn-delete-detail {
+    background: white;
+    border-color: var(--danger-gov);
+    color: var(--danger-gov);
+}
+
+.btn-delete-detail:hover {
+    background: var(--danger-gov);
+    border-color: var(--danger-gov);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(190, 18, 60, 0.25);
+}
+
+/* Info Cards */
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 30px;
+}
+
+.info-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    border-color: var(--primary-gov);
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.1);
+    transform: translateY(-4px);
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.info-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-right: 12px;
+}
+
+.info-card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.info-card-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    word-break: break-word;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.detail-card-gov {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.info-card {
+    animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.info-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.info-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.info-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.info-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header-gov {
+        padding: 20px;
+    }
+
+    .page-header-gov h1 {
+        font-size: 1.5rem;
+    }
+
+    .btn-back {
+        position: static;
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+    }
+
+    .profile-name {
+        font-size: 1.5rem;
+    }
+
+    .detail-table th {
+        width: 120px;
+        padding: 16px 20px;
+    }
+
+    .detail-table td {
+        padding: 16px 20px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-action-detail {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .info-cards {
+        grid-template-columns: 1fr;
+    }
+}

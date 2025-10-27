@@ -232,4 +232,35 @@ $validationRules = [
             ->where('module_name', $this->module)
             ->first();
     }
+    public function show($id)
+    {
+        $user = $this->userModel->find($id);
+
+        if (!$user) {
+            return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
+        }
+
+        $data = [
+            'title' => 'Detail User',
+            'user'  => $user
+        ];
+
+        return view('pages/manage_user/show', $data);
+    }
+    public function deleteSelected()
+{
+    // Ambil array ID dari form yang dikirim
+    $userIds = $this->request->getPost('user_ids');
+
+    if (empty($userIds)) {
+        return redirect()->back()->with('error', 'Tidak ada pengguna yang dipilih untuk dihapus.');
+    }
+
+    // Gunakan model untuk menghapus data berdasarkan array ID
+    // Metode delete() di model CodeIgniter 4 bisa menerima array ID
+    $this->userModel->delete($userIds);
+
+    $count = count($userIds);
+    return redirect()->to('manage_user')->with('success', "Berhasil menghapus {$count} pengguna.");
+}
 }

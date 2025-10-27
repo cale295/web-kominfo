@@ -26,7 +26,7 @@
         }
         
         .main-content {
-            margin-left: 250px;
+            margin-left: 265px;
             min-height: 100vh;
             padding: 20px;
             width: calc(100% - 250px);

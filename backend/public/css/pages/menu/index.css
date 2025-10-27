@@ -1,0 +1,318 @@
+:root {
+    --primary-gov: #1e40af;
+    --secondary-gov: #0c4a6e;
+    --success-gov: #047857;
+    --warning-gov: #b45309;
+    --danger-gov: #be123c;
+    --accent-gov: #fbbf24;
+}
+
+/* Page Header */
+.page-header-gov {
+    background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(30, 64, 175, 0.15);
+    margin-bottom: 30px;
+    border-left: 6px solid var(--accent-gov);
+}
+
+.page-header-gov h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.page-header-gov p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.page-header-gov .btn {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary-gov);
+    border: none;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.page-header-gov .btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.page-header-gov .btn i {
+    color: var(--primary-gov);
+}
+
+/* Alert Styles */
+.alert-gov {
+    border: none;
+    border-radius: 12px;
+    padding: 18px 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+}
+
+.alert-success-gov {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left: 5px solid var(--success-gov);
+    color: #065f46;
+}
+
+.alert-success-gov i {
+    color: var(--success-gov);
+    font-size: 1.2rem;
+}
+
+.alert-danger-gov {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-left: 5px solid var(--danger-gov);
+    color: #991b1b;
+}
+
+.alert-danger-gov i {
+    color: var(--danger-gov);
+    font-size: 1.2rem;
+}
+
+/* Card Styles */
+.card-gov {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    background: white;
+}
+
+/* Table Styles */
+.table-gov {
+    margin: 0;
+}
+
+.table-gov thead {
+    background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
+}
+
+.table-gov thead th {
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 18px 20px;
+    border: none;
+}
+
+.table-gov tbody td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+}
+
+.table-gov tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table-gov tbody tr:hover {
+    background-color: #f8fafc;
+    transform: scale(1.002);
+}
+
+/* Parent Menu Row */
+.table-gov .parent-row {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left: 4px solid var(--primary-gov);
+}
+
+.table-gov .parent-row td {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.table-gov .parent-row:hover {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+/* Child Menu Row */
+.table-gov .child-row td:first-child {
+    padding-left: 30px;
+}
+
+.child-indicator {
+    color: var(--primary-gov);
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+/* Menu Icon Styles */
+.menu-icon {
+    color: var(--primary-gov);
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+/* Badge Styles */
+.badge-gov {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.badge-active {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 1px solid #059669;
+}
+
+.badge-inactive {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: #475569;
+    border: 1px solid #94a3b8;
+}
+
+/* Button Group Styles */
+.btn-group-gov {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-action {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-action:hover {
+    border-color: var(--primary-gov);
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: var(--primary-gov);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+}
+
+.btn-action.btn-toggle-active i {
+    color: var(--success-gov);
+}
+
+.btn-action.btn-toggle-active:hover {
+    border-color: var(--success-gov);
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.btn-action.btn-edit:hover {
+    border-color: var(--primary-gov);
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+/* Loading Animation */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Tooltip Enhancement */
+.tooltip-inner {
+    background: #1e293b;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.empty-state h5 {
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #94a3b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header-gov {
+        padding: 20px;
+    }
+
+    .page-header-gov h3 {
+        font-size: 1.5rem;
+    }
+
+    .table-gov thead th,
+    .table-gov tbody td {
+        padding: 12px;
+        font-size: 0.85rem;
+    }
+
+    .btn-action {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-gov {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.alert-gov {
+    animation: fadeInUp 0.4s ease-out;
+}
