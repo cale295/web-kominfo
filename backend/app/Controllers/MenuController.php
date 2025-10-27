@@ -30,7 +30,7 @@ class MenuController extends BaseController
             return view('pages/menu/index', [
                 'title' => 'Manajemen Menu',
                 'menus' => [],
-                'error' => '⚠️ Kamu tidak memiliki hak akses ke modul ini.'
+                'error' => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
             ]);
         }
 
@@ -142,6 +142,7 @@ public function edit($id = null)
 
     return view('pages/menu/edit', $data);
 }
+
     // ========================================================
     // PUT /menu/{id} → update menu
     // ========================================================
