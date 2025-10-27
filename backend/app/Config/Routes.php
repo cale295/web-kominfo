@@ -21,6 +21,8 @@ $routes->resource('manage_user', ['controller' => 'UserController']);
 $routes->post('manage_user/delete_selected', 'UserController::deleteSelected');
 $routes->resource('berita', ['controller' => 'BeritaController']);
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
+$routes->resource('agenda', ['controller' => 'AgendaController','except' => ['show']]);
+
 
 //menu 
 $routes->resource('menu', ['controller' => 'MenuController']);

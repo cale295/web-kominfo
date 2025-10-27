@@ -195,7 +195,7 @@ public function edit($id = null)
     // Toggle status aktif/nonaktif menu
     // ========================================================
     public function toggleStatus($id)
-{
+    {
     $menuModel = new MenuModel();
     $menu = $menuModel->find($id);
 
@@ -209,8 +209,10 @@ public function edit($id = null)
     return $this->response->setJSON([
         'success' => true,
         'newStatus' => $newStatus
+        
     ]);
-}
+    
+    }
 
 
     // ========================================================

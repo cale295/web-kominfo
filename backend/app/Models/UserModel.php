@@ -82,20 +82,23 @@ protected $validationMessages = [
     // Callbacks
     protected $allowCallbacks = true;
     protected $beforeInsert   = ['hashPassword'];
-    protected $beforeUpdate   = ['hashPassword'];
+    protected $beforeUpdate   = ['hashPassword','adjustEmailRule'];
 
     /**
      * Hash password sebelum disimpan ke database
      */
     protected function hashPassword(array $data): array
-    {
-        if (!empty($data['data']['password'])) {
+{
+    if (!empty($data['data']['password'])) {
+        // Cegah double hash
+        if (password_get_info($data['data']['password'])['algo'] === 0) {
             $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
         }
-        return $data;
     }
+    return $data;
+}   
 
-    protected function beforeUpdate(array $data)
+    protected function adjustEmailRule(array $data)
 {
     $id = $data['id'][0] ?? null;
 
