@@ -24,7 +24,7 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form action="<?= site_url('agenda/' . $agenda['id_agenda']) ?>" method="post">
+            <form action="<?= site_url('agenda/' . $agenda['id_agenda']) ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <!-- Tambahkan baris ini agar request dikenali sebagai PUT -->
                 <input type="hidden" name="_method" value="PUT">
@@ -36,7 +36,7 @@
                 <img src="<?= base_url('uploads/agenda/' . $agenda['image']) ?>" alt="Foto Agenda" width="150" class="rounded shadow-sm">
                 </div>
                 <?php endif; ?>
-                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                <input type="file" name="image" id="image" class="form-control" accept="image/jpeg, image/png, image/jpg*">
             </div>
 
                 <div class="mb-3">

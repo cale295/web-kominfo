@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\AgendaModel;
 use App\Models\AccessRightsModel;
+use CodeIgniter\Exceptions\PageNotFoundException; // Pastikan ini di-import
 
 class AgendaController extends BaseController
 {
@@ -40,10 +41,10 @@ class AgendaController extends BaseController
         $agendas = $this->agendaModel->orderBy('start_date', 'DESC')->findAll();
 
         $data = [
-            'agendas'     => $agendas,
-            'can_create'  => $access['can_create'],
-            'can_update'  => $access['can_update'],
-            'can_delete'  => $access['can_delete'],
+            'agendas'    => $agendas,
+            'can_create' => $access['can_create'],
+            'can_update' => $access['can_update'],
+            'can_delete' => $access['can_delete'],
         ];
 
         return view('agenda/index', $data);
@@ -76,7 +77,12 @@ class AgendaController extends BaseController
             'activity_name' => 'required|min_length[3]',
             'start_date'    => 'required|valid_date',
             'end_date'      => 'required|valid_date',
-            'image'         => 'permit_empty|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]',
+            
+            // =======================================================================
+            // PERBAIKAN: Aturan 'is_image[image]' dihapus untuk mengatasi masalah PNG.
+            // Kita hanya bergantung pada 'ext_in' untuk memeriksa ekstensi.
+            // =======================================================================
+            'image' => 'permit_empty|ext_in[image,jpg,jpeg,png]' 
         ]);
 
         if (!$validation) {
@@ -96,7 +102,7 @@ class AgendaController extends BaseController
         if ($img = $this->request->getFile('image')) {
             if ($img->isValid() && !$img->hasMoved()) {
                 $newName = $img->getRandomName();
-                $img->move('uploads/agenda/', $newName);
+                $img->move(FCPATH . 'uploads/agenda/', $newName); // Gunakan FCPATH
                 $data['image'] = $newName;
             }
         }
@@ -117,7 +123,7 @@ class AgendaController extends BaseController
 
         $agenda = $this->agendaModel->find($id);
         if (!$agenda) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Agenda tidak ditemukan.');
+            throw new PageNotFoundException('Agenda tidak ditemukan.');
         }
 
         return view('agenda/edit', ['agenda' => $agenda]);
@@ -133,14 +139,20 @@ class AgendaController extends BaseController
             return redirect()->to('/agenda')->with('error', 'Kamu tidak punya izin mengubah agenda.');
         }
 
-        $validation = $this->validate([
+        $img = $this->request->getFile('image');
+
+        // =======================================================================
+        // PERBAIKAN: Aturan validasi file ditambahkan di sini agar konsisten
+        // dengan method create() dan lebih rapi.
+        // =======================================================================
+        $rules = [
             'activity_name' => 'required|min_length[3]',
             'start_date'    => 'required|valid_date',
             'end_date'      => 'required|valid_date',
-            'image'         => 'permit_empty|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]',
-        ]);
+            'image'         => 'permit_empty|ext_in[image,jpg,jpeg,png]' // 'is_image' juga dihapus
+        ];
 
-        if (!$validation) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -153,18 +165,32 @@ class AgendaController extends BaseController
             'status'        => $this->request->getPost('status') ?? 'inactive',
         ];
 
-        // Handle upload gambar baru
-        if ($img = $this->request->getFile('image')) {
-            if ($img->isValid() && !$img->hasMoved()) {
-                $newName = $img->getRandomName();
-                $img->move('uploads/agenda/', $newName);
-                $data['image'] = $newName;
+        // Folder upload (gunakan FCPATH)
+        $uploadPath = FCPATH . 'uploads/agenda/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
 
-                // hapus gambar lama
-                $old = $this->agendaModel->find($id);
-                if ($old && !empty($old['image']) && file_exists('uploads/agenda/' . $old['image'])) {
-                    unlink('uploads/agenda/' . $old['image']);
-                }
+        // Upload file baru (Gunakan getSize() > 0 untuk memastikan file benar-benar di-upload)
+        if ($img && $img->isValid() && $img->getSize() > 0) {
+            
+            // =======================================================================
+            // PERBAIKAN: Pengecekan ekstensi manual dihapus,
+            // karena sudah ditangani oleh $this->validate($rules) di atas.
+            // =======================================================================
+
+            $newName = $img->getRandomName();
+
+            if (!$img->move($uploadPath, $newName)) {
+                return redirect()->back()->with('error', 'Gagal menyimpan gambar. Pastikan folder "uploads/agenda" writable.');
+            }
+
+            $data['image'] = $newName;
+
+            // hapus gambar lama
+            $old = $this->agendaModel->find($id);
+            if ($old && !empty($old['image']) && file_exists($uploadPath . $old['image'])) {
+                @unlink($uploadPath . $old['image']); // gunakan @ untuk menekan error jika file tidak ada
             }
         }
 
@@ -183,8 +209,14 @@ class AgendaController extends BaseController
         }
 
         $agenda = $this->agendaModel->find($id);
-        if ($agenda && !empty($agenda['image']) && file_exists('uploads/agenda/' . $agenda['image'])) {
-            unlink('uploads/agenda/' . $agenda['image']);
+
+        // =======================================================================
+        // PERBAIKAN: Tambahkan FCPATH. Path 'uploads/agenda/...' saja tidak akan
+        // ditemukan. Harus FCPATH . 'uploads/agenda/'
+        // =======================================================================
+        $uploadPath = FCPATH . 'uploads/agenda/';
+        if ($agenda && !empty($agenda['image']) && file_exists($uploadPath . $agenda['image'])) {
+            @unlink($uploadPath . $agenda['image']); // gunakan @ untuk menekan error
         }
 
         if ($this->agendaModel->delete($id)) {
