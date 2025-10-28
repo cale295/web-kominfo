@@ -28,7 +28,7 @@ class AgendaController extends BaseController
         $access = $this->getAccess($role);
 
         if (!$access) {
-            return view('agenda/index', [
+            return view('pages/agenda/index', [
                 'agendas' => [],
                 'error'   => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
             ]);
@@ -47,11 +47,11 @@ class AgendaController extends BaseController
             'can_delete' => $access['can_delete'],
         ];
 
-        return view('agenda/index', $data);
+        return view('pages/agenda/index', $data);
     }
 
     // ==========================================================
-    // GET /agenda/new → form tambah agenda
+    // GET /pages/agenda/new → form tambah agenda
     // ==========================================================
     public function new()
     {
@@ -60,7 +60,7 @@ class AgendaController extends BaseController
             return redirect()->to('/agenda')->with('error', 'Kamu tidak punya izin menambah agenda.');
         }
 
-        return view('agenda/create');
+        return view('pages/agenda/create');
     }
 
     // ==========================================================
@@ -102,7 +102,7 @@ class AgendaController extends BaseController
         if ($img = $this->request->getFile('image')) {
             if ($img->isValid() && !$img->hasMoved()) {
                 $newName = $img->getRandomName();
-                $img->move(FCPATH . 'uploads/agenda/', $newName); // Gunakan FCPATH
+                $img->move(FCPATH . 'uploads/pages/agenda/', $newName); // Gunakan FCPATH
                 $data['image'] = $newName;
             }
         }
@@ -112,7 +112,7 @@ class AgendaController extends BaseController
     }
 
     // ==========================================================
-    // GET /agenda/{id}/edit → form edit agenda
+    // GET /pages/agenda/{id}/edit → form edit agenda
     // ==========================================================
     public function edit($id = null)
     {
@@ -126,11 +126,11 @@ class AgendaController extends BaseController
             throw new PageNotFoundException('Agenda tidak ditemukan.');
         }
 
-        return view('agenda/edit', ['agenda' => $agenda]);
+        return view('pages/agenda/edit', ['agenda' => $agenda]);
     }
 
     // ==========================================================
-    // PUT /agenda/{id} → update agenda
+    // PUT /pages/agenda/{id} → update agenda
     // ==========================================================
     public function update($id = null)
     {
@@ -166,7 +166,7 @@ class AgendaController extends BaseController
         ];
 
         // Folder upload (gunakan FCPATH)
-        $uploadPath = FCPATH . 'uploads/agenda/';
+        $uploadPath = FCPATH . 'uploads/pages/agenda/';
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
@@ -199,7 +199,7 @@ class AgendaController extends BaseController
     }
 
     // ==========================================================
-    // DELETE /agenda/{id} → hapus agenda
+    // DELETE /pages/agenda/{id} → hapus agenda
     // ==========================================================
     public function delete($id = null)
     {
@@ -211,10 +211,10 @@ class AgendaController extends BaseController
         $agenda = $this->agendaModel->find($id);
 
         // =======================================================================
-        // PERBAIKAN: Tambahkan FCPATH. Path 'uploads/agenda/...' saja tidak akan
-        // ditemukan. Harus FCPATH . 'uploads/agenda/'
+        // PERBAIKAN: Tambahkan FCPATH. Path 'uploads/pages/agenda/...' saja tidak akan
+        // ditemukan. Harus FCPATH . 'uploads/pages/agenda/'
         // =======================================================================
-        $uploadPath = FCPATH . 'uploads/agenda/';
+        $uploadPath = FCPATH . 'uploads/pages/agenda/';
         if ($agenda && !empty($agenda['image']) && file_exists($uploadPath . $agenda['image'])) {
             @unlink($uploadPath . $agenda['image']); // gunakan @ untuk menekan error
         }

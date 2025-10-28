@@ -217,7 +217,7 @@
     .status-active::before {
         content: '●';
         font-size: 1rem;
-        animation: pulse 2s ease-in-out infinite;
+        animation: status-pulse 2s ease-in-out infinite;
     }
 
     .status-inactive {
@@ -231,7 +231,7 @@
         font-size: 1rem;
     }
 
-    @keyframes pulse {
+    @keyframes status-pulse {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.5; }
     }
