@@ -12,6 +12,12 @@ $menuItems = [
         'roles' => ['superadmin', 'admin', 'editor']
     ],
     [
+        'title' => 'Banner',
+        'icon' => 'bi-house-door',
+        'url' => 'banner/',
+        'roles' => ['admin']
+    ],
+    [
         'title' => 'Manajemen Berita',
         'icon' => 'bi-newspaper',
         'roles' => ['admin', 'editor'],
