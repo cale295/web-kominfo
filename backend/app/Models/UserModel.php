@@ -35,11 +35,11 @@ protected $allowedFields = [
     // Validation rules
     protected $validationRules = [
     'full_name' => [
-        'rules' => 'required|min_length[3]|max_length[100]',
+        'rules' => 'required|min_length[5]|max_length[100]',
         'label' => 'Nama Lengkap'
     ],
     'username' => [
-        'rules' => 'required|min_length[3]|max_length[50]',
+        'rules' => 'required|min_length[5]|max_length[50]',
         'label' => 'Username'
     ],
     'password' => [
@@ -55,12 +55,12 @@ protected $allowedFields = [
 protected $validationMessages = [
     'full_name' => [
         'required'   => 'Nama lengkap harus diisi.',
-        'min_length' => 'Nama lengkap minimal 3 karakter.',
+        'min_length' => 'Nama lengkap minimal 5 karakter.',
         'max_length' => 'Nama lengkap maksimal 100 karakter.',
     ],
     'username' => [
         'required'   => 'Username harus diisi.',
-        'min_length' => 'Username minimal 3 karakter.',
+        'min_length' => 'Username minimal 5  karakter.',
         'max_length' => 'Username maksimal 50 karakter.',
     ],
     'password' => [

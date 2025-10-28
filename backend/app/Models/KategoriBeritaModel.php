@@ -28,8 +28,8 @@ class KategoriBeritaModel extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
+    protected $validationRules      = ['nama_kategori' => 'required|min_length[3]|max_length[50]|is_unique[m_kategori_berita.nama_kategori]'];
+    protected $validationMessages   = ['nama_kategori' => ['required' => 'Kategori berita harus diisi', 'is_unique' => 'Kategori berita sudah ada']];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 

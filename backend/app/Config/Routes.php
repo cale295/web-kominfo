@@ -31,6 +31,23 @@ $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController'
 // Agenda
 $routes->resource('agenda', ['controller' => 'AgendaController','except' => ['show']]);
 
+// Profile
+$routes->resource('profile', ['controller' => 'ProfileController', 'except' => ['show']]);
+
+
+// Banner logo
+$routes->resource('banner', ['controller' => 'BannerController', 'except' => ['show']]);
+$routes->get('banner/view/(:num)', 'BannerController::view/$1');
+$routes->get('banner/click/(:num)', 'BannerController::click/$1');
+$routes->get('banner/trash', 'BannerController::trash');
+$routes->get('banner/restore/(:num)', 'BannerController::restore/$1'); // restore data
+$routes->post('banner/(:num)/restore', 'BannerController::restore/$1');
+$routes->get('banner/destroyPermanent/(:num)', 'BannerController::destroyPermanent/$1');
+
+
+
+
+
 
 //menu 
 $routes->resource('menu', ['controller' => 'MenuController']);

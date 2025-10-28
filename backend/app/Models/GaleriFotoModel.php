@@ -29,7 +29,12 @@ class GaleriFotoModel extends Model
 
     // Validation
     protected $validationRules      = 
-    ['judul_foto' => 'required', 'path_file' => 'required', 'slug' => 'required', 'id_album' => 'required', 'created_at' => 'required', 'updated_at' => 'required',];
+    ['judul_foto' => 'required|min_length[8]|max_length[100]', 
+    'path_file' => 'required|min_length[8]|max_length[100]', 
+    'slug' => 'required|min_length[8]|max_length[100]', 
+    'id_album' => 'required', 
+    'created_at' => 'required', 
+    'updated_at' => 'required',];
     protected $validationMessages =
         [
             'judul_foto' => [

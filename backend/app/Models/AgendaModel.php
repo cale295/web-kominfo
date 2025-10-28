@@ -32,7 +32,7 @@ class AgendaModel extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation (opsional)
-    protected $validationRules      = [];
+    protected $validationRules      = [''];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
