@@ -615,9 +615,9 @@
                                                 <input type="hidden" name="_method" value="DELETE">
                                                 <button type="submit" 
                                                         class="btn btn-sm btn-danger btn-action"
-                                                        onclick="return confirm('Yakin ingin menghapus banner ini?')"
+                                                        onclick="return confirm('Yakin ingin Membuang banner ini?')"
                                                         title="Hapus Banner">
-                                                    <i class="bi bi-trash3"></i>Hapus
+                                                    <i class="bi bi-trash3"></i>Trash
                                                 </button>
                                             </form>
                                         </div>

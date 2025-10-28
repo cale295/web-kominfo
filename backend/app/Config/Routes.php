@@ -40,6 +40,13 @@ $routes->get('kategori/trash', 'KategoriController::trash');
 $routes->get('kategori/(:num)/restore', 'KategoriController::restore/$1');
 $routes->delete('kategori/(:num)/destroyPermanent', 'KategoriController::destroyPermanent/$1');
 
+// berita kategori
+$routes->resource('berita_tag', ['controller' => 'BeritaTagController', 'except' => ['show']]);
+$routes->get('berita_tag/trash', 'BeritaTagController::trash');
+$routes->get('berita_tag/(:num)/restore', 'BeritaTagController::restore/$1');
+$routes->delete('berita_tag/(:num)/destroyPermanent', 'BeritaTagController::destroyPermanent/$1');
+
+
 
 
 // Banner logo

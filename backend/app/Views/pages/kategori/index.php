@@ -67,9 +67,9 @@
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="_method" value="DELETE">
                                             <button class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Yakin hapus kategori ini?')"
+                                                    onclick="return confirm('Yakin Membuang kategori ini?')"
                                                     title="Hapus">
-                                                Hapus
+                                                Trash
                                             </button>
                                         </form>
                                     </td>
