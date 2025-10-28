@@ -34,6 +34,13 @@ $routes->resource('agenda', ['controller' => 'AgendaController','except' => ['sh
 // Profile
 $routes->resource('profile', ['controller' => 'ProfileController', 'except' => ['show']]);
 
+// Kategori
+$routes->resource('kategori', ['controller' => 'KategoriController', 'except' => ['show']]);
+$routes->get('kategori/trash', 'KategoriController::trash');
+$routes->get('kategori/(:num)/restore', 'KategoriController::restore/$1');
+$routes->delete('kategori/(:num)/destroyPermanent', 'KategoriController::destroyPermanent/$1');
+
+
 
 // Banner logo
 $routes->resource('banner', ['controller' => 'BannerController', 'except' => ['show']]);
