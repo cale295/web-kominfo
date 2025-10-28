@@ -1,11 +1,12 @@
 import React, { useState } from "react";
+import "../css/news.css";
 import {
   ChevronLeft,
   ChevronRight,
   Calendar,
   Bell,
   Image as ImageIcon,
-} from "lucide-react"; // Import ImageIcon dari lucide-react
+} from "lucide-react";
 
 interface AnnouncementItem {
   id: number;
@@ -21,9 +22,7 @@ interface CalendarEvent {
 
 interface NewsItem {
   id: number;
-  // tag: string; // Dihapus
-  // title: string; // Dihapus
-  image: string; // Tambah properti image
+  image: string;
   subtitle: string;
   desc: string;
   source: string;
@@ -32,31 +31,30 @@ interface NewsItem {
 
 type TabType = "agenda" | "pengumuman";
 
-// Data untuk newsItems diubah agar tidak ada `tag` dan `title` lagi, diganti `image`
 const newsItems: NewsItem[] = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/news1/400/200", // Contoh URL gambar
-    subtitle: "DIMULAI HARI INI!",
+    image: "https://picsum.photos/seed/news1/600/300",
+    subtitle: "BERITA TERBARU",
     desc: "Optimalkan Pembangunan Infrastruktur, Pemkot Tangerang Perbaiki 40 Ruas Jalan Kota",
     source: "Dinas Pendidikan Kota Tangerang",
-    date: "Selasa, 27 Desember 2022 16:50 WIB",
+    date: "27 Des 2022",
   },
   {
     id: 2,
-    image: "https://picsum.photos/seed/news2/400/200",
-    subtitle: "PROYEK BARU DIMULAI!",
+    image: "https://picsum.photos/seed/news2/600/300",
+    subtitle: "PROYEK BARU",
     desc: "Pemerintah Kota Tangerang Luncurkan Program Jalan Pintar Berbasis Teknologi",
     source: "Dinas PU Kota Tangerang",
-    date: "Rabu, 3 Januari 2023 09:00 WIB",
+    date: "3 Jan 2023",
   },
   {
     id: 3,
-    image: "https://picsum.photos/seed/news3/400/200",
-    subtitle: "DIBUKA SEKARANG!",
+    image: "https://picsum.photos/seed/news3/600/300",
+    subtitle: "BEASISWA DIBUKA",
     desc: "Pemkot Tangerang Buka Program Beasiswa untuk 1000 Pelajar Berprestasi",
     source: "Dinas Pendidikan Kota Tangerang",
-    date: "Kamis, 5 Januari 2023 08:30 WIB",
+    date: "5 Jan 2023",
   },
 ];
 
@@ -68,49 +66,51 @@ const calendarEvents: Record<number, CalendarEvent> = {
   },
   17: {
     date: 17,
-    title: "Culinary Day lorem ipsum dolor sit amet",
-    time: "10.00 WIB",
+    title: "Culinary Festival Tangerang",
+    time: "14.00 WIB",
   },
   25: {
     date: 25,
-    title: "Culinary Day lorem ipsum dolor sit amet",
-    time: "10.00 WIB",
+    title: "Workshop Kewirausahaan",
+    time: "09.00 WIB",
   },
   26: {
     date: 26,
-    title: "Culinary Day lorem ipsum dolor sit amet",
-    time: "10.00 WIB",
+    title: "Pameran Seni Lokal",
+    time: "16.00 WIB",
   },
   30: {
     date: 30,
-    title: "Culinary Day lorem ipsum dolor sit amet",
-    time: "10.00 WIB",
+    title: "Pelatihan Digital Marketing",
+    time: "13.00 WIB",
   },
 };
 
 const announcementData: AnnouncementItem[] = [
   {
     id: 1,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
+    title: "Pengumuman Hasil Seleksi CPNS 2024",
+    date: "12 Agu 2024",
   },
-  { id: 2, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
+  {
+    id: 2,
+    title: "Pendaftaran Beasiswa D3 dan S1 Tahun Ajaran 2024/2025",
+    date: "10 Agu 2024",
+  },
   {
     id: 3,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
+    title: "Pelatihan Pengelolaan Keuangan Desa",
+    date: "8 Agu 2024",
   },
-  { id: 4, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
+  {
+    id: 4,
+    title: "Pemeliharaan Jalan Raya Merak - Anyer",
+    date: "5 Agu 2024",
+  },
   {
     id: 5,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
-  },
-  { id: 6, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
-  {
-    id: 7,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
+    title: "Pembukaan Posko Pengaduan Lebaran",
+    date: "29 Mar 2024",
   },
 ];
 
@@ -177,207 +177,164 @@ export default function TangerangNewsApp() {
   const currentNews = newsItems[currentNewsIndex];
 
   return (
-    <div className="bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Section - News Carousel */}
-          <div className="lg:col-span-1">
-            <h1 className="text-4xl text-blue-800 mb-4">Berita Utama</h1>
+    <div className="app-container">
+      <div className="container-xl py-4 py-md-5">
+        <div className="row g-4">
+          {/* Kolom Kiri - Carousel Berita */}
+          <div className="col-12 col-lg-4">
+            <h1 className="display-6 text-blue-800 mb-4">Berita Terbaru</h1>
 
-            <div className="relative">
-              <div className="bg-blue-100 rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-[500px] text-white">
-                {/* Bagian Atas - Image Container */}
-                <div className="w-full h-48 md:h-56 overflow-hidden relative bg-blue-800 flex items-center justify-center">
-                  {currentNews.image ? (
-                    <img
-                      src={currentNews.image}
-                      alt="News Illustration"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <ImageIcon className="w-24 h-24 text-blue-300 opacity-50" />
-                  )}
-                </div>
-
-                {/* Bagian Konten */}
-                <div className="p-6 flex flex-col flex-grow">
-                  <div className="flex-grow">
-                    {/* Subtitle tetap ada */}
-                    <p className="text-blue-800 font-bold text-lg mb-2">
-                      {currentNews.subtitle}
-                    </p>
-                    {/* Desc tetap ada */}
-                    <p className="text-black text-sm leading-relaxed">
-                      {currentNews.desc}
-                    </p>
+            <div className="card bg-blue-100 rounded-4 overflow-hidden shadow-lg text-white">
+              <div className="position-relative bg-blue-800" style={{ height: '200px' }}>
+                {currentNews.image ? (
+                  <img
+                    src={currentNews.image}
+                    alt={currentNews.subtitle}
+                    className="w-100 h-100 object-cover"
+                  />
+                ) : (
+                  <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                    <ImageIcon className="text-blue-300 opacity-50" size={48} />
                   </div>
+                )}
+              </div>
 
-                  {/* Bagian Bawah/Footer Kartu */}
-                  <div className="mt-6 pt-4 border-t border-slate-700">
-                    <p className="text-slate-400 text-xs font-medium">
-                      Sumber: {currentNews.source}
-                    </p>
-                    <p className="text-slate-500 text-xs mt-1">
-                      {currentNews.date}
-                    </p>
-                  </div>
+              <div className="card-body d-flex flex-column p-4">
+                <div className="flex-grow-1">
+                  <span className="badge bg-blue-600 text-uppercase fs-6 mb-2">{currentNews.subtitle}</span>
+                  <h5 className="card-title text-black mb-3">{currentNews.desc}</h5>
                 </div>
 
-                {/* Indikator Carousel */}
-                <div className="flex justify-center gap-2 p-6 pt-2">
-                  {newsItems.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentNewsIndex(i)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        i === currentNewsIndex
-                          ? "bg-yellow-400 w-8"
-                          : "bg-slate-600 hover:bg-slate-500"
-                      }`}
-                    />
-                  ))}
+                <div className="mt-3">
+                  <small className="text-slate-500 d-block">Sumber: {currentNews.source}</small>
+                  <small className="text-slate-400">{currentNews.date}</small>
                 </div>
+              </div>
+
+              <div className="d-flex justify-content-center gap-2 p-4">
+                {newsItems.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentNewsIndex(i)}
+                    className={`rounded-circle border-0 p-0 ${i === currentNewsIndex ? 'active' : ''}`}
+                    style={{
+                      width: '12px',
+                      height: '12px',
+                      backgroundColor: i === currentNewsIndex ? '#fbbf24' : '#94a3b8',
+                    }}
+                    aria-label={`Slide ${i + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right Section - Tabs */}
-          <div className="lg:col-span-2">
-            {/* Tab Navigation */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          {/* Kolom Kanan - Tab Agenda & Pengumuman */}
+          <div className="col-12 col-lg-8">
+            <div className="d-flex flex-column flex-md-row gap-3 mb-4">
               <button
                 onClick={() => setActiveTab("agenda")}
-                className={`group px-8 py-3 rounded-2xl font-bold transition-all duration-300 flex items-center gap-2 ${
-                  activeTab === "agenda"
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg scale-105"
-                    : "border-2 border-blue-400 text-blue-600 hover:border-blue-500 hover:shadow-md"
-                }`}
+                className={`btn rounded-pill px-4 py-2 fw-bold ${activeTab === "agenda" ? 'btn-primary' : 'btn-outline-primary'}`}
               >
-                <Calendar className="w-5 h-5" />
+                <Calendar className="me-2" size={18} />
                 Agenda
               </button>
               <button
                 onClick={() => setActiveTab("pengumuman")}
-                className={`group px-8 py-3 rounded-2xl font-bold transition-all duration-300 flex items-center gap-2 ${
-                  activeTab === "pengumuman"
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg scale-105"
-                    : "border-2 border-blue-400 text-blue-600 hover:border-blue-500 hover:shadow-md"
-                }`}
+                className={`btn rounded-pill px-4 py-2 fw-bold ${activeTab === "pengumuman" ? 'btn-primary' : 'btn-outline-primary'}`}
               >
-                <Bell className="w-5 h-5" />
+                <Bell className="me-2" size={18} />
                 Pengumuman
               </button>
             </div>
 
             {activeTab === "agenda" ? (
-              // Agenda Tab
-              <div className="bg-blue-50 rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row">
-                <div className="md:w-5/12 p-5">
-                  <img
-                    src="assets/car free.jpeg"
-                    alt="Masjid Raya Al-A'zhom Tangerang"
-                    className="w-full h-48 md:h-full rounded-xl object-cover"
-                  />
-                </div>
-                <div className="md:w-7/12 p-6 flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
+              <div className="card rounded-4 shadow-lg">
+                <div className="p-4">
+                  <div className="d-flex align-items-center justify-content-between mb-4">
                     <button
                       onClick={handlePrevMonth}
-                      className="p-1 hover:bg-blue-100 rounded-full transition-colors"
+                      className="btn btn-sm btn-light rounded-circle"
                     >
-                      <ChevronLeft className="w-5 h-5 text-blue-600" />
+                      <ChevronLeft className="text-blue-600" size={18} />
                     </button>
-                    <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                      {monthNames[currentMonth - 1]} {currentYear}
-                    </span>
+                    <h5 className="fw-bold text-blue-700 mb-0">{monthNames[currentMonth - 1]} {currentYear}</h5>
                     <button
                       onClick={handleNextMonth}
-                      className="p-1 hover:bg-blue-100 rounded-full transition-colors"
+                      className="btn btn-sm btn-light rounded-circle"
                     >
-                      <ChevronRight className="w-5 h-5 text-blue-600" />
+                      <ChevronRight className="text-blue-600" size={18} />
                     </button>
                   </div>
-                  <div className="mb-6">
-                    <div className="grid grid-cols-7 gap-1 text-xs font-semibold text-blue-600 mb-2">
+
+                  <div className="mb-4">
+                    <div className="row g-1 text-center text-blue-600 fw-semibold small mb-2">
                       {dayNames.map((day) => (
-                        <div
-                          key={day}
-                          className="w-full h-8 flex items-center justify-center"
-                        >
-                          {day}
+                        <div key={day} className="col">
+                          <div className="py-2">{day}</div>
                         </div>
                       ))}
                     </div>
-                    <div className="grid grid-cols-7 gap-1">
-                      {days.map((day, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => day && setSelectedDate(day)}
-                          className={`w-full h-8 text-xs flex items-center justify-center rounded-full transition-all duration-200 ${(() => {
-                            const isToday =
-                              day === today.getDate() &&
-                              currentMonth === today.getMonth() + 1 &&
-                              currentYear === today.getFullYear();
-                            if (day === null) return "";
-                            if (selectedDate === day)
-                              return "bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-md scale-110";
-                            if (calendarEvents[day as number])
-                              return "bg-gradient-to-br from-yellow-400 to-yellow-500 text-white hover:scale-110";
-                            if (isToday)
-                              return "bg-blue-200 text-blue-700 font-bold";
-                            return "text-gray-600 hover:bg-blue-100";
-                          })()}`}
-                        >
-                          {day}
-                        </button>
-                      ))}
+                    <div className="row g-1">
+                      {days.map((day, idx) => {
+                        const isToday =
+                          day === today.getDate() &&
+                          currentMonth === today.getMonth() + 1 &&
+                          currentYear === today.getFullYear();
+                        const hasEvent = day && calendarEvents[day];
+                        const isSelected = day === selectedDate;
+
+                        return (
+                          <div key={idx} className="col">
+                            <button
+                              onClick={() => day && setSelectedDate(day)}
+                              className={`btn w-100 py-2 fs-6 rounded-3 ${
+                                day === null
+                                  ? 'disabled text-muted'
+                                  : isSelected
+                                    ? 'btn-success text-white'
+                                    : hasEvent
+                                      ? 'btn-warning text-white'
+                                      : isToday
+                                        ? 'btn-info text-white'
+                                        : 'btn-outline-blue text-blue-600'
+                              }`}
+                              style={{ minHeight: '40px' }} // Tinggi tetap agar sejajar
+                            >
+                              {day}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                  <div className="bg-blue-200 rounded-2xl p-4 border border-blue-100 shadow-sm mt-auto">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <h3 className="font-bold text-blue-700 text-sm">
-                        Agenda Tanggal {selectedDate}
-                      </h3>
-                    </div>
+
+                  <div className="bg-blue-50 rounded-3 p-3 border border-blue-100">
+                    <h6 className="fw-bold text-blue-700 mb-2">
+                      <Calendar className="me-1" size={16} />
+                      Agenda Tanggal {selectedDate}
+                    </h6>
                     {selectedEvent ? (
-                      <div className="overflow-y-auto max-h-24">
-                        <p className="text-gray-800 text-sm font-semibold mb-2">
-                          {selectedEvent.title}
-                        </p>
-                        <p className="text-blue-600 font-bold text-base">
-                          {selectedEvent.time}
-                        </p>
-                      </div>
+                      <>
+                        <p className="mb-1">{selectedEvent.title}</p>
+                        <p className="text-blue-600 fw-bold">{selectedEvent.time}</p>
+                      </>
                     ) : (
-                      <p className="text-gray-500 text-sm">
-                        Tidak ada agenda pada tanggal ini.
-                      </p>
+                      <p className="text-muted fst-italic">Tidak ada agenda pada tanggal ini.</p>
                     )}
                   </div>
                 </div>
               </div>
             ) : (
-              // Pengumuman Tab
-              <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-                <div className="divide-y-2 divide-gray-100">
+              <div className="card rounded-4 shadow-lg">
+                <div className="list-group list-group-flush">
                   {announcementData.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-6 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 group cursor-pointer"
-                    >
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-2 h-2 rounded-full bg-blue-600 group-hover:scale-150 transition-transform" />
-                            <h3 className="font-bold text-gray-800 group-hover:text-blue-700 transition-colors">
-                              {item.title}
-                            </h3>
-                          </div>
+                    <div key={item.id} className="list-group-item border-0 px-4 py-3 hover-bg-light transition">
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div>
+                          <h6 className="mb-1">{item.title}</h6>
                         </div>
-                        <span className="text-blue-600 font-bold text-sm whitespace-nowrap">
-                          {item.date}
-                        </span>
+                        <small className="text-blue-600 fw-bold">{item.date}</small>
                       </div>
                     </div>
                   ))}

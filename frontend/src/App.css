@@ -1,1 +1,20 @@
-@import "tailwindcss";
+.px-10 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.py-10 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+.md\:px-10 {
+    @media (min-width: 768px) {
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+    }
+}
+.md\:py-10 {
+    @media (min-width: 768px) {
+        padding-top: 2.5rem;
+        padding-bottom: 2.5rem;
+    }
+}

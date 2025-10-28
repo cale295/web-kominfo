@@ -1,4 +1,5 @@
 import React from "react";
+import "../css/services.css";
 
 interface ServiceItem {
   id: number;
@@ -38,54 +39,64 @@ const services: ServiceItem[] = [
     title: "Layanan Tangerang LIVE Room",
     link: "https://live.tangerangkota.go.id",
   },
+  {
+    id: 6,
+    image: "",
+    title: "Layanan Pengaduan SP4N-LAPOR",
+    link: "https://lapor.go.id",
+  },
+  {
+    id: 7,
+    image: "/assets/sandi.png",
+    title: "Layanan Persandian",
+    link: "#",
+  },
+  {
+    id: 8,
+    image: "/assets/upt.png",
+    title: "Layanan UPT Pengelola Ruang Kendali Kota",
+    link: "#",
+  },
+  {
+    id: 9,
+    image: "/assets/layanan-tik.png",
+    title: "Layanan TIK",
+    link: "#",
+  },
+  {
+    id: 10,
+    image: "/assets/layanan-informasi.png",
+    title: "Layanan Informasi dan Komunikasi Publik",
+    link: "#",
+  },
 ];
 
 const ServiceGrid: React.FC = () => {
   return (
     <section className="py-16 bg-gray-50">
-      <div className="max-w-full mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 justify-items-center">
+      <div className="container-fluid mx-auto px-6">
+        {/* Baris pertama */}
+        <div className="row row-cols-1 row-cols-2 row-cols-md-3 row-cols-lg-5 g-4 justify-content-center">
           {services.map((service) => (
-            <a
-              key={service.id}
-              href={service.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col items-center text-center focus:outline-none focus:ring-4 focus:ring-blue-400 rounded-xl"
-            >
-              <div className="bg-gray-100 rounded-2xl shadow p-6 w-48 h-28 flex justify-center items-center transition group-hover:shadow-lg group-hover:scale-105">
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className="max-h-16 object-contain"
-                />
-              </div>
-              <p className="mt-4 font-semibold text-gray-900 text-sm md:text-base group-hover:text-blue-700">
-                {service.title}
-              </p>
-            </a>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 justify-items-center mt-15">
-          {services.map((service) => (
-            <a
-              key={service.id}
-              href={service.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col items-center text-center focus:outline-none focus:ring-4 focus:ring-blue-400 rounded-xl"
-            >
-              <div className="bg-gray-100 rounded-2xl shadow p-6 w-48 h-28 flex justify-center items-center transition group-hover:shadow-lg group-hover:scale-105">
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className="max-h-16 object-contain"
-                />
-              </div>
-              <p className="mt-4 font-semibold text-gray-900 text-sm md:text-base group-hover:text-blue-700">
-                {service.title}
-              </p>
-            </a>
+            <div key={service.id} className="col d-flex justify-content-center">
+              <a
+                href={service.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="service-card-link d-flex flex-column align-items-center text-center focus-outline-none focus-ring-4 focus-ring-blue-400 rounded-xl"
+              >
+                <div className="service-card bg-gray-100 rounded-2 rounded-lg-2 rounded-xl-2 shadow p-6 w-48 h-28 d-flex justify-content-center align-items-center transition service-hover-effect">
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="service-image max-h-16 object-contain"
+                  />
+                </div>
+                <p className="mt-4 font-semibold text-gray-900 text-sm text-md-base service-title-hover">
+                  {service.title}
+                </p>
+              </a>
+            </div>
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Youtube, Facebook, Instagram, Twitter } from "lucide-react";
-import "../index.css";
+import "../css/navbar.css";
 import api from "../services/api";
 
 interface Menu {
@@ -11,6 +11,9 @@ interface Menu {
   order_number: string | number | null;
   parent_id: string | number | null;
   status: "active" | "inactive" | null;
+  // Tambahkan sub_menu sementara untuk menerima data dari API
+  sub_menu?: Menu[]; 
+  // Tambahkan children untuk digunakan di komponen
   children?: Menu[];
 }
 
@@ -21,7 +24,16 @@ function Navbar() {
     const fetchMenus = async () => {
       try {
         const response = await api.get<{ status: number; message: string; data: Menu[] }>("/menu");
-        setMenus(response.data.data || []);
+        console.log("Data Menu dari API:", response.data.data); // Log untuk memastikan struktur
+        
+        // Ubah nama field sub_menu menjadi children
+        const menusWithChildren = response.data.data.map(menu => ({
+          ...menu,
+          children: menu.sub_menu // Gunakan sub_menu dari API sebagai children
+        }));
+
+        console.log("Data Menu Setelah Rename:", menusWithChildren); // Log hasil rename
+        setMenus(menusWithChildren);
       } catch (error) {
         console.error("Gagal mengambil data menu:", error);
       }
@@ -30,79 +42,92 @@ function Navbar() {
     fetchMenus();
   }, []);
 
-  // 🔹 Render recursive multi-level menu
   const renderMenus = (menuList: Menu[], depth = 0) => {
-    return menuList.map((menu) => (
-      <div key={menu.id_menu} className="relative group">
-        <a
-          href={menu.menu_url || "#"}
-          className={`px-3 py-2 inline-block transition-colors duration-300 ${
-            depth === 0 ? "hover:underline" : "hover:bg-blue-100 text-blue-900"
-          }`}
-        >
-          {menu.menu_name}
-        </a>
+    // Pastikan menuList adalah array
+    if (!Array.isArray(menuList)) {
+      console.warn("renderMenus menerima argumen bukan array:", menuList);
+      return null; // Atau return <></> jika lebih suka
+    }
 
-        {/* Kalau punya anak, tampilkan dropdown */}
-        {menu.children && menu.children.length > 0 && (
-          <div
-            className={`
-              absolute bg-white shadow-md rounded-md z-50 min-w-[200px]
-              opacity-0 translate-y-2 invisible
-              group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible
-              transition-all duration-300 ease-out
-              ${depth === 0 ? "top-full left-0 mt-1" : "top-0 left-full ml-1"}
-            `}
-          >
-            {renderMenus(menu.children, depth + 1)}
-          </div>
-        )}
+    // ... bagian renderMenus sebelumnya ...
+
+return menuList.map((menu) => (
+  // Ganti className="position-relative group-navbar" dengan class khusus
+  <div key={menu.id_menu} className="navbar-menu-item position-relative d-inline-block">
+    <a // Tambahkan class untuk hover
+      href={menu.menu_url || "#"}
+      className={`px-3 py-2 d-inline-block transition-colors duration-300 navbar-menu-link ${
+        depth === 0 
+          ? "text-white hover-text-decoration-underline" 
+          : "hover-bg-blue-100 text-blue-900"
+      }`}
+    >
+      {menu.menu_name}
+    </a>
+
+    {menu.children && menu.children.length > 0 && (
+      <div
+        // Ganti class group-hover-navbar-* dengan class khusus
+        className={`
+          position-absolute bg-white shadow-md rounded-md z-index-50 min-width-200px
+          submenu-hidden
+          submenu-transition
+          ${depth === 0 ? "top-100 start-0 mt-1" : "top-0 start-100 ms-1"}
+        `}
+      >
+        {renderMenus(menu.children, depth + 1)}
       </div>
-    ));
+    )}
+  </div>
+));
+// ... bagian renderMenus setelahnya ...
   };
 
   return (
-    // 👇 PERBAIKAN DI SINI: class "overflow-hidden" dihapus
-    <nav className="bg-gradient-to-r from-blue-800 to-blue-950 text-white rounded-t-4xl shadow-md">
-      {/* 🔹 Top Bar */}
-      <div className="flex items-center px-16 py-6 relative">
-        {/* Left icons */}
-        <div className="hidden md:flex space-x-4 absolute top-6 left-16">
-          <Youtube className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-full p-1 hover:scale-110 transition-transform" />
-          <Facebook className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-full p-1 hover:scale-110 transition-transform" />
-          <Instagram className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-full p-1 hover:scale-110 transition-transform" />
-          <Twitter className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-full p-1 hover:scale-110 transition-transform" />
+    <nav className="bg-gradient-to-r-blue-800-950 text-white rounded-top-4 rounded-top-sm-4 rounded-top-md-4 rounded-top-lg-4 rounded-top-xl-4 rounded-top-xxl-4 shadow-md">
+      <div className="d-flex align-items-center position-relative px-4 px-md-5 px-lg-6 px-xl-6 px-xxl-6 py-6">
+        <div className="d-none d-md-flex gap-3 position-absolute top-6 start-6 start-md-6 start-lg-6 start-xl-6 start-xxl-6">
+          <div className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-circle p-1 hover-scale-110 transition-transform">
+            <Youtube size={20} />
+          </div>
+          <div className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-circle p-1 hover-scale-110 transition-transform">
+            <Facebook size={20} />
+          </div>
+          <div className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-circle p-1 hover-scale-110 transition-transform">
+            <Instagram size={20} />
+          </div>
+          <div className="w-7 h-7 cursor-pointer text-blue-800 bg-white rounded-circle p-1 hover-scale-110 transition-transform">
+            <Twitter size={20} />
+          </div>
         </div>
 
-        {/* Logo & Title */}
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <img src="/assets/logo.png" alt="Logo Kominfo" className="w-24 mb-3 mt-7" />
+        <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+          <img src="/assets/logo.png" alt="Logo Kominfo" className="w-24 mb-3 mt-7" style={{width: '6rem'}} />
           <h1 className="font-bold text-lg leading-snug text-center tracking-wide">
             DINAS KOMUNIKASI DAN INFORMATIKA <br /> KOTA TANGERANG
           </h1>
         </div>
 
-        {/* Language flags */}
-        <div className="flex space-x-5 absolute top-6 right-16">
+        <div className="d-flex gap-2 position-absolute top-6 end-6 end-md-6 end-lg-6 end-xl-6 end-xxl-6">
           <img
             src="/assets/indo.png"
             alt="Bahasa Indonesia"
-            className="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition"
+            className="w-8 h-8 rounded-circle cursor-pointer hover-opacity-80 transition"
+            style={{width: '2rem', height: '2rem'}}
           />
           <img
             src="/assets/britain.jpg"
             alt="English"
-            className="w-8 h-8 rounded-full cursor-pointer hover:opacity-80 transition"
+            className="w-8 h-8 rounded-circle cursor-pointer hover-opacity-80 transition"
+            style={{width: '2rem', height: '2rem'}}
           />
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-white"></div>
+      <div className="border-top border-white"></div>
 
-      {/* 🔹 Menu bar */}
-      <div className="w-full overflow-x-auto lg:overflow-visible">
-        <div className="flex justify-between min-w-max px-10 md:px-20 py-3 font-semibold text-md whitespace-nowrap">
+      <div className="w-100 overflow-x-auto lg-overflow-visible">
+        <div className="d-flex justify-content-between min-width-max px-3 px-md-5 px-lg-5 px-xl-5 px-xxl-5 py-3 font-semibold text-md whitespace-nowrap">
           {renderMenus(menus)}
         </div>
       </div>

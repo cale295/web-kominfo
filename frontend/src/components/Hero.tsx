@@ -1,48 +1,47 @@
 import React from "react";
+import "../css/hero.css";
 import { Search, Accessibility } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   return (
-    <div className="bg-gray-50 py-4">
-      <header className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6 ">
-        <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-yellow-400 text-blue-800 font-semibold px-5 py-3 rounded-4xl sm:rounded-r-full shadow hover:bg-yellow-300 transition">
-          <Accessibility className="w-6 h-6" />
-          <span>DISABILITAS</span>
+    <div className="hero-container">
+      {/* Header Bar */}
+      <header className="hero-header d-flex justify-content-between align-items-center px-1 py-3">
+        <button className="btn-disabilitas d-flex align-items-center gap-2">
+          <Accessibility className="icon-accessibility" />
+          <span className="disabilitas">DISABILITAS</span>
         </button>
 
-        <div className="flex items-center gap-2 w-full md:w-auto md:max-w-sm px-4">
-          <div className="flex-grow flex items-center bg-white rounded-full border-2 border-blue-800 px-4 py-2">
+        <div className="search-wrapper d-flex align-items-center">
+          <div className="search-input-wrapper">
             <input 
               type="text"
               placeholder="Apa yang kamu cari"
-              className="flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
+              className="search-input"
             />
           </div>
-          <button className="text-white bg-blue-800 p-3 rounded-full flex-shrink-0">
-            <Search className="w-5 h-5" />
+          <button className="btn-search">
+            <Search className="icon-search" />
           </button>
         </div>
       </header>
 
-      <section className="flex flex-col md:flex-row items-center justify-between bg-radial from-[#c9815f] to-[#d67041] text-white shadow-lg overflow-hidden my-5 mx-4 rounded-xl">
-      
-        <div className="flex-1 p-8 md:p-12 lg:p-16 text-center md:text-left">
-          {/* Ukuran font dibuat responsif */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4">
+      {/* Hero Section */}
+      <section className="hero-content d-flex flex-column flex-md-row align-items-center">
+        <div className="hero-text p-4 p-md-5 p-lg-6">
+          <h1 className="hero-title mb-3">
             Mau ikut pelatihan kerja? Ikut Cakap Kerja, Yuk!
           </h1>
-          <p className="text-base text-orange-100">
-            Tangerang Cakap kerja adalah Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit. Ut posuere vitae felis quis pretium.
-            Maecenas ultricies rutrum mattis.
+          <p className="hero-subtitle">
+            Tangerang Cakap kerja adalah Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut posuere vitae felis quis pretium. Maecenas ultricies rutrum mattis.
           </p>
         </div>
 
-        <div className="flex-1 flex justify-center items-end w-full">
+        <div className="hero-image-wrapper">
           <img
             src="/assets/mbak.png"
             alt="Woman smiling with laptop"
-            className="w-full h-64 md:h-full object-cover object-center"
+            className="hero-image"
           />
         </div>
       </section>

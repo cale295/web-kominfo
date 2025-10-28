@@ -9,7 +9,7 @@ import Structure from './components/Structure'
 
 function App() {
   return (
-    <div className='min-h-screen px-5 py-5 md:px-10 sm:py-10'>
+    <div className='min-h-screen px-10 py-10 md:px-10 md:py-10 '>
       <Navbar />
       <HeroSection />
       <ServiceGrid />
