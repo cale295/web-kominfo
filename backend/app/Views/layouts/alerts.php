@@ -1,9 +1,10 @@
 <!-- app/Views/layouts/alerts.php -->
 
 <style>
+    /* Animations */
     @keyframes slideDown {
         from {
-            transform: translateY(-100%) scale(0.8);
+            transform: translateY(-100%) scale(0.9);
             opacity: 0;
         }
         to {
@@ -12,25 +13,36 @@
         }
     }
 
-    @keyframes shake {
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    @keyframes gentle-shake {
         0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-        20%, 40%, 60%, 80% { transform: translateX(10px); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
     }
 
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
-        50% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+    @keyframes scaleIn {
+        from { transform: scale(0); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
 
+    /* Alert Container */
     .custom-alert-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(5px);
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(3px);
         z-index: 9999;
         display: flex;
         align-items: center;
@@ -38,180 +50,209 @@
         animation: fadeIn 0.3s ease;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
+    /* Alert Box */
     .custom-alert-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 20px;
-        padding: 40px;
-        max-width: 500px;
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 480px;
         width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        animation: slideDown 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         position: relative;
-        overflow: hidden;
     }
 
     .custom-alert-box.error {
-        background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-        animation: slideDown 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), shake 0.5s ease 0.5s;
+        border-top: 4px solid #dc3545;
+        animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                   gentle-shake 0.4s ease 0.3s;
     }
 
     .custom-alert-box.success {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border-top: 4px solid #28a745;
     }
 
-    .custom-alert-box::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-        animation: rotate 10s linear infinite;
-    }
-
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
+    /* Alert Content */
     .custom-alert-content {
-        position: relative;
-        z-index: 1;
         text-align: center;
-        color: white;
     }
 
     .custom-alert-icon {
-        font-size: 80px;
-        margin-bottom: 20px;
+        font-size: 64px;
+        margin-bottom: 16px;
         display: inline-block;
-        animation: scaleIn 0.5s ease 0.3s both;
-    }
-
-    @keyframes scaleIn {
-        from { transform: scale(0); }
-        to { transform: scale(1); }
+        animation: scaleIn 0.4s ease 0.2s both;
     }
 
     .custom-alert-title {
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #2c3e50;
+    }
+
+    .custom-alert-box.error .custom-alert-title {
+        color: #dc3545;
+    }
+
+    .custom-alert-box.success .custom-alert-title {
+        color: #28a745;
     }
 
     .custom-alert-message {
-        font-size: 18px;
-        margin-bottom: 30px;
+        font-size: 16px;
+        margin-bottom: 24px;
         line-height: 1.6;
+        color: #495057;
     }
 
+    /* Error List Styling */
+    .custom-alert-message ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+    }
+
+    .custom-alert-message ul li {
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        background: #fff5f5;
+        border-left: 3px solid #dc3545;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .custom-alert-message ul li:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Button */
     .custom-alert-close {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid white;
+        background: #6c757d;
+        border: none;
         color: white;
-        padding: 12px 40px;
-        border-radius: 50px;
-        font-size: 16px;
-        font-weight: bold;
+        padding: 12px 32px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }
 
     .custom-alert-close:hover {
-        background: white;
-        color: #333;
-        transform: scale(1.05);
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
     }
 
-    .alert-particles {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        pointer-events: none;
+    .custom-alert-close:active {
+        transform: translateY(0);
     }
 
-    .particle {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 50%;
-        animation: float 3s infinite ease-in-out;
+    .custom-alert-box.error .custom-alert-close {
+        background: #dc3545;
     }
 
-    @keyframes float {
-        0%, 100% { transform: translateY(0) translateX(0); }
-        50% { transform: translateY(-20px) translateX(10px); }
+    .custom-alert-box.error .custom-alert-close:hover {
+        background: #c82333;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .custom-alert-box.success .custom-alert-close {
+        background: #28a745;
+    }
+
+    .custom-alert-box.success .custom-alert-close:hover {
+        background: #218838;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+        .custom-alert-box {
+            padding: 24px;
+        }
+
+        .custom-alert-icon {
+            font-size: 48px;
+        }
+
+        .custom-alert-title {
+            font-size: 20px;
+        }
+
+        .custom-alert-message {
+            font-size: 14px;
+        }
     }
 </style>
 
+<!-- Error Alert (Flash Data) -->
 <?php if (session()->getFlashdata('error')): ?>
     <div class="custom-alert-overlay" id="errorAlert">
         <div class="custom-alert-box error">
-            <div class="alert-particles">
-                <div class="particle" style="width: 10px; height: 10px; top: 20%; left: 10%; animation-delay: 0s;"></div>
-                <div class="particle" style="width: 8px; height: 8px; top: 60%; left: 80%; animation-delay: 1s;"></div>
-                <div class="particle" style="width: 12px; height: 12px; top: 80%; left: 30%; animation-delay: 2s;"></div>
-            </div>
             <div class="custom-alert-content">
                 <div class="custom-alert-icon">⛔</div>
-                <div class="custom-alert-title">TERLARANG!</div>
+                <div class="custom-alert-title">Terjadi Kesalahan!</div>
                 <div class="custom-alert-message">
                     <?= esc(session()->getFlashdata('error')) ?>
                 </div>
-                <button class="custom-alert-close" onclick="closeAlert('errorAlert')">TUTUP</button>
+                <button class="custom-alert-close" onclick="closeAlert('errorAlert')">Tutup</button>
             </div>
         </div>
     </div>
 <?php endif; ?>
 
+<!-- Success Alert (Flash Data) -->
 <?php if (session()->getFlashdata('success')): ?>
     <div class="custom-alert-overlay" id="successAlert">
         <div class="custom-alert-box success">
-            <div class="alert-particles">
-                <div class="particle" style="width: 10px; height: 10px; top: 20%; left: 10%; animation-delay: 0s;"></div>
-                <div class="particle" style="width: 8px; height: 8px; top: 60%; left: 80%; animation-delay: 1s;"></div>
-                <div class="particle" style="width: 12px; height: 12px; top: 80%; left: 30%; animation-delay: 2s;"></div>
-            </div>
             <div class="custom-alert-content">
                 <div class="custom-alert-icon">✅</div>
-                <div class="custom-alert-title">BERHASIL!</div>
+                <div class="custom-alert-title">Berhasil!</div>
                 <div class="custom-alert-message">
                     <?= esc(session()->getFlashdata('success')) ?>
                 </div>
-                <button class="custom-alert-close" onclick="closeAlert('successAlert')">TUTUP</button>
+                <button class="custom-alert-close" onclick="closeAlert('successAlert')">Tutup</button>
             </div>
         </div>
     </div>
 <?php endif; ?>
 
+<!-- Direct Error Alert -->
 <?php if (!empty($error)): ?>
     <div class="custom-alert-overlay" id="directError">
         <div class="custom-alert-box error">
-            <div class="alert-particles">
-                <div class="particle" style="width: 10px; height: 10px; top: 20%; left: 10%; animation-delay: 0s;"></div>
-                <div class="particle" style="width: 8px; height: 8px; top: 60%; left: 80%; animation-delay: 1s;"></div>
-                <div class="particle" style="width: 12px; height: 12px; top: 80%; left: 30%; animation-delay: 2s;"></div>
-            </div>
             <div class="custom-alert-content">
                 <div class="custom-alert-icon">⛔</div>
-                <div class="custom-alert-title">TERLARANG!</div>
+                <div class="custom-alert-title">Terjadi Kesalahan!</div>
                 <div class="custom-alert-message">
                     <?= esc($error) ?>
                 </div>
-                <button class="custom-alert-close" onclick="closeAlert('directError')">TUTUP</button>
+                <button class="custom-alert-close" onclick="closeAlert('directError')">Tutup</button>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Validation Errors Alert -->
+<?php if (session()->get('errors')): ?>
+    <div class="custom-alert-overlay" id="validationErrors">
+        <div class="custom-alert-box error">
+            <div class="custom-alert-content">
+                <div class="custom-alert-icon">⚠️</div>
+                <div class="custom-alert-title">Validasi Gagal!</div>
+                <div class="custom-alert-message">
+                    <ul>
+                        <?php foreach (session()->get('errors') as $error): ?>
+                            <li><?= esc($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <button class="custom-alert-close" onclick="closeAlert('validationErrors')">Tutup</button>
             </div>
         </div>
     </div>
@@ -228,7 +269,7 @@
         }
     }
 
-    // Auto close after 5 seconds
+    // Auto close alerts after 5 seconds
     document.addEventListener('DOMContentLoaded', function() {
         const alerts = document.querySelectorAll('.custom-alert-overlay');
         alerts.forEach(alert => {
@@ -237,14 +278,4 @@
             }, 5000);
         });
     });
-
-    // Add fadeOut animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
 </script>

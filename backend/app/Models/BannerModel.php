@@ -30,6 +30,40 @@ class BannerModel extends Model
         'is_delete_by_id',
         'is_delete_by_name',
     ];
+        protected $validationRules = [
+    'title'         => 'required|min_length[3]|max_length[255]',
+    'status'        => 'required|in_list[0,1]',
+    'media_type'    => 'permit_empty|in_list[image,video]',
+    'url'           => 'permit_empty|valid_url',
+    'keterangan'    => 'permit_empty|min_length[3]|string|max_length[255]',
+    'url_yt'        => 'permit_empty|valid_url',
+    'sorting'       => 'permit_empty|integer',
+    'category_banner' => 'permit_empty|string|max_length[100]',
+    ];
+
+
+protected $validationMessages = [
+    'title' => [
+        'required'    => 'Judul banner wajib diisi.',
+        'min_length'  => 'Judul minimal 3 karakter.',
+        'max_length'  => 'Judul maksimal 255 karakter.',
+    ],
+    'status' => [
+        'required' => 'Status wajib diisi.',
+        'in_list'  => 'Status harus 0 (nonaktif) atau 1 (aktif).',
+    ],
+    'keterangan' => [
+        'required' => 'Keterangan wajib diisi.',
+        'min_length' => 'Keterangan minimal 3 karakter.',
+        'max_length' => 'Keterangan maksimal 255 karakter.',
+    ],
+    'url' => [
+        'valid_url' => 'URL tidak valid.',
+    ],
+    'url_yt' => [
+        'valid_url' => 'URL YouTube tidak valid.',
+    ],
+    ];
 
     // ❌ Nonaktifkan soft delete bawaan CI
     protected $useSoftDeletes = false;
@@ -38,6 +72,8 @@ class BannerModel extends Model
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+
+
 
     // ✅ Ambil data aktif
     public function getAllActive()

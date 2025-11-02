@@ -1,6 +1,15 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
-
+<?= $this->include('layouts/alerts') ?>
+<?php if (session()->get('errors')): ?>
+    <div class="alert alert-danger">
+        <ul>
+            <?php foreach (session()->get('errors') as $error): ?>
+                <li><?= esc($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
 <style>
     :root {
         --primary-blue: #1e40af;

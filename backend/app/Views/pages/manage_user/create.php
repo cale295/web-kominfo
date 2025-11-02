@@ -5,6 +5,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 <div class="container-fluid py-4">
     <!-- Page Header -->
     <div class="page-header-gov">

@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
-
+<?= $this->include('layouts/alerts') ?>
 <div class="container mt-4">
     <h3>Profil Saya</h3>
 

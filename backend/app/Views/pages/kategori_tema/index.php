@@ -222,6 +222,8 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
+
 <div class="container-fluid py-4">
     <div class="page-header-gov">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -245,7 +247,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
-    <?= $this->include('layouts/alerts') ?>
+
 
     <div class="card table-card-gov">
         <div class="table-responsive">

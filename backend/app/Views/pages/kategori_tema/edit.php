@@ -1,6 +1,8 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('styles') ?>
+
+
 <style>
     /* * NOTE: Ini adalah semua CSS dari file agenda & daftar tema Anda.
      * Idealnya, semua CSS ini dipindahkan ke file CSS utama Anda 
@@ -159,6 +161,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 <div class="container-fluid py-4">
     <div class="page-header-gov">
         <div class="d-flex justify-content-between align-items-center flex-wrap">

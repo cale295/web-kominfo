@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 
 <div class="container py-4">
     <h3>Trash Kategori</h3>

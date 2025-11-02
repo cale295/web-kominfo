@@ -1,6 +1,16 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 
+<?php if (session()->get('errors')): ?>
+    <div class="alert alert-danger">
+        <ul>
+            <?php foreach (session()->get('errors') as $error): ?>
+                <li><?= esc($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
 <div class="container py-4">
     <h3>➕ Tambah Tag Baru</h3>
     <a href="<?= site_url('berita_tag') ?>" class="btn btn-secondary mb-3">← Kembali</a>

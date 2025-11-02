@@ -5,6 +5,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 <div class="container-fluid py-4">
     <!-- Page Header -->
     <div class="page-header-gov">
@@ -160,6 +161,28 @@
                         <span class="role-badge-large <?= $roleClass ?>">
                             <?= esc($user['role']) ?>
                         </span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <span class="detail-icon icon-created-at">
+                            <i class="bi bi-calendar-date-fill"></i>
+                        </span>
+                        Tanggal Dibuat
+                    </th>
+                    <td>
+                        <?= date('d F Y', strtotime($user['created_at'])) ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <span class="detail-icon icon-updated-at">
+                            <i class="bi bi-calendar-date-fill"></i>
+                        </span>
+                        Tanggal Diperbarui
+                    </th>
+                    <td>
+                        <?= date('d F Y', strtotime($user['updated_at'])) ?>
                     </td>
                 </tr>
             </tbody>

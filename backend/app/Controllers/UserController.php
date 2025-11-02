@@ -26,7 +26,6 @@ class UserController extends BaseController
         $role = session()->get('role');
         $access = $this->getAccess($role);
 
-        // Jika tidak ada data akses sama sekali
         if (!$access) {
             return view('pages/manage_user/index', [
                 'title' => 'Manajemen User',
@@ -35,7 +34,6 @@ class UserController extends BaseController
             ]);
         }
 
-        // Jika role tidak punya izin membaca
         if (!$access['can_read']) {
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat data user.');
         }
@@ -61,11 +59,7 @@ class UserController extends BaseController
     {
         $access = $this->getAccess(session()->get('role'));
 
-        if (!$access) {
-            return redirect()->to('/manage_user')->with('error', 'Data hak akses tidak ditemukan.');
-        }
-
-        if (!$access['can_create']) {
+        if (!$access || !$access['can_create']) {
             return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin menambah user.');
         }
 
@@ -86,7 +80,7 @@ class UserController extends BaseController
         $data = [
             'full_name' => $this->request->getPost('full_name'),
             'username'  => $this->request->getPost('username'),
-            'password'  => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'password'  => $this->request->getPost('password'), // ❌ jangan hash manual
             'email'     => $this->request->getPost('email'),
             'role'      => $this->request->getPost('role'),
         ];
@@ -125,82 +119,59 @@ class UserController extends BaseController
     // ========================================================
     // PUT /manage_user/{id} → update user
     // ========================================================
-public function update($id = null)
-{
-    $access = $this->getAccess(session()->get('role'));
+    public function update($id = null)
+    {
+        $access = $this->getAccess(session()->get('role'));
 
-    // 🔒 Cek hak akses update
-    if (!$access || !$access['can_update']) {
-        return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengubah user.');
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/manage_user')->with('error', 'Kamu tidak punya izin mengubah user.');
+        }
+
+        $user = $this->userModel->find($id);
+        if (!$user) {
+            return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
+        }
+
+        $data = [
+            'full_name' => $this->request->getPost('full_name'),
+            'username'  => $this->request->getPost('username'),
+            'email'     => $this->request->getPost('email'),
+            'role'      => $this->request->getPost('role'),
+        ];
+
+        $password = $this->request->getPost('password');
+        $password_confirm = $this->request->getPost('password_confirm');
+
+        // =========================
+        // Validasi
+        // =========================
+        $validationRules = [
+            'full_name' => 'required|min_length[3]|max_length[100]',
+            'username'  => "required|min_length[3]|max_length[50]|is_unique[m_users.username,id_user,{$id}]",
+            'email'     => "required|valid_email|is_unique[m_users.email,id_user,{$id}]",
+        ];
+
+        // Jika password diisi, tambahkan validasi
+        if (!empty($password)) {
+            $validationRules['password'] = 'required|min_length[8]|max_length[255]|regex_match[/(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+/]';
+            $validationRules['password_confirm'] = 'matches[password]';
+        }
+
+        if (!$this->validate($validationRules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // Jika password diisi, serahkan ke model untuk di-hash
+        if (!empty($password)) {
+            $data['password'] = $password; 
+        }
+
+        if (!$this->userModel->update($id, $data)) {
+            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
+        }
+
+        return redirect()->to('/manage_user')->with('success', 'User berhasil diperbarui.');
     }
-
-    // 🔍 Ambil data user lama
-    $user = $this->userModel->find($id);
-    if (!$user) {
-        return redirect()->to('/manage_user')->with('error', 'User tidak ditemukan.');
-    }
-
-    // 🔄 Ambil data dari form
-    $data = [
-        'full_name' => $this->request->getPost('full_name'),
-        'username'  => $this->request->getPost('username'),
-        'email'     => $this->request->getPost('email'),
-        'role'      => $this->request->getPost('role'),
-    ];
-
-    $password = $this->request->getPost('password');
-    $password_confirm = $this->request->getPost('password_confirm');
-
-    // ✅ Aturan dasar
-$validationRules = [
-    'full_name' => 'required|min_length[3]|max_length[100]',
-    'username'  => "required|min_length[3]|max_length[50]|is_unique[m_users.username,id_user,{$id}]",
-    'email'     => "required|valid_email|is_unique[m_users.email,id_user,{$id}]",
-];
-
-
-    // ✅ Username — hanya cek unik jika berubah
-    if ($data['username'] !== $user['username']) {
-        $validationRules['username'] = 'required|min_length[3]|max_length[50]|is_unique[m_users.username,id_user,' . $id . ']';
-    } else {
-        $validationRules['username'] = 'required|min_length[3]|max_length[50]';
-    }
-
-    // ✅ Email — hanya cek unik jika berubah
-    if ($data['email'] !== $user['email']) {
-        $validationRules['email'] = 'required|valid_email|is_unique[m_users.email,id_user,' . $id . ']';
-    } else {
-        $validationRules['email'] = 'required|valid_email';
-    }
-
-    // ✅ Jika password diisi, validasi tambahan
-    if (!empty($password)) {
-        $validationRules['password'] = 'required|min_length[6]|max_length[255]';
-        $validationRules['password_confirm'] = 'matches[password]';
-    }
-
-    // 🔍 Jalankan validasi
-    if (!$this->validate($validationRules)) {
-        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-    }
-
-    // 🔐 Update password jika diisi
-    if (!empty($password)) {
-        $data['password'] = password_hash($password, PASSWORD_DEFAULT);
-    } else {
-        unset($data['password']); // pastikan tidak menimpa password lama
-    }
-
-    // 💾 Simpan perubahan ke database
-    if (!$this->userModel->update($id, $data)) {
-        return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
-    }
-
-    return redirect()->to('/manage_user')->with('success', 'User berhasil diperbarui.');
-}
-
-
-
 
     // ========================================================
     // DELETE /manage_user/{id} → hapus user
@@ -232,6 +203,7 @@ $validationRules = [
             ->where('module_name', $this->module)
             ->first();
     }
+
     public function show($id)
     {
         $user = $this->userModel->find($id);
@@ -247,20 +219,18 @@ $validationRules = [
 
         return view('pages/manage_user/show', $data);
     }
+
     public function deleteSelected()
-{
-    // Ambil array ID dari form yang dikirim
-    $userIds = $this->request->getPost('user_ids');
+    {
+        $userIds = $this->request->getPost('user_ids');
 
-    if (empty($userIds)) {
-        return redirect()->back()->with('error', 'Tidak ada pengguna yang dipilih untuk dihapus.');
+        if (empty($userIds)) {
+            return redirect()->back()->with('error', 'Tidak ada pengguna yang dipilih untuk dihapus.');
+        }
+
+        $this->userModel->delete($userIds);
+
+        $count = count($userIds);
+        return redirect()->to('manage_user')->with('success', "Berhasil menghapus {$count} pengguna.");
     }
-
-    // Gunakan model untuk menghapus data berdasarkan array ID
-    // Metode delete() di model CodeIgniter 4 bisa menerima array ID
-    $this->userModel->delete($userIds);
-
-    $count = count($userIds);
-    return redirect()->to('manage_user')->with('success', "Berhasil menghapus {$count} pengguna.");
-}
 }

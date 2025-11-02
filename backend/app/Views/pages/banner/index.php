@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
-
+<?= $this->include('layouts/alerts') ?>
 <style>
     :root {
         --primary-blue: #1e40af;
@@ -492,8 +492,6 @@
             <div><?= session()->getFlashdata('error') ?></div>
         </div>
     <?php endif; ?>
-
-    <?= $this->include('layouts/alerts') ?>
 
     <!-- Table Card -->
     <?php if (!empty($banners) && is_array($banners)): ?>

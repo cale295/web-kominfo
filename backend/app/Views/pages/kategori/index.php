@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 
 <div class="container py-4">
     <!-- Header -->
@@ -28,6 +29,8 @@
                             <th width="10%" class="text-center">Status</th>
                             <th width="12%" class="text-center">Tampil Nav</th>
                             <th width="10%" class="text-center">Urutan</th>
+                            <th width="10%" class="text-center">Waktu Dibuat</th>
+                            <th width="10%" class="text-center">Update Terakhir</th>
                             <th width="15%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -55,6 +58,8 @@
                                     <td class="text-center">
                                         <span class="badge bg-dark"><?= $row['sorting_nav'] ?? '-' ?></span>
                                     </td>
+                                    <td class="fw-semibold"><?= esc($row['created_on']) ?></td>
+                                    <td class="fw-semibold"><?= esc($row['modified_on']) ?></td>
                                     <td class="text-center">
                                         <a href="<?= site_url('kategori/' . $row['id_kategori'] . '/edit') ?>" 
                                            class="btn btn-sm btn-warning me-1" 

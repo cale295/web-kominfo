@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('styles') ?>
+
     <style>
         :root {
             --primary-gov: #1e40af;
