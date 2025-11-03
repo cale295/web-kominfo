@@ -21,7 +21,9 @@
                 <th>Status Tayang</th>
                 <th>Status Berita</th>
                 <th>Dibuat Oleh</th>
-                <th>Tanggal Dibuat</th>
+                <th>Waktu Dibuat</th>
+                <th>Diupdate Oleh</th>
+                <th>Update Terakhir</th>
                 <th width="12%">Aksi</th>
             </tr>
         </thead>
@@ -69,8 +71,9 @@
                                 $statusBerita = [
                                     '0' => ['bg-secondary', 'Draft'],
                                     '2' => ['bg-info text-dark', 'Menunggu Verifikasi'],
-                                    '3' => ['bg-warning text-dark', 'Perbaikan'],
-                                    '4' => ['bg-success', 'Layak Tayang'],
+                                    '1' => ['bg-success', 'Tayang'],
+                                    '3' => ['bg-warning text-dark', 'Ditolak / Perbaikan'],
+                                    '4' => ['bg-primary text-light', 'Layak Tayang'],
                                     '6' => ['bg-danger', 'Revisi']
                                 ];
                                 [$class, $text] = $statusBerita[$row['status_berita']] ?? ['bg-light text-dark', '-'];
@@ -81,20 +84,36 @@
                         <!-- Pembuat -->
                         <td class="text-center"><?= esc($row['created_by_name'] ?? '-') ?></td>
 
-                        <!-- Tanggal -->
-                        <td class="text-center"><?= date('d M Y H:i', strtotime($row['created_at'])) ?></td>
+                                                <!-- Waktu Dibuat -->
+                        <td class="text-center"><?= !empty($row['created_at']) ? date('d M Y H:i', strtotime($row['created_at'])) : '-' ?></td>
 
-                        <!-- Aksi -->
-                        <td class="text-center">
-                            <a href="<?= site_url('berita/'.$row['id_berita'].'/edit') ?>" class="btn btn-sm btn-warning">✏️</a>
-                            <a href="<?= site_url('berita/delete/'.$row['id_berita']) ?>" 
-                               class="btn btn-sm btn-danger" 
-                               onclick="return confirm('Yakin ingin hapus berita ini?')">🗑️</a>
-                        </td>
+                        <!-- Updated By -->
+                        <td class="text-center"><?= esc($row['updated_by_name'] ?? '-') ?></td>
+
+                        <!-- Updated At -->
+                        <td class="text-center"><?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?></td>
+
+                        <!-- Aksi -->   
+                <td class="text-center">
+                    <!-- Edit -->
+                    <a href="<?= site_url('berita/'.$row['id_berita'].'/edit') ?>" class="btn btn-sm btn-warning">✏️</a>
+
+<form action="<?= site_url('berita/' . $row['id_berita']) ?>" 
+      method="post" style="display:inline;">
+    <?= csrf_field() ?>
+    <input type="hidden" name="_method" value="DELETE">
+    <button type="submit" class="btn btn-sm btn-danger"
+            onclick="return confirm('Yakin membuang berita ini?')">
+        Trash
+    </button>
+</form>
+
+
+                </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="10" class="text-center text-muted">Belum ada berita</td></tr>
+                <tr><td colspan="11" class="text-center text-muted">Belum ada berita</td></tr>
             <?php endif; ?>
         </tbody>
     </table>

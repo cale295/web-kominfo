@@ -28,6 +28,7 @@ class BeritaModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 
+    
     // =========================================================
     // Ambil berita + join kategori, hanya kategori aktif
     // =========================================================
@@ -47,18 +48,29 @@ class BeritaModel extends Model
 
 
     
+public function getTrashBerita()
+{
+    return $this->db->table($this->table)
+        ->select('t_berita.*, m_kategori_berita.kategori AS nama_kategori')
+        ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita.id_kategori', 'left')
+        ->where('t_berita.trash', '1') // hanya yang sudah dihapus
+        ->orderBy('t_berita.updated_at', 'DESC')
+        ->get()
+        ->getResultArray();
+}
+
+
     // =========================================================
     // Berita berdasarkan slug
     // =========================================================
     public function getBySlug($slug)
     {
-        return $this->db->table($this->table)
-                    ->where('slug', $slug)
-                    ->where('trash', '0')
-                    ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita.id_kategori', 'left')
-                    ->where('m_kategori_berita.status', '1')
-                    ->get()
-                    ->getRowArray();
+return $this->db->table($this->table)
+                ->where('t_berita.slug', $slug)
+                ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita.id_kategori', 'left')
+                ->get()
+                ->getRowArray();
+
     }
 
     // =========================================================

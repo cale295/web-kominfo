@@ -4,7 +4,7 @@
 <div class="container py-4">
     <h3>✏️ Edit Berita</h3>
 
-    <form action="<?= site_url('berita/'.$berita['id_berita']) ?>" method="post" enctype="multipart/form-data">
+    <form action="<?= site_url('berita/'.$berita['id_berita']) ?>" method="post">
         <?= csrf_field() ?>
         <input type="hidden" name="_method" value="PUT">
 
@@ -31,6 +31,12 @@
                     </option>
                 <?php endforeach; ?>
             </select>
+        </div>
+
+        <!-- Sub Kategori -->
+        <div class="mb-3">
+            <label class="form-label">Sub Kategori</label>
+            <input type="text" name="id_sub_kategori" class="form-control" value="<?= esc(old('id_sub_kategori', $berita['id_sub_kategori'])) ?>">
         </div>
 
         <!-- Intro -->
@@ -71,15 +77,6 @@
             </select>
         </div>
 
-        <!-- Gambar Utama -->
-        <div class="mb-3">
-            <label class="form-label">Gambar Utama (feat_image)</label>
-            <input type="file" name="feat_image" class="form-control">
-            <?php if(!empty($berita['feat_image'])): ?>
-                <small>Gambar saat ini: <?= esc($berita['feat_image']) ?></small>
-            <?php endif; ?>
-        </div>
-
         <!-- Link Video -->
         <div class="mb-3">
             <label class="form-label">Link Video (YouTube / lainnya)</label>
@@ -113,6 +110,24 @@
         <div class="mb-3">
             <label class="form-label">Note Revisi</label>
             <textarea name="note_revisi" class="form-control" rows="2"><?= esc(old('note_revisi', $berita['note_revisi'])) ?></textarea>
+        </div>
+
+        <!-- Dokumen -->
+        <?php for($i=1;$i<=4;$i++): ?>
+        <div class="mb-3">
+            <label class="form-label">Dokumen <?= $i ?></label>
+            <input type="text" name="dokumen<?= $i == 1 ? '' : ($i == 2 ? '_duo' : ($i == 3 ? '_tigo' : '_quatro')) ?>" class="form-control mb-1" placeholder="Link / path dokumen" value="<?= esc(old('dokumen'.($i == 1 ? '' : ($i == 2 ? '_duo' : ($i == 3 ? '_tigo' : '_quatro'))), $berita['dokumen'.($i == 1 ? '' : ($i == 2 ? '_duo' : ($i == 3 ? '_tigo' : '_quatro')))])) ?>">
+            <input type="text" name="dokumen_<?php echo ['title','duo_title','tigo_title','quatro_title'][$i-1]; ?>" class="form-control" placeholder="Judul dokumen" value="<?= esc(old('dokumen_'.['title','duo_title','tigo_title','quatro_title'][$i-1], $berita['dokumen_'.['title','duo_title','tigo_title','quatro_title'][$i-1]])) ?>">
+        </div>
+        <?php endfor; ?>
+
+        <!-- Status -->
+        <div class="mb-3">
+            <label class="form-label">Status Tayang</label>
+            <select name="status" class="form-select">
+                <option value="0" <?= $berita['status'] == '0' ? 'selected' : '' ?>>Tidak Tayang</option>
+                <option value="1" <?= $berita['status'] == '1' ? 'selected' : '' ?>>Tayang</option>
+            </select>
         </div>
 
         <!-- Status Berita -->

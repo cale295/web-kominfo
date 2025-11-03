@@ -17,70 +17,138 @@ class BeritaController extends BaseController
     public function __construct()
     {
         $this->beritaModel = new BeritaModel();
-        $this->kategoriModel = new KategoriModel(); // Panggil kategori dari sini
+        $this->kategoriModel = new KategoriModel();
         $this->accessRightsModel = new AccessRightsModel();
     }
 
     // ========================================================
-    // Daftar berita
+    // Daftar Berita
     // ========================================================
-        public function index()
-        {
-            $access = $this->getAccess(session()->get('role'));
-            if (!$access || !$access['can_read']) {
-                return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
-            }
-
-            // Ambil semua berita yang trash = 0
-            $data = [
-                'title' => 'Manajemen Berita',
-                'berita' => $this->beritaModel->getBeritaWithKategori(false), // tampilkan semua kategori
-                'can_create' => $access['can_create'],
-                'can_update' => $access['can_update'],
-                'can_delete' => $access['can_delete']
-            ];
-
-            return view('pages/berita/index', $data);
+    public function index()
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_read']) {
+            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
         }
 
+        $data = [
+            'title' => 'Manajemen Berita',
+            'berita' => $this->beritaModel->getBeritaWithKategori(true),
+            'can_create' => $access['can_create'],
+            'can_update' => $access['can_update'],
+            'can_delete' => $access['can_delete']
+        ];
 
-
-    // ========================================================
-    // Form edit berita
-    // ========================================================
-public function edit($id = null)
-{
-    $access = $this->getAccess(session()->get('role'));
-    if (!$access || !$access['can_update']) {
-        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengedit berita.');
+        return view('pages/berita/index', $data);
     }
 
-    $berita = $this->beritaModel->find($id);
-    if (!$berita || $berita['trash'] == '1') {
-        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    // ========================================================
+    // Form Tambah Berita
+    // ========================================================
+    public function new()
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_create']) {
+            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
+        }
+
+        $data = [
+            'title' => 'Tambah Berita',
+            'kategori' => $this->kategoriModel->getKategoriAktif(),
+            'beritaAll' => $this->beritaModel->getBeritaWithKategori(false)
+        ];
+
+        return view('pages/berita/create', $data);
     }
 
-    // Ambil semua berita untuk dropdown terkait, kecuali berita yang sedang diedit
-    $beritaAll = $this->beritaModel
-        ->where('trash', '0')
-        ->where('id_berita !=', $id)
-        ->orderBy('created_at', 'DESC')
-        ->findAll();
+    // ========================================================
+    // Simpan Berita Baru
+    // ========================================================
+    public function create()
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_create']) {
+            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
+        }
 
-    $kategori = $this->kategoriModel->where('trash', '0')->findAll();
+        $post = $this->request->getPost();
 
-    return view('pages/berita/edit', [
-        'title' => 'Edit Berita',
-        'berita' => $berita,
-        'beritaAll' => $beritaAll, // kirim ke view
-        'kategori' => $kategori,
-    ]);
-}
+        $data = [
+            'judul'       => $post['judul'],
+            'topik'       => $post['topik'] ?? null,
+            'id_kategori' => $post['id_kategori'] ?? null,
+            'id_sub_kategori' => $post['id_sub_kategori'] ?? null,
+            'content'     => $post['content'] ?? null,
+            'intro'       => $post['intro'] ?? null,
+            'feat_image'  => $post['feat_image'] ?? null,
+            'caption'     => $post['caption'] ?? null,
+            'sumber'      => $post['sumber'] ?? null,
+            'link_video'  => $post['link_video'] ?? null,
+            'status'      => $post['status'] ?? '0',
+            'status_berita' => $post['status_berita'] ?? '0',
+            'id_berita_terkait'  => $post['id_berita_terkait'] ?? null,
+            'id_berita_terkait2' => $post['id_berita_terkait2'] ?? null,
+            'keyword'     => $post['keyword'] ?? null,
+            'dokumen_title' => $post['dokumen_title'] ?? null,
+            'dokumen_duo_title' => $post['dokumen_duo_title'] ?? null,
+            'dokumen_tigo_title' => $post['dokumen_tigo_title'] ?? null,
+            'dokumen_quatro_title' => $post['dokumen_quatro_title'] ?? null,
+            'dokumen' => $post['dokumen'] ?? null,
+            'dokumen_duo' => $post['dokumen_duo'] ?? null,
+            'dokumen_tigo' => $post['dokumen_tigo'] ?? null,
+            'dokumen_quatro' => $post['dokumen_quatro'] ?? null,
+            'slug'        => url_title($post['judul'], '-', true),
+            'hash_berita' => md5(uniqid()),
+            'created_by_id'   => session()->get('id_user'),
+            'created_by_name' => session()->get('username'),
+            'created_at'      => date('Y-m-d H:i:s'),
+
+
+
+            
+        ];
+
+        if (!$this->beritaModel->insert($data)) {
+            return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
+        }
+
+        return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
+    }
 
     // ========================================================
-    // Update berita
+    // Form Edit Berita
     // ========================================================
-    public function update($id = null)
+    public function edit($id)
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengedit berita.');
+        }
+
+        $berita = $this->beritaModel->find($id);
+        if (!$berita || $berita['trash'] == '1') {
+            return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+        }
+
+        $kategori = $this->kategoriModel->where('trash', '0')->findAll();
+        $beritaAll = $this->beritaModel
+            ->where('trash', '0')
+            ->where('id_berita !=', $id)
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
+
+        return view('pages/berita/edit', [
+            'title' => 'Edit Berita',
+            'berita' => $berita,
+            'kategori' => $kategori,
+            'beritaAll' => $beritaAll
+        ]);
+    }
+
+    // ========================================================
+    // Update Berita
+    // ========================================================
+    public function update($id)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_update']) {
@@ -92,17 +160,38 @@ public function edit($id = null)
             return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
         }
 
-        $data = [
-            'judul'       => $this->request->getPost('judul'),
-            'topik'       => $this->request->getPost('topik'),
-            'id_kategori' => $this->request->getPost('id_kategori'),
-            'content'     => $this->request->getPost('content'),
-            'status'      => $this->request->getPost('status') ?? '0',
-            'slug'        => url_title($this->request->getPost('judul'), '-', true),
-            'id_berita_terkait' => $this->request->getPost('id_berita_terkait') ?: null,
-            'id_berita_terkait2'=> $this->request->getPost('id_berita_terkait2') ?: null,
+        $post = $this->request->getPost();
 
-            
+        $data = [
+            'judul'       => $post['judul'],
+            'topik'       => $post['topik'] ?? null,
+            'id_kategori' => $post['id_kategori'] ?? null,
+            'id_sub_kategori' => $post['id_sub_kategori'] ?? null,
+            'content'     => $post['content'] ?? null,
+            'intro'       => $post['intro'] ?? null,
+            'feat_image'  => $post['feat_image'] ?? null,
+            'caption'     => $post['caption'] ?? null,
+            'sumber'      => $post['sumber'] ?? null,
+            'link_video'  => $post['link_video'] ?? null,
+            'status'      => $post['status'] ?? '0',
+            'status_berita' => $post['status_berita'] ?? '0',
+            'id_berita_terkait'  => $post['id_berita_terkait'] ?? null,
+            'id_berita_terkait2' => $post['id_berita_terkait2'] ?? null,
+            'keyword'     => $post['keyword'] ?? null,
+            'dokumen_title' => $post['dokumen_title'] ?? null,
+            'dokumen_duo_title' => $post['dokumen_duo_title'] ?? null,
+            'dokumen_tigo_title' => $post['dokumen_tigo_title'] ?? null,
+            'dokumen_quatro_title' => $post['dokumen_quatro_title'] ?? null,
+            'dokumen' => $post['dokumen'] ?? null,
+            'dokumen_duo' => $post['dokumen_duo'] ?? null,
+            'dokumen_tigo' => $post['dokumen_tigo'] ?? null,
+            'dokumen_quatro' => $post['dokumen_quatro'] ?? null,
+            'slug'        => url_title($post['judul'], '-', true),
+            'updated_by_id'   => session()->get('id_user'),
+            'updated_by_name' => session()->get('username'),
+            'updated_at'      => date('Y-m-d H:i:s')
+
+
         ];
 
         $this->beritaModel->skipValidation(true)->update($id, $data);
@@ -111,92 +200,109 @@ public function edit($id = null)
     }
 
     // ========================================================
-    // Form tambah berita
+    // Detail Berita
     // ========================================================
-    public function new()
+    public function show($slug)
+    {
+        $berita = $this->beritaModel->getBySlug($slug);
+        if (!$berita) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Berita tidak ditemukanass');
+        }
+
+        $related = [];
+        if (!empty($berita['id_berita_terkait'])) {
+            $related[] = $this->beritaModel->find($berita['id_berita_terkait']);
+        }
+        if (!empty($berita['id_berita_terkait2'])) {
+            $related[] = $this->beritaModel->find($berita['id_berita_terkait2']);
+        }
+
+        return view('pages/berita/show', [
+            'berita' => $berita,
+            'related' => $related
+        ]);
+    }
+
+    // ========================================================
+    // Soft Delete Berita
+    // ========================================================
+// ========================================================
+// Soft Delete Berita
+// ========================================================
+public function delete($id = null)
 {
     $access = $this->getAccess(session()->get('role'));
-    if (!$access || !$access['can_create']) {
-        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
+    if (!$access || !$access['can_delete']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menghapus berita.');
+    }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    $this->beritaModel->update($id, ['trash' => '1']);
+    return redirect()->to('/berita')->with('success', 'Berita dipindahkan ke sampah.');
+}
+
+// ========================================================
+// Restore Berita
+// ========================================================
+public function restore($id = null)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/berita/trash')->with('error', 'Kamu tidak punya izin memulihkan berita.');
+    }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita/trash')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    $this->beritaModel->update($id, ['trash' => '0']);
+    return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dipulihkan.');
+}
+
+// ========================================================
+// Hapus Permanen Berita
+// ========================================================
+public function destroyPermanent($id = null)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_delete']) {
+        return redirect()->to('/berita/trash')->with('error', 'Kamu tidak punya izin menghapus berita permanen.');
+    }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita/trash')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    $this->beritaModel->delete($id, true); // force delete
+    return redirect()->to('/berita/trash')->with('success', 'Berita dihapus permanen.');
+}
+
+public function trash()
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_read']) {
+        return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat sampah berita.');
     }
 
     $data = [
-        'title' => 'Tambah Berita',
-        'kategori' => $this->kategoriModel->getKategoriAktif(),
-        'beritaAll' => $this->beritaModel->getBeritaWithKategori(false) // semua berita untuk pilihan terkait
+        'title' => 'Sampah Berita',
+        'berita' => $this->beritaModel->getTrashBerita()
     ];
 
-    return view('pages/berita/create', $data);
+    
+    return view('pages/berita/trash', $data);
 }
 
+ 
 
     // ========================================================
-    // Tambah berita baru
-    // ========================================================
-    public function create()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_create']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
-        }
-
-        $data = [
-            'judul'       => $this->request->getPost('judul'),
-            'topik'       => $this->request->getPost('topik'),
-            'id_kategori' => $this->request->getPost('id_kategori'),
-            'content'     => $this->request->getPost('content'),
-            'status'      => $this->request->getPost('status') ?? '0',
-            'slug'        => url_title($this->request->getPost('judul'), '-', true),
-            'id_berita_terkait' => $this->request->getPost('id_berita_terkait') ?: null,
-            'id_berita_terkait2'=> $this->request->getPost('id_berita_terkait2') ?: null,
-            'hash_berita' => md5(uniqid())
-        ];
-
-        if (!$this->beritaModel->insert($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
-        }
-
-        return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
-    }
-
-    // ========================================================
-    // Detail berita + hit count
-    // ========================================================
-public function show($slug = null)
-{
-    $berita = $this->beritaModel->getBySlug($slug); // ambil berita berdasarkan slug
-    if (!$berita) {
-        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Berita tidak ditemukan');
-    }
-
-    // Ambil berita terkait 1 dan 2
-    $related = [];
-    if ($berita['id_berita_terkait']) {
-        $related[] = $this->beritaModel->find($berita['id_berita_terkait']);
-    }
-    if ($berita['id_berita_terkait2']) {
-        $related[] = $this->beritaModel->find($berita['id_berita_terkait2']);
-    }
-
-    return view('pages/berita/show', [
-        'berita' => $berita,
-        'related' => $related
-    ]);
-}
-
-
-
-    // ========================================================
-    // Soft delete berita
-    // ========================================================
-    public function delete($id = null)
-    {
-        $this->beritaModel->update($id, ['trash' => '1']);
-        return redirect()->to('/berita')->with('success', 'Berita dipindahkan ke sampah.');
-    }
-
-    // ========================================================
-    // Hak akses
+    // Hak Akses
     // ========================================================
     private function getAccess($role)
     {

@@ -2,40 +2,75 @@
 <?= $this->section('content') ?>
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>🗑️ Berita Dihapus</h3>
-        <a href="<?= site_url('berita') ?>" class="btn btn-secondary">← Kembali</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">🗑️ Sampah Berita</h3>
+        <a href="<?= site_url('berita') ?>" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
     </div>
 
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Judul</th>
-                <th>Dihapus Oleh</th>
-                <th>Tanggal Hapus</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($berita)): ?>
-                <?php foreach ($berita as $i => $row): ?>
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php elseif (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
                     <tr>
-                        <td><?= $i + 1 ?></td>
-                        <td><?= esc($row['judul']) ?></td>
-                        <td><?= esc($row['is_delete_by_name']) ?></td>
-                        <td><?= date('d M Y H:i', strtotime($row['delete_at'])) ?></td>
-                        <td>
-                            <a href="<?= site_url('berita/restore/'.$row['id_berita']) ?>" class="btn btn-sm btn-success">♻️ Restore</a>
-                            <a href="<?= site_url('berita/destroy/'.$row['id_berita']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus permanen?')">🗑️ Hapus Permanen</a>
-                        </td>
+                        <th>Judul</th>
+                        <th>Kategori</th>
+                        <th>Diperbarui Oleh</th>
+                        <th>Tanggal Update</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="5" class="text-center">Tidak ada berita di sampah</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    <?php if (!empty($berita)): ?>
+                        <?php foreach ($berita as $row): ?>
+                            <tr>
+                                <td class="fw-semibold"><?= esc($row['judul']) ?></td>
+                                <td><?= esc($row['nama_kategori']) ?></td>
+                                <td><?= esc($row['updated_by_name']) ?></td>
+                                <td><?= date('d M Y H:i', strtotime($row['updated_at'])) ?></td>
+                                <td class="text-center">
+                                    <a href="<?= site_url('berita/' . $row['id_berita'] . '/restore') ?>" 
+                                       class="btn btn-success btn-sm px-3 me-1">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Pulihkan
+                                    </a>
+                                    <form action="<?= site_url('berita/' . $row['id_berita'] . '/destroyPermanent') ?>" 
+                                          method="post" style="display:inline;">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" 
+                                                class="btn btn-danger btn-sm px-3" 
+                                                onclick="return confirm('Yakin ingin menghapus permanen berita ini?')">
+                                            <i class="bi bi-trash3"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                Tidak ada berita di sampah.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <?= $this->endSection() ?>

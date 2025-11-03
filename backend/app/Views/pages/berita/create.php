@@ -3,7 +3,7 @@
 
 <div class="container py-4">
     <h3>📝 Tambah Berita</h3>
-    <form action="<?= site_url('berita') ?>" method="post" enctype="multipart/form-data">
+    <form action="<?= site_url('berita') ?>" method="post">
         <?= csrf_field() ?>
 
         <!-- Judul -->
@@ -29,6 +29,12 @@
                     </option>
                 <?php endforeach; ?>
             </select>
+        </div>
+
+        <!-- Sub Kategori -->
+        <div class="mb-3">
+            <label class="form-label">Sub Kategori</label>
+            <input type="text" name="id_sub_kategori" class="form-control" placeholder="Sub kategori (optional)" value="<?= old('id_sub_kategori') ?>">
         </div>
 
         <!-- Intro -->
@@ -69,12 +75,6 @@
             </select>
         </div>
 
-        <!-- Gambar Utama -->
-        <div class="mb-3">
-            <label class="form-label">Gambar Utama (feat_image)</label>
-            <input type="file" name="feat_image" class="form-control">
-        </div>
-
         <!-- Link Video -->
         <div class="mb-3">
             <label class="form-label">Link Video (YouTube / lainnya)</label>
@@ -99,9 +99,34 @@
             <textarea name="caption" class="form-control" rows="2" placeholder="Tuliskan keterangan gambar"><?= old('caption') ?></textarea>
         </div>
 
+        <!-- Dokumen -->
+        <div class="mb-3">
+            <label class="form-label">Dokumen 1</label>
+            <input type="text" name="dokumen_title" class="form-control mb-1" placeholder="Judul dokumen" value="<?= old('dokumen_title') ?>">
+            <input type="text" name="dokumen" class="form-control" placeholder="Link / path dokumen" value="<?= old('dokumen') ?>">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dokumen 2</label>
+            <input type="text" name="dokumen_duo_title" class="form-control mb-1" placeholder="Judul dokumen" value="<?= old('dokumen_duo_title') ?>">
+            <input type="text" name="dokumen_duo" class="form-control" placeholder="Link / path dokumen" value="<?= old('dokumen_duo') ?>">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dokumen 3</label>
+            <input type="text" name="dokumen_tigo_title" class="form-control mb-1" placeholder="Judul dokumen" value="<?= old('dokumen_tigo_title') ?>">
+            <input type="text" name="dokumen_tigo" class="form-control" placeholder="Link / path dokumen" value="<?= old('dokumen_tigo') ?>">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dokumen 4</label>
+            <input type="text" name="dokumen_quatro_title" class="form-control mb-1" placeholder="Judul dokumen" value="<?= old('dokumen_quatro_title') ?>">
+            <input type="text" name="dokumen_quatro" class="form-control" placeholder="Link / path dokumen" value="<?= old('dokumen_quatro') ?>">
+        </div>
+
         <!-- Status otomatis -->
-        <input type="hidden" name="status" value="0"> <!-- Tidak tayang dulu -->
-        <input type="hidden" name="status_berita" value="2"> <!-- Menunggu Verifikasi -->
+        <input type="hidden" name="status" value="0">
+        <input type="hidden" name="status_berita" value="2">
 
         <!-- Tombol Aksi -->
         <div class="d-flex justify-content-end mt-4">

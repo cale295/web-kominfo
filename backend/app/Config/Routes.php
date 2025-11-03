@@ -22,9 +22,6 @@ $routes->resource('tema', ['controller' => 'TemaKategoriController', 'except' =>
 // Resource Web (non-API)
 $routes->resource('manage_user', ['controller' => 'UserController']);
 
-// berita
-$routes->resource('berita', ['controller' => 'BeritaController']);
-
 // Kategori Berita
 $routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
 
@@ -46,12 +43,21 @@ $routes->get('berita_tag/trash', 'BeritaTagController::trash');
 $routes->get('berita_tag/(:num)/restore', 'BeritaTagController::restore/$1');
 $routes->delete('berita_tag/(:num)/destroyPermanent', 'BeritaTagController::destroyPermanent/$1');
 
-// Berita
-$routes->resource('galeri_foto', ['controller' => 'GaleriFotoController']);
+// BERITA ROUTES (manual agar tidak bentrok)
+$routes->get('berita', 'BeritaController::index');
+$routes->get('berita/create', 'BeritaController::create');
+$routes->post('berita', 'BeritaController::store');
+
+$routes->get('berita/trash', 'BeritaController::trash');
+$routes->get('berita/(:num)/restore', 'BeritaController::restore/$1');
+$routes->delete('berita/(:num)/destroyPermanent', 'BeritaController::destroyPermanent/$1');
+
+$routes->get('berita/(:segment)/edit', 'BeritaController::edit/$1');
+$routes->put('berita/(:segment)', 'BeritaController::update/$1');
+$routes->delete('berita/(:segment)', 'BeritaController::delete/$1');
 $routes->get('berita/(:segment)', 'BeritaController::show/$1');
-$routes->get('galeri_foto/trash', 'GaleriFotoController::trash');
-$routes->get('galeri_foto/(:num)/restore', 'GaleriFotoController::restore/$1');
-$routes->delete('galeri_foto/(:num)/destroyPermanent', 'GaleriFotoController::destroyPermanent/$1');
+
+
 
 
 
