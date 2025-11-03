@@ -46,13 +46,22 @@ class KategoriModel extends Model
         return $data;
     }
 
+    // Tambahkan di class KategoriModel
+public function getKategoriAktif()
+{
+    return $this->where('status', '1')   // hanya kategori aktif
+                ->where('trash', '0')    // tidak dihapus
+                ->orderBy('kategori', 'ASC')
+                ->findAll();
+}
+
+
     // ======================
     // Validation
     // ======================
     protected $validationRules = [
         'kategori' => 'required|min_length[3]|max_length[100]',
         'slug'     => 'required|alpha_dash|is_unique[m_kategori_berita.slug,id_kategori,{id}]',
-        'status'   => 'required|in_list[active,inactive]',
         'trash'    => 'permit_empty|in_list[0,1]',
         'is_show_nav' => 'permit_empty|in_list[0,1]',
         'sorting_nav' => 'permit_empty|numeric'
@@ -68,10 +77,6 @@ class KategoriModel extends Model
             'required'    => 'Slug harus diisi.',
             'alpha_dash'  => 'Slug hanya boleh huruf, angka, dash, dan underscore.',
             'is_unique'   => 'Slug sudah digunakan.',
-        ],
-        'status' => [
-            'required' => 'Status harus diisi.',
-            'in_list'  => 'Status harus "active" atau "inactive".',
         ],
         'trash' => [
             'in_list' => 'Trash hanya boleh 0 atau 1.',

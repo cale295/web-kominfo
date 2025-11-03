@@ -46,6 +46,12 @@ $routes->get('berita_tag/trash', 'BeritaTagController::trash');
 $routes->get('berita_tag/(:num)/restore', 'BeritaTagController::restore/$1');
 $routes->delete('berita_tag/(:num)/destroyPermanent', 'BeritaTagController::destroyPermanent/$1');
 
+// Berita
+$routes->resource('galeri_foto', ['controller' => 'GaleriFotoController']);
+$routes->get('berita/(:segment)', 'BeritaController::show/$1');
+$routes->get('galeri_foto/trash', 'GaleriFotoController::trash');
+$routes->get('galeri_foto/(:num)/restore', 'GaleriFotoController::restore/$1');
+$routes->delete('galeri_foto/(:num)/destroyPermanent', 'GaleriFotoController::destroyPermanent/$1');
 
 
 

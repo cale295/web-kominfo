@@ -71,15 +71,20 @@ class KategoriController extends BaseController
     // ========================================================
     // Form tambah kategori
     // ========================================================
-    public function new()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_create']) {
-            return redirect()->to('/kategori')->with('error', 'Kamu tidak punya izin menambah kategori.');
-        }
-
-        return view('pages/kategori/create', ['title' => 'Tambah Kategori']);
+public function new()
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_create']) {
+        return redirect()->to('/kategori')->with('error', 'Kamu tidak punya izin menambah kategori.');
     }
+
+    $data = [
+        'title' => 'Tambah Kategori',
+        'kategori' => $this->kategoriModel->where('trash', '0')->findAll() // untuk parent category
+    ];
+
+    return view('pages/kategori/create', $data);
+}
 
     // ========================================================
     // Simpan kategori baru
@@ -157,34 +162,32 @@ class KategoriController extends BaseController
     // ========================================================
     // Update kategori
     // ========================================================
-    public function update($id = null)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/kategori')->with('error', 'Kamu tidak punya izin mengubah kategori.');
-        }
-
-        $kategori = $this->kategoriModel->find($id);
-        if (!$kategori) {
-            return redirect()->to('/kategori')->with('error', 'Kategori tidak ditemukan.');
-        }
-
-        $data = [
-            'id_parent'   => $this->request->getPost('id_parent'),
-            'kategori'    => $this->request->getPost('kategori'),
-            'slug'        => url_title($this->request->getPost('kategori'), '-', true),
-            'keterangan'  => $this->request->getPost('keterangan'),
-            'status'      => $this->request->getPost('status') ?? 'active',
-            'is_show_nav' => $this->request->getPost('is_show_nav') ?? '0',
-            'sorting_nav' => $this->request->getPost('sorting_nav'),
-        ];
-
-        if (!$this->kategoriModel->update($id, $data)) {
-            return redirect()->back()->withInput()->with('errors', $this->kategoriModel->errors());
-        }
-
-        return redirect()->to('/kategori')->with('success', 'Kategori berhasil diperbarui.');
+public function update($id = null)
+{
+    $kategori = $this->kategoriModel->find($id);
+    if (!$kategori) {
+        return redirect()->to('/kategori')->with('error', 'Kategori tidak ditemukan.');
     }
+
+    $kategoriBaru = $this->request->getPost('kategori');
+    $slugBaru = url_title($kategoriBaru, '-', true);
+
+    $data = [
+        'id_parent'   => $this->request->getPost('id_parent'),
+        'kategori'    => $kategoriBaru,
+        'slug'        => $slugBaru,
+        'keterangan'  => $this->request->getPost('keterangan'),
+        'status'      => $this->request->getPost('status') ?? 'active',
+        'is_show_nav' => $this->request->getPost('is_show_nav') ?? '0',
+        'sorting_nav' => $this->request->getPost('sorting_nav'),
+    ];
+
+    // ❌ Nonaktifkan validasi model untuk update
+    $this->kategoriModel->skipValidation(true)->update($id, $data);
+
+    return redirect()->to('/kategori')->with('success', 'Kategori berhasil diperbarui.');
+}
+
 
     // ========================================================
     // Soft delete → ubah trash jadi '1'

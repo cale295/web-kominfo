@@ -425,6 +425,7 @@
     <div class="card form-card-gov">
         <div class="card-body">
             <form action="<?= base_url('agenda') ?>" method="post" enctype="multipart/form-data" id="agendaForm">
+                
                 <?= csrf_field() ?>
 
                 <!-- Basic Information -->

@@ -102,7 +102,7 @@ class AgendaController extends BaseController
         if ($img = $this->request->getFile('image')) {
             if ($img->isValid() && !$img->hasMoved()) {
                 $newName = $img->getRandomName();
-                $img->move(FCPATH . 'uploads/pages/agenda/', $newName); // Gunakan FCPATH
+                $img->move(FCPATH . 'uploads/agenda/', $newName); // Gunakan FCPATH
                 $data['image'] = $newName;
             }
         }
@@ -166,7 +166,7 @@ class AgendaController extends BaseController
         ];
 
         // Folder upload (gunakan FCPATH)
-        $uploadPath = FCPATH . 'uploads/pages/agenda/';
+        $uploadPath = FCPATH . 'uploads/agenda/';
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
