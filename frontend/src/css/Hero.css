@@ -9,10 +9,10 @@
 
 .btn-disabilitas {
   background-color: #fbbf24; 
-  color: #1e40af; 
+  color: #2547A2; 
   font-weight: 600;
-  padding: 0.75rem 1.25rem;
-  border-top-right-radius: 2rem;
+  padding: 0.5rem 1rem;
+  border-top-right-radius: 1.875rem;
   border-bottom-right-radius: 2rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   transition: background-color 0.3s ease, padding 0.3s ease;
@@ -28,9 +28,9 @@
 }
 
 .icon-accessibility {
-  width: 1.5rem;
-  height: 1.5rem;
-  stroke: #1e40af;
+  width: 2rem;
+  height: 2rem;
+  stroke: #2547A2;
 }
 
 .disabilitas {
@@ -63,9 +63,9 @@
 
 .search-input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #1e40af;
-  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid #2547A2;
+  border-radius: 1.875rem;
   background-color: #fff;
   outline: none;
   font-size: 1rem;
@@ -78,7 +78,7 @@
 }
 
 .btn-search {
-  background-color: #1e40af;
+  background-color: #2547A2;
   color: #fff;
   border-radius: 50%;
   width: 2.5rem;
@@ -101,23 +101,7 @@
   stroke: #fff;
 }
 
-@media (max-width: 768px) {
-  .search-input-wrapper {
-    max-width: 300px;
-  }
-
-  .search-input {
-    font-size: 0.9rem;
-    padding: 0.6rem 0.9rem;
-  }
-
-  .btn-search {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-}
-
-@media (max-width: 487px) {
+@media (max-width: 283px) {
   .search-wrapper {
     gap: 0.25rem;
     margin-right: 0;

@@ -1,0 +1,120 @@
+/* Custom Colors (Tailwind-like) */
+.text-blue-800 {
+  color: #1e3a8a !important;
+}
+.text-blue-600 {
+  color: #2563eb !important;
+}
+.text-gray-700 {
+  color: #374151 !important;
+}
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+.bg-gray-50 {
+  background-color: #f9fafb !important;
+}
+.bg-yellow-400 {
+  background-color: #facc15 !important;
+}
+.bg-blue-500 {
+  background-color: #3b82f6 !important;
+}
+.bg-blue-600 {
+  background-color: #2563eb !important;
+}
+.bg-blue-700 {
+  background-color: #1d4ed8 !important;
+}
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+/* Hover effects */
+.bg-hover-gray-100:hover {
+  background-color: #f3f4f6 !important;
+}
+.group-hover-text-blue-600 {
+  /* Tidak bisa pakai group di Bootstrap, jadi kita ganti manual */
+}
+a .text-blue-800:hover {
+  color: #2563eb !important;
+}
+
+/* Social hover */
+.text-red-600-hover:hover {
+  color: #dc2626 !important;
+}
+.text-blue-600-hover:hover {
+  color: #2563eb !important;
+}
+.text-pink-600-hover:hover {
+  color: #db2777 !important;
+}
+.text-blue-400-hover:hover {
+  color: #60a5fa !important;
+}
+
+/* Typography */
+.fs-1 {
+  font-size: 1.875rem !important; /* 30px */
+}
+.fs-md-1 {
+  font-size: 2.25rem !important; /* 36px */
+}
+.fs-4 {
+  font-size: 1.25rem !important;
+}
+.fs-5 {
+  font-size: 1.125rem !important;
+}
+.fs-6 {
+  font-size: 0.875rem !important;
+}
+.text-sm {
+  font-size: 0.875rem !important;
+}
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+/* Spacing */
+.mb-10 {
+  margin-bottom: 2.5rem !important;
+}
+.mb-md-12 {
+  margin-bottom: 3rem !important;
+}
+.pt-6 {
+  padding-top: 1.5rem !important;
+}
+.gap-4 {
+  gap: 1rem !important;
+}
+.gap-6 {
+  gap: 1.5rem !important;
+}
+.rounded-lg {
+  border-radius: 0.5rem !important;
+}
+.rounded-xl {
+  border-radius: 0.75rem !important;
+}
+.lh-base {
+  line-height: 1.5 !important;
+}
+
+/* Responsive gutter override */
+.g-10 > * {
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+}
+.g-md-8 > * {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Transitions */
+.transition-colors {
+  transition: color 0.3s ease;
+}

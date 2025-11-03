@@ -1,5 +1,6 @@
 import React from "react";
 import "../css/services.css";
+import { Container, Row, Col } from "react-bootstrap";
 
 interface ServiceItem {
   id: number;
@@ -23,13 +24,13 @@ const services: ServiceItem[] = [
   },
   {
     id: 3,
-    image: "/images/egov.png",
+    image: "/assets/egov.png",
     title: "Layanan EGOV",
     link: "https://egov.tangerangkota.go.id",
   },
   {
     id: 4,
-    image: "/images/statistik.png",
+    image: "/assets/statistik.png",
     title: "Layanan Statistik",
     link: "https://statistik.tangerangkota.go.id",
   },
@@ -71,37 +72,70 @@ const services: ServiceItem[] = [
   },
 ];
 
-const ServiceGrid: React.FC = () => {
+const ServiceGrid: React.FC<{ service: ServiceItem }> = ({ service }) => {
+  const cardStyle: React.CSSProperties = {
+    height: "127px",
+    width: "231px",
+    borderRadius: "20px",
+    backgroundColor: "#EDEDED",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container-fluid mx-auto px-6">
-        {/* Baris pertama */}
-        <div className="row row-cols-1 row-cols-2 row-cols-md-3 row-cols-lg-5 g-4 justify-content-center">
-          {services.map((service) => (
-            <div key={service.id} className="col d-flex justify-content-center">
-              <a
-                href={service.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="service-card-link d-flex flex-column align-items-center text-center focus-outline-none focus-ring-4 focus-ring-blue-400 rounded-xl"
-              >
-                <div className="service-card bg-gray-100 rounded-2 rounded-lg-2 rounded-xl-2 shadow p-6 w-48 h-28 d-flex justify-content-center align-items-center transition service-hover-effect">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="service-image max-h-16 object-contain"
-                  />
-                </div>
-                <p className="mt-4 font-semibold text-gray-900 text-sm text-md-base service-title-hover">
-                  {service.title}
-                </p>
-              </a>
-            </div>
-          ))}
+    <div className="text-center">
+      <a
+        href={service.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-decoration-none text-dark d-flex flex-column align-items-center"
+      >
+        <div style={cardStyle} className=" mb-2">
+          {service.image && (
+            <img
+              src={service.image}
+              alt={service.title}
+              className="img-fluid"
+              style={{
+                maxWidth: "100px",
+                maxHeight: "100px",
+                objectFit: "contain",
+              }}
+            />
+          )}
         </div>
-      </div>
-    </section>
+        <h6
+          className="fw-bold text-center"
+          style={{
+            fontSize: "0.9rem",
+            lineHeight: "1.2",
+            maxWidth: "140px",
+          }}
+        >
+          {service.title}
+        </h6>
+      </a>
+    </div>
   );
 };
 
-export default ServiceGrid;
+// Komponen Utama
+const ServicesSection: React.FC = () => {
+  return (
+    <Container className="py-4">
+      {/* Baris Pertama */}
+      <Row className="g-4 mb-4 justify-content-between">
+        {services.map((service) => (
+          <Col key={service.id} xs={12} sm={6} md={4} lg={2} xl={2}>
+            <ServiceGrid service={service} />
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
+};
+
+// Ekspor komponen utama
+export default ServicesSection;

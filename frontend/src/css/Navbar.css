@@ -1,6 +1,6 @@
 /* Custom CSS untuk menggantikan Tailwind */
 .bg-gradient-to-r-blue-800-950 {
-  background: linear-gradient(to right, #1e40af, #0f172a);
+  background: linear-gradient(to right, rgba(37, 71, 162, 1), rgba(20, 58, 105, 1));
 }
 
 .w-24 {
@@ -21,6 +21,9 @@
 
 .h-8 {
   height: 2rem;
+}
+.h-10 {
+  height: 15rem;
 }
 
 .font-bold {
@@ -332,6 +335,10 @@
   pointer-events: auto;
 }
 
+.navbar-wrapper {
+  overflow-x: visible !important;
+}
+
 /* Item di dalam submenu */
 .submenu-hidden a {
   display: block;
@@ -360,4 +367,10 @@
 /* Efek muncul halus untuk submenu bertingkat */
 .submenu-hidden .submenu-hidden {
   transition-delay: 0.05s;
+}
+
+.batik {
+    position: absolute;
+    inset-inline-end: 5px;
+    inset-block-start: 25px;
 }

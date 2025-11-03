@@ -10,6 +10,7 @@ import {
   Instagram,
   Twitter,
 } from 'lucide-react';
+import '../css/contact.css'; // file CSS custom di bawah
 
 export default function HubungiKami() {
   const contactItems = [
@@ -46,7 +47,7 @@ export default function HubungiKami() {
       title: "KEGAWAT DARURATAN",
       subtitle: (
         <>
-          Emergency Call <span className="font-bold">112</span> (Bebas Pulsa)
+          Emergency Call <span className="fw-bold">112</span> (Bebas Pulsa)
         </>
       ),
       bgColor: "bg-blue-700",
@@ -55,53 +56,53 @@ export default function HubungiKami() {
   ];
 
   const socialMedia = [
-    { icon: <Youtube className="w-6 h-6" />, link: "#", color: "hover:text-red-600"  },
-    { icon: <Facebook className="w-6 h-6" />, link: "#", color: "hover:text-blue-600" },
-    { icon: <Instagram className="w-6 h-6" />, link: "#", color: "hover:text-pink-600" },
-    { icon: <Twitter className="w-6 h-6" />, link: "#", color: "hover:text-blue-400" },
+    { icon: <Youtube className="w-6 h-6" />, link: "#", colorClass: "text-red-600-hover" },
+    { icon: <Facebook className="w-6 h-6" />, link: "#", colorClass: "text-blue-600-hover" },
+    { icon: <Instagram className="w-6 h-6" />, link: "#", colorClass: "text-pink-600-hover" },
+    { icon: <Twitter className="w-6 h-6" />, link: "#", colorClass: "text-blue-400-hover" },
   ];
 
   return (
-    <div className="bg-gray-50 py-12 md:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-blue-800 text-center mb-10 md:mb-12">
+    <div className="bg-gray-50 py-12 py-md-16">
+      <div className="container px-4">
+        <h1 className="fs-1 fs-md-1 fw-bold text-blue-800 text-center mb-10 mb-md-12">
           Hubungi Kami
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-8">
-          <div className="flex flex-col gap-4">
+        <div className="row g-10 g-md-8">
+          <div className="col-md-6 d-flex flex-column gap-4">
             {contactItems.map((item, index) => (
               <a
                 key={index}
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 group"
+                className="d-flex align-items-center gap-4 p-4 rounded-lg bg-hover-gray-100 text-decoration-none"
               >
-                <div className={`${item.bgColor} p-3 rounded-full flex-shrink-0`}>
+                <div className={`${item.bgColor} p-3 rounded-circle flex-shrink-0`}>
                   {item.icon}
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-blue-800 group-hover:text-blue-600">
+                <div className="flex-grow-1">
+                  <h3 className="fs-5 fw-bold text-blue-800 group-hover-text-blue-600">
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-sm text-gray-700 mt-1">
+                    <p className="text-sm text-gray-700 mt-1 mb-0">
                       {item.subtitle}
                     </p>
                   )}
                 </div>
               </a>
-            ))} 
+            ))}
 
-            <div className="flex justify-center gap-6 pt-6">
+            <div className="d-flex justify-content-center gap-6 pt-6">
               {socialMedia.map((social, index) => (
                 <a
                   key={index}
                   href={social.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`text-blue-800 ${social.color} transition-colors duration-300`}
+                  className={`text-blue-800 ${social.colorClass} transition-colors`}
                 >
                   {social.icon}
                 </a>
@@ -109,31 +110,22 @@ export default function HubungiKami() {
             </div>
           </div>
 
-          <div className="flex flex-col text-center md:text-left items-center md:items-start">
-            <h2 className="text-xl font-bold text-blue-800">
+          <div className="col-md-6 d-flex flex-column align-items-center align-items-md-start text-center text-md-start">
+            <h2 className="fs-4 fw-bold text-blue-800">
               Dinas Komunikasi dan Informatika
             </h2>
-            <h3 className="text-xl font-bold text-blue-800 mb-4">
+            <h3 className="fs-4 fw-bold text-blue-800 mb-4">
               Kota Tangerang
             </h3>
 
-            <address className="text-gray-600 text-sm leading-relaxed not-italic mb-6">
-              Jl. Satria, RT.002/RW.001, Sukasari, Kec. Tangerang,
+            <address className="text-gray-600 fs-6 mb-6 lh-base fst-normal">
+              Jl. Satria, RT.002/RW.001, Sukasari, Kec. Tangerang,<br />
               Kota Tangerang, Banten, Indonesia 15111 <br />
               Telp. 021-55764955 Fax. 021-55764957
             </address>
 
-            <div className="w-full h-64 rounded-xl overflow-hidden shadow-md">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.582531321013!2d106.6310888153472!3d-6.186675062335191!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f8d555555555%3A0xbf55869536831c1!2sPusat%20Pemerintahan%20Kota%20Tangerang!5e0!3m2!1sen!2sid!4v1668581123999!5m2!1sen!2sid"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen={false}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Peta Lokasi Dinas Komunikasi dan Informatika Kota Tangerang"
-              ></iframe>
+            <div className="w-100 rounded-xl overflow-hidden shadow-sm" style={{ height: '256px' }}>
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1319.3408819062997!2d106.6401152789647!3d-6.171026352341869!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f8cfe4d01d59%3A0xc9bf83c50c061315!2sDinas%20Komunikasi%20dan%20Informatika%20Kota%20Tangerang!5e1!3m2!1sid!2sid!4v1762144536793!5m2!1sid!2sid" width="100%" height="100%" loading="lazy"></iframe>
             </div>
           </div>
         </div>

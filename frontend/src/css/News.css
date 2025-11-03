@@ -1,158 +1,84 @@
-/* Warna Kustom */
-:root {
-  --blue-800: #1e3a8a;
-  --blue-700: #1d4ed8;
-  --blue-600: #2563eb;
-  --blue-500: #3b82f6;
-  --blue-400: #60a5fa;
-  --blue-100: #dbeafe;
-  --blue-50: #eff6ff;
-  --slate-400: #94a3b8;
-  --slate-500: #64748b;
-  --gray-50: #f9fafb;
-  --yellow-400: #fbbf24;
-  --success: #10b981;
-  --info: #0ea5e9;
-  --warning: #f59e0b;
+/* Custom styles for TangerangNewsApp */
+
+.news-card {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
-.app-container {
-  background-color: var(--gray-50);
-  min-height: 100vh;
-  padding-bottom: 2rem;
-}
-
-.text-blue-800 { color: var(--blue-800); }
-.text-blue-700 { color: var(--blue-700); }
-.text-blue-600 { color: var(--blue-600); }
-.text-slate-400 { color: var(--slate-400); }
-.text-slate-500 { color: var(--slate-500); }
-.bg-blue-100 { background-color: var(--blue-100); }
-.bg-blue-50 { background-color: var(--blue-50); }
-.btn-outline-blue {
-  border-color: var(--blue-400);
-  color: var(--blue-600);
-}
-.btn-outline-blue:hover {
-  background-color: var(--blue-100);
-  border-color: var(--blue-500);
-}
-
-/* Gaya Umum */
-.rounded-4 {
-  border-radius: 1rem !important;
-}
-.card {
-  border: none;
+.news-image-container {
+  height: 230px;
   overflow: hidden;
 }
-.shadow-lg {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-.hover-bg-light:hover {
-  background-color: #f8f9fa;
-}
-.transition {
-  transition: background-color 0.2s ease;
-}
-.object-cover {
-  object-fit: cover;
-}
 
-/* Tombol Tab */
-.btn-primary {
-  background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
-  border: none;
-}
-.btn-primary:hover {
-  background: linear-gradient(135deg, var(--blue-700), var(--blue-600));
-}
-.btn-outline-primary {
-  color: var(--blue-600);
-  border-color: var(--blue-400);
-}
-.btn-outline-primary:hover {
-  background-color: var(--blue-100);
-  border-color: var(--blue-500);
-}
-
-/* Kalender Button - Diperbaiki */
-.btn-outline-blue {
-  border: 1px solid var(--blue-400);
-  color: var(--blue-600);
-  transition: all 0.2s ease;
-}
-.btn-outline-blue:hover {
-  background-color: var(--blue-100);
-  border-color: var(--blue-500);
-}
-.btn-outline-blue.active,
-.btn-outline-blue:active {
-  background-color: var(--blue-600);
-  border-color: var(--blue-600);
-}
-.btn-success {
-  background-color: var(--success);
-  border-color: var(--success);
-}
-.btn-info {
-  background-color: var(--info);
-  border-color: var(--info);
-}
-.btn-warning {
-  background-color: var(--warning);
-  border-color: var(--warning);
-}
-
-/* Carousel Indicators */
-.carousel-indicators button {
+.indicator {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  width: 12px;
-  height: 12px;
+  background-color: #6c757d;
+  border: none;
   transition: all 0.3s ease;
 }
-.carousel-indicators .active {
-  transform: scale(1.2);
+.indicator.active {
+  width: 32px;
+  background-color: #ffc107;
 }
 
-/* Responsif */
-@media (min-width: 768px) {
-  .display-6 {
-    font-size: 1.75rem;
-  }
-  .py-md-5 {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-  }
-  .p-md-4 {
-    padding: 1.5rem;
-  }
-  .mb-md-4 {
-    margin-bottom: 1.5rem;
-  }
+.tab-btn {
+  border: 2px solid #0d6efd;
+  color: #0d6efd;
+  font-weight: 600;
+  border-radius: 1rem;
+  padding: 0.6rem 1.5rem;
+  transition: all 0.3s ease;
+}
+.tab-btn:hover {
+  border-color: #0b5ed7;
+  box-shadow: 0 0 0.4rem rgba(13, 110, 253, 0.3);
+}
+.tab-btn.active {
+  background: linear-gradient(90deg, #0d6efd, #6610f2);
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.3);
 }
 
-@media (min-width: 992px) {
-  .display-6 {
-    font-size: 2rem; /* Lebih kecil dari sebelumnya untuk tampilan desktop */
-  }
-  .py-md-5 {
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
-  }
-  .p-md-4 {
-    padding: 2rem;
-  }
-  .mb-md-4 {
-    margin-bottom: 2rem;
-  }
-  .col-lg-4,
-  .col-lg-8 {
-    /* Memastikan kolom tetap 2 kolom di layar besar */
-    flex: 0 0 auto;
-    width: 33.333333%; /* Atau 4/12 */
-  }
-  .col-lg-8 {
-    width: 66.666667%; /* Atau 8/12 */
-  }
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day {
+  border: none;
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  font-size: 12px;
+  background: none;
+  transition: all 0.2s ease;
+}
+.calendar-day:hover {
+  background-color: #e7f1ff;
+}
+.calendar-day.today {
+  background-color: #cfe2ff;
+  font-weight: bold;
+}
+.calendar-day.event {
+  background: linear-gradient(90deg, #ffc107, #ffca2c);
+  color: #fff;
+}
+.calendar-day.selected {
+  background: linear-gradient(90deg, #20c997, #0dcaf0);
+  color: #fff;
+  transform: scale(1.1);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.hover-bg-light:hover {
+  background: linear-gradient(90deg, #e9f2ff, #eef2ff);
 }

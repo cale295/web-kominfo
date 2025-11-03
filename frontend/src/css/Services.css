@@ -27,42 +27,6 @@
 
 /* Row dan Col */
 
-/* Default (HP): 1 kolom 
-  Kita tambahkan class baru .row-cols-1 untuk ini
-*/
-.row-cols-1 > * {
-  flex: 0 0 auto;
-  width: 100%;
-}
-
-/* Tablet (Kecil > 576px): 2 kolom
-  Sesuai permintaan "2 atau 3 kolom"
-*/
-@media (min-width: 576px) {
-  .row-cols-sm-2 > * {
-    flex: 0 0 auto;
-    width: 50%;
-  }
-}
-
-/* Tablet (Besar > 768px): 3 kolom
-  Sesuai permintaan "2 atau 3 kolom"
-*/
-@media (min-width: 768px) {
-  .row-cols-md-3 > * {
-    flex: 0 0 auto;
-    width: 33.333333%;
-  }
-}
-
-/* Laptop (> 992px): 5 kolom
-*/
-@media (min-width: 992px) {
-  .row-cols-lg-5 > * {
-    flex: 0 0 auto;
-    width: 20%;
-  }
-}
 
 .g-4 {
   gap: 1rem;
@@ -82,12 +46,12 @@
 
 /* Card Styling */
 .service-card {
-  background-color: #f3f4f6; /* bg-gray-100 */
-  border-radius: 0.5rem; /* rounded-2xl */
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
-  padding: 1.5rem; /* p-6 */
-  width: 12rem; /* w-48 */
-  height: 7rem; /* h-28 */
+  background-color: #EDEDED;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  width: 14.375rem;
+  height: 7.938rem;
   transition: all 0.3s ease;
   display: flex;
   justify-content: center;

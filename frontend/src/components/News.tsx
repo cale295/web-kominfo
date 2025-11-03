@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import "../css/news.css";
+import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,6 +6,7 @@ import {
   Bell,
   Image as ImageIcon,
 } from "lucide-react";
+import "../css/news.css";
 
 interface AnnouncementItem {
   id: number;
@@ -14,10 +14,22 @@ interface AnnouncementItem {
   date: string;
 }
 
+interface ApiAgendaItem {
+  id_agenda: string;
+  activity_name: string;
+  description: string;
+  start_date: string; // format "2025-10-27 13:23:00"
+  end_date: string;
+  location: string;
+  image: string;
+  status: string;
+}
+
 interface CalendarEvent {
   date: number;
   title: string;
   time: string;
+  image?: string;
 }
 
 interface NewsItem {
@@ -34,83 +46,53 @@ type TabType = "agenda" | "pengumuman";
 const newsItems: NewsItem[] = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/news1/600/300",
-    subtitle: "BERITA TERBARU",
+    image: "https://picsum.photos/seed/news1/400/200",
+    subtitle: "DIMULAI HARI INI!",
     desc: "Optimalkan Pembangunan Infrastruktur, Pemkot Tangerang Perbaiki 40 Ruas Jalan Kota",
     source: "Dinas Pendidikan Kota Tangerang",
-    date: "27 Des 2022",
+    date: "Selasa, 27 Desember 2022 16:50 WIB",
   },
   {
     id: 2,
-    image: "https://picsum.photos/seed/news2/600/300",
-    subtitle: "PROYEK BARU",
+    image: "https://picsum.photos/seed/news2/400/200",
+    subtitle: "PROYEK BARU DIMULAI!",
     desc: "Pemerintah Kota Tangerang Luncurkan Program Jalan Pintar Berbasis Teknologi",
     source: "Dinas PU Kota Tangerang",
-    date: "3 Jan 2023",
+    date: "Rabu, 3 Januari 2023 09:00 WIB",
   },
   {
     id: 3,
-    image: "https://picsum.photos/seed/news3/600/300",
-    subtitle: "BEASISWA DIBUKA",
+    image: "https://picsum.photos/seed/news3/400/200",
+    subtitle: "DIBUKA SEKARANG!",
     desc: "Pemkot Tangerang Buka Program Beasiswa untuk 1000 Pelajar Berprestasi",
     source: "Dinas Pendidikan Kota Tangerang",
-    date: "5 Jan 2023",
+    date: "Kamis, 5 Januari 2023 08:30 WIB",
   },
 ];
-
-const calendarEvents: Record<number, CalendarEvent> = {
-  16: {
-    date: 16,
-    title: "Car Free Day dalam rangka World Clean Up Day",
-    time: "10.00 WIB",
-  },
-  17: {
-    date: 17,
-    title: "Culinary Festival Tangerang",
-    time: "14.00 WIB",
-  },
-  25: {
-    date: 25,
-    title: "Workshop Kewirausahaan",
-    time: "09.00 WIB",
-  },
-  26: {
-    date: 26,
-    title: "Pameran Seni Lokal",
-    time: "16.00 WIB",
-  },
-  30: {
-    date: 30,
-    title: "Pelatihan Digital Marketing",
-    time: "13.00 WIB",
-  },
-};
 
 const announcementData: AnnouncementItem[] = [
   {
     id: 1,
-    title: "Pengumuman Hasil Seleksi CPNS 2024",
-    date: "12 Agu 2024",
+    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
+    date: "01 September 2025",
   },
-  {
-    id: 2,
-    title: "Pendaftaran Beasiswa D3 dan S1 Tahun Ajaran 2024/2025",
-    date: "10 Agu 2024",
-  },
+  { id: 2, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
   {
     id: 3,
-    title: "Pelatihan Pengelolaan Keuangan Desa",
-    date: "8 Agu 2024",
+    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
+    date: "01 September 2025",
   },
-  {
-    id: 4,
-    title: "Pemeliharaan Jalan Raya Merak - Anyer",
-    date: "5 Agu 2024",
-  },
+  { id: 4, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
   {
     id: 5,
-    title: "Pembukaan Posko Pengaduan Lebaran",
-    date: "29 Mar 2024",
+    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
+    date: "01 September 2025",
+  },
+  { id: 6, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
+  {
+    id: 7,
+    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
+    date: "01 September 2025",
   },
 ];
 
@@ -123,14 +105,62 @@ export default function TangerangNewsApp() {
   const [selectedDate, setSelectedDate] = useState<number | null>(
     today.getDate()
   );
+  const [calendarEvents, setCalendarEvents] = useState<
+    Record<number, CalendarEvent>
+  >({});
+  const [loadingAgenda, setLoadingAgenda] = useState<boolean>(true);
+  const [errorAgenda, setErrorAgenda] = useState<string | null>(null);
 
-  const getDaysInMonth = (month: number, year: number) => {
-    return new Date(year, month, 0).getDate();
-  };
+  // Fetch agenda data from API
+  useEffect(() => {
+    const fetchAgenda = async () => {
+      try {
+        setLoadingAgenda(true);
+        const res = await fetch("http://localhost:8080/api/agenda");
+        const json = await res.json();
 
-  const getFirstDayOfMonth = (month: number, year: number) => {
-    return new Date(year, month - 1, 1).getDay();
-  };
+        if (json.status && Array.isArray(json.data)) {
+          const eventsMap: Record<number, CalendarEvent> = {};
+
+          json.data.forEach((item: ApiAgendaItem) => {
+            const start = new Date(item.start_date);
+            const day = start.getDate();
+
+            if (
+              start.getMonth() + 1 === currentMonth &&
+              start.getFullYear() === currentYear
+            ) {
+              eventsMap[day] = {
+                date: day,
+                title: item.activity_name,
+                time: start.toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+                image: item.image,
+              };
+            }
+          });
+
+          setCalendarEvents(eventsMap);
+        } else {
+          setErrorAgenda("Format data tidak sesuai.");
+        }
+      } catch (error) {
+        console.error(error);
+        setErrorAgenda("Gagal memuat data agenda.");
+      } finally {
+        setLoadingAgenda(false);
+      }
+    };
+
+    fetchAgenda();
+  }, [currentMonth, currentYear]);
+
+  const getDaysInMonth = (month: number, year: number) =>
+    new Date(year, month, 0).getDate();
+  const getFirstDayOfMonth = (month: number, year: number) =>
+    new Date(year, month - 1, 1).getDay();
 
   const monthNames = [
     "Januari",
@@ -146,7 +176,6 @@ export default function TangerangNewsApp() {
     "November",
     "Desember",
   ];
-
   const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
   const daysInMonth = getDaysInMonth(currentMonth, currentYear);
@@ -159,186 +188,207 @@ export default function TangerangNewsApp() {
     if (currentMonth === 1) {
       setCurrentMonth(12);
       setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
+    } else setCurrentMonth(currentMonth - 1);
   };
 
   const handleNextMonth = () => {
     if (currentMonth === 12) {
       setCurrentMonth(1);
       setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
+    } else setCurrentMonth(currentMonth + 1);
   };
 
   const selectedEvent = selectedDate ? calendarEvents[selectedDate] : null;
   const currentNews = newsItems[currentNewsIndex];
 
   return (
-    <div className="app-container">
-      <div className="container-xl py-4 py-md-5">
+    <div className="container-fluid py-5 bg-light">
+      <div className="container">
         <div className="row g-4">
-          {/* Kolom Kiri - Carousel Berita */}
-          <div className="col-12 col-lg-4">
-            <h1 className="display-6 text-blue-800 mb-4">Berita Terbaru</h1>
-
-            <div className="card bg-blue-100 rounded-4 overflow-hidden shadow-lg text-white">
-              <div className="position-relative bg-blue-800" style={{ height: '200px' }}>
+          {/* News Section */}
+          <div className="col">
+            <h1 className="fw-bold text-primary mb-3">Berita Utama</h1>
+            <div className="card border-0 shadow news-card position-relative rounded-4 overflow-hidden">
+              <div className="news-image-container">
                 {currentNews.image ? (
                   <img
                     src={currentNews.image}
-                    alt={currentNews.subtitle}
-                    className="w-100 h-100 object-cover"
+                    className="img-fluid w-100 h-100 object-fit-cover"
+                    alt="News"
                   />
                 ) : (
-                  <div className="w-100 h-100 d-flex align-items-center justify-content-center">
-                    <ImageIcon className="text-blue-300 opacity-50" size={48} />
+                  <div
+                    className="d-flex justify-content-center align-items-center bg-primary text-white"
+                    style={{ height: "200px" }}
+                  >
+                    <ImageIcon size={60} />
                   </div>
                 )}
               </div>
-
-              <div className="card-body d-flex flex-column p-4">
-                <div className="flex-grow-1">
-                  <span className="badge bg-blue-600 text-uppercase fs-6 mb-2">{currentNews.subtitle}</span>
-                  <h5 className="card-title text-black mb-3">{currentNews.desc}</h5>
-                </div>
-
-                <div className="mt-3">
-                  <small className="text-slate-500 d-block">Sumber: {currentNews.source}</small>
-                  <small className="text-slate-400">{currentNews.date}</small>
+              <div className="card-body text-dark d-flex flex-column">
+                <p className="fw-bold text-primary mb-2">
+                  {currentNews.subtitle}
+                </p>
+                <p className="small">{currentNews.desc}</p>
+                <div className="mt-auto pt-3 border-top">
+                  <small className="text-muted d-block">
+                    Sumber: {currentNews.source}
+                  </small>
+                  <small className="text-secondary">{currentNews.date}</small>
                 </div>
               </div>
-
-              <div className="d-flex justify-content-center gap-2 p-4">
+              <div className="d-flex justify-content-center gap-2 pb-3">
                 {newsItems.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentNewsIndex(i)}
-                    className={`rounded-circle border-0 p-0 ${i === currentNewsIndex ? 'active' : ''}`}
-                    style={{
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor: i === currentNewsIndex ? '#fbbf24' : '#94a3b8',
-                    }}
-                    aria-label={`Slide ${i + 1}`}
+                    className={`indicator ${
+                      i === currentNewsIndex ? "active" : ""
+                    }`}
                   />
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Kolom Kanan - Tab Agenda & Pengumuman */}
-          <div className="col-12 col-lg-8">
-            <div className="d-flex flex-column flex-md-row gap-3 mb-4">
+          {/* Right Tabs */}
+          <div className="col-lg-8">
+            <div className="d-flex flex-wrap gap-3 mb-4">
               <button
                 onClick={() => setActiveTab("agenda")}
-                className={`btn rounded-pill px-4 py-2 fw-bold ${activeTab === "agenda" ? 'btn-primary' : 'btn-outline-primary'}`}
+                className={`btn tab-btn ${
+                  activeTab === "agenda" ? "active" : ""
+                }`}
               >
-                <Calendar className="me-2" size={18} />
-                Agenda
+                <Calendar size={18} className="me-2" /> Agenda
               </button>
               <button
                 onClick={() => setActiveTab("pengumuman")}
-                className={`btn rounded-pill px-4 py-2 fw-bold ${activeTab === "pengumuman" ? 'btn-primary' : 'btn-outline-primary'}`}
+                className={`btn tab-btn ${
+                  activeTab === "pengumuman" ? "active" : ""
+                }`}
               >
-                <Bell className="me-2" size={18} />
-                Pengumuman
+                <Bell size={18} className="me-2" /> Pengumuman
               </button>
             </div>
 
             {activeTab === "agenda" ? (
-              <div className="card rounded-4 shadow-lg">
-                <div className="p-4">
-                  <div className="d-flex align-items-center justify-content-between mb-4">
-                    <button
-                      onClick={handlePrevMonth}
-                      className="btn btn-sm btn-light rounded-circle"
-                    >
-                      <ChevronLeft className="text-blue-600" size={18} />
-                    </button>
-                    <h5 className="fw-bold text-blue-700 mb-0">{monthNames[currentMonth - 1]} {currentYear}</h5>
-                    <button
-                      onClick={handleNextMonth}
-                      className="btn btn-sm btn-light rounded-circle"
-                    >
-                      <ChevronRight className="text-blue-600" size={18} />
-                    </button>
+              <div className="card border-0 shadow rounded-4 bg-light overflow-hidden">
+                <div className="row g-0">
+                  <div className="col-md-5">
+                    <img
+                      src={
+                        selectedEvent && selectedEvent.image
+                          ? `http://localhost:8080/uploads/agenda/${selectedEvent.image}`
+                          : "assets/default-agenda.jpg"
+                      }
+                      alt={selectedEvent?.title || "Agenda"}
+                      className="img-fluid h-100 object-fit-cover rounded-start-4"
+                    />
                   </div>
 
-                  <div className="mb-4">
-                    <div className="row g-1 text-center text-blue-600 fw-semibold small mb-2">
-                      {dayNames.map((day) => (
-                        <div key={day} className="col">
-                          <div className="py-2">{day}</div>
-                        </div>
-                      ))}
+                  <div className="col-md-7 p-4 d-flex flex-column">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <button
+                        onClick={handlePrevMonth}
+                        className="btn btn-sm btn-outline-primary rounded-circle"
+                      >
+                        <ChevronLeft size={18} />
+                      </button>
+                      <span className="fw-bold text-primary">
+                        {monthNames[currentMonth - 1]} {currentYear}
+                      </span>
+                      <button
+                        onClick={handleNextMonth}
+                        className="btn btn-sm btn-outline-primary rounded-circle"
+                      >
+                        <ChevronRight size={18} />
+                      </button>
                     </div>
-                    <div className="row g-1">
-                      {days.map((day, idx) => {
-                        const isToday =
-                          day === today.getDate() &&
-                          currentMonth === today.getMonth() + 1 &&
-                          currentYear === today.getFullYear();
-                        const hasEvent = day && calendarEvents[day];
-                        const isSelected = day === selectedDate;
 
-                        return (
-                          <div key={idx} className="col">
+                    {loadingAgenda ? (
+                      <div className="text-center text-muted small my-5">
+                        Memuat agenda...
+                      </div>
+                    ) : errorAgenda ? (
+                      <div className="text-center text-danger small my-5">
+                        {errorAgenda}
+                      </div>
+                    ) : (
+                      <>
+                        <div className="calendar-grid mb-3">
+                          {dayNames.map((d) => (
+                            <div
+                              key={d}
+                              className="fw-semibold text-center text-primary small"
+                            >
+                              {d}
+                            </div>
+                          ))}
+                          {days.map((day, idx) => (
                             <button
+                              key={idx}
                               onClick={() => day && setSelectedDate(day)}
-                              className={`btn w-100 py-2 fs-6 rounded-3 ${
-                                day === null
-                                  ? 'disabled text-muted'
-                                  : isSelected
-                                    ? 'btn-success text-white'
-                                    : hasEvent
-                                      ? 'btn-warning text-white'
-                                      : isToday
-                                        ? 'btn-info text-white'
-                                        : 'btn-outline-blue text-blue-600'
-                              }`}
-                              style={{ minHeight: '40px' }} // Tinggi tetap agar sejajar
+                              className={`calendar-day ${(() => {
+                                const isToday =
+                                  day === today.getDate() &&
+                                  currentMonth === today.getMonth() + 1 &&
+                                  currentYear === today.getFullYear();
+                                if (!day) return "invisible";
+                                if (selectedDate === day) return "selected";
+                                if (calendarEvents[day as number])
+                                  return "event";
+                                if (isToday) return "today";
+                                return "";
+                              })()}`}
                             >
                               {day}
                             </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                          ))}
+                        </div>
 
-                  <div className="bg-blue-50 rounded-3 p-3 border border-blue-100">
-                    <h6 className="fw-bold text-blue-700 mb-2">
-                      <Calendar className="me-1" size={16} />
-                      Agenda Tanggal {selectedDate}
-                    </h6>
-                    {selectedEvent ? (
-                      <>
-                        <p className="mb-1">{selectedEvent.title}</p>
-                        <p className="text-blue-600 fw-bold">{selectedEvent.time}</p>
+                        <div className="card bg-primary-subtle border-0 rounded-3 p-3 mt-auto">
+                          <div className="d-flex align-items-center gap-2 mb-2">
+                            <Calendar size={16} className="text-primary" />
+                            <h6 className="mb-0 fw-bold text-primary">
+                              Agenda Tanggal {selectedDate}
+                            </h6>
+                          </div>
+                          {selectedEvent ? (
+                            <>
+                              <p className="fw-semibold mb-1 small">
+                                {selectedEvent.title}
+                              </p>
+                              <p className="fw-bold text-primary mb-0">
+                                {selectedEvent.time}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-muted small mb-0">
+                              Tidak ada agenda pada tanggal ini.
+                            </p>
+                          )}
+                        </div>
                       </>
-                    ) : (
-                      <p className="text-muted fst-italic">Tidak ada agenda pada tanggal ini.</p>
                     )}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="card rounded-4 shadow-lg">
-                <div className="list-group list-group-flush">
-                  {announcementData.map((item) => (
-                    <div key={item.id} className="list-group-item border-0 px-4 py-3 hover-bg-light transition">
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div>
-                          <h6 className="mb-1">{item.title}</h6>
-                        </div>
-                        <small className="text-blue-600 fw-bold">{item.date}</small>
+              <div className="card border-0 shadow rounded-4">
+                {announcementData.map((a) => (
+                  <div key={a.id} className="p-3 border-bottom hover-bg-light">
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div className="d-flex align-items-center gap-2">
+                        <div className="dot bg-primary"></div>
+                        <h6 className="mb-0 fw-semibold">{a.title}</h6>
                       </div>
+                      <span className="fw-bold text-primary small">
+                        {a.date}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
