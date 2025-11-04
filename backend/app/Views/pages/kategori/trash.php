@@ -26,11 +26,14 @@
                         <td><?= $row['status'] ? 'Aktif' : 'Nonaktif' ?></td>
                         <td>
                             <a href="<?= site_url('kategori/' . $row['id_kategori'] . '/restore') ?>" class="btn btn-sm btn-success">Restore</a>
-                            <form action="<?= site_url('kategori/' . $row['id_kategori'] . '/destroyPermanent') ?>" method="post" style="display:inline;">
-                                <?= csrf_field() ?>
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus permanen?')">Hapus Permanen</button>
-                            </form>
+<form action="<?= site_url('kategori/' . $row['id_kategori'] . '/destroyPermanent') ?>" method="post" style="display:inline;">
+    <?= csrf_field() ?>
+    <button class="btn btn-sm btn-danger"
+        onclick="return confirm('Yakin hapus permanen? Semua berita terkait akan tetap ada, tapi kategori akan hilang.')">
+        Hapus Permanen
+    </button>
+</form>
+
                         </td>
                     </tr>
                 <?php endforeach ?>

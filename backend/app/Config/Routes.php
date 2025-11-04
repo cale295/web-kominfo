@@ -35,7 +35,8 @@ $routes->resource('profile', ['controller' => 'ProfileController', 'except' => [
 $routes->resource('kategori', ['controller' => 'KategoriController', 'except' => ['show']]);
 $routes->get('kategori/trash', 'KategoriController::trash');
 $routes->get('kategori/(:num)/restore', 'KategoriController::restore/$1');
-$routes->delete('kategori/(:num)/destroyPermanent', 'KategoriController::destroyPermanent/$1');
+$routes->post('kategori/(:num)/destroyPermanent', 'KategoriController::destroyPermanent/$1');
+
 
 // berita kategori
 $routes->resource('berita_tag', ['controller' => 'BeritaTagController', 'except' => ['show']]);
@@ -56,6 +57,32 @@ $routes->get('berita/(:segment)/edit', 'BeritaController::edit/$1');
 $routes->put('berita/(:segment)', 'BeritaController::update/$1');
 $routes->delete('berita/(:segment)', 'BeritaController::delete/$1');
 $routes->get('berita/(:segment)', 'BeritaController::show/$1');
+
+
+//album
+$routes->resource('album', [
+    'controller' => 'PhotoAlbumController',
+    'except' => ['show']
+]);
+$routes->get('album/trash', 'PhotoAlbumController::trash');
+$routes->get('album/restore/(:num)', 'PhotoAlbumController::restore/$1');
+$routes->get('album/destroy/(:num)', 'PhotoAlbumController::destroyPermanent/$1');
+
+// Gallery manual routes
+$routes->get('gallery', 'PhotoGalleryController::index');
+$routes->get('gallery/create', 'PhotoGalleryController::create');
+$routes->post('gallery', 'PhotoGalleryController::store');
+$routes->get('gallery/edit/(:num)', 'PhotoGalleryController::edit/$1');
+$routes->post('gallery/update/(:num)', 'PhotoGalleryController::update/$1');
+$routes->get('gallery/delete/(:num)', 'PhotoGalleryController::delete/$1');
+
+// Trash dan restore
+$routes->get('gallery/trash', 'PhotoGalleryController::trash');
+$routes->get('gallery/restore/(:num)', 'PhotoGalleryController::restore/$1');
+$routes->get('gallery/destroy/(:num)', 'PhotoGalleryController::destroyPermanent/$1');
+
+
+
 
 
 
@@ -99,6 +126,16 @@ $routes->put('access_rights/update/(:num)', 'AccessRightsController::update/$1',
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+
+    //Photo Album
+    $routes->get('album', 'Api\ApiPhotoAlbumController::index');
+    $routes->get('album/(:num)', 'Api\ApiPhotoAlbumController::show/$1');
+
+    //galery
+    $routes->get('gallery', 'Api\ApiPhotoGalleryController::index');
+    $routes->get('gallery/(:num)', 'Api\ApiPhotoGalleryController::show/$1');
+    $routes->get('gallery/album/(:num)', 'Api\ApiPhotoGalleryController::byAlbum/$1');
 
     //Agenda
     $routes->get('agenda', 'Api\ApiAgendaController::index');   

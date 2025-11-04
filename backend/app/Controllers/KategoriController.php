@@ -192,21 +192,20 @@ public function update($id = null)
     // ========================================================
     // Soft delete → ubah trash jadi '1'
     // ========================================================
-    public function delete($id = null)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_delete']) {
-            return redirect()->to('/kategori')->with('error', 'Kamu tidak punya izin menghapus kategori.');
-        }
+public function delete($id = null)
+{
+    $kategori = $this->kategoriModel->find($id);
+    if (!$kategori) return redirect()->to('/kategori')->with('error', 'Kategori tidak ditemukan.');
 
-        $kategori = $this->kategoriModel->find($id);
-        if (!$kategori) {
-            return redirect()->to('/kategori')->with('error', 'Kategori tidak ditemukan.');
-        }
-
-        $this->kategoriModel->update($id, ['trash' => '1']);
-        return redirect()->to('/kategori')->with('success', 'Kategori dipindahkan ke sampah.');
+    if ($this->request->getVar('permanent')) {
+        $this->kategoriModel->where('id_kategori', $id)->delete();
+        return redirect()->to('/kategori/trash')->with('success', 'Kategori dihapus permanen.');
     }
+
+    // Soft delete
+    $this->kategoriModel->update($id, ['trash' => '1']);
+    return redirect()->to('/kategori')->with('success', 'Kategori dipindahkan ke sampah.');
+}
 
     // ========================================================
     // Restore kategori dari trash
@@ -230,21 +229,42 @@ public function update($id = null)
     // ========================================================
     // Hapus permanen
     // ========================================================
-    public function destroyPermanent($id = null)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_delete']) {
-            return redirect()->to('/kategori/trash')->with('error', 'Kamu tidak punya izin menghapus kategori permanen.');
-        }
-
-        $kategori = $this->kategoriModel->find($id);
-        if (!$kategori) {
-            return redirect()->to('/kategori/trash')->with('error', 'Kategori tidak ditemukan.');
-        }
-
-        $this->kategoriModel->delete($id, true); // force delete
-        return redirect()->to('/kategori/trash')->with('success', 'Kategori dihapus permanen.');
+// ========================================================
+// Hapus permanen
+// ========================================================
+public function destroyPermanent($id = null)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_delete']) {
+        return redirect()->to('/kategori/trash')
+            ->with('error', 'Kamu tidak punya izin menghapus kategori permanen.');
     }
+
+    $kategori = $this->kategoriModel->find($id);
+    if (!$kategori) {
+        return redirect()->to('/kategori/trash')
+            ->with('error', 'Kategori tidak ditemukan.');
+    }
+
+    try {
+        $db = \Config\Database::connect();
+
+        // Set id_kategori di t_berita jadi NULL untuk berita terkait
+        $db->table('t_berita')
+            ->where('id_kategori', $id)
+            ->update(['id_kategori' => null]);
+
+        // Hapus kategori dari m_kategori_berita
+        $this->kategoriModel->where('id_kategori', $id)->delete();
+
+        return redirect()->to('/kategori/trash')
+            ->with('success', 'Kategori dihapus permanen, berita terkait tetap ada.');
+    } catch (\Exception $e) {
+        return redirect()->to('/kategori/trash')
+            ->with('error', 'Gagal menghapus kategori. ' . $e->getMessage());
+    }
+}
+
 
     // ========================================================
     // Fungsi bantu untuk ambil akses role
