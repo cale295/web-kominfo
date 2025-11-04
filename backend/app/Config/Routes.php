@@ -44,19 +44,17 @@ $routes->get('berita_tag/trash', 'BeritaTagController::trash');
 $routes->get('berita_tag/(:num)/restore', 'BeritaTagController::restore/$1');
 $routes->delete('berita_tag/(:num)/destroyPermanent', 'BeritaTagController::destroyPermanent/$1');
 
-// BERITA ROUTES (manual agar tidak bentrok)
+// ========================================================
+// BERITA ROUTES
+// ========================================================
 $routes->get('berita', 'BeritaController::index');
-$routes->get('berita/create', 'BeritaController::create');
-$routes->post('berita', 'BeritaController::store');
-
+$routes->get('berita/new', 'BeritaController::new');
+$routes->post('berita', 'BeritaController::create');
+$routes->get('berita/(:num)/edit', 'BeritaController::edit/$1');
+$routes->post('berita/(:num)/update', 'BeritaController::update/$1');
+$routes->post('berita/(:num)/delete', 'BeritaController::delete/$1'); // ✅ ini penting
 $routes->get('berita/trash', 'BeritaController::trash');
-$routes->get('berita/(:num)/restore', 'BeritaController::restore/$1');
-$routes->delete('berita/(:num)/destroyPermanent', 'BeritaController::destroyPermanent/$1');
-
-$routes->get('berita/(:segment)/edit', 'BeritaController::edit/$1');
-$routes->put('berita/(:segment)', 'BeritaController::update/$1');
-$routes->delete('berita/(:segment)', 'BeritaController::delete/$1');
-$routes->get('berita/(:segment)', 'BeritaController::show/$1');
+$routes->post('berita/(:num)/restore', 'BeritaController::restore/$1');
 
 
 //album

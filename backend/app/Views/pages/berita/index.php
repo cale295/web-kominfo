@@ -5,118 +5,151 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3>📜 Daftar Berita</h3>
         <div>
-            <a href="<?= site_url('berita/new') ?>" class="btn btn-primary">+ Tambah Berita</a>
+            <?php if (!empty($can_create)): ?>
+                <a href="<?= site_url('berita/new') ?>" class="btn btn-primary">+ Tambah Berita</a>
+            <?php endif; ?>
             <a href="<?= site_url('berita/trash') ?>" class="btn btn-secondary">🗑️ Sampah</a>
         </div>
     </div>
 
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark text-center">
-            <tr>
-                <th width="5%">#</th>
-                <th width="10%">Gambar</th>
-                <th>Judul</th>
-                <th>Topik</th>
-                <th>Kategori</th>
-                <th>Status Tayang</th>
-                <th>Status Berita</th>
-                <th>Dibuat Oleh</th>
-                <th>Waktu Dibuat</th>
-                <th>Diupdate Oleh</th>
-                <th>Update Terakhir</th>
-                <th width="12%">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($berita)): ?>
-                <?php foreach ($berita as $i => $row): ?>
-                    <tr>
-                        <td class="text-center"><?= $i + 1 ?></td>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+<thead class="table-dark text-center">
+<tr>
+    <th>#</th>
+    <th>Cover</th>
+    <th>Foto Tambahan</th>
+    <th>Judul</th>
+    <th>Topik</th>
+    <th>Kategori</th>
+    <th>Status Tayang</th>
+    <th>Status Berita</th>
+    <th>Dibuat Oleh</th>
+    <th>Waktu Dibuat</th>
+    <th>Diupdate Oleh</th>
+    <th>Update Terakhir</th>
+    <th>Aksi</th>
+</tr>
+</thead>
+<tbody>
+<?php foreach ($berita as $i => $row): ?>
+<tr>
+    <td class="text-center"><?= $i + 1 ?></td>
 
-                        <!-- Thumbnail -->
-                        <td class="text-center">
-                            <?php if (!empty($row['feat_image'])): ?>
-                                <img src="<?= base_url('uploads/berita/' . $row['feat_image']) ?>" 
-                                     alt="Gambar Berita" 
-                                     class="img-thumbnail" 
-                                     style="width: 80px; height: 60px; object-fit: cover;">
-                            <?php else: ?>
-                                <span class="text-muted">Tidak ada</span>
-                            <?php endif; ?>
-                        </td>
+    <!-- Cover -->
+    <td class="text-center">
+        <?php if (!empty($row['feat_image'])): ?>
+            <img src="<?= base_url($row['feat_image']) ?>" 
+                 alt="Cover" class="img-thumbnail mb-1" 
+                 style="width:80px;height:60px;object-fit:cover;">
+        <?php else: ?>
+            <span class="text-muted">Tidak ada</span>
+        <?php endif; ?>
+    </td>
 
-                        <!-- Judul -->
-                        <td><?= esc($row['judul']) ?></td>
+    <!-- Additional Images -->
+    <td class="text-center">
+        <?php 
+        $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
+        if (!empty($additional)):
+            foreach ($additional as $img): ?>
+                <img src="<?= base_url($img) ?>" 
+                     alt="Foto Tambahan" class="img-thumbnail mb-1" 
+                     style="width:50px;height:40px;object-fit:cover;">
+            <?php endforeach; 
+        else: ?>
+            <span class="text-muted">Tidak ada</span>
+        <?php endif; ?>
+    </td>
 
-                        <!-- Topik -->
-                        <td><?= esc($row['topik'] ?? '-') ?></td>
+    <!-- Judul -->
+    <td><?= esc($row['judul']) ?></td>
 
-                        <!-- Kategori -->
-                        <td><?= esc($row['nama_kategori'] ?? '-') ?></td>
+    <!-- Topik -->
+    <td><?= esc($row['topik'] ?? '-') ?></td>
 
-                        <!-- Status Tayang -->
-                        <td class="text-center">
-                            <?php if ($row['status'] == '1'): ?>
-                                <span class="badge bg-success">Tayang</span>
-                            <?php elseif ($row['status'] == '0'): ?>
-                                <span class="badge bg-secondary">Tidak Tayang</span>
-                            <?php else: ?>
-                                <span class="badge bg-warning text-dark">Draft</span>
-                            <?php endif; ?>
-                        </td>
+    <!-- Kategori -->
+    <td>
+        <?php
+        if (!empty($row['kategori'])) {
+            foreach ($row['kategori'] as $katName) {
+                echo '<span class="badge bg-secondary me-1">'.esc($katName).'</span>';
+            }
+        } else {
+            echo '-';
+        }
+        ?>
+    </td>
 
-                        <!-- Status Berita -->
-                        <td class="text-center">
-                            <?php
-                                $statusBerita = [
-                                    '0' => ['bg-secondary', 'Draft'],
-                                    '2' => ['bg-info text-dark', 'Menunggu Verifikasi'],
-                                    '1' => ['bg-success', 'Tayang'],
-                                    '3' => ['bg-warning text-dark', 'Ditolak / Perbaikan'],
-                                    '4' => ['bg-primary text-light', 'Layak Tayang'],
-                                    '6' => ['bg-danger', 'Revisi']
-                                ];
-                                [$class, $text] = $statusBerita[$row['status_berita']] ?? ['bg-light text-dark', '-'];
-                            ?>
-                            <span class="badge <?= $class ?>"><?= $text ?></span>
-                        </td>
+    <!-- Status Tayang -->
+    <td class="text-center">
+        <?php if ($row['status'] == '1'): ?>
+            <span class="badge bg-success">Tayang</span>
+        <?php elseif ($row['status'] == '0'): ?>
+            <span class="badge bg-secondary">Tidak Tayang</span>
+        <?php else: ?>
+            <span class="badge bg-warning text-dark">Draft</span>
+        <?php endif; ?>
+    </td>
 
-                        <!-- Pembuat -->
-                        <td class="text-center"><?= esc($row['created_by_name'] ?? '-') ?></td>
+    <!-- Status Berita -->
+    <td class="text-center">
+        <?php
+        $statusBerita = [
+            '0' => ['bg-secondary', 'Draft'],
+            '2' => ['bg-info text-dark', 'Menunggu Verifikasi'],
+            '1' => ['bg-success', 'Tayang'],
+            '3' => ['bg-warning text-dark', 'Ditolak / Perbaikan'],
+            '4' => ['bg-primary text-light', 'Layak Tayang'],
+            '6' => ['bg-danger', 'Revisi']
+        ];
+        [$class, $text] = $statusBerita[$row['status_berita']] ?? ['bg-light text-dark','-'];
+        ?>
+        <span class="badge <?= $class ?>"><?= $text ?></span>
+    </td>
 
-                                                <!-- Waktu Dibuat -->
-                        <td class="text-center"><?= !empty($row['created_at']) ? date('d M Y H:i', strtotime($row['created_at'])) : '-' ?></td>
+    <!-- Dibuat Oleh -->
+    <td class="text-center"><?= esc($row['created_by_name'] ?? '-') ?></td>
 
-                        <!-- Updated By -->
-                        <td class="text-center"><?= esc($row['updated_by_name'] ?? '-') ?></td>
+    <!-- Waktu Dibuat -->
+    <td class="text-center"><?= !empty($row['created_at']) ? date('d M Y H:i', strtotime($row['created_at'])) : '-' ?></td>
 
-                        <!-- Updated At -->
-                        <td class="text-center"><?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?></td>
+    <!-- Diupdate Oleh -->
+    <td class="text-center"><?= esc($row['updated_by_name'] ?? '-') ?></td>
 
-                        <!-- Aksi -->   
-                <td class="text-center">
-                    <!-- Edit -->
-                    <a href="<?= site_url('berita/'.$row['id_berita'].'/edit') ?>" class="btn btn-sm btn-warning">✏️</a>
+    <!-- Update Terakhir -->
+    <td class="text-center"><?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?></td>
 
-<form action="<?= site_url('berita/' . $row['id_berita']) ?>" 
-      method="post" style="display:inline;">
+    <!-- Aksi -->
+    <td class="text-center">
+        <?php if (!empty($can_update)): ?>
+            <a href="<?= site_url('berita/'.$row['id_berita'].'/edit') ?>" class="btn btn-sm btn-warning mb-1">✏️ Edit</a>
+        <?php endif; ?>
+
+        <?php if (!empty($can_delete)): ?>
+<form action="<?= site_url('berita/'.$row['id_berita'].'/delete') ?>" method="post" style="display:inline;">
     <?= csrf_field() ?>
-    <input type="hidden" name="_method" value="DELETE">
-    <button type="submit" class="btn btn-sm btn-danger"
-            onclick="return confirm('Yakin membuang berita ini?')">
-        Trash
-    </button>
+    <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin membuang berita ini ke sampah?')">🗑️ Trash</button>
 </form>
 
+        <?php endif; ?>
+    </td>
+</tr>
+<?php endforeach; ?>
+</tbody>
 
-                </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="11" class="text-center text-muted">Belum ada berita</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+        </table>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tooltip bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
 
 <?= $this->endSection() ?>

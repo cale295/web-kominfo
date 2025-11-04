@@ -6,6 +6,7 @@ use CodeIgniter\Model;
 
 class PhotoAlbumModel extends Model
 {
+    
     protected $table = 'm_photo_album';
     protected $primaryKey = 'id_album';
     protected $useAutoIncrement = true;

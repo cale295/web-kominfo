@@ -11,18 +11,20 @@ class BeritaModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
 
-    protected $allowedFields = [
-        'hash_berita', 'judul', 'topik', 'id_kategori', 'id_sub_kategori', 'slug',
-        'is_berita_terkait', 'content', 'id_berita_terkait', 'content2',
-        'id_berita_terkait2', 'intro', 'id_photo', 'feat_image', 'caption', 'sumber',
-        'link_video', 'status', 'status_berita', 'hit', 'count_copy', 'keyword',
-        'created_by_role_id', 'created_by_id', 'created_by_name',
-        'created_at', 'updated_by_id', 'updated_by_name', 'updated_at',
-        'is_delete_by_id', 'is_delete_by_name', 'is_delete', 'delete_at', 'posted_at',
-        'dokumen_title', 'dokumen_duo_title', 'dokumen_tigo_title', 'dokumen_quatro_title',
-        'dokumen', 'dokumen_duo', 'dokumen_tigo', 'dokumen_quatro',
-        'old_berita', 'note', 'note_revisi', 'trash'
-    ];
+protected $allowedFields = [
+    'hash_berita', 'judul', 'topik', 'id_kategori', 'id_sub_kategori', 'slug',
+    'is_berita_terkait', 'content', 'id_berita_terkait', 'content2',
+    'id_berita_terkait2', 'intro', 'id_photo', 'feat_image', 'caption', 'sumber',
+    'link_video', 'status', 'status_berita', 'hit', 'count_copy', 'keyword',
+    'created_by_role_id', 'created_by_id', 'created_by_name',
+    'created_at', 'updated_by_id', 'updated_by_name', 'updated_at',
+    'is_delete_by_id', 'is_delete_by_name', 'is_delete', 'delete_at', 'posted_at',
+    'dokumen_title', 'dokumen_duo_title', 'dokumen_tigo_title', 'dokumen_quatro_title',
+    'dokumen', 'dokumen_duo', 'dokumen_tigo', 'dokumen_quatro',
+    'old_berita', 'note', 'note_revisi', 'trash',
+    'additional_images'  // ✅ tambahkan ini
+];
+
 
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
@@ -32,19 +34,64 @@ class BeritaModel extends Model
     // =========================================================
     // Ambil berita + join kategori, hanya kategori aktif
     // =========================================================
-    public function getBeritaWithKategori($onlyActive = true)
-    {
-        $builder = $this->db->table($this->table)
-            ->select('t_berita.*, m_kategori_berita.kategori AS nama_kategori')
-            ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita.id_kategori', 'left')
-            ->orderBy('t_berita.created_at', 'DESC');
+// ... di dalam class BeritaModel ...
+public function getBeritaWithKategori($onlyActive = true)
+{
+    $berita = $this->db->table($this->table)
+                       ->where('trash', '0')
+                       ->orderBy('created_at', 'DESC')
+                       ->get()
+                       ->getResultArray();
 
-        if ($onlyActive) {
-            $builder->where('t_berita.trash', '0'); // hanya yang trash = 0
-        }
-
-        return $builder->get()->getResultArray();
+    foreach ($berita as &$b) {
+        $b['kategori'] = $this->getKategoriBerita($b['id_berita']);
     }
+
+    return $berita;
+}
+
+
+// Ambil kategori untuk berita tertentu
+public function getKategoriByBerita($idBerita)
+{
+    $db = \Config\Database::connect();
+    return $db->table('t_berita_kategori as bk')
+              ->select('k.id_kategori, k.kategori')
+              ->join('m_kategori_berita k', 'k.id_kategori = bk.id_kategori')
+              ->where('bk.id_berita', $idBerita)
+              ->get()->getResultArray();
+}
+
+    public function getKategoriBerita($id_berita)
+{
+    return $this->db->table('t_berita_kategori')
+                    ->select('m_kategori_berita.*')
+                    ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita_kategori.id_kategori')
+                    ->where('t_berita_kategori.id_berita', $id_berita)
+                    ->get()
+                    ->getResultArray();
+}
+
+public function saveKategoriBerita($idBerita, array $kategoriIds)
+{
+    $db = \Config\Database::connect();
+    $builder = $db->table('t_berita_kategori');
+
+    // Hapus dulu kategori lama
+    $builder->where('id_berita', $idBerita)->delete();
+
+    // Simpan kategori baru
+    foreach ($kategoriIds as $idKat) {
+        $builder->insert([
+            'id_berita' => $idBerita,
+            'id_kategori' => $idKat
+        ]);
+    }
+}
+
+
+
+// ...
 
 
     

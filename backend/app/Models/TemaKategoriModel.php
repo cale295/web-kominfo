@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class TemaKategoriModel extends Model
 {
-    protected $table            = 'm_berita_kategori_tema';
+    protected $table            = 'm_ori_tema';
     protected $primaryKey       = 'id_tema';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -28,7 +28,7 @@ class TemaKategoriModel extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = ['nama_tema' => 'required|is_unique[m_berita_kategori_tema.nama_tema]|max_length[100]|min_length[3]'];
+    protected $validationRules      = ['nama_tema' => 'required|is_unique[m_ori_tema.nama_tema]|max_length[100]|min_length[3]'];
     protected $validationMessages   = ['nama_tema' => ['required' => 'Tema harus diisi.', 'is_unique' => 'Tema sudah ada.', 'max_length' => 'Tema maksimal 100 karakter.', 'min_length' => 'Tema minimal 3 karakter.']];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;

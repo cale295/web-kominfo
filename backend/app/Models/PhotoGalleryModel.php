@@ -12,6 +12,7 @@ class PhotoGalleryModel extends Model
         'photo_title',
         'file_path',
         'id_album',
+        'upload_date',
         'trash'
     ];
 
