@@ -1,7 +1,7 @@
 /* Custom styles for TangerangNewsApp */
 
 .news-card {
-  min-height: 500px;
+  height: 500px;
   display: flex;
   flex-direction: column;
 }
@@ -15,29 +15,35 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #6c757d;
+  background-color: #ADADAD;
+  opacity: 50%;
   border: none;
   transition: all 0.3s ease;
+  margin: 0;
+  padding: 0;
+  display: block;
+  flex-shrink: 0;
 }
 .indicator.active {
-  width: 32px;
-  background-color: #ffc107;
+  width: 8px;
+  background-color: #ADADAD;
+  opacity: 100%;
 }
 
 .tab-btn {
-  border: 2px solid #0d6efd;
-  color: #0d6efd;
+  border: 2px solid #2547A2;
+  color: #2547A2;
   font-weight: 600;
-  border-radius: 1rem;
+  border-radius: 0.875rem;
   padding: 0.6rem 1.5rem;
   transition: all 0.3s ease;
 }
 .tab-btn:hover {
-  border-color: #0b5ed7;
+  border-color: #2547A2;
   box-shadow: 0 0 0.4rem rgba(13, 110, 253, 0.3);
 }
 .tab-btn.active {
-  background: linear-gradient(90deg, #0d6efd, #6610f2);
+  background: #2547A2;
   color: #fff;
   transform: scale(1.05);
   box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.3);
@@ -66,12 +72,12 @@
   font-weight: bold;
 }
 .calendar-day.event {
-  background: linear-gradient(90deg, #ffc107, #ffca2c);
-  color: #fff;
+  background: #F6D046;
+  color: black;
 }
 .calendar-day.selected {
-  background: linear-gradient(90deg, #20c997, #0dcaf0);
-  color: #fff;
+  background: #69E07B;
+  color: black;
   transform: scale(1.1);
 }
 .dot {
@@ -81,4 +87,12 @@
 }
 .hover-bg-light:hover {
   background: linear-gradient(90deg, #e9f2ff, #eef2ff);
+}
+
+.calender-container {
+  height: 500px;
+  background-color: #EDF2FF;
+}
+.text-blue{
+    color: #2547A2;
 }

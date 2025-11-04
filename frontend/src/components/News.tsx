@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  ChevronLeft,
-  ChevronRight,
+  Triangle,
   Calendar,
   Bell,
   Image as ImageIcon,
@@ -202,12 +201,12 @@ export default function TangerangNewsApp() {
   const currentNews = newsItems[currentNewsIndex];
 
   return (
-    <div className="container-fluid py-5 bg-light">
+    <div className="container-fluid py-5">
       <div className="container">
-        <div className="row g-4">
+        <div className="row g-4 align-items-stretch">
           {/* News Section */}
           <div className="col">
-            <h1 className="fw-bold text-primary mb-3">Berita Utama</h1>
+            <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
             <div className="card border-0 shadow news-card position-relative rounded-4 overflow-hidden">
               <div className="news-image-container">
                 {currentNews.image ? (
@@ -226,9 +225,7 @@ export default function TangerangNewsApp() {
                 )}
               </div>
               <div className="card-body text-dark d-flex flex-column">
-                <p className="fw-bold text-primary mb-2">
-                  {currentNews.subtitle}
-                </p>
+                <p className="fw-bold text-blue mb-2">{currentNews.subtitle}</p>
                 <p className="small">{currentNews.desc}</p>
                 <div className="mt-auto pt-3 border-top">
                   <small className="text-muted d-block">
@@ -253,7 +250,7 @@ export default function TangerangNewsApp() {
 
           {/* Right Tabs */}
           <div className="col-lg-8">
-            <div className="d-flex flex-wrap gap-3 mb-4">
+            <div className="d-flex flex-wrap gap-3 mb-3">
               <button
                 onClick={() => setActiveTab("agenda")}
                 className={`btn tab-btn ${
@@ -274,35 +271,37 @@ export default function TangerangNewsApp() {
 
             {activeTab === "agenda" ? (
               <div className="card border-0 shadow rounded-4 bg-light overflow-hidden">
-                <div className="row g-0">
-                  <div className="col-md-5">
+                <div className="row g-0 h-100">
+                  <div className="col-md-5 d-flex">
                     <img
                       src={
                         selectedEvent && selectedEvent.image
                           ? `http://localhost:8080/uploads/agenda/${selectedEvent.image}`
-                          : "assets/default-agenda.jpg"
+                          : "assets/agenda-default.jpg"
                       }
-                      alt={selectedEvent?.title || "Agenda"}
+                      alt={selectedEvent?.title || "Belum Ada Agenda"}
                       className="img-fluid h-100 object-fit-cover rounded-start-4"
                     />
                   </div>
 
-                  <div className="col-md-7 p-4 d-flex flex-column">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <button
-                        onClick={handlePrevMonth}
-                        className="btn btn-sm btn-outline-primary rounded-circle"
-                      >
-                        <ChevronLeft size={18} />
+                  <div className="col-md-7 p-4 d-flex flex-column calender-container">
+                    <div className="d-flex justify-content-center align-items-center mb-3">
+                      <button onClick={handlePrevMonth} className="btn">
+                        <Triangle
+                          size={18}
+                          fill="black"
+                          style={{ transform: "rotate(-90deg)" }}
+                        />
                       </button>
-                      <span className="fw-bold text-primary">
+                      <span className="fw-bold text-blue">
                         {monthNames[currentMonth - 1]} {currentYear}
                       </span>
-                      <button
-                        onClick={handleNextMonth}
-                        className="btn btn-sm btn-outline-primary rounded-circle"
-                      >
-                        <ChevronRight size={18} />
+                      <button onClick={handleNextMonth} className="btn">
+                        <Triangle
+                          size={18}
+                          fill="black"
+                          style={{ transform: "rotate(90deg)" }}
+                        />
                       </button>
                     </div>
 
@@ -320,7 +319,7 @@ export default function TangerangNewsApp() {
                           {dayNames.map((d) => (
                             <div
                               key={d}
-                              className="fw-semibold text-center text-primary small"
+                              className="fw-semibold text-center text-blue small"
                             >
                               {d}
                             </div>
@@ -348,21 +347,21 @@ export default function TangerangNewsApp() {
                         </div>
 
                         <div className="card bg-primary-subtle border-0 rounded-3 p-3 mt-auto">
-                          <div className="d-flex align-items-center gap-2 mb-2">
-                            <Calendar size={16} className="text-primary" />
-                            <h6 className="mb-0 fw-bold text-primary">
+                          <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
+                            <Calendar size={16} className="text-blue" />
+                            <h6 className="mb-0 fw-bold text-blue">
                               Agenda Tanggal {selectedDate}
                             </h6>
                           </div>
                           {selectedEvent ? (
-                            <>
+                            <div className="d-flex justify-content-between align-items-center">
                               <p className="fw-semibold mb-1 small">
                                 {selectedEvent.title}
                               </p>
-                              <p className="fw-bold text-primary mb-0">
+                              <p className="fw-bold text-blue mb-0">
                                 {selectedEvent.time}
                               </p>
-                            </>
+                            </div>
                           ) : (
                             <p className="text-muted small mb-0">
                               Tidak ada agenda pada tanggal ini.
@@ -383,9 +382,7 @@ export default function TangerangNewsApp() {
                         <div className="dot bg-primary"></div>
                         <h6 className="mb-0 fw-semibold">{a.title}</h6>
                       </div>
-                      <span className="fw-bold text-primary small">
-                        {a.date}
-                      </span>
+                      <span className="fw-bold text-blue small">{a.date}</span>
                     </div>
                   </div>
                 ))}

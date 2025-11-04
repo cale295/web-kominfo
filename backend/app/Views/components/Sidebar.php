@@ -45,8 +45,8 @@ $menuItems = [
         'icon' => 'bi-images',
         'roles' => ['admin', 'editor'],
         'submenu' => [
-            ['title' => 'Album Foto', 'url' => '/galeri/album', 'roles' => ['admin', 'editor']],
-            ['title' => 'Foto Galeri', 'url' => '/galeri/foto', 'roles' => ['admin', 'editor']],
+            ['title' => 'Album Foto', 'url' => '/album', 'roles' => ['admin', 'editor']],
+            ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['admin', 'editor']],
             ['title' => 'Upload Foto', 'url' => '/galeri/upload', 'roles' => ['admin', 'editor']]
         ]
     ],
