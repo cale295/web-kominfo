@@ -5,8 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>📷 Daftar Foto</h3>
         <div>
-            <a href="<?= site_url('gallery/create') ?>" class="btn btn-primary">+ Tambah Foto</a>
-            <a href="<?= site_url('gallery/trash') ?>" class="btn btn-secondary">🗑️ Sampah</a>
+            <a href="<?= site_url('gallery/new') ?>" class="btn btn-primary">+ Tambah Foto</a>
         </div>
     </div>
 
@@ -19,12 +18,12 @@
     <table class="table table-bordered table-striped align-middle">
         <thead>
             <tr class="text-center">
-                <th width="5%">#</th>
+                <th>#</th>
                 <th>Judul Foto</th>
                 <th>Album</th>
                 <th>File</th>
                 <th>Tanggal Upload</th>
-                <th width="20%">Aksi</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -36,19 +35,19 @@
                         <td><?= esc($row['album_name'] ?? '-') ?></td>
                         <td class="text-center">
                             <?php if (!empty($row['file_path'])): ?>
-                                <img src="<?= base_url('uploads/gallery/' . $row['file_path']) ?>" 
-                                     width="80" height="80" class="rounded shadow-sm" alt="foto">
+                                <img src="<?= base_url('uploads/gallery/' . $row['file_path']) ?>" width="80" height="80" class="rounded shadow-sm">
                             <?php else: ?>
                                 <span class="text-muted">Tidak ada file</span>
                             <?php endif; ?>
                         </td>
                         <td><?= esc($row['created_at']) ?></td>
                         <td class="text-center">
-                            <a href="<?= site_url('gallery/edit/' . $row['id_photo']) ?>" 
-                               class="btn btn-sm btn-warning">Edit</a>
-                            <a href="<?= site_url('gallery/delete/' . $row['id_photo']) ?>" 
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('Yakin ingin hapus ke sampah?')">Hapus</a>
+                            <a href="<?= site_url('gallery/' . $row['id_photo'] . '/edit') ?>" class="btn btn-sm btn-warning">Edit</a>
+
+                            <form action="<?= site_url('gallery/' . $row['id_photo']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus foto ini?')">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Hapus</button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>

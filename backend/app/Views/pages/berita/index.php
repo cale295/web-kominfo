@@ -9,6 +9,7 @@
                 <a href="<?= site_url('berita/new') ?>" class="btn btn-primary">+ Tambah Berita</a>
             <?php endif; ?>
             <a href="<?= site_url('berita/trash') ?>" class="btn btn-secondary">🗑️ Sampah</a>
+            
         </div>
     </div>
 
@@ -21,6 +22,8 @@
     <th>Foto Tambahan</th>
     <th>Judul</th>
     <th>Topik</th>
+    <th>Konten</th>
+    <th>Konten 2</th>
     <th>Kategori</th>
     <th>Status Tayang</th>
     <th>Status Berita</th>
@@ -68,6 +71,12 @@
     <!-- Topik -->
     <td><?= esc($row['topik'] ?? '-') ?></td>
 
+    <!-- Konten -->
+    <td><?= ($row['content']) ?></td>
+
+    <!-- Konten 2 -->
+    <td><?= ($row['content2'] ?? '-') ?></td>
+
     <!-- Kategori -->
     <td>
         <?php
@@ -85,7 +94,7 @@
     <td class="text-center">
         <?php if ($row['status'] == '1'): ?>
             <span class="badge bg-success">Tayang</span>
-        <?php elseif ($row['status'] == '0'): ?>
+        <?php elseif ($row['status'] == '5'): ?>
             <span class="badge bg-secondary">Tidak Tayang</span>
         <?php else: ?>
             <span class="badge bg-warning text-dark">Draft</span>
@@ -98,9 +107,8 @@
         $statusBerita = [
             '0' => ['bg-secondary', 'Draft'],
             '2' => ['bg-info text-dark', 'Menunggu Verifikasi'],
-            '1' => ['bg-success', 'Tayang'],
-            '3' => ['bg-warning text-dark', 'Ditolak / Perbaikan'],
-            '4' => ['bg-primary text-light', 'Layak Tayang'],
+            '3' => ['bg-success', 'Perbaikan'],
+            '4' => ['bg-warning text-dark', 'Layak Tayanag'],
             '6' => ['bg-danger', 'Revisi']
         ];
         [$class, $text] = $statusBerita[$row['status_berita']] ?? ['bg-light text-dark','-'];
@@ -121,19 +129,31 @@
     <td class="text-center"><?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?></td>
 
     <!-- Aksi -->
-    <td class="text-center">
-        <?php if (!empty($can_update)): ?>
-            <a href="<?= site_url('berita/'.$row['id_berita'].'/edit') ?>" class="btn btn-sm btn-warning mb-1">✏️ Edit</a>
-        <?php endif; ?>
+<td class="text-center">
+    <!-- Tombol Edit -->
+    <?php if (!empty($can_update)): ?>
+        <a href="<?= site_url('berita/'.$row['id_berita'].'/edit') ?>" class="btn btn-sm btn-warning mb-1">
+            ✏️ Edit
+        </a>
+    <?php endif; ?>
 
-        <?php if (!empty($can_delete)): ?>
-<form action="<?= site_url('berita/'.$row['id_berita'].'/delete') ?>" method="post" style="display:inline;">
-    <?= csrf_field() ?>
-    <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin membuang berita ini ke sampah?')">🗑️ Trash</button>
-</form>
+    <!-- Tombol Trash / Soft Delete -->
+    <?php if (!empty($can_delete)): ?>
+        <form action="<?= site_url('berita/'.$row['id_berita'].'/delete') ?>" method="post" style="display:inline;">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin membuang berita ini ke sampah?')">
+                🗑️ Trash
+            </button>
+        </form>
+    <?php endif; ?>
 
-        <?php endif; ?>
-    </td>
+    <!-- Tombol Show / Detail -->
+    <?php if (!empty($can_read)): ?>
+        <a href="<?= site_url('berita/show/'.$row['id_berita']) ?>" class="btn btn-sm btn-info mb-1">
+            🔍 Lihat
+        </a>
+    <?php endif; ?>
+</td>
 </tr>
 <?php endforeach; ?>
 </tbody>

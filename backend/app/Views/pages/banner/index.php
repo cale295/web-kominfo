@@ -470,9 +470,6 @@
                 Daftar Banner
             </h3>
             <div class="d-flex gap-2 flex-wrap">
-                <a href="<?= site_url('banner/trash') ?>" class="btn btn-trash">
-                    <i class="bi bi-trash3 me-2"></i>Lihat Sampah
-                </a>
                 <a href="<?= site_url('banner/new') ?>" class="btn btn-primary-custom">
                     <i class="bi bi-plus-circle me-2"></i>Tambah Banner
                 </a>
@@ -608,16 +605,15 @@
                                                title="Edit Banner">
                                                 <i class="bi bi-pencil-square"></i>Edit
                                             </a>
-                                            <form action="<?= site_url('banner/' . $b['id_banner']) ?>" method="post" class="d-inline">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="_method" value="DELETE">
-                                                <button type="submit" 
-                                                        class="btn btn-sm btn-danger btn-action"
-                                                        onclick="return confirm('Yakin ingin Membuang banner ini?')"
-                                                        title="Hapus Banner">
-                                                    <i class="bi bi-trash3"></i>Trash
-                                                </button>
-                                            </form>
+                                    <form action="<?= site_url('banner/'.$b['id_banner']) ?>" method="post" class="d-inline">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" 
+                                                class="btn-action btn-delete" 
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus tema ini?')"
+                                                title="Hapus Tema">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                         </div>
                                     </td>
                                 </tr>

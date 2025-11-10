@@ -17,7 +17,6 @@ class ApiPhotoAlbumController extends ResourceController
     public function index()
     {
         $albums = $this->model
-            ->where('trash', '0') // hanya tampilkan yang aktif
             ->orderBy('created_at', 'DESC')
             ->findAll();
 
@@ -36,7 +35,6 @@ class ApiPhotoAlbumController extends ResourceController
     {
         $album = $this->model
             ->where('id_album', $id)
-            ->where('trash', '0') // pastikan bukan sampah
             ->first();
 
         if (!$album) {

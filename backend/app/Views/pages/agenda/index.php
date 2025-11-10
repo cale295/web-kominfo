@@ -1,6 +1,8 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('styles') ?>
+<?= $this->include('layouts/alerts') ?>
+
 <style>
     :root {
         --primary-gov: #1e40af;
@@ -556,12 +558,15 @@
                                            title="Edit Agenda">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a href="<?= site_url('agenda/delete/' . $agenda['id_agenda']) ?>" 
-                                           class="btn-action btn-delete"
-                                           onclick="return confirm('Apakah Anda yakin ingin menghapus agenda ini?')"
-                                           title="Hapus Agenda">
+                                    <form action="<?= site_url('agenda/'.$agenda['id_agenda']) ?>" method="post" class="d-inline">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" 
+                                                class="btn-action btn-delete" 
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus tema ini?')"
+                                                title="Hapus Tema">
                                             <i class="bi bi-trash"></i>
-                                        </a>
+                                        </button>
+                                    </form>
                                     </div>
                                 </td>
                             </tr>

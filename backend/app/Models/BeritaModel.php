@@ -14,8 +14,9 @@ class BeritaModel extends Model
 protected $allowedFields = [
     'hash_berita', 'judul', 'topik', 'id_kategori', 'id_sub_kategori', 'slug',
     'is_berita_terkait', 'content', 'id_berita_terkait', 'content2',
+    'status', 'status_berita', 
     'id_berita_terkait2', 'intro', 'id_photo', 'feat_image', 'caption', 'sumber',
-    'link_video', 'status', 'status_berita', 'hit', 'count_copy', 'keyword',
+    'link_video','hit', 'count_copy', 'keyword',
     'created_by_role_id', 'created_by_id', 'created_by_name',
     'created_at', 'updated_by_id', 'updated_by_name', 'updated_at',
     'is_delete_by_id', 'is_delete_by_name', 'is_delete', 'delete_at', 'posted_at',
@@ -206,8 +207,6 @@ return $this->db->table($this->table)
         'judul' => 'required|min_length[5]|max_length[255]',
         'slug' => 'permit_empty|is_unique[t_berita.slug,id_berita,{id_berita}]',
         'content' => 'permit_empty|string',
-        'status' => 'permit_empty|in_list[0,1,2,3,4,5]',
-        'status_berita' => 'permit_empty|in_list[0,2,3,4,6]',
     ];
 
     protected $validationMessages = [

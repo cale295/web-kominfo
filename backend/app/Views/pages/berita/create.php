@@ -18,10 +18,86 @@
             <input type="text" name="topik" class="form-control" placeholder="Masukkan topik berita" value="<?= old('topik') ?>">
         </div>
 
-        <!-- Isi Berita -->
+        <!-- Isi Berita dengan Rich Text Editor -->
         <div class="mb-3">
             <label class="form-label">Isi Berita <span class="text-danger">*</span></label>
-            <textarea name="content" class="form-control" rows="8" required placeholder="Tulis isi berita di sini..."><?= old('content') ?></textarea>
+            <div id="toolbar-content" class="ql-toolbar-custom mb-2">
+                <button class="ql-bold" title="Bold"></button>
+                <button class="ql-italic" title="Italic"></button>
+                <button class="ql-underline" title="Underline"></button>
+                <button class="ql-strike" title="Strike"></button>
+                <select class="ql-header">
+                    <option value="1">Heading 1</option>
+                    <option value="2">Heading 2</option>
+                    <option value="3">Heading 3</option>
+                    <option selected>Normal</option>
+                </select>
+                <select class="ql-size">
+                    <option value="small">Small</option>
+                    <option selected>Normal</option>
+                    <option value="large">Large</option>
+                    <option value="huge">Huge</option>
+                </select>
+                <select class="ql-font">
+                    <option selected>Sans Serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="monospace">Monospace</option>
+                </select>
+                <select class="ql-color"></select>
+                <select class="ql-background"></select>
+                <button class="ql-list" value="ordered" title="Ordered List"></button>
+                <button class="ql-list" value="bullet" title="Bullet List"></button>
+                <button class="ql-align" value="" title="Left Align"></button>
+                <button class="ql-align" value="center" title="Center"></button>
+                <button class="ql-align" value="right" title="Right Align"></button>
+                <button class="ql-align" value="justify" title="Justify"></button>
+                <button class="ql-link" title="Insert Link"></button>
+                <button class="ql-image" title="Insert Image"></button>
+                <button class="ql-clean" title="Clear Formatting"></button>
+            </div>
+            <div id="editor-content" style="min-height: 250px; background: white; border: 1px solid #ced4da; border-radius: 0.375rem;"><?= old('content') ?></div>
+            <textarea name="content" id="content-hidden" style="display:none;"></textarea>
+        </div>
+
+        <!-- Isi Berita 2 dengan Rich Text Editor -->
+        <div class="mb-3">
+            <label class="form-label">Isi Berita 2 <span class="text-danger">*</span></label>
+            <div id="toolbar-content2" class="ql-toolbar-custom mb-2">
+                <button class="ql-bold" title="Bold"></button>
+                <button class="ql-italic" title="Italic"></button>
+                <button class="ql-underline" title="Underline"></button>
+                <button class="ql-strike" title="Strike"></button>
+                <select class="ql-header">
+                    <option value="1">Heading 1</option>
+                    <option value="2">Heading 2</option>
+                    <option value="3">Heading 3</option>
+                    <option selected>Normal</option>
+                </select>
+                <select class="ql-size">
+                    <option value="small">Small</option>
+                    <option selected>Normal</option>
+                    <option value="large">Large</option>
+                    <option value="huge">Huge</option>
+                </select>
+                <select class="ql-font">
+                    <option selected>Sans Serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="monospace">Monospace</option>
+                </select>
+                <select class="ql-color"></select>
+                <select class="ql-background"></select>
+                <button class="ql-list" value="ordered" title="Ordered List"></button>
+                <button class="ql-list" value="bullet" title="Bullet List"></button>
+                <button class="ql-align" value="" title="Left Align"></button>
+                <button class="ql-align" value="center" title="Center"></button>
+                <button class="ql-align" value="right" title="Right Align"></button>
+                <button class="ql-align" value="justify" title="Justify"></button>
+                <button class="ql-link" title="Insert Link"></button>
+                <button class="ql-image" title="Insert Image"></button>
+                <button class="ql-clean" title="Clear Formatting"></button>
+            </div>
+            <div id="editor-content2" style="min-height: 250px; background: white; border: 1px solid #ced4da; border-radius: 0.375rem;"><?= old('content2') ?></div>
+            <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
         </div>
 
         <!-- Kategori -->
@@ -143,6 +219,9 @@
     </form>
 </div>
 
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <style>
 .kategori-btn {
     transition: all 0.3s ease;
@@ -170,13 +249,75 @@
     border-radius: 8px;
     border: 2px solid #ddd;
 }
+.ql-toolbar-custom {
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 8px;
+}
+.ql-toolbar-custom button,
+.ql-toolbar-custom select {
+    margin: 2px;
+}
+.ql-editor {
+    min-height: 250px;
+    font-size: 16px;
+}
 </style>
+
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quill Editors
+    const quillContent = new Quill('#editor-content', {
+        modules: {
+            toolbar: '#toolbar-content'
+        },
+        theme: 'snow',
+        placeholder: 'Tulis isi berita di sini...'
+    });
+
+    const quillContent2 = new Quill('#editor-content2', {
+        modules: {
+            toolbar: '#toolbar-content2'
+        },
+        theme: 'snow',
+        placeholder: 'Tulis isi berita di sini...'
+    });
+
+    // Update hidden textareas before form submit
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const content1 = quillContent.root.innerHTML.trim();
+        const content2 = quillContent2.root.innerHTML.trim();
+        
+        // Check if content is empty (only has <p><br></p> or similar)
+        const isEmpty1 = content1 === '<p><br></p>' || content1 === '' || quillContent.getText().trim() === '';
+        const isEmpty2 = content2 === '<p><br></p>' || content2 === '' || quillContent2.getText().trim() === '';
+        
+        if (isEmpty1) {
+            e.preventDefault();
+            alert('Isi Berita tidak boleh kosong!');
+            quillContent.focus();
+            return false;
+        }
+        
+        if (isEmpty2) {
+            e.preventDefault();
+            alert('Isi Berita 2 tidak boleh kosong!');
+            quillContent2.focus();
+            return false;
+        }
+        
+        document.getElementById('content-hidden').value = content1;
+        document.getElementById('content2-hidden').value = content2;
+    });
+
+    // Kategori Selection
     let selectedKategori = [];
 
-    // Load old kategori if any
     const oldKategori = document.getElementById('kategori-hidden').value;
     if (oldKategori) {
         selectedKategori = oldKategori.split(',').map(k => k.trim()).filter(k => k);
