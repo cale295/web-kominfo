@@ -158,7 +158,6 @@
                                             <img src="<?= base_url($berita['feat_image']) ?>" 
                                                  class="img-thumbnail" 
                                                  style="max-height: 200px; object-fit: cover;" 
-                                                 alt="Current Featured Image">
                                             <div class="form-text">Gambar saat ini</div>
                                         </div>
                                     <?php endif; ?>
@@ -167,29 +166,27 @@
                                 </div>
 
                                 <!-- Additional Images -->
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label fw-semibold">Gambar Tambahan</label>
-                                    <?php if(!empty($additionalImages)): ?>
-                                        <img src="<?= base_url($berita['additional_images']) ?>"
-                                        class="img-thumbnail"
-                                        style="max-height: 200px; object-fit: cover;"
-                                        alt="Current Featured Image">
-                                        <div class="row mb-2 g-2">
-                                            <?php foreach($additionalImages as $img): ?>
-                                                <div class="col-md-3">
-                                                    <img src="<?= base_url($img) ?>" 
-                                                         class="img-thumbnail w-100" 
-                                                         style="height: 150px; object-fit: cover;" 
-                                                         alt="Additional Image">
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                        <div class="form-text mb-2">Gambar tambahan saat ini</div>
-                                    <?php endif; ?>
-                                    <input type="file" name="additional_images[]" class="form-control" 
-                                           accept="image/*" multiple>
-                                    <small class="text-muted">Upload beberapa gambar sekaligus (tekan Ctrl/Cmd untuk pilih banyak)</small>
-                                </div>
+<!-- Additional Images -->
+<div class="col-md-12 mb-3">
+    <label class="form-label fw-semibold">Gambar Tambahan</label>
+    <?php if(!empty($additionalImages)): ?>
+        <div class="row mb-2 g-2">
+            <?php foreach($additionalImages as $img): ?>
+                <div class="col-md-3">
+                    <img src="<?= base_url($img) ?>" 
+                         class="img-thumbnail w-100" 
+                         style="height: 150px; object-fit: cover;" 
+                         alt="Additional Image">
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="form-text mb-2">Gambar tambahan saat ini</div>
+    <?php endif; ?>
+    <input type="file" name="additional_images[]" class="form-control" 
+           accept="image/*" multiple>
+    <small class="text-muted">Upload beberapa gambar sekaligus (tekan Ctrl/Cmd untuk pilih banyak)</small>
+</div>
+
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-semibold">Link Video</label>
