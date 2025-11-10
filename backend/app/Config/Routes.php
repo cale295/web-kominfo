@@ -43,6 +43,7 @@ $routes->resource('berita_tag', ['controller' => 'backend\BeritaTagController', 
 // ========================================================
 // BERITA ROUTES
 // ========================================================
+
 $routes->get('berita', 'BeritaController::index');
 $routes->get('berita/new', 'BeritaController::new');
 $routes->post('berita', 'BeritaController::create');
