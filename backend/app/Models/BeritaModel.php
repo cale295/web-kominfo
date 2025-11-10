@@ -241,4 +241,35 @@ return $this->db->table($this->table)
         }
         return $data;
     }
+
+    // =========================================================
+    // Relasi: Ambil log berdasarkan id_berita
+    // =========================================================
+    public function getLogByBerita($id_berita)
+    {
+        return $this->db->table('t_berita_log')
+                        ->select('t_berita_log.*, m_users.full_name AS user_name')
+                        ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left')
+                        ->where('t_berita_log.id_berita', $id_berita)
+                        ->orderBy('t_berita_log.created_date', 'DESC')
+                        ->get()
+                        ->getResultArray();
+    }   
+
+    // =========================================================
+// Simpan log berita baru (dipanggil saat update/status berubah)
+// =========================================================
+public function addLog($id_berita, $log, $status, $id_user, $fullname, $keterangan = null)
+{
+    $this->db->table('t_berita_log')->insert([
+        'id_berita'   => $id_berita,
+        'id_user'     => $id_user,
+        'fullname'    => $fullname,
+        'log'         => $log,
+        'status'      => $status,
+        'keterangan'  => $keterangan,
+        'id_hash'     => uniqid('log_'),
+        'created_date'=> date('Y-m-d H:i:s')
+    ]);
+}
 }

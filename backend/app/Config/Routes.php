@@ -56,6 +56,8 @@ $routes->post('berita/(:num)/delete', 'BeritaController::delete/$1'); // ✅ ini
 $routes->post('berita/(:num)/destroyPermanent', 'BeritaController::destroyPermanent/$1');
 $routes->get('berita/trash', 'BeritaController::trash');
 $routes->post('berita/(:num)/restore', 'BeritaController::restore/$1');
+$routes->get('/berita/log/(:num)', 'BeritaController::log/$1');
+
 
 
 //album
@@ -81,12 +83,6 @@ $routes->get('gallery/restore/(:num)', 'PhotoGalleryController::restore/$1');
 $routes->get('gallery/destroy/(:num)', 'PhotoGalleryController::destroyPermanent/$1');
 
 
-
-
-
-
-
-
 // Banner logo
 $routes->resource('banner', ['controller' => 'BannerController', 'except' => ['show']]);
 $routes->get('banner/view/(:num)', 'BannerController::view/$1');
@@ -96,11 +92,6 @@ $routes->get('banner/restore/(:num)', 'BannerController::restore/$1'); // restor
 $routes->post('banner/(:num)/restore', 'BannerController::restore/$1');
 $routes->get('banner/destroyPermanent/(:num)', 'BannerController::destroyPermanent/$1');
 
-
-
-
-
-
 //menu 
 $routes->resource('menu', ['controller' => 'MenuController']);
 $routes->get('menu/toggleStatus/(:num)', 'MenuController::toggleStatus/$1');
@@ -109,16 +100,12 @@ $routes->get('menu/edit/(:num)', 'MenuController::edit/$1');
 $routes->get('menu/(:num)/edit', 'MenuController::edit/$1');
 
 
-
-
 // ===============================
 // ROUTE UNTUK MANAJEMEN HAK AKSES
 // ===============================
 $routes->get('access_rights', 'AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
 $routes->get('access_rights/edit/(:num)', 'AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
 $routes->put('access_rights/update/(:num)', 'AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
-
-
 
 
 // =========================================================

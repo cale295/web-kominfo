@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\BeritaModel;
 use App\Models\KategoriModel;
 use App\Models\AccessRightsModel;
+use App\Models\BeritaLogModel;
+
 
 class BeritaController extends BaseController
 {
@@ -13,12 +15,16 @@ class BeritaController extends BaseController
     protected $kategoriModel;
     protected $accessRightsModel;
     protected $module = 'berita';
+    protected $beritaLogModel;
+
 
     public function __construct()
     {
         $this->beritaModel = new BeritaModel();
         $this->kategoriModel = new KategoriModel();
         $this->accessRightsModel = new AccessRightsModel();
+        $this->beritaLogModel = new BeritaLogModel();
+
     }
 
     // ========================================================
@@ -152,6 +158,8 @@ $berita = $this->beritaModel->where('trash', '0')->findAll();
             $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
         }
 
+        $this->saveLog($idBerita, 'Menambahkan berita baru');
+
         return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
     }
 
@@ -258,6 +266,9 @@ public function update($id)
     // --- Update kategori pivot ---
     $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
 
+    $this->saveLog($id, 'Mengubah berita');
+
+
     return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
 }
 
@@ -283,6 +294,8 @@ public function delete($id)
     if(!$updated){
         return redirect()->to('/berita')->with('error', 'Gagal memindahkan berita ke sampah.');
     }
+    $this->saveLog($id, 'Memindahkan berita ke sampah');
+
 
     return redirect()->to('/berita')->with('success', 'Berita dipindahkan ke sampah.');
 }
@@ -301,6 +314,8 @@ public function destroyPermanent($id)
 
     // Hapus berita permanen
     $this->beritaModel->delete($id, true); // true = force delete
+    $this->saveLog($id, 'Menghapus berita secara permanen');
+
 
     return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dihapus permanen.');
 }
@@ -325,6 +340,9 @@ public function restore($id)
         'is_delete_by_name' => null,
         'delete_at' => null
     ]);
+
+    $this->saveLog($id, 'Memulihkan berita dari sampah');
+
 
     return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dipulihkan.');
 }
@@ -384,4 +402,90 @@ public function trash()
             'can_delete' => (bool) $access['can_delete'],
         ];
     }
+
+    // ========================================================
+// Save log perubahan berita
+// ========================================================
+
+private function saveLog($idBerita, $keterangan, $status = null, $notePerbaikan = null, $noteRevisi = null)
+{
+     log_message('info', 'User ID: ' . session()->get('id_user'));
+    log_message('info', 'Username: ' . session()->get('username'));
+    $berita = $this->beritaModel->find($idBerita);
+    if (!$berita) {
+        log_message('error', "Berita tidak ditemukan: ID $idBerita");
+        return;
+    }
+
+    // Ambil data kategori
+    $kategori = $this->beritaModel->getKategoriByBerita($idBerita);
+    $berita['kategori_berita'] = $kategori;
+
+    // Ambil additional images jika ada
+    if (!empty($berita['additional_images'])) {
+        $berita['galeri_foto'] = json_decode($berita['additional_images'], true);
+    }
+
+    $logData = [
+        'id_hash' => $berita['hash_berita'] ?? '',
+        'id_berita' => $idBerita,
+        'log' => json_encode($berita, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        'keterangan' => $keterangan,
+        'id_user' => session()->get('id_user'),
+        'created_date' => date('Y-m-d H:i:s'),
+        'status' => $status ?? $berita['status'] ?? 0,
+        'note_perbaikan' => $notePerbaikan,
+        'note_revisi' => $noteRevisi,
+        'fullname' => session()->get('username'),
+    ];
+
+    // DEBUG: tampilkan data yang akan disimpan
+    log_message('info', 'Data Log: ' . print_r($logData, true));
+    
+    $result = $this->beritaLogModel->insert($logData);
+    
+    if (!$result) {
+        $errors = $this->beritaLogModel->errors();
+        log_message('error', 'Gagal simpan log: ' . print_r($errors, true));
+    } else {
+        log_message('info', "Log berhasil disimpan untuk berita ID: $idBerita");
+    }
+}/// ========================================================
+// Log Aktivitas Berita
+// ========================================================
+public function log($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_read']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin melihat log berita.');
+    }
+
+    $db = \Config\Database::connect();
+
+    // Ambil data berita
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    // Ambil log berdasarkan id_berita
+    $logs = $db->table('t_berita_log')
+        ->select('t_berita_log.*, m_users.full_name AS user_name')
+        ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left')
+        ->where('t_berita_log.id_berita', $id)
+        ->orderBy('t_berita_log.created_date', 'DESC')
+        ->get()
+        ->getResultArray();
+
+    $data = [
+        'title' => 'Log Aktivitas Berita',
+        'berita' => $berita,
+        'logs' => $logs
+    ];
+
+    return view('pages/berita/logs', $data);
+}
+
+
+
 }

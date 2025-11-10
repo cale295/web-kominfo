@@ -4,9 +4,9 @@
 <div class="container py-4">
     <h3>✏️ Edit Berita</h3>
 
-    <form action="<?= site_url('berita/'.$berita['id_berita']) ?>" method="post">
+    <form action="<?= site_url('berita/'.$berita['id_berita'].'/update') ?>" method="post" enctype="multipart/form-data">
         <?= csrf_field() ?>
-        <input type="hidden" name="_method" value="PUT">
+        
 
         <!-- Judul -->
         <div class="mb-3">
