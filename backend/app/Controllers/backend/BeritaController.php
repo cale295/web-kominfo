@@ -245,6 +245,7 @@ public function edit($id)
         'judul' => $post['judul'],
         'topik' => $post['topik'] ?? null,
         'content' => $post['content'] ?? null,
+        'content2' => $post['content2'] ?? null,
         'intro' => $post['intro'] ?? null,
         'id_berita_terkait' => $post['id_berita_terkait'] ?? null,
         'id_berita_terkait2' => $post['id_berita_terkait2'] ?? null,

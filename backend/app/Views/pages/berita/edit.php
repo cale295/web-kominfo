@@ -106,7 +106,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Isi Berita</label>
-                                <textarea name="content" class="form-control" rows="8" 
+                                <textarea name="content2" class="form-control" rows="8" 
                                           placeholder="Tulis konten berita secara lengkap..."><?= (old('content', $berita['content2'])) ?></textarea>
                             </div>
                         </div>
