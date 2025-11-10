@@ -53,6 +53,7 @@ $routes->post('berita', 'BeritaController::create');
 $routes->get('berita/(:num)/edit', 'BeritaController::edit/$1');
 $routes->post('berita/(:num)/update', 'BeritaController::update/$1');
 $routes->post('berita/(:num)/delete', 'BeritaController::delete/$1'); // ✅ ini penting
+$routes->post('berita/(:num)/destroyPermanent', 'BeritaController::destroyPermanent/$1');
 $routes->get('berita/trash', 'BeritaController::trash');
 $routes->post('berita/(:num)/restore', 'BeritaController::restore/$1');
 

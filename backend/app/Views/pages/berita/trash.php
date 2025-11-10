@@ -38,7 +38,7 @@
                         <?php foreach ($berita as $row): ?>
                             <tr>
                                 <td class="fw-semibold"><?= esc($row['judul']) ?></td>
-                                <td><?= esc($row['nama_kategori']) ?></td>
+                                <td><?= esc($row['kategori']) ?></td>
                                 <td><?= esc($row['updated_by_name']) ?></td>
                                 <td><?= date('d M Y H:i', strtotime($row['updated_at'])) ?></td>
                                 <td class="text-center">
@@ -46,16 +46,14 @@
                                        class="btn btn-success btn-sm px-3 me-1">
                                         <i class="bi bi-arrow-counterclockwise"></i> Pulihkan
                                     </a>
-                                    <form action="<?= site_url('berita/' . $row['id_berita'] . '/destroyPermanent') ?>" 
-                                          method="post" style="display:inline;">
-                                        <?= csrf_field() ?>
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" 
-                                                class="btn btn-danger btn-sm px-3" 
-                                                onclick="return confirm('Yakin ingin menghapus permanen berita ini?')">
-                                            <i class="bi bi-trash3"></i> Hapus
-                                        </button>
-                                    </form>
+                                   <form action="<?= site_url('berita/' . $row['id_berita'] . '/destroyPermanent') ?>" method="post" style="display:inline;">
+    <?= csrf_field() ?>
+    <button class="btn btn-sm btn-danger"
+        onclick="return confirm('Yakin hapus permanen? Semua berita terkait akan tetap ada, tapi kategori akan hilang.')">
+        Hapus Permanen
+    </button>
+</form>
+
                                 </td>
                             </tr>
                         <?php endforeach; ?>

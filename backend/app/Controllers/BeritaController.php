@@ -287,6 +287,25 @@ public function delete($id)
     return redirect()->to('/berita')->with('success', 'Berita dipindahkan ke sampah.');
 }
 
+public function destroyPermanent($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_delete']) {
+        return redirect()->to('/berita/trash')->with('error', 'Kamu tidak punya izin menghapus berita.');
+    }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita/trash')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    // Hapus berita permanen
+    $this->beritaModel->delete($id, true); // true = force delete
+
+    return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dihapus permanen.');
+}
+
+
 
 
 // ========================================================
@@ -314,6 +333,9 @@ public function restore($id)
 // ========================================================
 // Daftar Berita Trash
 // ========================================================
+// ========================================================
+// Daftar Berita Trash
+// ========================================================
 public function trash()
 {
     $access = $this->getAccess(session()->get('role'));
@@ -321,7 +343,16 @@ public function trash()
         return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
     }
 
-    $berita = $this->beritaModel->where('trash', 1)->findAll();
+    // Ambil berita trash dengan join kategori
+    $berita = $this->beritaModel->db->table('t_berita')
+                ->select('t_berita.*, GROUP_CONCAT(m_kategori_berita.kategori SEPARATOR ", ") as kategori')
+                ->join('t_berita_kategori', 't_berita_kategori.id_berita = t_berita.id_berita', 'left')
+                ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita_kategori.id_kategori', 'left')
+                ->where('t_berita.trash', '1')
+                ->groupBy('t_berita.id_berita')
+                ->orderBy('t_berita.updated_at', 'DESC')
+                ->get()
+                ->getResultArray();
 
     $data = [
         'title' => 'Sampah Berita',
@@ -332,6 +363,7 @@ public function trash()
 
     return view('pages/berita/trash', $data);
 }
+
 
     // ========================================================
     // Hak Akses
