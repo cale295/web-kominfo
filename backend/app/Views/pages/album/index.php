@@ -1,11 +1,11 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 
 <div class="container py-4">
     <div class="d-flex justify-content-between mb-3">
         <h3><?= esc($title) ?></h3>
         <div>
-            <a href="<?= site_url('album/trash') ?>" class="btn btn-secondary">🗑️ Sampah</a>
             <a href="<?= site_url('album/new') ?>" class="btn btn-primary">➕ Tambah Album</a>
         </div>
     </div>
@@ -34,11 +34,15 @@
             </td>
             <td>
                 <a href="<?= site_url('album/'.$row['id_album'].'/edit') ?>" class="btn btn-sm btn-warning">Edit</a>
-                <form action="<?= site_url('album/'.$row['id_album']) ?>" method="post" style="display:inline;">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button class="btn btn-sm btn-danger" onclick="return confirm('Pindahkan ke sampah?')">Sampah</button>
-                </form>
+                                    <form action="<?= site_url('album/'.$row['id_album']) ?>" method="post" class="d-inline">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" 
+                                                class="btn-action btn-delete" 
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus tema ini?')"
+                                                title="Hapus Tema">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
             </td>
         </tr>
         <?php endforeach; ?>

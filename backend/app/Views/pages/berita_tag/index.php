@@ -7,7 +7,6 @@
         <h3>📌 Daftar Tag Berita</h3>
         <div>
             <a href="<?= site_url('berita_tag/new') ?>" class="btn btn-primary">+ Tambah Tag</a>
-            <a href="<?= site_url('berita_tag/trash') ?>" class="btn btn-secondary">🗑️ Tong Sampah</a>
         </div>
     </div>
 
@@ -40,17 +39,16 @@
                         <td><?= esc($tag['created_at'] ?? '-') ?></td>
                         <td>
                             <a href="<?= site_url('berita_tag/'.$tag['id_tags'].'/edit') ?>" class="btn btn-sm btn-warning">Edit</a>
-                                        <form action="<?= site_url('berita_tag/' . $tag['id_tags']) ?>" 
-                                              method="post" 
-                                              style="display:inline;">
-                                            <?= csrf_field() ?>
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <button class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Yakin Membuang Tag ini?')"
-                                                    title="Hapus">
-                                                Trash
-                                            </button>
-                                        </form>                        </td>
+                                    <form action="<?= site_url('berita_tag/'.$tag['id_tags']) ?>" method="post" class="d-inline">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" 
+                                                class="btn-action btn-delete" 
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus tema ini?')"
+                                                title="Hapus Tema">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>               
+                                 </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

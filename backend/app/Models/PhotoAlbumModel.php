@@ -18,7 +18,6 @@ class PhotoAlbumModel extends Model
         'album_name',
         'description',
         'cover_image',
-        'trash', // 0 = aktif, 1 = sampah
         'created_at',
         'updated_at',
     ];

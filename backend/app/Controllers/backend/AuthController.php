@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\backend;
 
 use App\Models\UserModel;
 use CodeIgniter\Controller;

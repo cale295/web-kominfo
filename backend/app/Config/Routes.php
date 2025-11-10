@@ -6,107 +6,87 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-$routes->get('/', 'AuthController::index');
+$routes->get('/', 'backend\AuthController::index');
 
 // Login & Logout
-$routes->get('/login', 'AuthController::index');
-$routes->post('/login', 'AuthController::login');
-$routes->get('/logout', 'AuthController::logout');
+$routes->get('/login', 'backend\AuthController::index');
+$routes->post('/login', 'backend\AuthController::login');
+$routes->get('/logout', 'backend\AuthController::logout');
 
 // Dashboard
-$routes->get('/dashboard', 'DashboardController::index');
+$routes->get('/dashboard', 'backend\DashboardController::index');
 
 // Berita Kategori Tema
-$routes->resource('tema', ['controller' => 'TemaKategoriController', 'except' => ['show']]);
+$routes->resource('tema', ['controller' => 'backend\TemaKategoriController', 'except' => ['show']]);
 
 // Resource Web (non-API)
-$routes->resource('manage_user', ['controller' => 'UserController']);
+$routes->resource('manage_user', ['controller' => 'backend\UserController']);
 
 // Kategori Berita
-$routes->resource('kategori_berita', ['controller' => 'KategoriBeritaController']);
+$routes->resource('kategori_berita', ['controller' => 'backend\KategoriBeritaController']);
 
 // Agenda
-$routes->resource('agenda', ['controller' => 'AgendaController','except' => ['show']]);
+$routes->resource('agenda', ['controller' => 'backend\AgendaController','except' => ['show']]);
 
 // Profile
-$routes->resource('profile', ['controller' => 'ProfileController', 'except' => ['show']]);
+$routes->resource('profile', ['controller' => 'backend\ProfileController', 'except' => ['show']]);
 
 // Kategori
-$routes->resource('kategori', ['controller' => 'KategoriController', 'except' => ['show']]);
-$routes->get('kategori/trash', 'KategoriController::trash');
-$routes->get('kategori/(:num)/restore', 'KategoriController::restore/$1');
-$routes->post('kategori/(:num)/destroyPermanent', 'KategoriController::destroyPermanent/$1');
+$routes->resource('kategori', ['controller' => 'backend\KategoriController', 'except' => ['show']]);
+$routes->get('kategori/trash', 'backend\KategoriController::trash');
+$routes->get('kategori/(:num)/restore', 'backend\KategoriController::restore/$1');
+$routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::destroyPermanent/$1');
 
 
 // berita kategori
-$routes->resource('berita_tag', ['controller' => 'BeritaTagController', 'except' => ['show']]);
-$routes->get('berita_tag/trash', 'BeritaTagController::trash');
-$routes->get('berita_tag/(:num)/restore', 'BeritaTagController::restore/$1');
-$routes->delete('berita_tag/(:num)/destroyPermanent', 'BeritaTagController::destroyPermanent/$1');
-
+$routes->resource('berita_tag', ['controller' => 'backend\BeritaTagController', 'except' => ['show']]);
 // ========================================================
 // BERITA ROUTES
 // ========================================================
-$routes->get('berita', 'BeritaController::index');
-$routes->get('berita/new', 'BeritaController::new');
-$routes->post('berita', 'BeritaController::create');
-$routes->get('berita/(:num)/edit', 'BeritaController::edit/$1');
-$routes->post('berita/(:num)/update', 'BeritaController::update/$1');
-$routes->post('berita/(:num)/delete', 'BeritaController::delete/$1'); // ✅ ini penting
-$routes->post('berita/(:num)/destroyPermanent', 'BeritaController::destroyPermanent/$1');
-$routes->get('berita/trash', 'BeritaController::trash');
-$routes->post('berita/(:num)/restore', 'BeritaController::restore/$1');
+$routes->get('berita', 'backend\BeritaController::index');
+$routes->get('berita/new', 'backend\BeritaController::new');
+$routes->post('berita', 'backend\BeritaController::create');
+$routes->get('berita/(:num)/edit', 'backend\BeritaController::edit/$1');
+$routes->post('berita/(:num)/update', 'backend\BeritaController::update/$1');
+$routes->post('berita/(:num)/delete', 'backend\BeritaController::delete/$1'); // ✅ ini penting
+$routes->post('berita/(:num)/destroyPermanent', 'backend\BeritaController::destroyPermanent/$1');
+$routes->get('berita/trash', 'backend\BeritaController::trash');
+$routes->post('berita/(:num)/restore', 'backend\BeritaController::restore/$1');
 
 
 //album
 $routes->resource('album', [
-    'controller' => 'PhotoAlbumController',
+    'controller' => 'backend\PhotoAlbumController',
     'except' => ['show']
 ]);
-$routes->get('album/trash', 'PhotoAlbumController::trash');
-$routes->get('album/restore/(:num)', 'PhotoAlbumController::restore/$1');
-$routes->get('album/destroy/(:num)', 'PhotoAlbumController::destroyPermanent/$1');
+$routes->get('album/trash', 'backend\PhotoAlbumController::trash');
+$routes->get('album/restore/(:num)', 'backend\PhotoAlbumController::restore/$1');
+$routes->get('album/destroy/(:num)', 'backend\PhotoAlbumController::destroyPermanent/$1');
 
-// Gallery manual routes
-$routes->get('gallery', 'PhotoGalleryController::index');
-$routes->get('gallery/create', 'PhotoGalleryController::create');
-$routes->post('gallery', 'PhotoGalleryController::store');
-$routes->get('gallery/edit/(:num)', 'PhotoGalleryController::edit/$1');
-$routes->post('gallery/update/(:num)', 'PhotoGalleryController::update/$1');
-$routes->get('gallery/delete/(:num)', 'PhotoGalleryController::delete/$1');
+// Gallery 
+$routes->resource('gallery', ['controller' => 'backend\PhotoGalleryController', 'except' => ['show']]);
 
 // Trash dan restore
-$routes->get('gallery/trash', 'PhotoGalleryController::trash');
-$routes->get('gallery/restore/(:num)', 'PhotoGalleryController::restore/$1');
-$routes->get('gallery/destroy/(:num)', 'PhotoGalleryController::destroyPermanent/$1');
-
-
-
-
+$routes->get('gallery/trash', 'backend\PhotoGalleryController::trash');
+$routes->get('gallery/restore/(:num)', 'backend\PhotoGalleryController::restore/$1');
+$routes->get('gallery/destroy/(:num)', 'backend\PhotoGalleryController::destroyPermanent/$1');
 
 
 
 
 // Banner logo
-$routes->resource('banner', ['controller' => 'BannerController', 'except' => ['show']]);
-$routes->get('banner/view/(:num)', 'BannerController::view/$1');
-$routes->get('banner/click/(:num)', 'BannerController::click/$1');
-$routes->get('banner/trash', 'BannerController::trash');
-$routes->get('banner/restore/(:num)', 'BannerController::restore/$1'); // restore data
-$routes->post('banner/(:num)/restore', 'BannerController::restore/$1');
-$routes->get('banner/destroyPermanent/(:num)', 'BannerController::destroyPermanent/$1');
-
-
-
+$routes->resource('banner', ['controller' => 'backend\BannerController', 'except' => ['show']]);
+$routes->get('banner/view/(:num)', 'backend\BannerController::view/$1');
+$routes->get('banner/click/(:num)', 'backend\BannerController::click/$1');
 
 
 
 //menu 
-$routes->resource('menu', ['controller' => 'MenuController']);
-$routes->get('menu/toggleStatus/(:num)', 'MenuController::toggleStatus/$1');
-$routes->post('menu/toggleStatus/(:num)', 'MenuController::toggleStatus/$1');
-$routes->get('menu/edit/(:num)', 'MenuController::edit/$1');
-$routes->get('menu/(:num)/edit', 'MenuController::edit/$1');
+$routes->resource('menu', ['controller' => 'backend\MenuController']);
+$routes->get('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
+$routes->post('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
+$routes->get('menu/edit/(:num)', 'backend\MenuController::edit/$1');
+$routes->get('menu/(:num)/edit', 'backend\MenuController::edit/$1');
 
 
 
@@ -114,9 +94,9 @@ $routes->get('menu/(:num)/edit', 'MenuController::edit/$1');
 // ===============================
 // ROUTE UNTUK MANAJEMEN HAK AKSES
 // ===============================
-$routes->get('access_rights', 'AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
-$routes->get('access_rights/edit/(:num)', 'AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
-$routes->put('access_rights/update/(:num)', 'AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
+$routes->get('access_rights', 'backend\AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
+$routes->get('access_rights/edit/(:num)', 'backend\AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
+$routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
 
 
 
@@ -126,6 +106,10 @@ $routes->put('access_rights/update/(:num)', 'AccessRightsController::update/$1',
 // =========================================================
 $routes->group('api', function ($routes) {
 
+
+    //berita
+    $routes->get('berita', 'Api\ApiBeritaController::index');
+    $routes->get('berita/(:num)', 'Api\ApiBeritaController::show/$1');
 
     //Photo Album
     $routes->get('album', 'Api\ApiPhotoAlbumController::index');

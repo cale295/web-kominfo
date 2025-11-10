@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\backend;
 
-use App\Controllers\BaseController;
-use App\Models\KategoriModel;
+use App\Controllers\BaseController;use App\Models\KategoriModel;
 use App\Models\AccessRightsModel;
 
 class KategoriController extends BaseController

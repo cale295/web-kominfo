@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\backend;
 
 use App\Controllers\BaseController;
 use App\Models\BannerModel;
@@ -47,26 +47,7 @@ class BannerController extends BaseController
         return view('pages/banner/index', $data);
     }
 
-    // TAMPILKAN SAMPAH
-    public function trash()
-    {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
 
-        // Memerlukan hak 'read' untuk melihat sampah
-        if (!$access || !$access['can_read']) {
-            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat sampah banner.');
-        }
-
-        $data = [
-            'title' => 'Sampah Banner',
-            'banners' => $this->bannerModel->getAllDeleted(),
-            'can_update' => $access['can_update'], // Untuk tombol restore
-            'can_delete' => $access['can_delete'], // Untuk tombol hapus permanen
-        ];
-
-        return view('pages/banner/trash', $data);
-    }
 
     // TAMBAH
     public function new()
@@ -192,8 +173,7 @@ class BannerController extends BaseController
         return redirect()->to('/banner')->with('success', 'Banner berhasil diperbarui.');
     }
 
-    // HAPUS KE SAMPAH
-    public function delete($id)
+    public function delete($id = null)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_delete']) {
@@ -201,67 +181,23 @@ class BannerController extends BaseController
         }
 
         $banner = $this->bannerModel->find($id);
-        if (!$banner) {
-            return redirect()->to('/banner')->with('error', 'Banner tidak ditemukan.');
+
+        // =======================================================================
+        // PERBAIKAN: Tambahkan FCPATH. Path 'uploads/pages/banner/...' saja tidak akan
+        // ditemukan. Harus FCPATH . 'uploads/pages/banner/'
+        // =======================================================================
+        $uploadPath = FCPATH . 'uploads/banner/';
+        if ($banner && !empty($banner['image']) && file_exists($uploadPath . $banner['image'])) {
+            @unlink($uploadPath . $banner['image']); // gunakan @ untuk menekan error
         }
 
-        $this->bannerModel->update($id, [
-            'is_delete' => '1',
-            'is_delete_at' => date('Y-m-d H:i:s'),
-            'is_delete_by_id' => session()->get('id_user') ?? null,
-            'is_delete_by_name' => session()->get('username') ?? 'Guest',
-        ]);
-
-        return redirect()->to('/banner')->with('success', 'Banner dipindahkan ke sampah.');
+        if ($this->bannerModel->delete($id)) {
+            return redirect()->to('/banner')->with('success', 'banner berhasil dihapus.');
+        } else {
+            return redirect()->to('/banner')->with('error', 'Gagal menghapus banner.');
+        }
     }
 
-    // RESTORE
-    public function restore($id)
-    {
-        // Memerlukan hak 'update' untuk me-restore
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/banner/trash')->with('error', 'Kamu tidak punya izin memulihkan banner.');
-        }
-
-        $banner = $this->bannerModel->find($id);
-        if (!$banner) {
-            return redirect()->to('/banner/trash')->with('error', 'Banner tidak ditemukan.');
-        }
-
-        $this->bannerModel->update($id, [
-            'is_delete' => '0',
-            'is_delete_at' => null,
-            'is_delete_by_id' => null,
-            'is_delete_by_name' => null,
-        ]);
-
-        return redirect()->to('/banner/trash')->with('success', 'Banner berhasil dipulihkan.');
-    }
-
-    // HAPUS PERMANEN
-    public function destroyPermanent($id)
-    {
-        // Memerlukan hak 'delete' untuk menghapus permanen
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_delete']) {
-            return redirect()->to('/banner/trash')->with('error', 'Kamu tidak punya izin menghapus banner permanen.');
-        }
-
-        $banner = $this->bannerModel->find($id);
-        if (!$banner) {
-            return redirect()->to('/banner/trash')->with('error', 'Banner tidak ditemukan.');
-        }
-
-        // Hapus file gambar terkait
-        if (!empty($banner['image']) && file_exists('uploads/banner/' . $banner['image'])) {
-            @unlink('uploads/banner/' . $banner['image']);
-        }
-
-        // Hapus data dari database (sesuai cara di controller asli)
-        $this->bannerModel->where('id_banner', $id)->delete();
-        return redirect()->to('/banner/trash')->with('success', 'Banner dihapus permanen!');
-    }
 
 
     // ========================================================

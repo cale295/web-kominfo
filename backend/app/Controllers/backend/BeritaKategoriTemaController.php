@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\backend;
 
 use App\Models\BeritaKategoriModel;
 use CodeIgniter\Controller;

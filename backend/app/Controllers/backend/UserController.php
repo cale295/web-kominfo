@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\backend;
 
-use App\Controllers\BaseController;
-use App\Models\UserModel;
+use App\Controllers\BaseController;use App\Models\UserModel;
 use App\Models\AccessRightsModel;
 
 class UserController extends BaseController

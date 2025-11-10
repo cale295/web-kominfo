@@ -9,7 +9,7 @@ class BeritaTagModel extends Model
     protected $table = 'm_berita_tag';
     protected $primaryKey = 'id_tags';
     protected $allowedFields = [
-        'name', 'slug', 'created_at', 'created_by_id', 'created_by_name', 'is_delete', 'trash'
+        'name', 'slug', 'created_at', 'created_by_id', 'created_by_name', 'is_delete'
     ];
 
     protected $useTimestamps = true;
@@ -26,7 +26,6 @@ class BeritaTagModel extends Model
         'name' => 'required|min_length[3]|max_length[100]',
         'slug' => 'required|is_unique[m_berita_tag.slug,id_tags,{id}]',
         'is_delete' => 'in_list[0,1]',
-        'trash' => 'in_list[0,1]'
     ];
 
     protected $validationMessages = [
@@ -42,9 +41,6 @@ class BeritaTagModel extends Model
         'is_delete' => [
             'in_list' => 'Nilai is_delete harus 0 atau 1.'
         ],
-        'trash' => [
-            'in_list' => 'Nilai trash harus 0 atau 1.'
-        ]
     ];
 
     protected $skipValidation = false;

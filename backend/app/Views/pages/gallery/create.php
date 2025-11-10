@@ -5,7 +5,9 @@
     <h3>➕ Tambah Foto</h3>
 
 <form action="<?= site_url('gallery') ?>" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
+    <?= csrf_field() ?>
+
+                <div class="mb-3">
             <label for="photo_title" class="form-label">Judul Foto</label>
             <input type="text" name="photo_title" id="photo_title" class="form-control" required>
         </div>

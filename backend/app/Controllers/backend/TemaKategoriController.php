@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\backend;
 
-use App\Controllers\BaseController;
-use App\Models\TemaKategoriModel;
+use App\Controllers\BaseController;use App\Models\TemaKategoriModel;
 use App\Models\AccessRightsModel; // 1. Tambahkan model hak akses
 
 class TemaKategoriController extends BaseController

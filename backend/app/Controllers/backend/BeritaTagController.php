@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\backend;
 
 use App\Controllers\BaseController;
 use App\Models\BeritaTagModel;
@@ -40,7 +40,7 @@ class BeritaTagController extends BaseController
 
         $data = [
             'title' => 'Manajemen Tag Berita',
-            'tags' => $this->beritaTagModel->where('trash', '0')->findAll(),
+            'tags' => $this->beritaTagModel->findAll(),
             'can_create' => $access['can_create'],
             'can_update' => $access['can_update'],
             'can_delete' => $access['can_delete'],
@@ -49,27 +49,6 @@ class BeritaTagController extends BaseController
         return view('pages/berita_tag/index', $data);
     }
 
-    // ========================
-    // TAMPILKAN SAMPAH
-    // ========================
-    public function trash()
-    {
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
-
-        if (!$access || !$access['can_read']) {
-            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat sampah Tag Berita.');
-        }
-
-        $data = [
-            'title' => 'Sampah Tag Berita',
-            'tags' => $this->beritaTagModel->where('trash', '1')->findAll(),
-            'can_update' => $access['can_update'], // Untuk restore
-            'can_delete' => $access['can_delete'], // Untuk hapus permanen
-        ];
-
-        return view('pages/berita_tag/trash', $data);
-    }
 
     // ========================
     // FORM TAMBAH TAG
@@ -104,7 +83,6 @@ class BeritaTagController extends BaseController
             'created_by_id' => session()->get('user_id'), // Sesuaikan 'user_id' jika key session Anda berbeda
             'created_by_name' => session()->get('username'), // Sesuaikan 'username' jika key session Anda berbeda
             'is_delete' => '0',
-            'trash' => '0'
         ];
 
         if (!$this->beritaTagModel->save($data)) {
@@ -125,7 +103,7 @@ class BeritaTagController extends BaseController
         }
 
         $tag = $this->beritaTagModel->find($id);
-        if (!$tag || $tag['trash'] == '1') {
+        if (!$tag) {
             return redirect()->to('/berita_tag')->with('error', 'Tag tidak ditemukan.');
         }
 
@@ -166,65 +144,28 @@ class BeritaTagController extends BaseController
         return redirect()->to('/berita_tag')->with('success', 'Tag berhasil diupdate.');
     }
 
-    // ========================
-    // MASUKKAN TAG KE TRASH
-    // ========================
+    
     public function delete($id = null)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_delete']) {
-            return redirect()->to('/berita_tag')->with('error', 'Kamu tidak punya izin menghapus Tag Berita.');
+            return redirect()->to('/berita_tag')->with('error', 'Kamu tidak punya izin menghapus tag$tag.');
         }
 
         $tag = $this->beritaTagModel->find($id);
-        if (!$tag) {
-            return redirect()->to('/berita_tag')->with('error', 'Tag tidak ditemukan.');
+
+        // =======================================================================
+        // PERBAIKAN: Tambahkan FCPATH. Path 'uploads/pages/tag$tag/...' saja tidak akan
+        // ditemukan. Harus FCPATH . 'uploads/pages/tag$tag/'
+
+
+        if ($this->beritaTagModel->delete($id)) {
+            return redirect()->to('/berita_tag')->with('success', 'tag berhasil dihapus.');
+        } else {
+            return redirect()->to('/berita_tag')->with('error', 'Gagal menghapus tag.');
         }
 
-        $this->beritaTagModel->update($id, ['trash' => '1']);
-        return redirect()->to('/berita_tag')->with('success', 'Tag dipindahkan ke sampah.');
     }
-
-    // ========================
-    // KEMBALIKAN DARI TRASH
-    // ========================
-    public function restore($id)
-    {
-        // Memerlukan hak 'update' untuk me-restore
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/berita_tag/trash')->with('error', 'Kamu tidak punya izin memulihkan Tag Berita.');
-        }
-
-        $tag = $this->beritaTagModel->find($id);
-        if (!$tag) {
-            return redirect()->to('/berita_tag/trash')->with('error', 'Tag tidak ditemukan.');
-        }
-
-        $this->beritaTagModel->update($id, ['trash' => '0']);
-        return redirect()->to('/berita_tag/trash')->with('success', 'Tag berhasil dikembalikan.');
-    }
-
-    // ========================
-    // HAPUS PERMANEN
-    // ========================
-    public function destroyPermanent($id)
-    {
-        // Memerlukan hak 'delete' untuk menghapus permanen
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_delete']) {
-            return redirect()->to('/berita_tag/trash')->with('error', 'Kamu tidak punya izin menghapus Tag Berita permanen.');
-        }
-
-        $tag = $this->beritaTagModel->find($id);
-        if (!$tag) {
-            return redirect()->to('/berita_tag/trash')->with('error', 'Tag tidak ditemukan.');
-        }
-
-        $this->beritaTagModel->delete($id, true); // true = force delete
-        return redirect()->to('/berita_tag/trash')->with('success', 'Tag berhasil dihapus permanen.');
-    }
-
     // ========================================================
     // Fungsi bantu untuk ambil akses role
     // ========================================================
