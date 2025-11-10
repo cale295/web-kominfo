@@ -163,32 +163,38 @@ class BeritaController extends BaseController
     // ========================================================
     // Form Edit Berita
     // ========================================================
-    public function edit($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
-        }
-
-        $berita = $this->beritaModel->find($id);
-        if (!$berita) {
-            return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
-        }
-
-        $kategori = $this->kategoriModel->where('trash', '0')->findAll();
-        $selectedKategori = $this->beritaModel->getKategoriByBerita($id);
-        $selectedKategoriIds = array_column($selectedKategori, 'id_kategori');
-
-        $data = [
-            'title' => 'Edit Berita',
-            'berita' => $berita,
-            'kategori' => $kategori,
-            'selectedKategoriIds' => $selectedKategoriIds,
-            'beritaAll' => $this->beritaModel->findAll(),
-        ];
-
-        return view('pages/berita/edit', $data);
+public function edit($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
     }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    // ✅ Decode gambar tambahan agar bisa ditampilkan
+    $additionalImages = [];
+    if (!empty($berita['additional_images'])) {
+        $decoded = json_decode($berita['additional_images'], true);
+        if (is_array($decoded)) {
+            $additionalImages = $decoded;
+        }
+    }
+
+    $kategori = $this->kategoriModel->findAll();
+    $beritaAll = $this->beritaModel->findAll();
+
+    return view('pages/berita/edit', [
+        'berita' => $berita,
+        'kategori' => $kategori,
+        'beritaAll' => $beritaAll,
+        'additionalImages' => $additionalImages, // ✅ kirim ke view
+    ]);
+}
+
 
     // ========================================================
     // Update Berita
@@ -257,6 +263,9 @@ class BeritaController extends BaseController
         'updated_by_id' => session()->get('id_user'),
         'updated_by_name' => session()->get('username'),
         'updated_at' => date('Y-m-d H:i:s'),
+
+        'note' => $post['note'] ?? null,
+        'note_revisi' => $post['note_revisi'] ?? null,
     ];
 
     // --- ✅ Fix error slug duplikat ---
