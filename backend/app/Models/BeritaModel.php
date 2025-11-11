@@ -203,25 +203,81 @@ return $this->db->table($this->table)
     // =========================================================
     // Validasi
     // =========================================================
-    protected $validationRules = [
-        'judul' => 'required|min_length[5]|max_length[255]',
-        'slug' => 'permit_empty|is_unique[t_berita.slug,id_berita,{id_berita}]',
-        'content' => 'permit_empty|string',
-    ];
+protected $validationRules = [
+    'judul'           => 'required|min_length[5]|max_length[255]',
+    'topik'           => 'required|min_length[5]|max_length[255]',
+    'content'         => 'permit_empty|string',
+    'content2'        => 'permit_empty|string',
+    'caption'         => 'permit_empty|string|min_length[5]|max_length[255]',
+    'intro'           => 'permit_empty|string|min_length[5]|max_length[255]',
+    'kata_kunci'      => 'permit_empty|string|min_length[5]|max_length[255]',
+    'sumber'          => 'permit_empty|string|min_length[5]|max_length[255]',
+    'id_berita_terkait' => 'required|integer',
+    'id_berita_terkait2' => 'required|integer',
+    'id_kategori' => 'required',
+    'feat_image'      => 'permit_empty|string',
+    'additional_images' => 'permit_empty|string'
+];
 
-    protected $validationMessages = [
-        'judul' => [
-            'required' => 'Judul berita wajib diisi.',
-            'min_length' => 'Judul minimal 5 karakter.',
-            'max_length' => 'Judul maksimal 255 karakter.'
-        ],
-        'slug' => [
-            'is_unique' => 'Slug sudah digunakan, gunakan judul lain.'
-        ],
-        'status' => [
-            'in_list' => 'Status tidak valid.'
-        ]
-    ];
+protected $validationMessages = [
+    'judul' => [
+        'required'    => 'Judul berita wajib diisi.',
+        'min_length'  => 'Judul minimal 5 karakter.',
+        'max_length'  => 'Judul maksimal 255 karakter.'
+    ],
+    'content' => [
+        'min_length' => 'Isi berita minimal 5 karakter',
+    ],
+    'content2' => [
+        'min_length' => 'Isi berita minimal 5 karakter',
+    ],
+    'id_kategori' => [
+        'required' => 'Kategori wajib dipilih.',
+    ],
+    'id_berita_terkait' => [
+        'required' => 'Berita terkait wajib dipilih.',
+        'integer'  => 'Berita terkait tidak valid.'
+    ],
+    'id_berita_terkait2' => [
+        'required' => 'Berita terkait wajib dipilih.',
+        'integer'  => 'Berita terkait tidak valid.'
+    ],
+    'caption' => [
+        'min_length' => 'Caption minimal 5 karakter',
+        'max_length' => 'Caption maksimal 255 karakter'
+    ],
+    'intro' => [
+        'min_length' => 'Intro minimal 5 karakter',
+        'max_length' => 'Intro maksimal 255 karakter'
+    ],
+    'kata_kunci' => [
+        'min_length' => 'Kata kunci minimal 5 karakter',
+        'max_length' => 'Kata kunci maksimal 255 karakter'
+    ],
+    'sumber' => [
+        'min_length' => 'Sumber minimal 5 karakter',
+        'max_length' => 'Sumber maksimal 255 karakter'
+    ],
+    'feat_image' => [
+        'max_size' => 'Ukuran gambar maksimal 5 MB.',
+        'ext_in'   => 'Format gambar harus JPG, JPEG, atau PNG.'
+    ],
+    'additional_images' => [
+        'max_size' => 'Ukuran gambar maksimal 5 MB.',
+        'ext_in'   => 'Format gambar harus JPG, JPEG, atau PNG.'
+    ],
+    'topik' => [
+        'required' => 'Topik wajib diisi',
+        'min_length' => 'Topik minimal 5 karakter',
+        'max_length' => 'Topik maksimal 255 karakter'
+    ],
+    'dokumen' => [
+        'max_size' => 'Ukuran dokumen maksimal 5 MB.',
+        'ext_in'   => 'Format dokumen harus PDF, DOC, atau DOCX.'
+    ]
+];
+
+
 
     protected $skipValidation = false;
     protected $cleanValidationRules = true;
