@@ -207,7 +207,10 @@ class BeritaController extends BaseController
         // --- Simpan kategori ke pivot table ---
         if (!empty($kategoriIds)) {
             $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
+            
         }
+        $this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? 0);
+
 
         return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
     }
@@ -218,37 +221,46 @@ class BeritaController extends BaseController
     // ========================================================
     // Form Edit Berita
     // ========================================================
-    public function edit($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
-        }
-
-        $berita = $this->beritaModel->find($id);
-        if (!$berita) {
-            return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
-        }
-
-        // ✅ Decode gambar tambahan agar bisa ditampilkan
-        $additionalImages = [];
-        if (!empty($berita['additional_images'])) {
-            $decoded = json_decode($berita['additional_images'], true);
-            if (is_array($decoded)) {
-                $additionalImages = $decoded;
-            }
-        }
-
-        $kategori = $this->kategoriModel->findAll();
-        $beritaAll = $this->beritaModel->findAll();
-
-        return view('pages/berita/edit', [
-            'berita' => $berita,
-            'kategori' => $kategori,
-            'beritaAll' => $beritaAll,
-            'additionalImages' => $additionalImages, // ✅ kirim ke view
-        ]);
+public function edit($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
     }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    // Decode gambar tambahan agar bisa ditampilkan
+    $additionalImages = [];
+    if (!empty($berita['additional_images'])) {
+        $decoded = json_decode($berita['additional_images'], true);
+        if (is_array($decoded)) {
+            $additionalImages = $decoded;
+        }
+    }
+
+    // Ambil semua kategori
+    $kategori = $this->kategoriModel->findAll();
+
+    // Ambil kategori yang dipilih sebelumnya
+    $kategoriPivot = $this->beritaModel->getKategoriByBerita($id);
+    $selected = array_column($this->beritaModel->getKategoriByBerita($id), 'id_kategori');
+    
+
+    $beritaAll = $this->beritaModel->findAll();
+
+    return view('pages/berita/edit', [
+        'berita' => $berita,
+        'kategori' => $kategori,
+        'beritaAll' => $beritaAll,
+        'additionalImages' => $additionalImages,
+        'selected' => $selected, // kirim ke view
+    ]);
+}
+
 
 
     // ========================================================
@@ -289,12 +301,20 @@ class BeritaController extends BaseController
             }
         }
 
-        // --- Ambil kategori ---
-        $kategoriIds = $post['id_kategori'] ?? [];
-        if (is_string($kategoriIds)) {
-            $kategoriIds = array_filter(array_map('trim', explode(',', $kategoriIds)));
-        }
-        $idKategori = (!empty($kategoriIds) && isset($kategoriIds[0])) ? (int)$kategoriIds[0] : null;
+// --- Ambil kategori ---
+$kategoriIds = $post['id_kategori'] ?? [];
+if (is_string($kategoriIds)) {
+    $kategoriIds = array_filter(array_map('trim', explode(',', $kategoriIds)));
+}
+
+// Jika user tidak pilih kategori baru, pakai kategori lama
+if (empty($kategoriIds)) {
+    $kategoriPivot = $this->beritaModel->getKategoriByBerita($id);
+    $kategoriIds = array_column($kategoriPivot, 'id_kategori');
+}
+
+// Ambil id kategori utama (misal untuk kolom id_kategori)
+$idKategori = (!empty($kategoriIds) && isset($kategoriIds[0])) ? (int)$kategoriIds[0] : null;
 
         // --- Data Update ---
         $data = [
@@ -333,6 +353,8 @@ class BeritaController extends BaseController
         if (!empty($kategoriIds)) {
             $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
         }
+        $this->saveLog($id, 'Berita diperbarui', $data['status'], $data['note'], $data['note_revisi']);
+
 
         return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
     }
@@ -356,6 +378,9 @@ class BeritaController extends BaseController
             'delete_at' => date('Y-m-d H:i:s')
         ]);
 
+        if ($updated) {
+        $this->saveLog($id, 'Berita dipindahkan ke sampah', $berita['status'] ?? 0);
+}
         if (!$updated) {
             return redirect()->to('/berita')->with('error', 'Gagal memindahkan berita ke sampah.');
         }
@@ -415,6 +440,8 @@ class BeritaController extends BaseController
             'is_delete_by_name' => null,
             'delete_at' => null
         ]);
+
+        $this->saveLog($id, 'Berita dipulihkan dari sampah');
 
         return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dipulihkan.');
     }

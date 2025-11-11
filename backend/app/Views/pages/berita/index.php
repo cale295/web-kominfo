@@ -147,6 +147,11 @@
             </button>
         </form>
     <?php endif; ?>
+    <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" 
+   class="btn btn-info btn-sm">
+    <i class="bi bi-journal-text"></i> Log
+</a>
+
 
     <!-- Tombol Show / Detail -->
     <?php if (!empty($can_read)): ?>

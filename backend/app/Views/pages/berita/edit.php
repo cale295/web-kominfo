@@ -52,22 +52,23 @@
                                     if (!empty($oldKategori) && !is_array($oldKategori)) {
                                         $oldKategori = explode(',', $oldKategori);
                                     }
-                                    $selected = !empty($oldKategori) ? $oldKategori : ($selectedKategoriIds ?? []);
+                                    $selected = !empty($oldKategori) ? $oldKategori : ($selected  ?? []);
                                     ?>
-                                    <div class="kategori-checkbox-group p-3 border rounded bg-light">
-                                        <?php foreach ($kategori as $kat): ?>
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input" type="checkbox" 
-                                                       name="id_kategori[]" 
-                                                       value="<?= $kat['id_kategori'] ?>" 
-                                                       id="kat_<?= $kat['id_kategori'] ?>"
-                                                       <?= in_array($kat['id_kategori'], $selected) ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="kat_<?= $kat['id_kategori'] ?>">
-                                                    <?= esc($kat['kategori']) ?>
-                                                </label>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
+<div class="kategori-checkbox-group p-3 border rounded bg-light">
+    <?php foreach ($kategori as $kat): ?>
+        <div class="form-check mb-2">
+<input class="form-check-input" type="checkbox" 
+       name="id_kategori[]" 
+       value="<?= $kat['id_kategori'] ?>" 
+       id="kat_<?= $kat['id_kategori'] ?>"
+       <?= in_array($kat['id_kategori'], $selected) ? 'checked' : '' ?>>
+            <label class="form-check-label" for="kat_<?= $kat['id_kategori'] ?>">
+                <?= esc($kat['kategori']) ?>
+            </label>
+        </div>
+    <?php endforeach; ?>
+</div>
+
                                     <small class="text-muted">
                                         <i class="bi bi-info-circle me-1"></i>
                                         Pilih satu atau lebih kategori

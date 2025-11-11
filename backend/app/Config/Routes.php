@@ -54,8 +54,7 @@ $routes->post('berita/(:num)/delete', 'backend\BeritaController::delete/$1'); //
 $routes->post('berita/(:num)/destroyPermanent', 'backend\BeritaController::destroyPermanent/$1');
 $routes->get('berita/trash', 'backend\BeritaController::trash');
 $routes->post('berita/(:num)/restore', 'backend\BeritaController::restore/$1');
-$routes->post('berita/(:num)/restore', 'BeritaController::restore/$1');
-$routes->get('/berita/log/(:num)', 'BeritaController::log/$1');
+$routes->get('/berita/(:num)/log/', 'backend\BeritaController::log/$1');
 
 
 
