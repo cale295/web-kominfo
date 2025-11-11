@@ -1,271 +1,642 @@
 <?= $this->extend('layouts/main') ?>
+<?= $this->section('styles') ?>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #1e40af;
+        --primary-dark: #1e3a8a;
+        --primary-light: #3b82f6;
+        --success: #059669;
+        --warning: #d97706;
+        --info: #0284c7;
+        --danger: #dc2626;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+    }
+
+    body {
+        background-color: var(--gray-50);
+    }
+
+    /* Header Styles */
+    .gov-header {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        border-left: 4px solid var(--primary);
+    }
+
+    .gov-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--gray-900);
+    }
+
+    .gov-header h1 i {
+        color: var(--primary);
+        margin-right: 10px;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: var(--primary);
+        margin-right: 10px;
+        font-size: 1.25rem;
+    }
+
+    /* Form Controls */
+    .form-label {
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .text-danger {
+        color: var(--danger) !important;
+    }
+
+    /* Kategori Buttons */
+    .kategori-btn {
+        border: 2px solid var(--gray-300);
+        background: white;
+        color: var(--gray-700);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .kategori-btn:hover {
+        border-color: var(--primary-light);
+        background: #eff6ff;
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .kategori-btn.active {
+        background: var(--primary) !important;
+        color: white !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .selected-kategori-badge {
+        display: inline-flex;
+        align-items: center;
+        background: var(--success);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        margin: 5px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+    }
+
+    .selected-kategori-badge i {
+        margin-right: 6px;
+    }
+
+    /* Image Preview */
+    .preview-container {
+        margin-top: 16px;
+    }
+
+    .preview-img {
+        max-width: 200px;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid var(--gray-200);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+    }
+
+    .preview-img:hover {
+        border-color: var(--primary);
+        transform: scale(1.02);
+    }
+
+    /* Quill Editor */
+    .ql-toolbar-custom {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-300) !important;
+        border-radius: 8px 8px 0 0;
+        padding: 12px;
+    }
+
+    .ql-container {
+        border: 1px solid var(--gray-300) !important;
+        border-radius: 0 0 8px 8px;
+        font-size: 0.9375rem;
+    }
+
+    .ql-editor {
+        min-height: 250px;
+        font-size: 0.9375rem;
+        color: var(--gray-800);
+    }
+
+    .ql-editor.ql-blank::before {
+        color: var(--gray-400);
+        font-style: normal;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        padding-top: 24px;
+        border-top: 2px solid var(--gray-200);
+        margin-top: 32px;
+    }
+
+    .btn {
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .btn-secondary {
+        background: var(--gray-600);
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-700);
+        transform: translateY(-2px);
+    }
+
+    .btn i {
+        margin-right: 6px;
+    }
+
+    /* Helper Text */
+    .form-text,
+    small.text-muted {
+        color: var(--gray-500);
+        font-size: 0.8125rem;
+        margin-top: 6px;
+        display: block;
+    }
+
+    /* Section Spacing */
+    .form-section {
+        margin-bottom: 32px;
+        padding-bottom: 32px;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-card {
+            padding: 20px;
+        }
+
+        .gov-header {
+            padding: 20px;
+        }
+
+        .gov-header h1 {
+            font-size: 1.375rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+        }
+
+        .kategori-btn {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+            margin: 4px 0 !important;
+        }
+    }
+
+    /* Additional Images Grid */
+    .additional-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .additional-preview img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid var(--gray-200);
+    }
+   /* Dropdown Kategori dengan Pencarian */
+#kategori-toggle {
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: var(--gray-700);
+}
+#kategori-toggle:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+.kategori-list .form-check {
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 2px 0;
+}
+.kategori-list .form-check:hover {
+    background-color: var(--gray-50);
+}
+.kategori-list .form-check-label {
+    font-size: 0.9375rem;
+    user-select: none;
+}
+.selected-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    margin: 2px 6px 2px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.selected-badge i {
+    margin-left: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0.8;
+}
+.selected-badge i:hover {
+    opacity: 1;
+    color: rgba(255,255,255,0.9);
+}
+.kategori-item {
+    display: flex;
+    align-items: center;
+}
+.kategori-no-results {
+    font-size: 0.875rem;
+}
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
+
+<!-- Page Header -->
+<div class="gov-header">
+    <h1>
+        <i class="bi bi-file-earmark-plus"></i>
+        Tambah Berita Baru
+    </h1>
+</div>
+
 <?= $this->include('layouts/alerts') ?>
 
-
-<div class="container py-4">
-    <h3>📝 Tambah Berita</h3>
+<!-- Form Card -->
+<div class="form-card">
     <form action="<?= site_url('berita') ?>" method="post" enctype="multipart/form-data">
         <?= csrf_field() ?>
 
-        <!-- Judul -->
-        <div class="mb-3">
-            <label class="form-label">Judul Berita <span class="text-danger">*</span></label>
-            <input type="text" name="judul" class="form-control" required placeholder="Masukkan judul berita" value="<?= old('judul') ?>">
-        </div>
-
-        <!-- Topik -->
-        <div class="mb-3">
-            <label class="form-label">Topik</label>
-            <input type="text" name="topik" class="form-control" placeholder="Masukkan topik berita" value="<?= old('topik') ?>">
-        </div>
-
-        <!-- Isi Berita dengan Rich Text Editor -->
-        <div class="mb-3">
-            <label class="form-label">Isi Berita <span class="text-danger">*</span></label>
-            <div id="toolbar-content" class="ql-toolbar-custom mb-2">
-                <button class="ql-bold" title="Bold"></button>
-                <button class="ql-italic" title="Italic"></button>
-                <button class="ql-underline" title="Underline"></button>
-                <button class="ql-strike" title="Strike"></button>
-                <select class="ql-header">
-                    <option value="1">Heading 1</option>
-                    <option value="2">Heading 2</option>
-                    <option value="3">Heading 3</option>
-                    <option selected>Normal</option>
-                </select>
-                <select class="ql-size">
-                    <option value="small">Small</option>
-                    <option selected>Normal</option>
-                    <option value="large">Large</option>
-                    <option value="huge">Huge</option>
-                </select>
-                <select class="ql-font">
-                    <option selected>Sans Serif</option>
-                    <option value="serif">Serif</option>
-                    <option value="monospace">Monospace</option>
-                </select>
-                <select class="ql-color"></select>
-                <select class="ql-background"></select>
-                <button class="ql-list" value="ordered" title="Ordered List"></button>
-                <button class="ql-list" value="bullet" title="Bullet List"></button>
-                <button class="ql-align" value="" title="Left Align"></button>
-                <button class="ql-align" value="center" title="Center"></button>
-                <button class="ql-align" value="right" title="Right Align"></button>
-                <button class="ql-align" value="justify" title="Justify"></button>
-                <button class="ql-link" title="Insert Link"></button>
-                <button class="ql-image" title="Insert Image"></button>
-                <button class="ql-clean" title="Clear Formatting"></button>
+        <!-- SECTION: Informasi Dasar -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-info-circle"></i>
+                Informasi Dasar
             </div>
-            <div id="editor-content" style="min-height: 250px; background: white; border: 1px solid #ced4da; border-radius: 0.375rem;"><?= old('content') ?></div>
-            <textarea name="content" id="content-hidden" style="display:none;"></textarea>
-        </div>
 
-        <!-- Isi Berita 2 dengan Rich Text Editor -->
-        <div class="mb-3">
-            <label class="form-label">Isi Berita 2 <span class="text-danger">*</span></label>
-            <div id="toolbar-content2" class="ql-toolbar-custom mb-2">
-                <button class="ql-bold" title="Bold"></button>
-                <button class="ql-italic" title="Italic"></button>
-                <button class="ql-underline" title="Underline"></button>
-                <button class="ql-strike" title="Strike"></button>
-                <select class="ql-header">
-                    <option value="1">Heading 1</option>
-                    <option value="2">Heading 2</option>
-                    <option value="3">Heading 3</option>
-                    <option selected>Normal</option>
-                </select>
-                <select class="ql-size">
-                    <option value="small">Small</option>
-                    <option selected>Normal</option>
-                    <option value="large">Large</option>
-                    <option value="huge">Huge</option>
-                </select>
-                <select class="ql-font">
-                    <option selected>Sans Serif</option>
-                    <option value="serif">Serif</option>
-                    <option value="monospace">Monospace</option>
-                </select>
-                <select class="ql-color"></select>
-                <select class="ql-background"></select>
-                <button class="ql-list" value="ordered" title="Ordered List"></button>
-                <button class="ql-list" value="bullet" title="Bullet List"></button>
-                <button class="ql-align" value="" title="Left Align"></button>
-                <button class="ql-align" value="center" title="Center"></button>
-                <button class="ql-align" value="right" title="Right Align"></button>
-                <button class="ql-align" value="justify" title="Justify"></button>
-                <button class="ql-link" title="Insert Link"></button>
-                <button class="ql-image" title="Insert Image"></button>
-                <button class="ql-clean" title="Clear Formatting"></button>
+            <div class="mb-3">
+                <label class="form-label">Judul Berita <span class="text-danger">*</span></label>
+                <input type="text" name="judul" class="form-control" required placeholder="Masukkan judul berita yang menarik" value="<?= old('judul') ?>">
             </div>
-            <div id="editor-content2" style="min-height: 250px; background: white; border: 1px solid #ced4da; border-radius: 0.375rem;"><?= old('content2') ?></div>
-            <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
-        </div>
 
-        <!-- Kategori -->
-        <div class="mb-3">
-            <label class="form-label">Kategori <span class="text-danger">*</span></label>
-            <div id="kategori-buttons" class="mb-3">
-                <?php foreach ($kategori as $kat): ?>
-                    <button type="button" 
-                            class="btn btn-outline-primary kategori-btn me-2 mb-2" 
-                            data-id="<?= $kat['id_kategori'] ?>" 
-                            data-name="<?= esc($kat['kategori']) ?>">
-                        <?= esc($kat['kategori']) ?>
-                    </button>
-                <?php endforeach; ?>
+            <div class="mb-3">
+                <label class="form-label">Topik</label>
+                <input type="text" name="topik" class="form-control" placeholder="Masukkan topik berita" value="<?= old('topik') ?>">
+                <small class="text-muted">Topik utama dari berita ini</small>
             </div>
-            <div id="selected-kategori" class="mb-2">
-                <small class="text-muted">Kategori terpilih akan muncul di sini</small>
+
+            <div class="mb-3">
+                <label class="form-label">Intro Singkat</label>
+                <textarea name="intro" class="form-control" rows="3" placeholder="Deskripsi singkat yang menarik pembaca"><?= old('intro') ?></textarea>
+                <small class="text-muted">Ringkasan singkat yang akan ditampilkan di preview berita</small>
             </div>
-            <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= old('id_kategori') ?>">
-            <small class="text-muted">Klik kategori untuk memilih/membatalkan. Minimal 1 kategori wajib dipilih.</small>
         </div>
 
-        <!-- Sub Kategori -->
-        <div class="mb-3">
-            <label class="form-label">Sub Kategori</label>
-            <input type="text" name="id_sub_kategori" class="form-control" placeholder="Sub kategori (optional)" value="<?= old('id_sub_kategori') ?>">
+        <!-- SECTION: Konten Berita -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-file-text"></i>
+                Konten Berita
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Isi Berita <span class="text-danger">*</span></label>
+                <div id="toolbar-content" class="ql-toolbar-custom">
+                    <button class="ql-bold" title="Bold"></button>
+                    <button class="ql-italic" title="Italic"></button>
+                    <button class="ql-underline" title="Underline"></button>
+                    <button class="ql-strike" title="Strike"></button>
+                    <select class="ql-header">
+                        <option value="1">Heading 1</option>
+                        <option value="2">Heading 2</option>
+                        <option value="3">Heading 3</option>
+                        <option selected>Normal</option>
+                    </select>
+                    <select class="ql-size">
+                        <option value="small">Small</option>
+                        <option selected>Normal</option>
+                        <option value="large">Large</option>
+                        <option value="huge">Huge</option>
+                    </select>
+                    <select class="ql-color"></select>
+                    <select class="ql-background"></select>
+                    <button class="ql-list" value="ordered" title="Ordered List"></button>
+                    <button class="ql-list" value="bullet" title="Bullet List"></button>
+                    <button class="ql-align" value="" title="Left Align"></button>
+                    <button class="ql-align" value="center" title="Center"></button>
+                    <button class="ql-align" value="right" title="Right Align"></button>
+                    <button class="ql-align" value="justify" title="Justify"></button>
+                    <button class="ql-link" title="Insert Link"></button>
+                    <button class="ql-image" title="Insert Image"></button>
+                    <button class="ql-clean" title="Clear Formatting"></button>
+                </div>
+                <div id="editor-content" class="ql-container ql-snow">
+                    <div class="ql-editor" data-placeholder="Tulis isi berita di sini..."><?= old('content') ?></div>
+                </div>
+                <textarea name="content" id="content-hidden" style="display:none;"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Isi Berita 2 <span class="text-danger">*</span></label>
+                <div id="toolbar-content2" class="ql-toolbar-custom">
+                    <button class="ql-bold" title="Bold"></button>
+                    <button class="ql-italic" title="Italic"></button>
+                    <button class="ql-underline" title="Underline"></button>
+                    <button class="ql-strike" title="Strike"></button>
+                    <select class="ql-header">
+                        <option value="1">Heading 1</option>
+                        <option value="2">Heading 2</option>
+                        <option value="3">Heading 3</option>
+                        <option selected>Normal</option>
+                    </select>
+                    <select class="ql-size">
+                        <option value="small">Small</option>
+                        <option selected>Normal</option>
+                        <option value="large">Large</option>
+                        <option value="huge">Huge</option>
+                    </select>
+                    <select class="ql-color"></select>
+                    <select class="ql-background"></select>
+                    <button class="ql-list" value="ordered" title="Ordered List"></button>
+                    <button class="ql-list" value="bullet" title="Bullet List"></button>
+                    <button class="ql-align" value="" title="Left Align"></button>
+                    <button class="ql-align" value="center" title="Center"></button>
+                    <button class="ql-align" value="right" title="Right Align"></button>
+                    <button class="ql-align" value="justify" title="Justify"></button>
+                    <button class="ql-link" title="Insert Link"></button>
+                    <button class="ql-image" title="Insert Image"></button>
+                    <button class="ql-clean" title="Clear Formatting"></button>
+                </div>
+                <div id="editor-content2" class="ql-container ql-snow">
+                    <div class="ql-editor" data-placeholder="Tulis isi berita bagian kedua di sini..."><?= old('content2') ?></div>
+                </div>
+                <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
+            </div>
         </div>
 
-        <!-- Foto Cover -->
-        <div class="mb-3">
-            <label class="form-label">Foto Cover (Utama) <span class="text-danger">*</span></label>
-            <input type="file" name="feat_image" class="form-control" accept="image/*" id="cover-image" required>
-            <small class="text-muted">Format: JPG, PNG, GIF (Maks 2MB)</small>
-            <div id="cover-preview" class="mt-2"></div>
+        <!-- SECTION: Kategori & Klasifikasi -->
+<div class="form-section">
+    <div class="section-title">
+        <i class="bi bi-tags"></i>
+        Kategori & Klasifikasi
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Kategori <span class="text-danger">*</span></label>
+        <div class="dropdown" id="kategori-dropdown">
+            <button type="button" class="form-select text-start d-flex align-items-center pe-3" 
+                    id="kategori-toggle" aria-haspopup="true" aria-expanded="false">
+                <span id="kategori-placeholder">Pilih minimal 1 kategori</span>
+                <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
+            </button>
+            <div class="dropdown-menu w-100 p-0 shadow border" 
+                 style="max-height: 320px; overflow: hidden; z-index: 1000;">
+                <!-- Search Box -->
+                <div class="px-3 py-2 border-bottom">
+                    <div class="input-group">
+                        <span class="input-group-text bg-gray-100 border-gray-300">
+                            <i class="bi bi-search text-gray-500"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control border-gray-300" 
+                               id="kategori-search" 
+                               placeholder="Cari kategori..."
+                               autocomplete="off">
+                    </div>
+                </div>
+                <!-- Scrollable List -->
+                <div class="kategori-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                    <?php foreach ($kategori as $kat): ?>
+                    <div class="form-check ps-3 py-1 kategori-item" 
+                         data-name="<?= esc(strtolower($kat['kategori'])) ?>">
+                        <input class="form-check-input kategori-checkbox" 
+                               type="checkbox" 
+                               id="kat-<?= $kat['id_kategori'] ?>" 
+                               value="<?= $kat['id_kategori'] ?>"
+                               <?= in_array($kat['id_kategori'], old('id_kategori', [])) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="kat-<?= $kat['id_kategori'] ?>">
+                            <?= esc($kat['kategori']) ?>
+                        </label>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <div id="kategori-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
+                    <small>Tidak ada kategori yang cocok</small>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="id_kategori" id="kategori-hidden" 
+               value="<?= implode(',', old('id_kategori', [])) ?>">
+        <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Sub Kategori</label>
+        <input type="text" name="id_sub_kategori" class="form-control" placeholder="Sub kategori (opsional)" value="<?= old('id_sub_kategori') ?>">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Kata Kunci (SEO)</label>
+        <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma, contoh: teknologi, inovasi, digital"><?= old('keyword') ?></textarea>
+        <small class="text-muted">Kata kunci untuk optimasi mesin pencari</small>
+    </div>
+</div>
+
+        <!-- SECTION: Media & Gambar -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-images"></i>
+                Media & Gambar
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Foto Cover (Utama) <span class="text-danger">*</span></label>
+                <input type="file" name="feat_image" class="form-control" accept="image/*" id="cover-image" required>
+                <small class="text-muted">Format: JPG, PNG, GIF (Maksimal 2MB)</small>
+                <div id="cover-preview" class="preview-container"></div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Foto Tambahan</label>
+                <input type="file" name="additional_images[]" class="form-control" accept="image/*" id="additional-images" multiple>
+                <small class="text-muted">Pilih beberapa foto sekaligus (maksimal 5 foto, @2MB)</small>
+                <div id="additional-preview" class="additional-preview"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Caption Gambar</label>
+                <textarea name="caption" class="form-control" rows="2" placeholder="Keterangan untuk gambar"><?= old('caption') ?></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Link Video</label>
+                <input type="text" name="link_video" class="form-control" placeholder="https://youtube.com/watch?v=..." value="<?= old('link_video') ?>">
+                <small class="text-muted">Link video YouTube atau platform video lainnya</small>
+            </div>
         </div>
 
-        <!-- Foto Tambahan -->
-        <div class="mb-3">
-            <label class="form-label">Foto Tambahan (Opsional)</label>
-            <input type="file" name="additional_images[]" class="form-control" accept="image/*" id="additional-images" multiple>
-            <small class="text-muted">Pilih beberapa foto sekaligus (maks 5 foto, @2MB)</small>
-            <div id="additional-preview" class="mt-2 row g-2"></div>
+        <!-- SECTION: Berita Terkait -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-link-45deg"></i>
+                Berita Terkait & Referensi
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Berita Terkait 1</label>
+                <select name="id_berita_terkait" class="form-select">
+                    <option value="">-- Pilih Berita Terkait --</option>
+                    <?php foreach ($beritaAll as $b): ?>
+                        <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait') == $b['id_berita'] ? 'selected' : '' ?>>
+                            <?= esc($b['judul']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Berita Terkait 2</label>
+                <select name="id_berita_terkait2" class="form-select">
+                    <option value="">-- Pilih Berita Terkait --</option>
+                    <?php foreach ($beritaAll as $b): ?>
+                        <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait2') == $b['id_berita'] ? 'selected' : '' ?>>
+                            <?= esc($b['judul']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Sumber Berita</label>
+                <input type="text" name="sumber" class="form-control" placeholder="Contoh: Kompas.com, Detik, Internal" value="<?= old('sumber') ?>">
+                <small class="text-muted">Sumber atau referensi berita</small>
+            </div>
         </div>
 
-        <!-- Caption Gambar -->
-        <div class="mb-3">
-            <label class="form-label">Caption Gambar</label>
-            <textarea name="caption" class="form-control" rows="2" placeholder="Tuliskan keterangan gambar"><?= old('caption') ?></textarea>
-        </div>
-
-        <!-- Intro -->
-        <div class="mb-3">
-            <label class="form-label">Intro Singkat</label>
-            <textarea name="intro" class="form-control" rows="3" placeholder="Deskripsi singkat sebelum isi utama"><?= old('intro') ?></textarea>
-        </div>
-
-        <!-- Berita Terkait 1 -->
-        <div class="mb-3">
-            <label class="form-label">Berita Terkait 1</label>
-            <select name="id_berita_terkait" class="form-select">
-                <option value="">-- Pilih Berita Terkait --</option>
-                <?php foreach ($beritaAll as $b): ?>
-                    <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait') == $b['id_berita'] ? 'selected' : '' ?>>
-                        <?= esc($b['judul']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <!-- Berita Terkait 2 -->
-        <div class="mb-3">
-            <label class="form-label">Berita Terkait 2</label>
-            <select name="id_berita_terkait2" class="form-select">
-                <option value="">-- Pilih Berita Terkait --</option>
-                <?php foreach ($beritaAll as $b): ?>
-                    <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait2') == $b['id_berita'] ? 'selected' : '' ?>>
-                        <?= esc($b['judul']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <!-- Link Video -->
-        <div class="mb-3">
-            <label class="form-label">Link Video (YouTube / lainnya)</label>
-            <input type="text" name="link_video" class="form-control" placeholder="https://youtube.com/..." value="<?= old('link_video') ?>">
-        </div>
-
-        <!-- Keyword/Tag -->
-        <div class="mb-3">
-            <label class="form-label">Kata Kunci (SEO Keyword)</label>
-            <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma"><?= old('keyword') ?></textarea>
-        </div>
-
-        <!-- Sumber -->
-        <div class="mb-3">
-            <label class="form-label">Sumber Berita</label>
-            <input type="text" name="sumber" class="form-control" placeholder="Contoh: Detik.com, Kompas, dll" value="<?= old('sumber') ?>">
-        </div>
-
-
-        <!-- Status otomatis -->
+        <!-- Hidden Status Fields -->
         <input type="hidden" name="status" value="0">
         <input type="hidden" name="status_berita" value="2">
 
-        <!-- Tombol Aksi -->
-        <div class="d-flex justify-content-end mt-4">
-            <button type="submit" class="btn btn-primary">💾 Simpan</button>
-            <a href="<?= site_url('berita') ?>" class="btn btn-secondary ms-2">Kembali</a>
+        <!-- Action Buttons -->
+        <div class="action-buttons d-flex justify-content-end gap-2">
+            <a href="<?= site_url('berita') ?>" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Batal
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Simpan Berita
+            </button>
         </div>
     </form>
 </div>
 
-<!-- Quill CSS -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
-<style>
-.kategori-btn {
-    transition: all 0.3s ease;
-}
-.kategori-btn.active {
-    background-color: #0d6efd !important;
-    color: white !important;
-    border-color: #0d6efd !important;
-    font-weight: 600;
-}
-.selected-kategori-badge {
-    display: inline-block;
-    background: #198754;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-    margin: 5px;
-    font-size: 14px;
-    font-weight: 500;
-}
-.preview-img {
-    max-width: 200px;
-    max-height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-}
-.ql-toolbar-custom {
-    background: #f8f9fa;
-    border: 1px solid #ced4da;
-    border-radius: 0.375rem;
-    padding: 8px;
-}
-.ql-toolbar-custom button,
-.ql-toolbar-custom select {
-    margin: 2px;
-}
-.ql-editor {
-    min-height: 250px;
-    font-size: 16px;
-}
-</style>
-
-<!-- Quill JS -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Quill Editors
-    const quillContent = new Quill('#editor-content', {
+    const quillContent = new Quill('#editor-content .ql-editor', {
         modules: {
             toolbar: '#toolbar-content'
         },
@@ -273,12 +644,12 @@ document.addEventListener('DOMContentLoaded', function() {
         placeholder: 'Tulis isi berita di sini...'
     });
 
-    const quillContent2 = new Quill('#editor-content2', {
+    const quillContent2 = new Quill('#editor-content2 .ql-editor', {
         modules: {
             toolbar: '#toolbar-content2'
         },
         theme: 'snow',
-        placeholder: 'Tulis isi berita di sini...'
+        placeholder: 'Tulis isi berita bagian kedua di sini...'
     });
 
     // Update hidden textareas before form submit
@@ -287,7 +658,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const content1 = quillContent.root.innerHTML.trim();
         const content2 = quillContent2.root.innerHTML.trim();
         
-        // Check if content is empty (only has <p><br></p> or similar)
         const isEmpty1 = content1 === '<p><br></p>' || content1 === '' || quillContent.getText().trim() === '';
         const isEmpty2 = content2 === '<p><br></p>' || content2 === '' || quillContent2.getText().trim() === '';
         
@@ -337,8 +707,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateKategoriUI() {
         const container = document.getElementById('selected-kategori');
         container.innerHTML = selectedKategori.length
-            ? selectedKategori.map(k => `<span class="selected-kategori-badge">✓ ${k.name}</span>`).join(' ')
-            : '<small class="text-muted">Kategori terpilih akan muncul di sini</small>';
+            ? selectedKategori.map(k => `<span class="selected-kategori-badge"><i class="bi bi-check-circle"></i>${k.name}</span>`).join(' ')
+            : '<small class="text-muted">Pilih minimal 1 kategori</small>';
         document.getElementById('kategori-hidden').value = selectedKategori.map(k => k.id).join(',');
         document.querySelectorAll('.kategori-btn').forEach(btn => {
             const btnId = btn.getAttribute('data-id');
@@ -353,7 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = e => preview.innerHTML = `<img src="${e.target.result}" class="preview-img" alt="Preview">`;
+            reader.onload = e => preview.innerHTML = `<img src="${e.target.result}" class="preview-img" alt="Preview Cover">`;
             reader.readAsDataURL(file);
         }
     });
@@ -362,17 +732,135 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('additional-images').addEventListener('change', function(e) {
         const preview = document.getElementById('additional-preview');
         preview.innerHTML = '';
-        Array.from(e.target.files).slice(0,5).forEach(file => {
+        Array.from(e.target.files).slice(0, 5).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => {
-                const col = document.createElement('div');
-                col.className = 'col-md-3';
-                col.innerHTML = `<img src="${e.target.result}" class="preview-img w-100" alt="Preview">`;
-                preview.appendChild(col);
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Preview';
+                preview.appendChild(img);
             };
             reader.readAsDataURL(file);
         });
     });
+});
+// Dropdown Kategori dengan Pencarian & Multi-Select
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('kategori-toggle');
+    const dropdownMenu = toggleBtn.nextElementSibling;
+    const searchInput = document.getElementById('kategori-search');
+    const kategoriItems = Array.from(document.querySelectorAll('.kategori-item'));
+    const checkboxes = document.querySelectorAll('.kategori-checkbox');
+    const hiddenInput = document.getElementById('kategori-hidden');
+    const placeholder = document.getElementById('kategori-placeholder');
+    const badgesContainer = document.getElementById('selected-kategori-badges');
+    const noResultsEl = document.getElementById('kategori-no-results');
+
+    // Map ID → Nama
+    const kategoriMap = {};
+    checkboxes.forEach(cb => {
+        const item = cb.closest('.kategori-item');
+        const name = item.getAttribute('data-name');
+        kategoriMap[cb.value] = name;
+    });
+
+    // Update tampilan berdasarkan pilihan
+    function updateUI() {
+        const selected = Array.from(checkboxes).filter(cb => cb.checked);
+        const ids = selected.map(cb => cb.value);
+        const names = selected.map(cb => {
+            const el = cb.closest('.kategori-item');
+            return el.querySelector('.form-check-label').textContent.trim();
+        });
+
+        // Simpan ke hidden input
+        hiddenInput.value = ids.join(',');
+
+        // Update placeholder
+        if (names.length === 0) {
+            placeholder.textContent = 'Pilih minimal 1 kategori';
+            placeholder.classList.add('text-gray-500');
+            placeholder.classList.remove('text-gray-700');
+        } else {
+            placeholder.textContent = names.length + ' kategori dipilih';
+            placeholder.classList.remove('text-gray-500');
+            placeholder.classList.add('text-gray-700');
+        }
+
+        // Render badges
+        badgesContainer.innerHTML = names.map((name, idx) => 
+            `<span class="selected-badge">
+                ${name}
+                <i class="bi bi-x-circle-fill" data-index="${idx}" title="Hapus"></i>
+            </span>`
+        ).join('');
+
+        // Event hapus badge
+        badgesContainer.querySelectorAll('.bi-x-circle-fill').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const idx = parseInt(this.getAttribute('data-index'));
+                const cb = selected[idx];
+                if (cb) {
+                    cb.checked = false;
+                    updateUI();
+                }
+            });
+        });
+    }
+
+    // Filter kategori berdasarkan input pencarian
+    function filterKategori() {
+        const query = searchInput.value.trim().toLowerCase();
+        let hasVisible = false;
+
+        kategoriItems.forEach(item => {
+            const name = item.getAttribute('data-name') || '';
+            const match = name.includes(query);
+            item.style.display = match ? 'flex' : 'none';
+            if (match) hasVisible = true;
+        });
+
+        noResultsEl.style.display = hasVisible ? 'none' : 'block';
+    }
+
+    // Toggle dropdown
+    toggleBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', !isExpanded);
+        dropdownMenu.classList.toggle('show', !isExpanded);
+        if (!isExpanded) {
+            setTimeout(() => searchInput.focus(), 50);
+        }
+    });
+
+    // Tutup dropdown saat klik luar
+    document.addEventListener('click', function(e) {
+        if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            dropdownMenu.classList.remove('show');
+        }
+    });
+
+    // Event: checkbox berubah
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateUI);
+    });
+
+    // Event: ketik di search
+    searchInput.addEventListener('input', filterKategori);
+
+    // Reset pencarian saat dropdown ditutup
+    const observer = new MutationObserver(() => {
+        if (!dropdownMenu.classList.contains('show')) {
+            searchInput.value = '';
+            filterKategori();
+        }
+    });
+    observer.observe(dropdownMenu, { attributes: true, attributeFilter: ['class'] });
+
+    // Inisialisasi UI
+    updateUI();
 });
 </script>
 
