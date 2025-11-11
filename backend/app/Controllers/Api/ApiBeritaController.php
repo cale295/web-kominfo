@@ -31,21 +31,30 @@ public function index()
     // ================================
     // TAMPILKAN 1 AGENDA BERDASARKAN ID
     // ================================
-    public function show($id = null)
-    {
-        $beritas = $this->model
-            ->where('id_berita ', $id)
-            ->where('trash', '0') // pastikan bukan sampah
-            ->first();
+public function show($id = null)
+{
+    $beritas = $this->model
+        ->where('id_berita', $id)
+        ->where('trash', '0') // pastikan bukan sampah
+        ->first();
 
-        if (!$beritas) {
-            return $this->failNotFound('berita tidak ditemukan.');
-        }
-
-        return $this->respond([
-            'status'  => true,
-            'message' => 'Detail album berhasil diambil.',
-            'data'    => $beritas
-        ]);
+    if (!$beritas) {
+        return $this->failNotFound('Berita tidak ditemukan.');
     }
+
+    // === Tambah hit (jumlah dibaca) ===
+    $this->model->set('hit', 'hit + 1', false)
+                ->where('id_berita', $id)
+                ->update();
+
+    // Ambil ulang setelah hit diperbarui (opsional, kalau mau lihat hasil terbaru)
+    $beritas['hit'] = $beritas['hit'] + 1;
+
+    return $this->respond([
+        'status'  => true,
+        'message' => 'Detail berita berhasil diambil.',
+        'data'    => $beritas
+    ]);
+}
+
 }

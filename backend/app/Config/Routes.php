@@ -57,6 +57,9 @@ $routes->post('berita/(:num)/restore', 'backend\BeritaController::restore/$1');
 $routes->get('/berita/(:num)/log/', 'backend\BeritaController::log/$1');
 
 
+//berita Utama
+$routes->resource('berita-utama', ['controller' => 'backend\BeritaUtamaController', 'except' => ['show']]);
+
 
 //album
 $routes->resource('album', [
