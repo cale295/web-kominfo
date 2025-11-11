@@ -16,12 +16,9 @@
                 </div>
             </div>
 
-            <!-- Form Card -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <form action="<?= site_url('berita/'.$berita['id_berita']) ?>" method="post" enctype="multipart/form-data">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="_method" value="PUT">
+    <form action="<?= site_url('berita/'.$berita['id_berita'].'/update') ?>" method="post" enctype="multipart/form-data">
+        <?= csrf_field() ?>
+        
 
                         <!-- Informasi Utama -->
                         <div class="mb-4">

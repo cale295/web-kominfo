@@ -54,6 +54,9 @@ $routes->post('berita/(:num)/delete', 'backend\BeritaController::delete/$1'); //
 $routes->post('berita/(:num)/destroyPermanent', 'backend\BeritaController::destroyPermanent/$1');
 $routes->get('berita/trash', 'backend\BeritaController::trash');
 $routes->post('berita/(:num)/restore', 'backend\BeritaController::restore/$1');
+$routes->post('berita/(:num)/restore', 'BeritaController::restore/$1');
+$routes->get('/berita/log/(:num)', 'BeritaController::log/$1');
+
 
 
 //album
@@ -84,13 +87,11 @@ $routes->get('banner/click/(:num)', 'backend\BannerController::click/$1');
 
 
 //menu 
-$routes->resource('menu', ['controller' => 'backend\MenuController', 'except' => ['show']]);
+$routes->resource('menu', ['controller' => 'backend\MenuController']);
 $routes->get('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
 $routes->post('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
 $routes->get('menu/edit/(:num)', 'backend\MenuController::edit/$1');
 $routes->get('menu/(:num)/edit', 'backend\MenuController::edit/$1');
-
-
 
 
 // ===============================
@@ -99,8 +100,6 @@ $routes->get('menu/(:num)/edit', 'backend\MenuController::edit/$1');
 $routes->get('access_rights', 'backend\AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
 $routes->get('access_rights/edit/(:num)', 'backend\AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
 $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
-
-
 
 
 // =========================================================
