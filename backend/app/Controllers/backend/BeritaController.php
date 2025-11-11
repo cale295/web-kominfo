@@ -266,98 +266,110 @@ public function edit($id)
     // ========================================================
     // Update Berita
     // ========================================================
-    public function update($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
-        }
+public function update($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
+    }
 
-        $post = $this->request->getPost();
-        $berita = $this->beritaModel->find($id);
-        if (!$berita) {
-            return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
-        }
+    $post = $this->request->getPost();
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
 
-        // --- Cover Image ---
-        $featImagePath = $berita['feat_image'];
-        $featImage = $this->request->getFile('feat_image');
-        if ($featImage && $featImage->isValid() && !$featImage->hasMoved()) {
-            $newName = $featImage->getRandomName();
-            $featImage->move(WRITEPATH . '../public/uploads/berita', $newName);
-            $featImagePath = 'uploads/berita/' . $newName;
-        }
+    // --- Cover Image ---
+    $featImagePath = $berita['feat_image'];
+    $featImage = $this->request->getFile('feat_image');
+    if ($featImage && $featImage->isValid() && !$featImage->hasMoved()) {
+        $newName = $featImage->getRandomName();
+        $featImage->move(WRITEPATH . '../public/uploads/berita', $newName);
+        $featImagePath = 'uploads/berita/' . $newName;
+    }
 
-        // --- Additional Images ---
-        $additionalImages = !empty($berita['additional_images']) ? json_decode($berita['additional_images'], true) : [];
-        $files = $this->request->getFileMultiple('additional_images');
-        if ($files) {
-            foreach ($files as $file) {
-                if ($file->isValid() && !$file->hasMoved()) {
-                    $newName = $file->getRandomName();
-                    $file->move(WRITEPATH . '../public/uploads/berita/additional', $newName);
-                    $additionalImages[] = 'uploads/berita/additional/' . $newName;
-                }
+    // --- Additional Images ---
+    $additionalImages = !empty($berita['additional_images']) ? json_decode($berita['additional_images'], true) : [];
+    $files = $this->request->getFileMultiple('additional_images');
+    if ($files) {
+        foreach ($files as $file) {
+            if ($file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move(WRITEPATH . '../public/uploads/berita/additional', $newName);
+                $additionalImages[] = 'uploads/berita/additional/' . $newName;
             }
         }
-
-// --- Ambil kategori ---
-$kategoriIds = $post['id_kategori'] ?? [];
-if (is_string($kategoriIds)) {
-    $kategoriIds = array_filter(array_map('trim', explode(',', $kategoriIds)));
-}
-
-// Jika user tidak pilih kategori baru, pakai kategori lama
-if (empty($kategoriIds)) {
-    $kategoriPivot = $this->beritaModel->getKategoriByBerita($id);
-    $kategoriIds = array_column($kategoriPivot, 'id_kategori');
-}
-
-// Ambil id kategori utama (misal untuk kolom id_kategori)
-$idKategori = (!empty($kategoriIds) && isset($kategoriIds[0])) ? (int)$kategoriIds[0] : null;
-
-        // --- Data Update ---
-        $data = [
-            'judul'             => $post['judul'] ?? null,
-            'topik'             => $post['topik'] ?? null,
-            'intro'             => $post['intro'] ?? null,
-            'sumber'            => $post['sumber'] ?? null,
-            'content'           => $post['content'] ?? null,
-            'content2'          => $post['content2'] ?? null,
-            'id_berita_terkait' => $post['id_berita_terkait'] ?? null,
-            'id_berita_terkait2' => $post['id_berita_terkait2'] ?? null,
-            'id_kategori'       => $idKategori,
-            'link_video'        => $post['link_video'] ?? null,
-            'keyword'           => $post['keyword'] ?? null,
-            'feat_image'        => $featImagePath,
-            'additional_images' => !empty($additionalImages) ? json_encode($additionalImages) : null,
-            'slug'              => url_title($post['judul'], '-', true),
-            'hash_berita'       => $berita['hash_berita'] ?? bin2hex(random_bytes(16)),
-            'status'            => (string)$post['status'],
-            'status_berita'     => (int)$post['status_berita'],
-            'updated_by_id'     => session()->get('id_user'),
-            'updated_by_name'   => session()->get('username'),
-            'updated_at'        => date('Y-m-d H:i:s'),
-            'note'              => $post['note'] ?? null,
-            'note_revisi'       => $post['note_revisi'] ?? null,
-        ];
-
-        // --- Simpan dengan validasi model ---
-        if (!$this->beritaModel->save(array_merge($data, ['id_berita' => $id]))) {
-            return redirect()->back()
-                ->withInput()
-                ->with('errors', $this->beritaModel->errors());
-        }
-
-        // --- Update kategori pivot ---
-        if (!empty($kategoriIds)) {
-            $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
-        }
-        $this->saveLog($id, 'Berita diperbarui', $data['status'], $data['note'], $data['note_revisi']);
-
-
-        return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
     }
+
+    // --- Ambil kategori ---
+    $kategoriIds = $post['id_kategori'] ?? [];
+    if (is_string($kategoriIds)) {
+        $kategoriIds = array_filter(array_map('trim', explode(',', $kategoriIds)));
+    }
+    if (empty($kategoriIds)) {
+        $kategoriPivot = $this->beritaModel->getKategoriByBerita($id);
+        $kategoriIds = array_column($kategoriPivot, 'id_kategori');
+    }
+    $idKategori = (!empty($kategoriIds) && isset($kategoriIds[0])) ? (int)$kategoriIds[0] : null;
+
+    // --- Data Update ---
+    $data = [
+        'judul'             => $post['judul'] ?? null,
+        'topik'             => $post['topik'] ?? null,
+        'intro'             => $post['intro'] ?? null,
+        'sumber'            => $post['sumber'] ?? null,
+        'content'           => $post['content'] ?? null,
+        'content2'          => $post['content2'] ?? null,
+        'id_berita_terkait' => $post['id_berita_terkait'] ?? null,
+        'id_berita_terkait2' => $post['id_berita_terkait2'] ?? null,
+        'id_kategori'       => $idKategori,
+        'link_video'        => $post['link_video'] ?? null,
+        'keyword'           => $post['keyword'] ?? null,
+        'feat_image'        => $featImagePath,
+        'additional_images' => !empty($additionalImages) ? json_encode($additionalImages) : null,
+        'slug'              => url_title($post['judul'], '-', true),
+        'hash_berita'       => $berita['hash_berita'] ?? bin2hex(random_bytes(16)),
+        'status'            => (string)$post['status'],
+        'status_berita'     => (int)$post['status_berita'],
+        'updated_by_id'     => session()->get('id_user'),
+        'updated_by_name'   => session()->get('username'),
+        'updated_at'        => date('Y-m-d H:i:s'),
+        'note'              => $post['note'] ?? null,
+        'note_revisi'       => $post['note_revisi'] ?? null,
+    ];
+
+    // --- Simpan dengan validasi model ---
+    if (!$this->beritaModel->save(array_merge($data, ['id_berita' => $id]))) {
+        return redirect()->back()
+            ->withInput()
+            ->with('errors', $this->beritaModel->errors());
+    }
+
+    // --- Update kategori pivot ---
+    if (!empty($kategoriIds)) {
+        $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
+    }
+
+    // --- Buat keterangan log otomatis berdasarkan perubahan ---
+    $keteranganArr = [];
+    $fields = [
+        'judul','topik','intro','sumber','content','content2',
+        'id_berita_terkait','id_berita_terkait2','id_kategori',
+        'link_video','keyword','feat_image','additional_images'
+    ];
+    foreach ($fields as $field) {
+        if (isset($data[$field]) && $berita[$field] != $data[$field]) {
+            $fieldName = str_replace('_', ' ', $field);
+            $keteranganArr[] = "Mengubah $fieldName";
+        }
+    }
+    $keterangan = !empty($keteranganArr) ? implode(', ', $keteranganArr) : 'Melakukan update berita';
+
+    // --- Simpan log ---
+    $this->saveLog($id, $keterangan, $data['status'], $data['note'], $data['note_revisi']);
+
+    return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
+}
 
 
     // ========================================================
