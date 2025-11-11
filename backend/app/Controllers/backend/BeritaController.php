@@ -103,6 +103,10 @@ class BeritaController extends BaseController
             return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
         }
 
+            // === HIT++ (Tambah jumlah pembaca) ===
+     $this->beritaModel->set('hit', 'hit + 1', false)
+                      ->where('id_berita', $id)
+                      ->update();
         // Ambil kategori berita
         $kategori = $this->beritaModel->getKategoriByBerita($id);
         $kategoriNames = array_column($kategori, 'kategori');

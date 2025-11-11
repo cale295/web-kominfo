@@ -291,6 +291,7 @@
                         <th class="text-center">Waktu Dibuat</th>
                         <th>Diupdate Oleh</th>
                         <th class="text-center">Update Terakhir</th>
+                        <th>dilihat</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -420,6 +421,8 @@
                                     <?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?>
                                 </td>
 
+                                <td><?= esc($row['hit'] ?? '-') ?></td>
+
                                 <!-- Aksi -->
                                 <td class="text-center" style="white-space: nowrap;">
                                     <div class="d-flex flex-column gap-1">
@@ -443,6 +446,11 @@
                                                 </button>
                                             </form>
                                         <?php endif; ?>
+                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" 
+   class="btn btn-info btn-sm">
+    <i class="bi bi-journal-text"></i> Log
+</a>
+
                                     </div>
                                 </td>
                             </tr>
