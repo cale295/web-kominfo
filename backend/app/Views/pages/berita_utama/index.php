@@ -36,10 +36,7 @@
                         <td><?= $i + 1 ?></td>
                         <td>
                             <?php if(!empty($b['feat_image'])): ?>
-                                <img src="<?= base_url('uploads/berita/' . $b['feat_image']) ?>" 
-                                     alt="<?= esc($b['judul']) ?>" 
-                                     class="img-thumbnail" 
-                                     style="max-height:60px; object-fit:cover;">
+                            <img src="<?= base_url($b['feat_image']) ?>" ...>
                             <?php else: ?>
                                 <span class="text-muted">Tidak ada gambar</span>
                             <?php endif; ?>
