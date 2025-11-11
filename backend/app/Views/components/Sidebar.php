@@ -102,93 +102,98 @@ $currentPath = '/' . $uri->getPath();
 
 <style>
     :root {
-        --sidebar-primary: #1e40af;
-        --sidebar-secondary: #1e3a8a;
-        --sidebar-accent: #fbbf24;
-        --sidebar-text: rgba(255, 255, 255, 0.9);
-        --sidebar-text-muted: rgba(255, 255, 255, 0.6);
+        --primary: #1e40af;
+        --primary-dark: #1e3a8a;
+        --primary-light: #3b82f6;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
     }
 
     .sidebar {
         width: 280px;
         height: 100vh;
-        background: linear-gradient(180deg, var(--sidebar-primary) 0%, var(--sidebar-secondary) 100%);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+        background: white;
+        border-right: 1px solid var(--gray-200);
         position: fixed;
         top: 0;
         left: 0;
         z-index: 1000;
         display: flex;
         flex-direction: column;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         transition: transform 0.3s ease;
     }
 
     /* Header Sidebar */
     .sidebar-header {
-        padding: 24px 20px;
-        background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%);
-        border-bottom: 2px solid rgba(251, 191, 36, 0.3);
-        border-left: 4px solid var(--sidebar-accent);
+        padding: 20px;
+        border-bottom: 1px solid var(--gray-200);
+        background-color: var(--gray-50);
     }
 
     .sidebar-header h5 {
-        color: white;
-        font-weight: 700;
-        font-size: 1.2rem;
+        color: var(--gray-900);
+        font-weight: 600;
+        font-size: 1.125rem;
         margin-bottom: 4px;
-        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
     }
 
     .sidebar-header h5 i {
-        color: var(--sidebar-accent);
+        color: var(--primary);
         margin-right: 10px;
-        font-size: 1.3rem;
+        font-size: 1.25rem;
     }
 
     .sidebar-header small {
-        color: var(--sidebar-text-muted);
-        font-size: 0.8rem;
-        letter-spacing: 0.3px;
+        color: var(--gray-600);
+        font-size: 0.8125rem;
     }
 
     /* User Info Box */
     .user-info-box {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        background: var(--gray-50);
         padding: 16px;
-        margin: 16px 12px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin: 16px 16px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--gray-200);
     }
 
     .user-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        border: 2px solid var(--sidebar-accent);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        border: 2px solid var(--primary);
     }
 
     .user-name {
-        color: white;
+        color: var(--gray-900);
         font-weight: 600;
-        font-size: 0.95rem;
-        margin-bottom: 2px;
+        font-size: 0.9375rem;
+        margin-bottom: 4px;
         line-height: 1.3;
     }
 
     .user-role {
-        color: var(--sidebar-accent);
+        color: var(--primary);
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         padding: 2px 8px;
-        background: rgba(251, 191, 36, 0.2);
+        background: var(--gray-100);
         border-radius: 4px;
         display: inline-block;
+        border: 1px solid var(--gray-200);
     }
 
     /* Scrollable Content */
@@ -197,7 +202,7 @@ $currentPath = '/' . $uri->getPath();
         overflow-y: auto;
         overflow-x: hidden;
         max-height: calc(100vh - 240px);
-        padding-bottom: 20px;
+        padding: 8px 0 20px;
     }
 
     .sidebar-scrollable-content::-webkit-scrollbar {
@@ -205,132 +210,124 @@ $currentPath = '/' . $uri->getPath();
     }
 
     .sidebar-scrollable-content::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
+        background: transparent;
     }
 
     .sidebar-scrollable-content::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--gray-300);
         border-radius: 3px;
     }
 
     .sidebar-scrollable-content::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.5);
+        background: var(--gray-400);
     }
 
     /* Navigation */
     .sidebar .nav {
-        padding: 8px 0;
+        padding: 0;
     }
 
     .sidebar .nav-link {
-        color: var(--sidebar-text);
-        padding: 12px 20px;
-        border-radius: 10px;
-        margin: 3px 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--gray-700);
+        padding: 10px 16px;
+        border-radius: 8px;
+        margin: 2px 16px;
+        transition: all 0.2s;
         white-space: nowrap;
         text-decoration: none;
         display: flex;
         align-items: center;
         font-weight: 500;
-        font-size: 0.9rem;
+        font-size: 0.875rem;
         position: relative;
-        overflow: hidden;
-    }
-
-    .sidebar .nav-link::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: var(--sidebar-accent);
-        transform: translateX(-4px);
-        transition: transform 0.3s ease;
     }
 
     .sidebar .nav-link:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: white;
-        transform: translateX(4px);
-    }
-
-    .sidebar .nav-link:hover::before {
-        transform: translateX(0);
+        background: var(--gray-100);
+        color: var(--gray-900);
     }
 
     .sidebar .nav-link.active {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--primary);
         color: white;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .sidebar .nav-link.active::before {
-        transform: translateX(0);
+    .sidebar .nav-link.active i {
+        color: white;
     }
 
     .sidebar .nav-link i {
         margin-right: 12px;
-        font-size: 1.15rem;
+        font-size: 1.125rem;
         width: 20px;
         text-align: center;
-        color: var(--sidebar-accent);
+        color: var(--gray-600);
+        transition: color 0.2s;
+    }
+
+    .sidebar .nav-link:hover i {
+        color: var(--primary);
     }
 
     /* Collapse Icon */
     .collapse-icon {
         margin-left: auto;
-        transition: transform 0.3s ease;
-        color: var(--sidebar-text-muted);
-        font-size: 0.9rem;
+        transition: transform 0.2s ease;
+        color: var(--gray-500);
+        font-size: 0.875rem;
     }
 
     .nav-link:not(.collapsed) .collapse-icon {
         transform: rotate(180deg);
-        color: var(--sidebar-accent);
     }
 
     /* Submenu */
     .submenu {
-        padding-left: 12px;
-        margin-top: 4px;
+        padding-left: 0;
+        margin-top: 2px;
+        margin-bottom: 4px;
     }
 
     .submenu .nav-link {
-        font-size: 0.85rem;
-        padding: 10px 16px 10px 40px;
-        margin: 2px 12px;
+        font-size: 0.8125rem;
+        padding: 8px 16px 8px 52px;
+        margin: 2px 16px;
         position: relative;
-    }
-
-    .submenu .nav-link::after {
-        content: '';
-        position: absolute;
-        left: 20px;
-        top: 50%;
-        width: 6px;
-        height: 6px;
-        background: var(--sidebar-text-muted);
-        border-radius: 50%;
-        transform: translateY(-50%);
-        transition: all 0.3s ease;
-    }
-
-    .submenu .nav-link:hover::after {
-        background: var(--sidebar-accent);
-        transform: translateY(-50%) scale(1.3);
-    }
-
-    .submenu .nav-link.active::after {
-        background: var(--sidebar-accent);
-        transform: translateY(-50%) scale(1.3);
-        box-shadow: 0 0 8px var(--sidebar-accent);
+        color: var(--gray-600);
     }
 
     .submenu .nav-link::before {
-        display: none;
+        content: '';
+        position: absolute;
+        left: 32px;
+        top: 50%;
+        width: 4px;
+        height: 4px;
+        background: var(--gray-400);
+        border-radius: 50%;
+        transform: translateY(-50%);
+        transition: all 0.2s;
+    }
+
+    .submenu .nav-link:hover {
+        color: var(--gray-900);
+    }
+
+    .submenu .nav-link:hover::before {
+        background: var(--primary);
+        transform: translateY(-50%) scale(1.5);
+    }
+
+    .submenu .nav-link.active {
+        background: var(--gray-100);
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .submenu .nav-link.active::before {
+        background: var(--primary);
+        transform: translateY(-50%) scale(1.5);
     }
 
     /* Logout Button */
@@ -339,32 +336,34 @@ $currentPath = '/' . $uri->getPath();
         bottom: 0;
         left: 0;
         width: 100%;
-        background: linear-gradient(180deg, transparent 0%, rgba(30, 58, 138, 0.95) 30%, rgba(30, 58, 138, 1) 100%);
-        padding: 20px 12px;
-        z-index: 10;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: white;
+        padding: 16px;
+        border-top: 1px solid var(--gray-200);
     }
 
     .logout-btn .nav-link {
-        background: rgba(220, 38, 38, 0.1);
-        border: 2px solid rgba(220, 38, 38, 0.3);
-        color: #fca5a5;
-        font-weight: 600;
+        background: white;
+        border: 1px solid var(--gray-300);
+        color: var(--gray-700);
+        font-weight: 500;
         justify-content: center;
         margin: 0;
+        transition: all 0.2s;
     }
 
     .logout-btn .nav-link:hover {
-        background: rgba(220, 38, 38, 0.2);
-        border-color: rgba(220, 38, 38, 0.5);
-        color: #fecaca;
-        transform: translateX(0);
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #dc2626;
     }
 
     .logout-btn .nav-link i {
-        color: #fca5a5;
+        color: var(--gray-600);
         margin-right: 8px;
+    }
+
+    .logout-btn .nav-link:hover i {
+        color: #dc2626;
     }
 
     /* Mobile Top Bar */
@@ -373,9 +372,9 @@ $currentPath = '/' . $uri->getPath();
         top: 0;
         left: 0;
         right: 0;
-        height: 70px;
-        background: linear-gradient(135deg, var(--sidebar-primary) 0%, var(--sidebar-secondary) 100%);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        height: 64px;
+        background: white;
+        border-bottom: 1px solid var(--gray-200);
         z-index: 1050;
         padding: 12px 16px;
         display: none;
@@ -386,55 +385,55 @@ $currentPath = '/' . $uri->getPath();
     }
 
     .sidebar-toggle-container .user-avatar {
-        width: 45px;
-        height: 45px;
-        border-radius: 10px;
-        border: 2px solid var(--sidebar-accent);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        border: 2px solid var(--primary);
     }
 
     .sidebar-toggle-container .user-name {
-        color: white;
+        color: var(--gray-900);
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.9375rem;
         margin-bottom: 2px;
     }
 
     .sidebar-toggle-container .user-role {
-        color: var(--sidebar-accent);
-        font-size: 0.7rem;
+        color: var(--primary);
+        font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        padding: 2px 6px;
-        background: rgba(251, 191, 36, 0.2);
+        padding: 2px 8px;
+        background: var(--gray-100);
         border-radius: 4px;
         display: inline-block;
+        border: 1px solid var(--gray-200);
     }
 
     /* Hamburger Toggle Button */
     #sidebarToggle {
-        background: rgba(255, 255, 255, 0.15);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        width: 45px;
-        height: 45px;
-        border-radius: 10px;
+        background: white;
+        border: 1px solid var(--gray-300);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
+        transition: all 0.2s;
         flex-shrink: 0;
         margin-left: auto;
     }
 
     #sidebarToggle:hover {
-        background: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: scale(1.05);
+        background: var(--gray-50);
+        border-color: var(--gray-400);
     }
 
     #sidebarToggle i {
-        font-size: 1.5rem;
-        color: white;
+        font-size: 1.25rem;
+        color: var(--gray-700);
     }
 
     /* Overlay untuk mobile */
@@ -466,50 +465,25 @@ $currentPath = '/' . $uri->getPath();
 
         .sidebar {
             transform: translateX(-100%);
-            top: 70px;
-            height: calc(100vh - 70px);
+            top: 64px;
+            height: calc(100vh - 64px);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar.show {
             transform: translateX(0);
         }
 
-        /* Adjust body padding for mobile top bar */
         body {
-            padding-top: 70px;
+            padding-top: 64px;
         }
     }
-
-    /* Animation */
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .sidebar .nav-item {
-        animation: slideIn 0.3s ease-out backwards;
-    }
-
-    .sidebar .nav-item:nth-child(1) { animation-delay: 0.05s; }
-    .sidebar .nav-item:nth-child(2) { animation-delay: 0.1s; }
-    .sidebar .nav-item:nth-child(3) { animation-delay: 0.15s; }
-    .sidebar .nav-item:nth-child(4) { animation-delay: 0.2s; }
-    .sidebar .nav-item:nth-child(5) { animation-delay: 0.25s; }
-    .sidebar .nav-item:nth-child(6) { animation-delay: 0.3s; }
-    .sidebar .nav-item:nth-child(7) { animation-delay: 0.35s; }
-    .sidebar .nav-item:nth-child(8) { animation-delay: 0.4s; }
 </style>
 
 <!-- Mobile Top Bar -->
 <div class="sidebar-toggle-container d-md-none">
     <div class="d-flex align-items-center flex-grow-1">
-        <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fbbf24&bold=true&format=svg" 
+        <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fff&bold=true&format=svg" 
              alt="Avatar" class="user-avatar me-3">
         <div class="flex-grow-1">
             <div class="user-name"><?= esc($fullName) ?></div>
@@ -528,7 +502,7 @@ $currentPath = '/' . $uri->getPath();
     <!-- Header -->
     <div class="sidebar-header">
         <h5>
-            <i class="bi bi-shield-check"></i>
+            <i class="bi bi-shield-lock"></i>
             Admin Panel
         </h5>
         <small>Sistem Informasi Pemerintah</small>
@@ -537,7 +511,7 @@ $currentPath = '/' . $uri->getPath();
     <!-- User Info -->
     <div class="user-info-box d-md-block d-none">
         <div class="d-flex align-items-center">
-            <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fbbf24&bold=true&format=svg" 
+            <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fff&bold=true&format=svg" 
                  alt="Avatar" class="user-avatar me-3">
             <div class="flex-grow-1">
                 <div class="user-name"><?= esc($fullName) ?></div>
@@ -601,7 +575,7 @@ $currentPath = '/' . $uri->getPath();
     <div class="logout-btn">
         <a href="/logout" class="nav-link">
             <i class="bi bi-box-arrow-right"></i>
-            <span>Keluar dari Sistem</span>
+            <span>Keluar</span>
         </a>
     </div>
 </div>
