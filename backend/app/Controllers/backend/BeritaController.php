@@ -32,10 +32,16 @@ class BeritaController extends BaseController
     // ========================================================
     public function index()
     {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_read']) {
-            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
+         $access = $this->getAccess(session()->get('role'));
+
+        if (!$access) {
+            return view('pages/kategori/index', [
+                'title' => 'Kategori',
+                'kategori' => [],
+                'error' => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
+            ]);
         }
+
 
         $berita = $this->beritaModel->where('trash', '0')->findAll();
 

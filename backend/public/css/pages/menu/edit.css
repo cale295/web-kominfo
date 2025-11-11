@@ -6,6 +6,29 @@
     --accent-gov: #fbbf24;
 }
 
+/* Tombol merah khusus (hapus) */
+.btn-danger-gov {
+    background-color: #dc3545 !important; /* Merah Bootstrap standar */
+    border: none;
+    color: #fff !important;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger-gov:hover {
+    background-color: #b02a37 !important; /* Merah lebih gelap saat hover */
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-danger-gov:active {
+    background-color: #842029 !important; /* Klik warna lebih pekat */
+    transform: translateY(0);
+}
+
 /* Page Header */
 .page-header-gov {
     background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
