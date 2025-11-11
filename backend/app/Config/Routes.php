@@ -84,7 +84,7 @@ $routes->get('banner/click/(:num)', 'backend\BannerController::click/$1');
 
 
 //menu 
-$routes->resource('menu', ['controller' => 'backend\MenuController']);
+$routes->resource('menu', ['controller' => 'backend\MenuController', 'except' => ['show']]);
 $routes->get('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
 $routes->post('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
 $routes->get('menu/edit/(:num)', 'backend\MenuController::edit/$1');

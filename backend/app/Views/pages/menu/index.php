@@ -20,7 +20,7 @@
             </div>
             <?php if ($can_create): ?>
                 <div class="mt-3 mt-md-0">
-                    <a href="<?= site_url('menu/create') ?>" class="btn">
+                    <a href="<?= site_url('menu/new') ?>" class="btn">
                         <i class="bi bi-plus-circle me-2"></i>Tambah Menu Baru
                     </a>
                 </div>
