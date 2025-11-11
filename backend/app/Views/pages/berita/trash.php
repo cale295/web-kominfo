@@ -43,10 +43,14 @@
                                 <td><?= esc($row['updated_by_name']) ?></td>
                                 <td><?= date('d M Y H:i', strtotime($row['updated_at'])) ?></td>
                                 <td class="text-center">
-                                    <a href="<?= site_url('berita/' . $row['id_berita'] . '/restore') ?>" 
-                                       class="btn btn-success btn-sm px-3 me-1">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Pulihkan
-                                    </a>
+<form action="<?= site_url('berita/' . $row['id_berita'] . '/restore') ?>" method="post" style="display:inline;">
+    <?= csrf_field() ?>
+    <button class="btn btn-success btn-sm px-3 me-1" 
+        onclick="return confirm('Yakin ingin memulihkan berita ini?')">
+        <i class="bi bi-arrow-counterclockwise"></i> Pulihkan
+    </button>
+</form>
+
                                    <form action="<?= site_url('berita/' . $row['id_berita'] . '/destroyPermanent') ?>" method="post" style="display:inline;">
     <?= csrf_field() ?>
     <button class="btn btn-sm btn-danger"
