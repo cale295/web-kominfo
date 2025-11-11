@@ -200,14 +200,6 @@
             <input type="text" name="sumber" class="form-control" placeholder="Contoh: Detik.com, Kompas, dll" value="<?= old('sumber') ?>">
         </div>
 
-        <!-- Dokumen -->
-        <?php for($i=1; $i<=4; $i++): ?>
-            <div class="mb-3">
-                <label class="form-label">Dokumen <?= $i ?></label>
-                <input type="text" name="dokumen<?= $i==1?'':'_duo' . ($i-2>0?'_tigo':'_quatro') ?>" class="form-control mb-1" placeholder="Judul dokumen" value="<?= old('dokumen'.($i==1?'':($i==2?'_duo':($i==3?'_tigo':'_quatro')).'_title')) ?>">
-                <input type="text" name="dokumen<?= $i==1?'':'_duo' . ($i-2>0?'_tigo':'_quatro') ?>" class="form-control" placeholder="Link / path dokumen" value="<?= old('dokumen'.($i==1?'':($i==2?'_duo':($i==3?'_tigo':'_quatro')))) ?>">
-            </div>
-        <?php endfor; ?>
 
         <!-- Status otomatis -->
         <input type="hidden" name="status" value="0">

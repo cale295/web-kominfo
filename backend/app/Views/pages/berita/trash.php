@@ -50,6 +50,11 @@
         <i class="bi bi-arrow-counterclockwise"></i> Pulihkan
     </button>
 </form>
+    <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" 
+   class="btn btn-info btn-sm">
+    <i class="bi bi-journal-text"></i> Log
+</a>
+
 
                                    <form action="<?= site_url('berita/' . $row['id_berita'] . '/destroyPermanent') ?>" method="post" style="display:inline;">
     <?= csrf_field() ?>
