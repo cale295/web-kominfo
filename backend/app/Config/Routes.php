@@ -43,17 +43,20 @@ $routes->resource('berita_tag', ['controller' => 'backend\BeritaTagController', 
 // ========================================================
 // BERITA ROUTES
 // ========================================================
-
-$routes->get('berita', 'BeritaController::index');
-$routes->get('berita/new', 'BeritaController::new');
-$routes->post('berita', 'BeritaController::create');
-$routes->get('berita/(:num)/edit', 'BeritaController::edit/$1');
-$routes->post('berita/(:num)/update', 'BeritaController::update/$1');
-$routes->post('berita/(:num)/delete', 'BeritaController::delete/$1');
-$routes->post('berita/(:num)/destroyPermanent', 'BeritaController::destroyPermanent/$1');
-$routes->get('berita/trash', 'BeritaController::trash');
+$routes->get('berita', 'backend\BeritaController::index');
+$routes->get('berita/show/(:num)', 'backend\BeritaController::show/$1');
+$routes->put('berita/(:num)', 'backend\BeritaController::update/$1');
+$routes->get('berita/new', 'backend\BeritaController::new');
+$routes->post('berita', 'backend\BeritaController::create');
+$routes->get('berita/(:num)/edit', 'backend\BeritaController::edit/$1');
+$routes->post('berita/(:num)/update', 'backend\BeritaController::update/$1');
+$routes->post('berita/(:num)/delete', 'backend\BeritaController::delete/$1'); // ✅ ini penting
+$routes->post('berita/(:num)/destroyPermanent', 'backend\BeritaController::destroyPermanent/$1');
+$routes->get('berita/trash', 'backend\BeritaController::trash');
+$routes->post('berita/(:num)/restore', 'backend\BeritaController::restore/$1');
 $routes->post('berita/(:num)/restore', 'BeritaController::restore/$1');
 $routes->get('/berita/log/(:num)', 'BeritaController::log/$1');
+
 
 
 //album
@@ -69,22 +72,22 @@ $routes->get('album/destroy/(:num)', 'backend\PhotoAlbumController::destroyPerma
 $routes->resource('gallery', ['controller' => 'backend\PhotoGalleryController', 'except' => ['show']]);
 
 // Trash dan restore
-$routes->get('gallery/trash', 'PhotoGalleryController::trash');
-$routes->get('gallery/restore/(:num)', 'PhotoGalleryController::restore/$1');
-$routes->get('gallery/destroy/(:num)', 'PhotoGalleryController::destroyPermanent/$1');
+$routes->get('gallery/trash', 'backend\PhotoGalleryController::trash');
+$routes->get('gallery/restore/(:num)', 'backend\PhotoGalleryController::restore/$1');
+$routes->get('gallery/destroy/(:num)', 'backend\PhotoGalleryController::destroyPermanent/$1');
+
+
 
 
 // Banner logo
-$routes->resource('banner', ['controller' => 'BannerController', 'except' => ['show']]);
-$routes->get('banner/view/(:num)', 'BannerController::view/$1');
-$routes->get('banner/click/(:num)', 'BannerController::click/$1');
-$routes->get('banner/trash', 'BannerController::trash');
-$routes->get('banner/restore/(:num)', 'BannerController::restore/$1'); // restore data
-$routes->post('banner/(:num)/restore', 'BannerController::restore/$1');
-$routes->get('banner/destroyPermanent/(:num)', 'BannerController::destroyPermanent/$1');
+$routes->resource('banner', ['controller' => 'backend\BannerController', 'except' => ['show']]);
+$routes->get('banner/view/(:num)', 'backend\BannerController::view/$1');
+$routes->get('banner/click/(:num)', 'backend\BannerController::click/$1');
+
+
 
 //menu 
-$routes->resource('menu', ['controller' => 'backend\MenuController', 'except' => ['show']]);
+$routes->resource('menu', ['controller' => 'backend\MenuController']);
 $routes->get('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
 $routes->post('menu/toggleStatus/(:num)', 'backend\MenuController::toggleStatus/$1');
 $routes->get('menu/edit/(:num)', 'backend\MenuController::edit/$1');

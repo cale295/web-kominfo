@@ -7,6 +7,7 @@ use App\Models\BeritaModel;
 use App\Models\KategoriModel;
 use App\Models\AccessRightsModel;
 use App\Models\BeritaLogModel;
+use PhpParser\Node\Expr\Cast\String_;
 
 
 class BeritaController extends BaseController
@@ -32,16 +33,10 @@ class BeritaController extends BaseController
     // ========================================================
     public function index()
     {
-         $access = $this->getAccess(session()->get('role'));
-
-        if (!$access) {
-            return view('pages/kategori/index', [
-                'title' => 'Kategori',
-                'kategori' => [],
-                'error' => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
-            ]);
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_read']) {
+            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
         }
-
 
         $berita = $this->beritaModel->where('trash', '0')->findAll();
 
@@ -130,49 +125,6 @@ public function create()
                 $additionalImages[] = 'uploads/berita/additional/' . $newName;
             }
         }
-<<<<<<< HEAD
-
-        // --- Ambil kategori ---
-        $kategoriIds = $post['id_kategori'] ?? [];
-        if (is_string($kategoriIds)) {
-            $kategoriIds = array_filter(array_map('trim', explode(',', $kategoriIds)));
-        }
-
-        // --- Simpan berita ---
-        $data = [
-            'judul' => $post['judul'],
-            'topik' => $post['topik'] ?? null,
-            'content' => $post['content'] ?? null,
-            'content2' => $post['content2'] ?? null,
-            'intro' => $post['intro'] ?? null,
-            'id_berita_terkait' => $post['id_berita_terkait'] ?? null,
-            'id_berita_terkait2' => $post['id_berita_terkait2'] ?? null,
-            'link_video' => $post['link_video'] ?? null,
-            'keyword' => $post['keyword'] ?? null,
-            'sumber' => $post['sumber'] ?? null,
-            'feat_image' => $featImagePath,
-            'additional_images' => !empty($additionalImages) ? json_encode($additionalImages) : null,
-            'slug' => url_title($post['judul'], '-', true),
-            'hash_berita' => bin2hex(random_bytes(16)),
-            'status' => $post['status'] ?? 0,
-            'status_berita' => $post['status_berita'] ?? 2,
-            'created_by_id' => session()->get('id_user'),
-            'created_by_name' => session()->get('username'),
-            'created_at' => date('Y-m-d H:i:s'),
-        ];
-
-        $idBerita = $this->beritaModel->insert($data);
-
-        // --- Simpan kategori ke pivot table ---
-        if (!empty($kategoriIds)) {
-            $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
-        }
-
-        $this->saveLog($idBerita, 'Menambahkan berita baru');
-
-        return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
-=======
->>>>>>> e4ae37c778cdfca9ff9b358d2595afe02fae8244
     }
 
     // --- Ambil kategori ---
@@ -352,13 +304,10 @@ public function edit($id)
 }
 
 
+// ========================================================
+// Soft Delete / Trash
+// ========================================================
 
-    // ========================================================
-// Show Detail Berita
-// ========================================================
-// Soft Delete / Trash
-// ========================================================
-// Soft Delete / Trash
 public function delete($id)
 {
     $access = $this->getAccess(session()->get('role'));
@@ -434,9 +383,6 @@ public function restore($id)
 // ========================================================
 // Daftar Berita Trash
 // ========================================================
-// ========================================================
-// Daftar Berita Trash
-// ========================================================
 public function trash()
 {
     $access = $this->getAccess(session()->get('role'));
@@ -476,116 +422,7 @@ public function trash()
     return view('pages/berita/show', $data);
 }
 
-    // ========================================================
-    // Soft Delete / Trash
-    // ========================================================
-    public function delete($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_delete']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menghapus berita.');
-        }
-
-        $updated = $this->beritaModel->update($id, [
-            'trash' => '1',
-            'is_delete_by_id' => session()->get('id_user'),
-            'is_delete_by_name' => session()->get('username'),
-            'delete_at' => date('Y-m-d H:i:s')
-        ]);
-
-        if (!$updated) {
-            return redirect()->to('/berita')->with('error', 'Gagal memindahkan berita ke sampah.');
-        }
-
-        return redirect()->to('/berita')->with('success', 'Berita dipindahkan ke sampah.');
-    }
-
-    // ========================================================
-    // Force Delete + Hapus Gambar
-    // ========================================================
-    public function destroyPermanent($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_delete']) {
-            return redirect()->to('/berita/trash')->with('error', 'Kamu tidak punya izin menghapus berita.');
-        }
-
-        $berita = $this->beritaModel->find($id);
-        if (!$berita) {
-            return redirect()->to('/berita/trash')->with('error', 'Berita tidak ditemukan.');
-        }
-
-        // Hapus file cover jika ada
-        if (!empty($berita['feat_image']) && file_exists(WRITEPATH . '../public/' . $berita['feat_image'])) {
-            unlink(WRITEPATH . '../public/' . $berita['feat_image']);
-        }
-
-        // Hapus additional images jika ada
-        if (!empty($berita['additional_images'])) {
-            $addImages = json_decode($berita['additional_images'], true);
-            foreach ($addImages as $img) {
-                if (file_exists(WRITEPATH . '../public/' . $img)) {
-                    unlink(WRITEPATH . '../public/' . $img);
-                }
-            }
-        }
-
-        // Hapus berita permanen
-        $this->beritaModel->delete($id, true); // true = force delete
-
-        return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dihapus permanen.');
-    }
-
-    // ========================================================
-    // Restore dari Trash
-    // ========================================================
-    public function restore($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/berita/trash')->with('error', 'Kamu tidak punya izin memulihkan berita.');
-        }
-
-        $this->beritaModel->update($id, [
-            'trash' => '0',
-            'is_delete_by_id' => null,
-            'is_delete_by_name' => null,
-            'delete_at' => null
-        ]);
-
-        return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dipulihkan.');
-    }
-
-    // ========================================================
-    // Daftar Berita Trash
-    // ========================================================
-    public function trash()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_read']) {
-            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
-        }
-
-        $berita = $this->beritaModel->db->table('t_berita')
-                    ->select('t_berita.*, GROUP_CONCAT(m_kategori_berita.kategori SEPARATOR ", ") as kategori')
-                    ->join('t_berita_kategori', 't_berita_kategori.id_berita = t_berita.id_berita', 'left')
-                    ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita_kategori.id_kategori', 'left')
-                    ->where('t_berita.trash', '1')
-                    ->groupBy('t_berita.id_berita')
-                    ->orderBy('t_berita.updated_at', 'DESC')
-                    ->get()
-                    ->getResultArray();
-
-        $data = [
-            'title' => 'Sampah Berita',
-            'berita' => $berita,
-            'can_restore' => $access['can_update'],
-            'can_delete' => $access['can_delete'],
-        ];
-
-        return view('pages/berita/trash', $data);
-    }
-
+   
     // ========================================================
     // Hak Akses
     // ========================================================
