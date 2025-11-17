@@ -40,6 +40,13 @@ $routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::d
 
 // berita kategori
 $routes->resource('berita_tag', ['controller' => 'backend\BeritaTagController', 'except' => ['show']]);
+
+// Dokument Kategori
+$routes->resource('dokument_kategori', ['controller' => 'backend\DokumenKategoriController', 'except' => ['show']]);
+
+// Dokument
+$routes->resource('dokument', ['controller' => 'backend\DokumenController', 'except' => ['show']]);
+
 // ========================================================
 // BERITA ROUTES
 // ========================================================
