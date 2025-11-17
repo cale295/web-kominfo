@@ -41,10 +41,10 @@ $routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::d
 // berita kategori
 $routes->resource('berita_tag', ['controller' => 'backend\BeritaTagController', 'except' => ['show']]);
 
-// Dokument Kategori
+// Dokumen Kategori
 $routes->resource('dokument_kategori', ['controller' => 'backend\DokumenKategoriController', 'except' => ['show']]);
 
-// Dokument
+// Dokumen
 $routes->resource('dokument', ['controller' => 'backend\DokumenController', 'except' => ['show']]);
 
 // ========================================================
@@ -117,9 +117,9 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 $routes->group('api', function ($routes) {
 
 
-    //dokument
+    //dokumen
     $routes->get('dokument', 'Api\ApiDokumentController::index');
-    $routes->get('dokument/(:num)', 'Api\ApiDokumentController::show/$1');
+    $routes->get('dokument/(:num)', 'Api\ApiDokumenController::show/$1');
     
     //berita
     $routes->get('berita', 'Api\ApiBeritaController::index');

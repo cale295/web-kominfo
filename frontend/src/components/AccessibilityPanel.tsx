@@ -14,7 +14,6 @@ import {
   AlignLeft,
   RotateCcw,
   Palette,
-  // Opsional: bisa tambah `Moon` untuk dark mode, `RefreshCw` untuk reset, dll
 } from 'lucide-react';
 
 interface AccessibilityOption {
@@ -108,17 +107,6 @@ const AccessibilityPanel: React.FC = () => {
 
   return (
     <>
-      {/* Tombol Aksesibilitas (ikon kursi roda) */}
-      <Button
-        variant="danger"
-        className="position-fixed top-0 end-0 m-3 p-2 rounded-circle"
-        onClick={togglePanel}
-        style={{ width: '50px', height: '50px', zIndex: 1000 }}
-        aria-label="Toggle accessibility panel"
-      >
-        <Wheelchair size={24} strokeWidth={1.5} />
-      </Button>
-
       {/* Panel Sarana */}
       {showPanel && (
         <Card
