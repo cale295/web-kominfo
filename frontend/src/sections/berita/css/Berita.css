@@ -1,0 +1,27 @@
+.berita-container {
+  font-family: "Arial", sans-serif;
+}
+
+.section-title {
+  font-weight: 600;
+  color: #0d47a1;
+  border-bottom: 2px solid #0d47a1;
+  padding-bottom: 6px;
+  margin-bottom: 15px;
+}
+
+.berita-utama img {
+  height: 300px;
+  object-fit: cover;
+}
+
+.berita-terkini-item:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.berita-thumb {
+  width: 130px;
+  height: 90px;
+  object-fit: cover;
+}

@@ -1,47 +1,43 @@
 import React from "react";
-import "../css/media.css";
 
 const Media: React.FC = () => {
-  const mediaLinks = [
-    {
-      id: 1,
-      image: "/assets/media1.png",
-      title: "Media Partner 1",
-      link: "https://mediapartner1.com",
-    },
-    {
-      id: 2,
-      image: "/assets/media2.png",
-      title: "Media Partner 2",
-      link: "https://mediapartner2.com",
-    },
-    {
-      id: 3,
-      image: "/assets/media3.png",
-      title: "Media Partner 3",
-      link: "https://mediapartner3.com",
-    },
+  const youtubeVideos = [
+    { id: 1, url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { id: 2, url: "https://www.youtube.com/embed/oHg5SJYRHA0" },
+    { id: 3, url: "https://www.youtube.com/embed/oHg5SJYRHA0" },
+    { id: 4, url: "https://www.youtube.com/embed/oHg5SJYRHA0" },
+    { id: 5, url: "https://www.youtube.com/embed/oHg5SJYRHA0" },
   ];
-
+  const video = youtubeVideos.find((v) => v.id === 1);
+  const filteredVideos = youtubeVideos.filter((v) => v.id >= 2);
   return (
-    <div className="media-section my-10">
-      <h2 className="text-2xl font-bold mb-6">Media Partners</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {mediaLinks.map((media) => (
-          <a
-            key={media.id}
-            href={media.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="media-card p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-          >
-            <img
-              src={media.image}
-              alt={media.title}
-              className="w-full h-32 object-contain mb-4"
-            />
-            <h3 className="text-lg font-semibold text-center">{media.title}</h3>
-          </a>
+    <div className="container my-5">
+      <div className="row">
+        <div className="col mb-4">
+          {video && (
+            <div className="ratio ratio-16x9">
+              <iframe
+                src={video.url}
+                title="YouTube video player"
+                allowFullScreen
+                style={{ borderRadius: "20px" }}
+              ></iframe>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="row">
+        {filteredVideos.map((vid) => (
+          <div key={vid.id} className="col mb-4">
+            <div className="ratio ratio-16x9">
+              <iframe
+                src={vid.url}
+                title={`YouTube video player ${vid.id}`}
+                allowFullScreen
+                style={{ borderRadius: "20px" }}
+              ></iframe>
+            </div>
+          </div>
         ))}
       </div>
     </div>

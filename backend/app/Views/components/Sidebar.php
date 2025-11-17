@@ -27,7 +27,7 @@ $menuItems = [
             ['title' => 'Kategori Berita', 'url' => '/kategori', 'roles' => ['admin']],
             ['title' => 'Tema Berita', 'url' => '/tema', 'roles' => ['admin']],
             ['title' => 'Tag Berita', 'url' => '/berita_tag', 'roles' => ['admin']],
-            ['title' => 'Berita Utama', 'url' => '/berita/featured', 'roles' => ['admin', 'editor']]
+            ['title' => 'Berita Utama', 'url' => '/berita-utama', 'roles' => ['admin', 'editor']]
         ]
     ],
     [

@@ -1,0 +1,87 @@
+/* ========== BASE ========== */
+.accessibility-scheme-default {
+  --bg-primary: #ffffff;
+  --text-primary: #000000;
+  --border-color: #ddd;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ========== HIGH CONTRAST ========== */
+.accessibility-scheme-high-contrast {
+  --bg-primary: #000000 !important;
+  --text-primary: #40c090 !important; /* Warna hijau toska cerah */
+  --border-color: #ffffff !important;
+
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+
+  /* Terapkan ke semua teks dan elemen umum */
+  * {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  /* Komponen Bootstrap utama */
+  .card,
+  .card-body,
+  .navbar,
+  .list-group-item,
+  .modal-content,
+  .dropdown-menu,
+  .form-control,
+  .continer,
+  .btn {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  /* Tautan */
+  a,
+  a:hover,
+  a:focus {
+    color: var(--text-primary) !important;
+    text-decoration: underline !important;
+  }
+
+  /* Tombol berwarna */
+  .btn-primary,
+  .btn-secondary,
+  .btn-success,
+  .btn-danger,
+  .btn-warning,
+  .btn-info,
+  .btn-light,
+  .btn-dark {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+
+  /* Input dan textarea */
+  input,
+  textarea,
+  select {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+
+  /* Card Header khusus */
+  .card-header {
+    background-color: #111 !important;
+    color: var(--text-primary) !important;
+  }
+}
+
+/* ========== DARK MODE (opsional) ========== */
+.accessibility-scheme-dark {
+  --bg-primary: #121212;
+  --text-primary: #e0e0e0;
+  --border-color: #444;
+
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}

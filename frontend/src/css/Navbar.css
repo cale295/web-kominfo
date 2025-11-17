@@ -178,33 +178,33 @@
 
 /* Responsive rounded top */
 .rounded-top-4 {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
+  border-top-left-radius: 61px;
+  border-top-right-radius: 61px;
 }
 
 .rounded-top-sm-4 {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
+  border-top-left-radius: 61px;
+  border-top-right-radius: 61px;
 }
 
 .rounded-top-md-4 {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
+  border-top-left-radius: 61px;
+  border-top-right-radius: 61px;
 }
 
 .rounded-top-lg-4 {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
+  border-top-left-radius: 61px;
+  border-top-right-radius: 61px;
 }
 
 .rounded-top-xl-4 {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
+  border-top-left-radius: 61px;
+  border-top-right-radius: 61px;
 }
 
 .rounded-top-xxl-4 {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
+  border-top-left-radius: 61px;
+  border-top-right-radius: 61px;
 }
 
 /* Overflow utilities */
@@ -336,7 +336,8 @@
 }
 
 .navbar-wrapper {
-  overflow-x: visible !important;
+  overflow: visible !important; /* biar dropdown bisa keluar */
+  position: relative;
 }
 
 /* Item di dalam submenu */
@@ -373,4 +374,10 @@
     position: absolute;
     inset-inline-end: 5px;
     inset-block-start: 25px;
+    display: block;
+}
+@media (max-width: 964px) {
+    .batik {
+        display: none;
+    }
 }

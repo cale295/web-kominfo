@@ -56,6 +56,9 @@ a .text-blue-800:hover {
 }
 
 /* Typography */
+.fs-i{
+  font-style: italic !important;
+}
 .fs-1 {
   font-size: 1.875rem !important; /* 30px */
 }
@@ -71,11 +74,14 @@ a .text-blue-800:hover {
 .fs-6 {
   font-size: 0.875rem !important;
 }
+.fs-7 {
+  font-size: 2rem !important;
+}
 .text-sm {
   font-size: 0.875rem !important;
 }
 .fw-bold {
-  font-weight: 700 !important;
+  font-weight: 800 !important;
 }
 
 /* Spacing */

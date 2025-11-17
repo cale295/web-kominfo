@@ -7,14 +7,19 @@ const HeroSection: React.FC = () => {
     <div className="hero-container">
       {/* Header Bar */}
       <header className="hero-header d-flex justify-content-between align-items-center px-1 py-3">
-        <button className="btn-disabilitas d-flex align-items-center gap-2">
+        <button
+          className="btn-disabilitas d-flex align-items-center gap-2"
+          onClick={() =>
+            window.dispatchEvent(new Event("toggleAccessibilityPanel"))
+          }
+        >
           <Accessibility className="icon-accessibility" />
           <span className="disabilitas">DISABILITAS</span>
         </button>
 
         <div className="search-wrapper d-flex align-items-center">
           <div className="search-input-wrapper">
-            <input 
+            <input
               type="text"
               placeholder="Apa yang kamu cari"
               className="search-input"
@@ -33,7 +38,9 @@ const HeroSection: React.FC = () => {
             Mau ikut pelatihan kerja? Ikut Cakap Kerja, Yuk!
           </h1>
           <p className="hero-subtitle">
-            Tangerang Cakap kerja adalah Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut posuere vitae felis quis pretium. Maecenas ultricies rutrum mattis.
+            Tangerang Cakap kerja adalah Lorem ipsum dolor sit amet, consectetur
+            adipiscing elit. Ut posuere vitae felis quis pretium. Maecenas
+            ultricies rutrum mattis.
           </p>
         </div>
 

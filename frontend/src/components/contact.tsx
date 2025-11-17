@@ -63,9 +63,9 @@ export default function HubungiKami() {
   ];
 
   return (
-    <div className="bg-gray-50 py-12 py-md-16">
+    <div className="py-12 py-md-16">
       <div className="container px-4">
-        <h1 className="fs-1 fs-md-1 fw-bold text-blue-800 text-center mb-10 mb-md-12">
+        <h1 className="fs-1 fs-md-1 fw-bold text-blue text-center mb-10 mb-md-12">
           Hubungi Kami
         </h1>
 
@@ -83,11 +83,11 @@ export default function HubungiKami() {
                   {item.icon}
                 </div>
                 <div className="flex-grow-1">
-                  <h3 className="fs-5 fw-bold text-blue-800 group-hover-text-blue-600">
+                  <h3 className="fs-7 fw-bold text-blue group-hover-text-blue-600">
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-sm text-gray-700 mt-1 mb-0">
+                    <p className="text-sm fs-i text-blue mt-1 mb-0">
                       {item.subtitle}
                     </p>
                   )}
@@ -95,14 +95,14 @@ export default function HubungiKami() {
               </a>
             ))}
 
-            <div className="d-flex justify-content-center gap-6 pt-6">
+            <div className="d-flex mx-4 gap-6 pt-6">
               {socialMedia.map((social, index) => (
                 <a
                   key={index}
                   href={social.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`text-blue-800 ${social.colorClass} transition-colors`}
+                  className={`text-blue ${social.colorClass} transition-colors`}
                 >
                   {social.icon}
                 </a>
@@ -111,10 +111,10 @@ export default function HubungiKami() {
           </div>
 
           <div className="col-md-6 d-flex flex-column align-items-center align-items-md-start text-center text-md-start">
-            <h2 className="fs-4 fw-bold text-blue-800">
+            <h2 className="fs-4 fw-bold text-blue">
               Dinas Komunikasi dan Informatika
             </h2>
-            <h3 className="fs-4 fw-bold text-blue-800 mb-4">
+            <h3 className="fs-4 fw-bold text-blue mb-4">
               Kota Tangerang
             </h3>
 

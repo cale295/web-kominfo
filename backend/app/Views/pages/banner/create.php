@@ -1,146 +1,157 @@
 <?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
-<?= $this->include('layouts/alerts') ?>
-
-
+<?= $this->section('styles') ?>
 <style>
     :root {
-        --primary-blue: #1e40af;
-        --secondary-blue: #1e3a8a;
-        --accent-gold: #fbbf24;
-        --light-gold: #fcd34d;
+        --primary: #1e40af;
+        --primary-dark: #1e3a8a;
+        --primary-light: #3b82f6;
+        --success: #059669;
+        --warning: #d97706;
+        --info: #0284c7;
+        --danger: #dc2626;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
     }
 
-    .page-header {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-        border-radius: 20px;
+    body {
+        background-color: var(--gray-50);
+    }
+
+    /* Header Styles */
+    .gov-header {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        border-left: 4px solid var(--primary);
+    }
+
+    .gov-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--gray-900);
+    }
+
+    .gov-header h1 i {
+        color: var(--primary);
+        margin-right: 10px;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         padding: 32px;
-        margin-bottom: 32px;
-        box-shadow: 0 8px 24px rgba(30, 64, 175, 0.2);
-        position: relative;
-        overflow: hidden;
     }
 
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, transparent 70%);
-        border-radius: 50%;
-    }
-
-    .page-header-content {
-        position: relative;
-        z-index: 1;
-    }
-
-    .page-header h3 {
-        color: white;
-        font-weight: 700;
-        font-size: 1.8rem;
-        margin-bottom: 8px;
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--gray-200);
         display: flex;
         align-items: center;
+    }
+
+    .section-title i {
+        color: var(--primary);
+        margin-right: 10px;
+        font-size: 1.25rem;
+    }
+
+    /* Info Box */
+    .info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-left: 4px solid var(--primary);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: start;
         gap: 12px;
     }
 
-    .page-header h3 i {
-        color: var(--accent-gold);
-        font-size: 2rem;
+    .info-box i {
+        color: var(--primary);
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        margin-top: 2px;
     }
 
-    .page-header p {
-        color: rgba(255, 255, 255, 0.85);
-        margin: 0;
-        font-size: 0.95rem;
+    .info-box-text {
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        line-height: 1.5;
     }
 
-    .btn-back {
-        background: rgba(255, 255, 255, 0.15);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        font-weight: 600;
-        padding: 10px 20px;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+    .info-box-text strong {
+        color: var(--gray-900);
+        display: block;
+        margin-bottom: 4px;
     }
 
-    .btn-back:hover {
-        background: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.5);
-        color: white;
-        transform: translateX(-4px);
-    }
-
-    .btn-back i {
-        font-size: 1.1rem;
-    }
-
-    .alert-success {
-        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-        border: none;
-        border-left: 4px solid #16a34a;
-        border-radius: 12px;
-        padding: 16px 20px;
-        color: #166534;
-        box-shadow: 0 2px 8px rgba(22, 163, 74, 0.1);
-        animation: slideInDown 0.4s ease-out;
-    }
-
-    .card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-    }
-
-    .card-body {
-        padding: 40px;
-    }
-
+    /* Form Controls */
     .form-label {
-        color: var(--primary-blue);
-        font-weight: 600;
-        font-size: 0.95rem;
-        margin-bottom: 10px;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+        font-size: 0.875rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
     }
 
     .form-label i {
-        color: var(--accent-gold);
-        font-size: 1.1rem;
+        color: var(--primary);
+        font-size: 1rem;
     }
 
-    .form-label .required {
-        color: #ef4444;
-        margin-left: 4px;
+    .text-danger {
+        color: var(--danger) !important;
     }
 
     .form-control,
     .form-select {
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 12px 16px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        background: #f8fafc;
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
     }
 
     .form-control:focus,
     .form-select:focus {
-        border-color: var(--accent-gold);
-        box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1);
-        background: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
     }
 
-    .form-control::placeholder {
-        color: #94a3b8;
+    .form-text {
+        color: var(--gray-500);
+        font-size: 0.8125rem;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .form-text i {
+        font-size: 0.875rem;
     }
 
     textarea.form-control {
@@ -148,21 +159,7 @@
         min-height: 100px;
     }
 
-    .form-text-helper {
-        color: #64748b;
-        font-size: 0.85rem;
-        margin-top: 6px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .form-text-helper i {
-        color: var(--accent-gold);
-        font-size: 0.9rem;
-    }
-
-    /* File Input Custom */
+    /* File Input */
     .file-input-wrapper {
         position: relative;
     }
@@ -185,433 +182,403 @@
     .file-input-label {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 10px;
         padding: 12px 20px;
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        background: var(--primary);
         color: white;
-        border-radius: 12px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 600;
-        box-shadow: 0 4px 16px rgba(30, 64, 175, 0.3);
+        transition: all 0.2s;
+        font-weight: 500;
+        font-size: 0.9375rem;
     }
 
     .file-input-label:hover {
+        background: var(--primary-dark);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(30, 64, 175, 0.4);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
     }
 
     .file-input-label i {
-        font-size: 1.2rem;
+        font-size: 1.125rem;
     }
 
     .file-name-display {
-        margin-top: 10px;
+        margin-top: 12px;
         padding: 10px 14px;
-        background: rgba(30, 64, 175, 0.08);
+        background: var(--gray-100);
         border-radius: 8px;
-        color: var(--primary-blue);
-        font-size: 0.9rem;
+        color: var(--gray-700);
+        font-size: 0.875rem;
         display: none;
-    }
-
-    .file-name-display.show {
-        display: flex;
         align-items: center;
         gap: 8px;
     }
 
+    .file-name-display.show {
+        display: flex;
+    }
+
     .file-name-display i {
-        color: var(--accent-gold);
-    }
-
-    .info-box {
-        background: linear-gradient(135deg, rgba(30, 64, 175, 0.05) 0%, rgba(251, 191, 36, 0.05) 100%);
-        border: 2px solid rgba(251, 191, 36, 0.2);
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 24px;
-    }
-
-    .info-box-content {
-        display: flex;
-        align-items: start;
-        gap: 12px;
-    }
-
-    .info-box-icon {
-        color: var(--accent-gold);
-        font-size: 1.5rem;
-        flex-shrink: 0;
-    }
-
-    .info-box-text {
-        color: var(--primary-blue);
-        font-size: 0.9rem;
-        line-height: 1.6;
-    }
-
-    .info-box-text strong {
-        color: var(--secondary-blue);
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    .btn-primary-custom {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 14px 32px;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(30, 64, 175, 0.3);
-        transition: all 0.3s ease;
-        font-size: 1rem;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-primary-custom::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.3), transparent);
-        transition: left 0.5s ease;
-    }
-
-    .btn-primary-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(30, 64, 175, 0.4);
-        color: white;
-    }
-
-    .btn-primary-custom:hover::before {
-        left: 100%;
-    }
-
-    .btn-secondary-custom {
-        background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 14px 32px;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(100, 116, 139, 0.3);
-        transition: all 0.3s ease;
+        color: var(--primary);
         font-size: 1rem;
     }
 
-    .btn-secondary-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
-        color: white;
-        background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 32px;
+    /* Action Buttons */
+    .action-buttons {
         padding-top: 24px;
-        border-top: 2px solid #f1f5f9;
+        border-top: 2px solid var(--gray-200);
+        margin-top: 32px;
     }
 
-    @keyframes slideInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .btn {
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+        border: none;
     }
 
+    .btn-primary {
+        background: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .btn-secondary {
+        background: var(--gray-600);
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-700);
+        transform: translateY(-2px);
+    }
+
+    .btn i {
+        margin-right: 6px;
+    }
+
+    /* Section Spacing */
+    .form-section {
+        margin-bottom: 32px;
+        padding-bottom: 32px;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-        .page-header {
-            padding: 24px;
+        .form-card {
+            padding: 20px;
         }
 
-        .page-header h3 {
-            font-size: 1.4rem;
+        .gov-header {
+            padding: 20px;
         }
 
-        .card-body {
-            padding: 24px;
+        .gov-header h1 {
+            font-size: 1.375rem;
         }
 
-        .form-actions {
+        .section-title {
+            font-size: 1rem;
+        }
+
+        .action-buttons {
             flex-direction: column;
         }
 
-        .btn-primary-custom,
-        .btn-secondary-custom {
+        .action-buttons .btn {
             width: 100%;
+            margin: 4px 0 !important;
         }
     }
 </style>
+<?= $this->endSection() ?>
 
-<div class="container-fluid py-4">
-    <!-- Page Header -->
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div class="page-header-content">
-                <h3>
-                    <i class="bi bi-plus-circle"></i>
-                    Tambah Banner Baru
-                </h3>
-                <p>Buat banner baru untuk ditampilkan di sistem</p>
-            </div>
-            <a href="<?= site_url('banner') ?>" class="btn btn-back">
-                <i class="bi bi-arrow-left me-2"></i>Kembali
+<?= $this->section('content') ?>
+
+<!-- Page Header -->
+<div class="gov-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1>
+                <i class="bi bi-plus-circle"></i>
+                Tambah Banner Baru
+            </h1>
+        </div>
+        <div>
+            <a href="<?= site_url('banner') ?>" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Kembali
             </a>
         </div>
     </div>
+</div>
 
-    <!-- Alerts -->
-    <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success d-flex align-items-center mb-4">
-            <i class="bi bi-check-circle-fill me-3" style="font-size: 1.5rem;"></i>
-            <div><?= session()->getFlashdata('success') ?></div>
+<?= $this->include('layouts/alerts') ?>
+
+<!-- Form Card -->
+<div class="form-card">
+    <!-- Info Box -->
+    <div class="info-box">
+        <i class="bi bi-lightbulb"></i>
+        <div class="info-box-text">
+            <strong>Petunjuk Pengisian</strong>
+            Pastikan semua informasi diisi dengan lengkap. Pilih kategori banner sesuai dengan tujuan penempatan.
         </div>
-    <?php endif; ?>
+    </div>
 
-    <?= $this->include('layouts/alerts') ?>
+    <form action="<?= site_url('banner') ?>" method="post" enctype="multipart/form-data">
+        <?= csrf_field() ?>
 
-    <!-- Form Card -->
-    <div class="card">
-        <div class="card-body">
-            <!-- Info Box -->
-            <div class="info-box">
-                <div class="info-box-content">
-                    <i class="bi bi-lightbulb info-box-icon"></i>
-                    <div class="info-box-text">
-                        <strong>Petunjuk Pengisian</strong>
-                        Pastikan semua informasi diisi dengan lengkap. Pilih kategori banner sesuai dengan tujuan penempatan.
+        <!-- SECTION: Informasi Dasar -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-info-circle"></i>
+                Informasi Dasar
+            </div>
+
+            <div class="mb-3">
+                <label for="title" class="form-label">
+                    <i class="bi bi-text-left"></i>
+                    Judul Banner
+                    <span class="text-danger">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    name="title" 
+                    id="title"
+                    class="form-control"
+                    placeholder="Contoh: Banner Promo Akhir Tahun"
+                    value="<?= old('title') ?>"
+                    required>
+                <small class="form-text">
+                    <i class="bi bi-info-circle"></i>
+                    Masukkan judul yang menarik dan deskriptif
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label for="keterangan" class="form-label">
+                    <i class="bi bi-text-paragraph"></i>
+                    Keterangan Banner
+                </label>
+                <textarea 
+                    name="keterangan" 
+                    id="keterangan" 
+                    rows="4"
+                    class="form-control"
+                    placeholder="Jelaskan detail tentang banner ini..."><?= old('keterangan') ?></textarea>
+                <small class="form-text">
+                    <i class="bi bi-info-circle"></i>
+                    Opsional - Tambahkan deskripsi untuk informasi lebih lengkap
+                </small>
+            </div>
+        </div>
+
+        <!-- SECTION: Media & Gambar -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-images"></i>
+                Media & Gambar
+            </div>
+
+            <div class="mb-4">
+                <label for="image" class="form-label">
+                    <i class="bi bi-image"></i>
+                    Gambar Banner
+                </label>
+                <div class="file-input-wrapper">
+                    <div class="file-input-custom">
+                        <input 
+                            type="file" 
+                            name="image" 
+                            id="image" 
+                            accept="image/*"
+                            onchange="displayFileName(this)">
+                        <label for="image" class="file-input-label">
+                            <i class="bi bi-cloud-upload"></i>
+                            <span>Pilih Gambar Banner</span>
+                        </label>
+                    </div>
+                    <div class="file-name-display" id="fileNameDisplay">
+                        <i class="bi bi-file-earmark-image"></i>
+                        <span id="fileName"></span>
+                    </div>
+                </div>
+                <small class="form-text">
+                    <i class="bi bi-info-circle"></i>
+                    Format: JPG, PNG, GIF | Maksimal: 5MB | Resolusi disarankan: 1920x600px
+                </small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="media_type" class="form-label">
+                            <i class="bi bi-film"></i>
+                            Tipe Media
+                        </label>
+                        <select name="media_type" id="media_type" class="form-select">
+                            <option value="">-- Pilih Tipe Media --</option>
+                            <option value="image" <?= old('media_type') === 'image' ? 'selected' : '' ?>>
+                                📷 Gambar
+                            </option>
+                            <option value="video" <?= old('media_type') === 'video' ? 'selected' : '' ?>>
+                                🎥 Video
+                            </option>
+                        </select>
+                        <small class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Pilih jenis konten banner
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="category_banner" class="form-label">
+                            <i class="bi bi-grid-3x3"></i>
+                            Kategori Banner
+                            <span class="text-danger">*</span>
+                        </label>
+                        <select name="category_banner" id="category_banner" class="form-select" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            <option value="1" <?= old('category_banner') === '1' ? 'selected' : '' ?>>
+                                🏠 Banner Utama
+                            </option>
+                            <option value="2" <?= old('category_banner') === '2' ? 'selected' : '' ?>>
+                                🪟 Banner Popup
+                            </option>
+                            <option value="3" <?= old('category_banner') === '3' ? 'selected' : '' ?>>
+                                📰 Banner Berita
+                            </option>
+                        </select>
+                        <small class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Tentukan posisi penempatan banner
+                        </small>
                     </div>
                 </div>
             </div>
-
-            <form action="<?= site_url('banner') ?>" method="post" enctype="multipart/form-data">
-                <?= csrf_field() ?>
-
-                <!-- Judul -->
-                <div class="mb-4">
-                    <label for="title" class="form-label">
-                        <i class="bi bi-text-left"></i>
-                        Judul Banner
-                        <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        name="title" 
-                        id="title"
-                        class="form-control"
-                        placeholder="Contoh: Banner Promo Akhir Tahun"
-                        value="<?= old('title') ?>"
-                        required>
-                    <div class="form-text-helper">
-                        <i class="bi bi-info-circle"></i>
-                        Masukkan judul yang menarik dan deskriptif
-                    </div>
-                </div>
-
-                <!-- Keterangan -->
-                <div class="mb-4">
-                    <label for="keterangan" class="form-label">
-                        <i class="bi bi-text-paragraph"></i>
-                        Keterangan Banner
-                    </label>
-                    <textarea 
-                        name="keterangan" 
-                        id="keterangan" 
-                        rows="4"
-                        class="form-control"
-                        placeholder="Jelaskan detail tentang banner ini..."><?= old('keterangan') ?></textarea>
-                    <div class="form-text-helper">
-                        <i class="bi bi-info-circle"></i>
-                        Opsional - Tambahkan deskripsi untuk informasi lebih lengkap
-                    </div>
-                </div>
-
-                <!-- Gambar -->
-                <div class="mb-4">
-                    <label for="image" class="form-label">
-                        <i class="bi bi-image"></i>
-                        Gambar Banner
-                    </label>
-                    <div class="file-input-wrapper">
-                        <div class="file-input-custom">
-                            <input 
-                                type="file" 
-                                name="image" 
-                                id="image" 
-                                accept="image/*"
-                                onchange="displayFileName(this)">
-                            <label for="image" class="file-input-label">
-                                <i class="bi bi-cloud-upload"></i>
-                                <span>Pilih Gambar Banner</span>
-                            </label>
-                        </div>
-                        <div class="file-name-display" id="fileNameDisplay">
-                            <i class="bi bi-file-earmark-image"></i>
-                            <span id="fileName"></span>
-                        </div>
-                    </div>
-                    <div class="form-text-helper">
-                        <i class="bi bi-info-circle"></i>
-                        Format: JPG, PNG, GIF | Max: 5MB | Resolusi disarankan: 1920x600px
-                    </div>
-                </div>
-
-                <!-- Row untuk Tipe Media & Kategori -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-4">
-                            <label for="media_type" class="form-label">
-                                <i class="bi bi-film"></i>
-                                Tipe Media
-                            </label>
-                            <select name="media_type" id="media_type" class="form-select">
-                                <option value="">-- Pilih Tipe Media --</option>
-                                <option value="image" <?= old('media_type') === 'image' ? 'selected' : '' ?>>
-                                    📷 Gambar
-                                </option>
-                                <option value="video" <?= old('media_type') === 'video' ? 'selected' : '' ?>>
-                                    🎥 Video
-                                </option>
-                            </select>
-                            <div class="form-text-helper">
-                                <i class="bi bi-info-circle"></i>
-                                Pilih jenis konten banner
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-4">
-                            <label for="category_banner" class="form-label">
-                                <i class="bi bi-grid-3x3"></i>
-                                Kategori Banner
-                                <span class="required">*</span>
-                            </label>
-                            <select name="category_banner" id="category_banner" class="form-select" required>
-                                <option value="">-- Pilih Kategori --</option>
-                                <option value="1" <?= old('category_banner') === '1' ? 'selected' : '' ?>>
-                                    🏠 Banner Utama
-                                </option>
-                                <option value="2" <?= old('category_banner') === '2' ? 'selected' : '' ?>>
-                                    🪟 Banner Popup
-                                </option>
-                                <option value="3" <?= old('category_banner') === '3' ? 'selected' : '' ?>>
-                                    📰 Banner Berita
-                                </option>
-                            </select>
-                            <div class="form-text-helper">
-                                <i class="bi bi-info-circle"></i>
-                                Tentukan posisi penempatan banner
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- URL Banner -->
-                <div class="mb-4">
-                    <label for="url" class="form-label">
-                        <i class="bi bi-link-45deg"></i>
-                        URL Banner (Link Tujuan)
-                    </label>
-                    <input 
-                        type="url" 
-                        name="url" 
-                        id="url"
-                        class="form-control"
-                        placeholder="https://contoh.com"
-                        value="<?= old('url') ?>">
-                    <div class="form-text-helper">
-                        <i class="bi bi-info-circle"></i>
-                        Opsional - Link yang akan dibuka saat banner diklik
-                    </div>
-                </div>
-
-                <!-- URL YouTube -->
-                <div class="mb-4">
-                    <label for="url_yt" class="form-label">
-                        <i class="bi bi-youtube"></i>
-                        URL YouTube (Jika Video)
-                    </label>
-                    <input 
-                        type="url" 
-                        name="url_yt" 
-                        id="url_yt"
-                        class="form-control"
-                        placeholder="https://youtube.com/watch?v=..."
-                        value="<?= old('url_yt') ?>">
-                    <div class="form-text-helper">
-                        <i class="bi bi-info-circle"></i>
-                        Opsional - Khusus untuk banner video dari YouTube
-                    </div>
-                </div>
-
-                <!-- Row untuk Status & Sorting -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-4">
-                            <label for="status" class="form-label">
-                                <i class="bi bi-toggle-on"></i>
-                                Status Publikasi
-                                <span class="required">*</span>
-                            </label>
-                            <select name="status" id="status" class="form-select" required>
-                                <option value="0" <?= old('status') === '0' ? 'selected' : '' ?>>
-                                    ✗ Unpublish - Tidak Ditampilkan
-                                </option>
-                                <option value="1" <?= old('status') === '1' ? 'selected' : '' ?>>
-                                    ✓ Publish - Ditampilkan
-                                </option>
-                            </select>
-                            <div class="form-text-helper">
-                                <i class="bi bi-info-circle"></i>
-                                Status publikasi banner di halaman depan
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-4">
-                            <label for="sorting" class="form-label">
-                                <i class="bi bi-sort-numeric-down"></i>
-                                Urutan Tampilan (Sorting)
-                            </label>
-                            <input 
-                                type="number" 
-                                name="sorting" 
-                                id="sorting"
-                                class="form-control"
-                                placeholder="1, 2, 3, ..."
-                                value="<?= old('sorting') ?>"
-                                min="1">
-                            <div class="form-text-helper">
-                                <i class="bi bi-info-circle"></i>
-                                Angka kecil akan tampil lebih dahulu
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Form Actions -->
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary-custom">
-                        <i class="bi bi-check-circle me-2"></i>Simpan Banner
-                    </button>
-                    <a href="<?= site_url('banner') ?>" class="btn btn-secondary-custom">
-                        <i class="bi bi-x-circle me-2"></i>Batal
-                    </a>
-                </div>
-            </form>
         </div>
-    </div>
+
+        <!-- SECTION: URL & Link -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-link-45deg"></i>
+                URL & Link
+            </div>
+
+            <div class="mb-3">
+                <label for="url" class="form-label">
+                    <i class="bi bi-link"></i>
+                    URL Banner (Link Tujuan)
+                </label>
+                <input 
+                    type="url" 
+                    name="url" 
+                    id="url"
+                    class="form-control"
+                    placeholder="https://contoh.com"
+                    value="<?= old('url') ?>">
+                <small class="form-text">
+                    <i class="bi bi-info-circle"></i>
+                    Opsional - Link yang akan dibuka saat banner diklik
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label for="url_yt" class="form-label">
+                    <i class="bi bi-youtube"></i>
+                    URL YouTube (Jika Video)
+                </label>
+                <input 
+                    type="url" 
+                    name="url_yt" 
+                    id="url_yt"
+                    class="form-control"
+                    placeholder="https://youtube.com/watch?v=..."
+                    value="<?= old('url_yt') ?>">
+                <small class="form-text">
+                    <i class="bi bi-info-circle"></i>
+                    Opsional - Khusus untuk banner video dari YouTube
+                </small>
+            </div>
+        </div>
+
+        <!-- SECTION: Pengaturan Publikasi -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-sliders"></i>
+                Pengaturan Publikasi
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">
+                            <i class="bi bi-toggle-on"></i>
+                            Status Publikasi
+                            <span class="text-danger">*</span>
+                        </label>
+                        <select name="status" id="status" class="form-select" required>
+                            <option value="0" <?= old('status') === '0' ? 'selected' : '' ?>>
+                                ✗ Unpublish - Tidak Ditampilkan
+                            </option>
+                            <option value="1" <?= old('status') === '1' ? 'selected' : '' ?>>
+                                ✓ Publish - Ditampilkan
+                            </option>
+                        </select>
+                        <small class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Status publikasi banner di halaman depan
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="sorting" class="form-label">
+                            <i class="bi bi-sort-numeric-down"></i>
+                            Urutan Tampilan (Sorting)
+                        </label>
+                        <input 
+                            type="number" 
+                            name="sorting" 
+                            id="sorting"
+                            class="form-control"
+                            placeholder="1, 2, 3, ..."
+                            value="<?= old('sorting') ?>"
+                            min="1">
+                        <small class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Angka kecil akan tampil lebih dahulu
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons d-flex justify-content-end gap-2">
+            <a href="<?= site_url('banner') ?>" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Batal
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Simpan Banner
+            </button>
+        </div>
+    </form>
 </div>
 
 <script>

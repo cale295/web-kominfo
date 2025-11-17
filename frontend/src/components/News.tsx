@@ -17,7 +17,7 @@ interface ApiAgendaItem {
   id_agenda: string;
   activity_name: string;
   description: string;
-  start_date: string; // format "2025-10-27 13:23:00"
+  start_date: string;
   end_date: string;
   location: string;
   image: string;
@@ -272,7 +272,7 @@ export default function TangerangNewsApp() {
             {activeTab === "agenda" ? (
               <div className="card border-0 shadow rounded-4 bg-light overflow-hidden">
                 <div className="row g-0 h-100">
-                  <div className="col-md-5 d-flex">
+                  <div className="col-md-5 d-flex ">
                     <img
                       src={
                         selectedEvent && selectedEvent.image
