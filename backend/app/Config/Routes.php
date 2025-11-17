@@ -117,6 +117,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 $routes->group('api', function ($routes) {
 
 
+    //dokument
+    $routes->get('dokument', 'Api\ApiDokumentController::index');
+    $routes->get('dokument/(:num)', 'Api\ApiDokumentController::show/$1');
+    
     //berita
     $routes->get('berita', 'Api\ApiBeritaController::index');
     $routes->get('berita/(:num)', 'Api\ApiBeritaController::show/$1');
