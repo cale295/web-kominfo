@@ -212,8 +212,6 @@ protected $validationRules = [
     'intro'           => 'permit_empty|string|min_length[5]|max_length[255]',
     'kata_kunci'      => 'permit_empty|string|min_length[5]|max_length[255]',
     'sumber'          => 'permit_empty|string|min_length[5]|max_length[255]',
-    'id_berita_terkait' => 'required|integer',
-    'id_berita_terkait2' => 'required|integer',
     'id_kategori' => 'required',
     'feat_image'      => 'permit_empty|string',
     'additional_images' => 'permit_empty|string'
@@ -233,14 +231,6 @@ protected $validationMessages = [
     ],
     'id_kategori' => [
         'required' => 'Kategori wajib dipilih.',
-    ],
-    'id_berita_terkait' => [
-        'required' => 'Berita terkait wajib dipilih.',
-        'integer'  => 'Berita terkait tidak valid.'
-    ],
-    'id_berita_terkait2' => [
-        'required' => 'Berita terkait wajib dipilih.',
-        'integer'  => 'Berita terkait tidak valid.'
     ],
     'caption' => [
         'min_length' => 'Caption minimal 5 karakter',

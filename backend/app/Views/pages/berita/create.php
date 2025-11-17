@@ -433,10 +433,10 @@
                     <button class="ql-image" title="Insert Image"></button>
                     <button class="ql-clean" title="Clear Formatting"></button>
                 </div>
-                <div id="editor-content" class="ql-container ql-snow">
-                    <div class="ql-editor" data-placeholder="Tulis isi berita di sini..."><?= old('content') ?></div>
-                </div>
-                <textarea name="content" id="content-hidden" style="display:none;"></textarea>
+<div id="editor-content" class="ql-container ql-snow">
+  <div class="ql-editor" data-placeholder="Tulis isi berita di sini..."></div>
+</div>
+<textarea name="content" id="content-hidden" style="display:none;"></textarea>
             </div>
 
             <div class="mb-3">
@@ -470,14 +470,15 @@
                     <button class="ql-image" title="Insert Image"></button>
                     <button class="ql-clean" title="Clear Formatting"></button>
                 </div>
-                <div id="editor-content2" class="ql-container ql-snow">
-                    <div class="ql-editor" data-placeholder="Tulis isi berita bagian kedua di sini..."><?= old('content2') ?></div>
-                </div>
-                <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
+<div id="editor-content2" class="ql-container ql-snow">
+  <div class="ql-editor" data-placeholder="Tulis isi berita bagian kedua di sini..."></div>
+</div>
+<textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
             </div>
         </div>
 
         <!-- SECTION: Kategori & Klasifikasi -->
+<!-- SECTION: Kategori & Klasifikasi -->
 <div class="form-section">
     <div class="section-title">
         <i class="bi bi-tags"></i>
@@ -509,18 +510,25 @@
                 </div>
                 <!-- Scrollable List -->
                 <div class="kategori-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                    <?php
+                    $oldKategori = old('id_kategori', []);
+                    if (!is_array($oldKategori)) {
+                        $oldKategori = explode(',', $oldKategori);
+                    }
+                    ?>
                     <?php foreach ($kategori as $kat): ?>
-                    <div class="form-check ps-3 py-1 kategori-item" 
-                         data-name="<?= esc(strtolower($kat['kategori'])) ?>">
-                        <input class="form-check-input kategori-checkbox" 
-                               type="checkbox" 
-                               id="kat-<?= $kat['id_kategori'] ?>" 
-                               value="<?= $kat['id_kategori'] ?>"
-                               <?= in_array($kat['id_kategori'], old('id_kategori', [])) ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="kat-<?= $kat['id_kategori'] ?>">
-                            <?= esc($kat['kategori']) ?>
-                        </label>
-                    </div>
+                        <div class="form-check ps-3 py-1 kategori-item" 
+                             data-name="<?= esc(strtolower($kat['kategori'])) ?>">
+                            <input class="form-check-input kategori-checkbox" 
+                                   type="checkbox" 
+                                   name="id_kategori[]" 
+                                   id="kat-<?= $kat['id_kategori'] ?>" 
+                                   value="<?= $kat['id_kategori'] ?>"
+                                   <?= in_array($kat['id_kategori'], $oldKategori) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="kat-<?= $kat['id_kategori'] ?>">
+                                <?= esc($kat['kategori']) ?>
+                            </label>
+                        </div>
                     <?php endforeach; ?>
                 </div>
                 <div id="kategori-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
@@ -528,10 +536,15 @@
                 </div>
             </div>
         </div>
-        <input type="hidden" name="id_kategori" id="kategori-hidden" 
-               value="<?= implode(',', old('id_kategori', [])) ?>">
+
+        <!-- Hidden input untuk JS multi-select -->
+        <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= implode(',', $oldKategori) ?>">
+
+        <!-- Container badge pilihan -->
         <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
     </div>
+</div>
+
 
     <div class="mb-3">
         <label class="form-label">Sub Kategori</label>
@@ -635,117 +648,74 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Quill Editors
-    const quillContent = new Quill('#editor-content .ql-editor', {
-        modules: {
-            toolbar: '#toolbar-content'
-        },
+
+    // --- Inisialisasi Quill Editor ---
+    const quillContent = new Quill('#editor-content', {
+        modules: { toolbar: '#toolbar-content' },
         theme: 'snow',
         placeholder: 'Tulis isi berita di sini...'
     });
 
-    const quillContent2 = new Quill('#editor-content2 .ql-editor', {
-        modules: {
-            toolbar: '#toolbar-content2'
-        },
+    const quillContent2 = new Quill('#editor-content2', {
+        modules: { toolbar: '#toolbar-content2' },
         theme: 'snow',
         placeholder: 'Tulis isi berita bagian kedua di sini...'
     });
 
-    // Update hidden textareas before form submit
+    // --- Masukkan old content dari server ---
+    const oldContent1 = <?= json_encode(old('content', '')) ?>;
+    const oldContent2 = <?= json_encode(old('content2', '')) ?>;
+    if (oldContent1.trim() !== '') quillContent.clipboard.dangerouslyPasteHTML(oldContent1);
+    if (oldContent2.trim() !== '') quillContent2.clipboard.dangerouslyPasteHTML(oldContent2);
+
+    // --- Update hidden textarea sebelum submit ---
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {
         const content1 = quillContent.root.innerHTML.trim();
         const content2 = quillContent2.root.innerHTML.trim();
-        
-        const isEmpty1 = content1 === '<p><br></p>' || content1 === '' || quillContent.getText().trim() === '';
-        const isEmpty2 = content2 === '<p><br></p>' || content2 === '' || quillContent2.getText().trim() === '';
-        
-        if (isEmpty1) {
-            e.preventDefault();
-            alert('Isi Berita tidak boleh kosong!');
-            quillContent.focus();
-            return false;
+
+        if (quillContent.getText().trim() === '') {
+            e.preventDefault(); alert('Isi Berita tidak boleh kosong!'); quillContent.focus(); return false;
         }
-        
-        if (isEmpty2) {
-            e.preventDefault();
-            alert('Isi Berita 2 tidak boleh kosong!');
-            quillContent2.focus();
-            return false;
+        if (quillContent2.getText().trim() === '') {
+            e.preventDefault(); alert('Isi Berita 2 tidak boleh kosong!'); quillContent2.focus(); return false;
         }
-        
+
         document.getElementById('content-hidden').value = content1;
         document.getElementById('content2-hidden').value = content2;
     });
 
-    // Kategori Selection
-    let selectedKategori = [];
-
-    const oldKategori = document.getElementById('kategori-hidden').value;
-    if (oldKategori) {
-        selectedKategori = oldKategori.split(',').map(k => k.trim()).filter(k => k);
-        updateKategoriUI();
-    }
-
-    document.querySelectorAll('.kategori-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            const name = this.getAttribute('data-name');
-
-            const index = selectedKategori.findIndex(k => k.id === id);
-            if (index > -1) {
-                selectedKategori.splice(index, 1);
-            } else {
-                selectedKategori.push({id: id, name: name});
-            }
-
-            updateKategoriUI();
-        });
-    });
-
-    function updateKategoriUI() {
-        const container = document.getElementById('selected-kategori');
-        container.innerHTML = selectedKategori.length
-            ? selectedKategori.map(k => `<span class="selected-kategori-badge"><i class="bi bi-check-circle"></i>${k.name}</span>`).join(' ')
-            : '<small class="text-muted">Pilih minimal 1 kategori</small>';
-        document.getElementById('kategori-hidden').value = selectedKategori.map(k => k.id).join(',');
-        document.querySelectorAll('.kategori-btn').forEach(btn => {
-            const btnId = btn.getAttribute('data-id');
-            btn.classList.toggle('active', selectedKategori.some(k => k.id === btnId));
-        });
-    }
-
-    // Preview Cover Image
-    document.getElementById('cover-image').addEventListener('change', function(e) {
-        const preview = document.getElementById('cover-preview');
-        preview.innerHTML = '';
+    // --- Preview Cover Image ---
+    const coverInput = document.getElementById('cover-image');
+    const coverPreview = document.getElementById('cover-preview');
+    coverInput.addEventListener('change', function(e) {
+        coverPreview.innerHTML = '';
         const file = e.target.files[0];
-        if (file) {
+        if(file){
             const reader = new FileReader();
-            reader.onload = e => preview.innerHTML = `<img src="${e.target.result}" class="preview-img" alt="Preview Cover">`;
+            reader.onload = e => coverPreview.innerHTML = `<img src="${e.target.result}" class="preview-img">`;
             reader.readAsDataURL(file);
         }
     });
 
-    // Preview Additional Images
-    document.getElementById('additional-images').addEventListener('change', function(e) {
-        const preview = document.getElementById('additional-preview');
-        preview.innerHTML = '';
-        Array.from(e.target.files).slice(0, 5).forEach(file => {
+    // --- Preview Additional Images ---
+    const additionalInput = document.getElementById('additional-images');
+    const additionalPreview = document.getElementById('additional-preview');
+    additionalInput.addEventListener('change', function(e) {
+        additionalPreview.innerHTML = '';
+        Array.from(e.target.files).slice(0,5).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => {
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.alt = 'Preview';
-                preview.appendChild(img);
-            };
+                additionalPreview.appendChild(img);
+            }
             reader.readAsDataURL(file);
         });
     });
-});
-// Dropdown Kategori dengan Pencarian & Multi-Select
-document.addEventListener('DOMContentLoaded', function() {
+
+    // --- Dropdown Kategori Multi-Select ---
     const toggleBtn = document.getElementById('kategori-toggle');
     const dropdownMenu = toggleBtn.nextElementSibling;
     const searchInput = document.getElementById('kategori-search');
@@ -756,112 +726,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const badgesContainer = document.getElementById('selected-kategori-badges');
     const noResultsEl = document.getElementById('kategori-no-results');
 
-    // Map ID → Nama
-    const kategoriMap = {};
-    checkboxes.forEach(cb => {
-        const item = cb.closest('.kategori-item');
-        const name = item.getAttribute('data-name');
-        kategoriMap[cb.value] = name;
-    });
-
-    // Update tampilan berdasarkan pilihan
-    function updateUI() {
+    function updateKategoriUI() {
         const selected = Array.from(checkboxes).filter(cb => cb.checked);
         const ids = selected.map(cb => cb.value);
-        const names = selected.map(cb => {
-            const el = cb.closest('.kategori-item');
-            return el.querySelector('.form-check-label').textContent.trim();
-        });
-
-        // Simpan ke hidden input
+        const names = selected.map(cb => cb.closest('.kategori-item').querySelector('.form-check-label').textContent.trim());
         hiddenInput.value = ids.join(',');
-
-        // Update placeholder
-        if (names.length === 0) {
-            placeholder.textContent = 'Pilih minimal 1 kategori';
-            placeholder.classList.add('text-gray-500');
-            placeholder.classList.remove('text-gray-700');
-        } else {
-            placeholder.textContent = names.length + ' kategori dipilih';
-            placeholder.classList.remove('text-gray-500');
-            placeholder.classList.add('text-gray-700');
-        }
+        placeholder.textContent = names.length ? `${names.length} kategori dipilih` : 'Pilih minimal 1 kategori';
+        placeholder.classList.toggle('text-gray-500', !names.length);
+        placeholder.classList.toggle('text-gray-700', !!names.length);
 
         // Render badges
-        badgesContainer.innerHTML = names.map((name, idx) => 
-            `<span class="selected-badge">
-                ${name}
-                <i class="bi bi-x-circle-fill" data-index="${idx}" title="Hapus"></i>
-            </span>`
+        badgesContainer.innerHTML = names.map((name, idx) =>
+            `<span class="selected-badge">${name} <i class="bi bi-x-circle-fill" data-index="${idx}"></i></span>`
         ).join('');
 
-        // Event hapus badge
         badgesContainer.querySelectorAll('.bi-x-circle-fill').forEach(icon => {
             icon.addEventListener('click', function() {
                 const idx = parseInt(this.getAttribute('data-index'));
-                const cb = selected[idx];
-                if (cb) {
-                    cb.checked = false;
-                    updateUI();
-                }
+                const cb = selected[idx]; if(cb){ cb.checked=false; updateKategoriUI(); }
             });
         });
     }
 
-    // Filter kategori berdasarkan input pencarian
-    function filterKategori() {
-        const query = searchInput.value.trim().toLowerCase();
-        let hasVisible = false;
+    // Inisialisasi checkbox dari hidden input lama
+    const oldValues = hiddenInput.value ? hiddenInput.value.split(',') : [];
+    oldValues.forEach(id => { const cb = document.getElementById('kat-'+id); if(cb) cb.checked=true; });
+    updateKategoriUI();
+    checkboxes.forEach(cb => cb.addEventListener('change', updateKategoriUI));
 
+    // Filter kategori
+    searchInput.addEventListener('input', function(){
+        const q = searchInput.value.trim().toLowerCase();
+        let visible=false;
         kategoriItems.forEach(item => {
             const name = item.getAttribute('data-name') || '';
-            const match = name.includes(query);
+            const match = name.includes(q);
             item.style.display = match ? 'flex' : 'none';
-            if (match) hasVisible = true;
+            if(match) visible=true;
         });
-
-        noResultsEl.style.display = hasVisible ? 'none' : 'block';
-    }
-
-    // Toggle dropdown
-    toggleBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-        toggleBtn.setAttribute('aria-expanded', !isExpanded);
-        dropdownMenu.classList.toggle('show', !isExpanded);
-        if (!isExpanded) {
-            setTimeout(() => searchInput.focus(), 50);
-        }
+        noResultsEl.style.display = visible ? 'none':'block';
     });
 
-    // Tutup dropdown saat klik luar
-    document.addEventListener('click', function(e) {
-        if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            toggleBtn.setAttribute('aria-expanded', 'false');
+    // Toggle dropdown
+    toggleBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        const show = toggleBtn.getAttribute('aria-expanded')!=='true';
+        toggleBtn.setAttribute('aria-expanded', show);
+        dropdownMenu.classList.toggle('show', show);
+        if(show) setTimeout(()=>searchInput.focus(),50);
+    });
+
+    // Tutup dropdown klik luar
+    document.addEventListener('click', function(e){
+        if(!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)){
+            toggleBtn.setAttribute('aria-expanded','false');
             dropdownMenu.classList.remove('show');
         }
     });
 
-    // Event: checkbox berubah
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', updateUI);
-    });
-
-    // Event: ketik di search
-    searchInput.addEventListener('input', filterKategori);
-
     // Reset pencarian saat dropdown ditutup
-    const observer = new MutationObserver(() => {
-        if (!dropdownMenu.classList.contains('show')) {
-            searchInput.value = '';
-            filterKategori();
-        }
-    });
-    observer.observe(dropdownMenu, { attributes: true, attributeFilter: ['class'] });
+    new MutationObserver(()=>{if(!dropdownMenu.classList.contains('show')){ searchInput.value=''; searchInput.dispatchEvent(new Event('input')); }}).observe(dropdownMenu,{attributes:true,attributeFilter:['class']});
 
-    // Inisialisasi UI
-    updateUI();
 });
 </script>
+
+
 
 <?= $this->endSection() ?>
