@@ -3,9 +3,353 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
 <style>
-    /* ... CSS yang sudah ada tetap sama ... */
-    
-    /* Tambahan CSS untuk Temporary Images */
+    :root {
+        --primary: #1e40af;
+        --primary-dark: #1e3a8a;
+        --primary-light: #3b82f6;
+        --success: #059669;
+        --warning: #d97706;
+        --info: #0284c7;
+        --danger: #dc2626;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+    }
+
+    body {
+        background-color: var(--gray-50);
+    }
+
+    /* Header Styles */
+    .gov-header {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+        border: 1px solid var(--gray-200);
+        border-left: 4px solid var(--primary);
+    }
+
+    .gov-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--gray-900);
+    }
+
+    .gov-header h1 i {
+        color: var(--primary);
+        margin-right: 10px;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: var(--primary);
+        margin-right: 10px;
+        font-size: 1.25rem;
+    }
+
+    /* Form Controls */
+    .form-label {
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .text-danger {
+        color: var(--danger) !important;
+    }
+
+    /* Kategori Buttons */
+    .kategori-btn {
+        border: 2px solid var(--gray-300);
+        background: white;
+        color: var(--gray-700);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .kategori-btn:hover {
+        border-color: var(--primary-light);
+        background: #eff6ff;
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .kategori-btn.active {
+        background: var(--primary) !important;
+        color: white !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .selected-kategori-badge {
+        display: inline-flex;
+        align-items: center;
+        background: var(--success);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        margin: 5px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+    }
+
+    .selected-kategori-badge i {
+        margin-right: 6px;
+    }
+
+    /* Image Preview */
+    .preview-container {
+        margin-top: 16px;
+    }
+
+    .preview-img {
+        max-width: 200px;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid var(--gray-200);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+    }
+
+    .preview-img:hover {
+        border-color: var(--primary);
+        transform: scale(1.02);
+    }
+
+    /* Quill Editor */
+    .ql-toolbar-custom {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-300) !important;
+        border-radius: 8px 8px 0 0;
+        padding: 12px;
+    }
+
+    .ql-container {
+        border: 1px solid var(--gray-300) !important;
+        border-radius: 0 0 8px 8px;
+        font-size: 0.9375rem;
+    }
+
+    .ql-editor {
+        min-height: 250px;
+        font-size: 0.9375rem;
+        color: var(--gray-800);
+    }
+
+    .ql-editor.ql-blank::before {
+        color: var(--gray-400);
+        font-style: normal;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        padding-top: 24px;
+        border-top: 2px solid var(--gray-200);
+        margin-top: 32px;
+    }
+
+    .btn {
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .btn-secondary {
+        background: var(--gray-600);
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-700);
+        transform: translateY(-2px);
+    }
+
+    .btn i {
+        margin-right: 6px;
+    }
+
+    /* Helper Text */
+    .form-text,
+    small.text-muted {
+        color: var(--gray-500);
+        font-size: 0.8125rem;
+        margin-top: 6px;
+        display: block;
+    }
+
+    /* Section Spacing */
+    .form-section {
+        margin-bottom: 32px;
+        padding-bottom: 32px;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-card {
+            padding: 20px;
+        }
+
+        .gov-header {
+            padding: 20px;
+        }
+
+        .gov-header h1 {
+            font-size: 1.375rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+        }
+
+        .kategori-btn {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+            margin: 4px 0 !important;
+        }
+    }
+
+    /* Additional Images Grid */
+    .additional-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .additional-preview img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid var(--gray-200);
+    }
+   /* Dropdown Kategori dengan Pencarian */
+#kategori-toggle {
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: var(--gray-700);
+}
+#kategori-toggle:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+.kategori-list .form-check {
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 2px 0;
+}
+.kategori-list .form-check:hover {
+    background-color: var(--gray-50);
+}
+.kategori-list .form-check-label {
+    font-size: 0.9375rem;
+    user-select: none;
+}
+.selected-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    margin: 2px 6px 2px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.selected-badge i {
+    margin-left: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0.8;
+}
+.selected-badge i:hover {
+    opacity: 1;
+    color: rgba(255,255,255,0.9);
+}
+.kategori-item {
+    display: flex;
+    align-items: center;
+}
+.kategori-no-results {
+    font-size: 0.875rem;
+}
     .retained-image-info {
         background-color: #e0f2fe;
         border-left: 4px solid #0284c7;
@@ -43,6 +387,14 @@
 
 <?= $this->section('content') ?>
 
+<?= 
+$oldContent1 = old('content', '');
+$oldContent2 = old('content2', '');
+
+// Sanitasi HTML (opsional tapi disarankan)
+$oldContent1 = htmlspecialchars_decode($oldContent1, ENT_QUOTES);
+$oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
+?>
 <!-- Page Header -->
 <div class="gov-header">
     <h1>
@@ -357,7 +709,6 @@
         </div>
     </form>
 </div>
-
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -376,10 +727,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- Masukkan old content dari server ---
-    const oldContent1 = <?= json_encode(old('content', '')) ?>;
-    const oldContent2 = <?= json_encode(old('content2', '')) ?>;
-    if (oldContent1.trim() !== '') quillContent.clipboard.dangerouslyPasteHTML(oldContent1);
-    if (oldContent2.trim() !== '') quillContent2.clipboard.dangerouslyPasteHTML(oldContent2);
+const oldContent1 = <?= json_encode($oldContent1) ?>;
+const oldContent2 = <?= json_encode($oldContent2) ?>;
+
+if (oldContent1 && typeof oldContent1 === 'string') {
+    // Kosongkan dulu agar tidak double
+    quillContent.setContents([]);
+    quillContent.clipboard.dangerouslyPasteHTML(0, oldContent1);
+}
+if (oldContent2 && typeof oldContent2 === 'string') {
+    quillContent2.setContents([]);
+    quillContent2.clipboard.dangerouslyPasteHTML(0, oldContent2);
+}
 
     // --- Update hidden textarea sebelum submit ---
     const form = document.querySelector('form');
