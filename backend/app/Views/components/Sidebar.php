@@ -55,8 +55,8 @@ $menuItems = [
         'icon' => 'bi-file-earmark-text',
         'roles' => ['admin', 'editor'],
         'submenu' => [
-            ['title' => 'Daftar Dokumen', 'url' => '/dokumen', 'roles' => ['admin', 'editor']],
-            ['title' => 'Kategori Dokumen', 'url' => '/dokumen/kategori', 'roles' => ['admin']],
+            ['title' => 'Daftar Dokumen', 'url' => '/dokument', 'roles' => ['admin', 'editor']],
+            ['title' => 'Kategori Dokumen', 'url' => '/dokument_kategori', 'roles' => ['admin']],
             ['title' => 'Upload Dokumen', 'url' => '/dokumen/upload', 'roles' => ['admin', 'editor']]
         ]
     ],
