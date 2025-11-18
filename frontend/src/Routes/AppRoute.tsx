@@ -1,16 +1,16 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import HeroSection from "../components/Hero";
-import ServiceGrid from "../components/Services";
-import TangerangNewsApp from "../components/News";
-import Media from "../components/Media";
-import HubungiKami from "../components/contact";
-import Structure from "../components/Structure";
-import Modal from "../components/Modal";
-import Footer from "../components/footer";
+import Navbar from "../sections/homepage/Navbar";
+import HeroSection from "../sections/homepage/Hero";
+import ServiceGrid from "../sections/homepage/Services";
+import TangerangNewsApp from "../sections/homepage//News";
+import Media from "../sections/homepage/Media";
+import HubungiKami from "../sections/homepage/contact";
+import Structure from "../sections/homepage/Structure";
+import Modal from "../sections/homepage/Modal";
+import Footer from "../sections/homepage/footer";
 import Berita from "../sections/berita/Berita";
-import AccessibilityPanel from "../components/AccessibilityPanel";
+import AccessibilityPanel from "../sections/homepage/AccessibilityPanel";
 
 const HomePage: React.FC = () => {
   return (

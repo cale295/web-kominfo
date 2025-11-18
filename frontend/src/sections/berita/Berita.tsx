@@ -1,8 +1,96 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/berita.css";
+import api from "../../services/api";
+
+// Interface untuk data berita
+interface BeritaItem {
+  id_berita: string;
+  judul: string;
+  intro: string;
+  feat_image: string;
+  created_at: string;
+}
 
 const Berita: React.FC = () => {
+  // State untuk menyimpan data berita
+  const [beritaUtama, setBeritaUtama] = useState<BeritaItem | null>(null);
+  const [beritaPopuler, setBeritaPopuler] = useState<BeritaItem[]>([]);
+  const [beritaTerkini, setBeritaTerkini] = useState<BeritaItem[]>([]);
+
+  // Format tanggal
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    };
+    return new Date(dateString).toLocaleDateString('id-ID', options);
+  };
+
+  useEffect(() => {
+  const fetchBerita = async () => {
+    try {
+      // Fetch utama + list berita
+      const res = await api.get("/berita");
+      const data = res?.data?.data;
+
+      if (!data) return;
+
+      // ==========================
+      // === FIX BERITA UTAMA ====
+      // ==========================
+      const utamaInfo = data.utama;
+      let beritaUtamaDetail = null;
+
+      if (utamaInfo && utamaInfo.id_berita) {
+        const idUtama = utamaInfo.id_berita;
+
+        // Cek apakah berita utama sudah ada di list "berita"
+        const foundInList = data.berita.find(
+          (item: BeritaItem) => item.id_berita === idUtama
+        );
+
+        if (foundInList) {
+          beritaUtamaDetail = foundInList;
+        } else {
+          // Kalau tidak ada → fetch pakai endpoint detail
+          const detailRes = await api.get(`/berita/${idUtama}`);
+          beritaUtamaDetail = detailRes?.data?.data || null;
+        }
+      }
+
+      setBeritaUtama(beritaUtamaDetail);
+
+      // ==========================
+      // === BERITA POPULER =======
+      // ==========================
+      const populer = [...data.berita]
+        .sort((a, b) => Number(b.hit) - Number(a.hit))
+        .slice(0, 5);
+      setBeritaPopuler(populer);
+
+      // ==========================
+      // === BERITA TERKINI =======
+      // ==========================
+      const terkini = [...data.berita]
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() -
+            new Date(a.created_at).getTime()
+        )
+        .slice(0, 5);
+      setBeritaTerkini(terkini);
+    } catch (error) {
+      console.error("Gagal fetch berita:", error);
+    }
+  };
+
+  fetchBerita();
+}, []);
+const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
+
+
   return (
     <div className="container my-5 berita-container">
       {/* ROW 1 */}
@@ -12,27 +100,31 @@ const Berita: React.FC = () => {
           <h5 className="section-title">
             <i className="bi bi-caret-right-fill me-2"></i>Berita Utama
           </h5>
-          <div className="card border-0 shadow-sm berita-utama">
-            <img
-              src="/assets/berita-utama-sample.jpg"
-              className="card-img-top rounded-2"
-              alt="Berita Utama"
-            />
-            <div className="card-body">
-              <h5 className="card-title fw-semibold mb-2">
-                Optimalkan Pembangunan Infrastruktur, Pemkot Tangerang Perbaiki 40 Ruas Jalan Kota
-              </h5>
-              <p className="card-text text-muted small mb-2">
-                Selasa, 25 Juni 2025
-              </p>
-              <p className="card-text small">
-                Ini adalah ringkasan dari berita utama. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              </p>
-              <a href="/berita/1" className="btn btn-primary btn-sm">
-                Baca Selengkapnya
-              </a>
+          {beritaUtama ? (
+            <div className="card border-0 shadow-sm berita-utama">
+              <img
+               src={`${ROOT}/${beritaUtama.feat_image.replace(/^\/+/, "")}`} // Gunakan base URL API jika perlu
+                className="card-img-top rounded-2"
+                alt={beritaUtama.judul}
+              />
+              <div className="card-body">
+                <h5 className="card-title fw-semibold mb-2">
+                  {beritaUtama.judul}
+                </h5>
+                <p className="card-text text-muted small mb-2">
+                  {formatDate(beritaUtama.created_at)}
+                </p>
+                <p className="card-text small">
+                  {beritaUtama.intro}
+                </p>
+                <a href={`/berita/${beritaUtama.id_berita}`} className="btn btn-primary btn-sm">
+                  Baca Selengkapnya
+                </a>
+              </div>
             </div>
-          </div>
+          ) : (
+            <p>Loading berita utama...</p>
+          )}
         </div>
 
         {/* ===== BERITA POPULER ===== */}
@@ -41,31 +133,20 @@ const Berita: React.FC = () => {
             <i className="bi bi-caret-right-fill me-2"></i>Berita Populer
           </h5>
           <ul className="list-group list-group-flush">
-            <li className="list-group-item px-0 border-0 pb-2">
-              <a href="/berita/2" className="text-decoration-none text-dark small">
-                1# Dinkes Genjot Capaian Booster Covid-19, Ini Cara Cek Jadwal Vaksinasi
-              </a>
-            </li>
-            <li className="list-group-item px-0 border-0 pb-2">
-              <a href="/berita/3" className="text-decoration-none text-dark small">
-                2# Catat! Ini 69 Obat yang Dicabut Izin Edarnya oleh BPOM
-              </a>
-            </li>
-            <li className="list-group-item px-0 border-0 pb-2">
-              <a href="/berita/4" className="text-decoration-none text-dark small">
-                3# Kick Off Imunisasi PCV, Cegah Pneumonia pada Bayi
-              </a>
-            </li>
-            <li className="list-group-item px-0 border-0 pb-2">
-              <a href="/berita/5" className="text-decoration-none text-dark small">
-                4# Mulai Hari Ini, Bus Tayo dan Si Benteng Digratiskan
-              </a>
-            </li>
-            <li className="list-group-item px-0 border-0 pb-2">
-              <a href="/berita/6" className="text-decoration-none text-dark small">
-                5# Segera Siapkan Berkas, Disnaker Akan Buka 783 Loker Besar!
-              </a>
-            </li>
+            {beritaPopuler.length > 0 ? (
+              beritaPopuler.map((item, index) => (
+                <li key={item.id_berita} className="list-group-item px-0 border-0 pb-2">
+                  <a 
+                    href={`/berita/${item.id_berita}`} 
+                    className="text-decoration-none text-dark small"
+                  >
+                    {index + 1}# {item.judul}
+                  </a>
+                </li>
+              ))
+            ) : (
+              <li className="list-group-item px-0 border-0 pb-2">Loading...</li>
+            )}
           </ul>
           <a href="#" className="small text-primary">
             Lihat berita populer lainnya
@@ -81,33 +162,37 @@ const Berita: React.FC = () => {
             <i className="bi bi-caret-right-fill me-2"></i>Berita Terkini
           </h5>
 
-          {[1, 2, 3, 4, 5].map((item) => (
-            <div
-              key={item}
-              className="d-flex gap-3 align-items-start berita-terkini-item mb-3 pb-3 border-bottom"
-            >
-              <img
-                src="/assets/mas.png"
-                className="rounded berita-thumb"
-                alt="Berita Terkini"
-              />
-              <div>
-                <h6 className="fw-semibold mb-1">
-                  Judul Berita Terkini {item}
-                </h6>
-                <p className="text-muted small mb-2">
-                  Kamis, 25 Desember | 15 jam lalu
-                </p>
-                <p className="text-secondary small mb-2">
-                  Ini adalah ringkasan dari berita terkini. Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit.
-                </p>
-                <a href={`/berita/${item}`} className="btn btn-outline-primary btn-sm">
-                  Baca Selengkapnya
-                </a>
+          {beritaTerkini.length > 0 ? (
+            beritaTerkini.map((item) => (
+              <div
+                key={item.id_berita}
+                className="d-flex gap-3 align-items-start berita-terkini-item mb-3 pb-3 border-bottom"
+              >
+                <img
+                  src={`${ROOT}/${item.feat_image.replace(/^\/+/, "")}`}
+                  className="rounded berita-thumb"
+                  alt={item.judul}
+                  style={{ width: '100px', height: '60px', objectFit: 'cover' }} // Gaya opsional
+                />
+                <div>
+                  <h6 className="fw-semibold mb-1">
+                    {item.judul}
+                  </h6>
+                  <p className="text-muted small mb-2">
+                    {formatDate(item.created_at)}
+                  </p>
+                  <p className="text-secondary small mb-2">
+                    {item.intro}
+                  </p>
+                  <a href={`/berita/${item.id_berita}`} className="btn btn-outline-primary btn-sm">
+                    Baca Selengkapnya
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>Loading berita terkini...</p>
+          )}
         </div>
 
         {/* ===== TAG PALING DICARI ===== */}
