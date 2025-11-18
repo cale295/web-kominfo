@@ -4,17 +4,30 @@ namespace App\Controllers\Api;
 
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\BeritaModel;
+use App\Models\BeritaUtamaModel;
 
 class ApiBeritaController extends ResourceController
 {
-    protected $modelName = BeritaModel::class;
+    protected $modelName = BeritaModel::class; // model default bawaan CI
     protected $format = 'json';
+
+    protected $utamaModel; // model kedua
+
+    public function __construct()
+    {
+        $this->utamaModel = new BeritaUtamaModel(); // instance manual model kedua
+    }
 
     // ================================
     // TAMPILKAN SEMUA AGENDA (API)
     // ================================
 public function index()
 {
+    $beritautama = $this->utamaModel
+        ->where('status', '0')
+        ->orderBy('created_date', 'DESC')
+        ->first();
+
     $beritas = $this->model
         ->where('trash', '0')
         ->orderBy('created_at', 'DESC')
@@ -22,8 +35,11 @@ public function index()
 
     return $this->respond([
         'status'  => true,
-        'message' => 'Daftar agenda aktif berhasil diambil.',
-        'data'    => $beritas
+        'message' => 'Data berita berhasil diambil.',
+        'data'    => [
+            'utama'  => $beritautama,
+            'berita' => $beritas
+        ]
     ]);
 }
 
@@ -31,30 +47,41 @@ public function index()
     // ================================
     // TAMPILKAN 1 AGENDA BERDASARKAN ID
     // ================================
-public function show($id = null)
-{
-    $beritas = $this->model
-        ->where('id_berita', $id)
-        ->where('trash', '0') // pastikan bukan sampah
-        ->first();
+    public function show($id = null)
+    {
+        $beritautama = $this->utamaModel
+            ->where('id_berita', $id)
+            ->where('trash', '0')
+            ->first();
 
-    if (!$beritas) {
-        return $this->failNotFound('Berita tidak ditemukan.');
+        if ($beritautama) {
+            return $this->respond([
+                'status'  => true,
+                'message' => 'Berita utama berhasil diambil.',
+                'data'    => $beritautama
+            ]);
+        }
+
+        $beritas = $this->model
+            ->where('id_berita', $id)
+            ->where('trash', '0')
+            ->first();
+
+        if (!$beritas) {
+            return $this->failNotFound('Berita tidak ditemukan.');
+        }
+
+        // Tambah hit
+        $this->model->set('hit', 'hit + 1', false)
+                    ->where('id_berita', $id)
+                    ->update();
+
+        $beritas['hit']++;
+
+        return $this->respond([
+            'status'  => true,
+            'message' => 'Detail berita berhasil diambil.',
+            'data'    => $beritas
+        ]);
     }
-
-    // === Tambah hit (jumlah dibaca) ===
-    $this->model->set('hit', 'hit + 1', false)
-                ->where('id_berita', $id)
-                ->update();
-
-    // Ambil ulang setelah hit diperbarui (opsional, kalau mau lihat hasil terbaru)
-    $beritas['hit'] = $beritas['hit'] + 1;
-
-    return $this->respond([
-        'status'  => true,
-        'message' => 'Detail berita berhasil diambil.',
-        'data'    => $beritas
-    ]);
-}
-
 }

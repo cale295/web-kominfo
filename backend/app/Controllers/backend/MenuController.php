@@ -44,6 +44,7 @@ class MenuController extends BaseController
         $menus = $this->menuModel
             ->orderBy('parent_id', 'ASC')
             ->orderBy('order_number', 'ASC')
+            ->orderBy('id_menu', 'ASC')
             ->findAll();
 
         $data = [

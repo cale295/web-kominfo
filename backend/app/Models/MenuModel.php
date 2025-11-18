@@ -43,8 +43,10 @@ class MenuModel extends Model
     {
         // Mengambil semua data, diurutkan untuk membantu rekursi
         return $this->orderBy('parent_id', 'ASC')
-                    ->orderBy('order_number', 'ASC')
-                    ->findAll();
+            ->orderBy('order_number', 'ASC')
+            ->orderBy('id_menu', 'ASC')   // <— FIX STABIL
+            ->findAll();
+
     }
 
     // =========================================================
