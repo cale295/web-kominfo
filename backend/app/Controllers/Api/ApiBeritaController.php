@@ -28,8 +28,8 @@ public function index()
 {
       $kategories = $this->katemodel
         ->where('trash', '0')
-        ->where('is_show', '1')
-        ->orderBy('created_at', 'DESC')
+        ->where('is_show_nav', '1')
+        ->orderBy('created_on', 'DESC')
         ->findAll();
 
 
@@ -60,6 +60,19 @@ public function index()
     // ================================
     public function show($id = null)
     {
+        $kategories = $this->katemodel
+            ->where('trash', '0')
+            ->where('is_show_nav', '1')
+            ->orderBy('created_on', 'DESC')
+            ->findAll();
+        if ($kategories) {
+            return $this->respond([
+                'status'  => true,
+                'message' => 'Daftar kategori berhasil diambil.',
+                'data'    => $kategories
+            ]);
+        }
+
         $beritautama = $this->utamaModel
             ->where('id_berita', $id)
             ->where('trash', '0')
