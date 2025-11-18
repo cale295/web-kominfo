@@ -85,7 +85,7 @@ class BeritaController extends BaseController
 
         $data = [
             'title' => 'Tambah Berita',
-            'kategori' => $this->kategoriModel->where('trash', '0')->findAll(),
+            'kategori' => $this->kategoriModel->where('trash', '0')->where('status', '1')->findAll(),
             'beritaAll' => $this->beritaModel->findAll(),
             'tempCoverImage' => session()->get('temp_cover_image'),
             'tempAdditionalImages' => session()->get('temp_additional_images') ?? []

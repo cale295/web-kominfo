@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\BeritaModel;
 use App\Models\BeritaUtamaModel;
+use App\Models\KategoriModel;
 
 class ApiBeritaController extends ResourceController
 {
@@ -12,10 +13,12 @@ class ApiBeritaController extends ResourceController
     protected $format = 'json';
 
     protected $utamaModel; // model kedua
+    protected $katemodel;
 
     public function __construct()
     {
         $this->utamaModel = new BeritaUtamaModel(); // instance manual model kedua
+        $this->katemodel = new KategoriModel();
     }
 
     // ================================
@@ -23,6 +26,13 @@ class ApiBeritaController extends ResourceController
     // ================================
 public function index()
 {
+      $kategories = $this->katemodel
+        ->where('trash', '0')
+        ->where('is_show', '1')
+        ->orderBy('created_at', 'DESC')
+        ->findAll();
+
+
     $beritautama = $this->utamaModel
         ->where('status', '1')
         ->orderBy('created_date', 'DESC')
@@ -38,7 +48,8 @@ public function index()
         'message' => 'Data berita berhasil diambil.',
         'data'    => [
             'utama'  => $beritautama,
-            'berita' => $beritas
+            'berita' => $beritas,
+            'kategori' => $kategories
         ]
     ]);
 }
