@@ -94,6 +94,51 @@ class BeritaController extends BaseController
         return view('pages/berita/create', $data);
     }
 
+
+    public function show($id)
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_read']) {
+            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
+        }
+
+        $berita = $this->beritaModel->find($id);
+        if (!$berita) {
+            return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+        }
+
+            // === HIT++ (Tambah jumlah pembaca) ===
+     $this->beritaModel->set('hit', 'hit + 1', false)
+                      ->where('id_berita', $id)
+                      ->update();
+        // Ambil kategori berita
+        $kategori = $this->beritaModel->getKategoriByBerita($id);
+        $kategoriNames = array_column($kategori, 'kategori');
+
+        // Ambil berita terkait
+        $beritaTerkait = [];
+        if (!empty($berita['id_berita_terkait'])) {
+            $beritaTerkait[] = $this->beritaModel->find($berita['id_berita_terkait']);
+        }
+        if (!empty($berita['id_berita_terkait2'])) {
+            $beritaTerkait[] = $this->beritaModel->find($berita['id_berita_terkait2']);
+        }
+
+        // Decode additional images
+        $additionalImages = !empty($berita['additional_images']) ? json_decode($berita['additional_images'], true) : [];
+
+        $data = [
+            'title' => 'Detail Berita',
+            'berita' => $berita,
+            'kategori' => $kategoriNames,
+            'additionalImages' => $additionalImages,
+            'beritaTerkait' => $beritaTerkait,
+        ];
+
+        return view('pages/berita/show', $data);
+    }
+
+
     // ========================================================
     // Simpan Berita Baru
     // ========================================================
@@ -206,6 +251,124 @@ class BeritaController extends BaseController
         return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
     }
 
+public function delete($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_delete']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menghapus berita.');
+    }
+
+    $berita = $this->beritaModel->find($id); // ← WAJIB ADA
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    $updated = $this->beritaModel->update($id, [
+        'trash' => '1',
+        'is_delete_by_id' => session()->get('id_user'),
+        'is_delete_by_name' => session()->get('username'),
+        'delete_at' => date('Y-m-d H:i:s')
+    ]);
+
+    if ($updated) {
+        $this->saveLog($id, 'Berita dipindahkan ke sampah', $berita['status'] ?? 0);
+    }
+
+    if (!$updated) {
+        return redirect()->to('/berita')->with('error', 'Gagal memindahkan berita ke sampah.');
+    }
+
+    return redirect()->to('/berita')->with('success', 'Berita dipindahkan ke sampah.');
+}
+
+
+    public function destroyPermanent($id)
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_delete']) {
+            return redirect()->to('/berita/trash')->with('error', 'Kamu tidak punya izin menghapus berita.');
+        }
+
+        $berita = $this->beritaModel->find($id);
+        if (!$berita) {
+            return redirect()->to('/berita/trash')->with('error', 'Berita tidak ditemukan.');
+        }
+
+        // Hapus file cover jika ada
+        if (!empty($berita['feat_image']) && file_exists(WRITEPATH . '../public/' . $berita['feat_image'])) {
+            unlink(WRITEPATH . '../public/' . $berita['feat_image']);
+        }
+
+        // Hapus additional images jika ada
+        if (!empty($berita['additional_images'])) {
+            $addImages = json_decode($berita['additional_images'], true);
+            foreach ($addImages as $img) {
+                if (file_exists(WRITEPATH . '../public/' . $img)) {
+                    unlink(WRITEPATH . '../public/' . $img);
+                }
+            }
+        }
+
+        // Hapus berita permanen
+        $this->beritaModel->delete($id, true); // true = force delete
+
+        return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dihapus permanen.');
+    }
+
+        // ========================================================
+    // Restore dari Trash
+    // ========================================================
+    public function restore($id)
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/berita/trash')->with('error', 'Kamu tidak punya izin memulihkan berita.');
+        }
+
+        $this->beritaModel->update($id, [
+            'trash' => '0',
+            'is_delete_by_id' => null,
+            'is_delete_by_name' => null,
+            'delete_at' => null
+        ]);
+
+        $this->saveLog($id, 'Berita dipulihkan dari sampah');
+
+        return redirect()->to('/berita/trash')->with('success', 'Berita berhasil dipulihkan.');
+    }
+
+        // ========================================================
+    // Daftar Berita Trash
+    // ========================================================
+    public function trash()
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_read']) {
+            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
+        }
+
+        $berita = $this->beritaModel->db->table('t_berita')
+            ->select('t_berita.*, GROUP_CONCAT(m_kategori_berita.kategori SEPARATOR ", ") as kategori')
+            ->join('t_berita_kategori', 't_berita_kategori.id_berita = t_berita.id_berita', 'left')
+            ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita_kategori.id_kategori', 'left')
+            ->where('t_berita.trash', '1')
+            ->groupBy('t_berita.id_berita')
+            ->orderBy('t_berita.updated_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $data = [
+            'title' => 'Sampah Berita',
+            'berita' => $berita,
+            'can_restore' => $access['can_update'],
+            'can_delete' => $access['can_delete'],
+        ];
+
+        return view('pages/berita/trash', $data);
+    }
+
+
+
     // ========================================================
     // Fungsi Upload Sementara
     // ========================================================
@@ -241,6 +404,8 @@ class BeritaController extends BaseController
             }
         }
     }
+
+    
 
     private function clearTemporaryImages()
     {
@@ -282,22 +447,87 @@ class BeritaController extends BaseController
     // ========================================================
     // Log Berita
     // ========================================================
-    private function saveLog($idBerita, $keterangan, $status = null)
+    // ========================================================
+    // Save log perubahan berita
+    // ========================================================
+
+    private function saveLog($idBerita, $keterangan, $status = null, $notePerbaikan = null, $noteRevisi = null)
     {
+        log_message('info', 'User ID: ' . session()->get('id_user'));
+        log_message('info', 'Username: ' . session()->get('username'));
         $berita = $this->beritaModel->find($idBerita);
-        if (!$berita) return;
+        if (!$berita) {
+            log_message('error', "Berita tidak ditemukan: ID $idBerita");
+            return;
+        }
+
+        // Ambil data kategori
+        $kategori = $this->beritaModel->getKategoriByBerita($idBerita);
+        $berita['kategori_berita'] = $kategori;
+
+        // Ambil additional images jika ada
+        if (!empty($berita['additional_images'])) {
+            $berita['galeri_foto'] = json_decode($berita['additional_images'], true);
+        }
 
         $logData = [
             'id_hash' => $berita['hash_berita'] ?? '',
             'id_berita' => $idBerita,
-            'log' => json_encode($berita, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            'log' => json_encode($berita, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             'keterangan' => $keterangan,
             'id_user' => session()->get('id_user'),
             'created_date' => date('Y-m-d H:i:s'),
             'status' => $status ?? $berita['status'] ?? 0,
+            'note_perbaikan' => $notePerbaikan,
+            'note_revisi' => $noteRevisi,
             'fullname' => session()->get('username'),
         ];
 
-        $this->beritaLogModel->insert($logData);
+        // DEBUG: tampilkan data yang akan disimpan
+        log_message('info', 'Data Log: ' . print_r($logData, true));
+
+        $result = $this->beritaLogModel->insert($logData);
+
+        if (!$result) {
+            $errors = $this->beritaLogModel->errors();
+            log_message('error', 'Gagal simpan log: ' . print_r($errors, true));
+        } else {
+            log_message('info', "Log berhasil disimpan untuk berita ID: $idBerita");
+        }
+    } /// ========================================================
+    // Log Aktivitas Berita
+    // ========================================================
+    public function log($id)
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_read']) {
+            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin melihat log berita.');
+        }
+
+        $db = \Config\Database::connect();
+
+        // Ambil data berita
+        $berita = $this->beritaModel->find($id);
+        if (!$berita) {
+            return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+        }
+
+        // Ambil log berdasarkan id_berita
+        $logs = $db->table('t_berita_log')
+            ->select('t_berita_log.*, m_users.full_name AS user_name')
+            ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left')
+            ->where('t_berita_log.id_berita', $id)
+            ->orderBy('t_berita_log.created_date', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $data = [
+            'title' => 'Log Aktivitas Berita',
+            'berita' => $berita,
+            'logs' => $logs
+        ];
+
+        return view('pages/berita/logs', $data);
     }
+
 }
