@@ -142,114 +142,211 @@ class BeritaController extends BaseController
     // ========================================================
     // Simpan Berita Baru
     // ========================================================
-    public function create()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access['can_create']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
-        }
+public function create()
+{
+    $access = $this->getAccess(session()->get('role'));
 
-        $validation = \Config\Services::validation();
-        $rules = [
-            'judul' => 'required|min_length[5]',
-            'content' => 'required',
-            'content2' => 'required',
-            'id_kategori' => 'required'
-        ];
-
-        if (!session()->has('temp_cover_image')) {
-            $rules['feat_image'] = 'uploaded[feat_image]|max_size[feat_image,2048]|is_image[feat_image]';
-        }
-
-        if (!$this->validate($rules)) {
-            $this->saveTemporaryImages();
-            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
-        }
-
-        // --- Cover Image ---
-        $featImagePath = null;
-        if (session()->has('temp_cover_image')) {
-            $tempFile = session()->get('temp_cover_image');
-            $tempPath = WRITEPATH . '../public/uploads/temp/' . $tempFile;
-            if (file_exists($tempPath)) {
-                $finalPath = WRITEPATH . '../public/uploads/berita/' . $tempFile;
-                rename($tempPath, $finalPath);
-                $featImagePath = 'uploads/berita/' . $tempFile;
-            }
-            session()->remove('temp_cover_image');
-        } else {
-            $featImage = $this->request->getFile('feat_image');
-            if ($featImage && $featImage->isValid() && !$featImage->hasMoved()) {
-                $newName = $featImage->getRandomName();
-                $featImage->move(WRITEPATH . '../public/uploads/berita', $newName);
-                $featImagePath = 'uploads/berita/' . $newName;
-            }
-        }
-
-        // --- Additional Images ---
-        $additionalImages = [];
-        if (session()->has('temp_additional_images')) {
-            foreach (session()->get('temp_additional_images') as $tempFile) {
-                $tempPath = WRITEPATH . '../public/uploads/temp/' . $tempFile;
-                if (file_exists($tempPath)) {
-                    $finalDir = WRITEPATH . '../public/uploads/berita/additional/';
-                    if (!is_dir($finalDir)) mkdir($finalDir, 0755, true);
-                    $finalPath = $finalDir . $tempFile;
-                    rename($tempPath, $finalPath);
-                    $additionalImages[] = 'uploads/berita/additional/' . $tempFile;
-                }
-            }
-            session()->remove('temp_additional_images');
-        }
-
-        $files = $this->request->getFileMultiple('additional_images');
-        if ($files) {
-            foreach ($files as $file) {
-                if ($file->isValid() && !$file->hasMoved()) {
-                    $newName = $file->getRandomName();
-                    $file->move(WRITEPATH . '../public/uploads/berita/additional', $newName);
-                    $additionalImages[] = 'uploads/berita/additional/' . $newName;
-                }
-            }
-        }
-
-        // --- Simpan ke database ---
-        $post = $this->request->getPost();
-        $kategoriIds = is_array($post['id_kategori']) ? $post['id_kategori'] : explode(',', $post['id_kategori']);
-        $idKategori = $kategoriIds[0] ?? null;
-
-        $data = [
-            'judul' => $post['judul'],
-            'topik' => $post['topik'] ?? null,
-            'intro' => $post['intro'] ?? null,
-            'sumber' => $post['sumber'] ?? null,
-            'content' => $post['content'],
-            'content2' => $post['content2'],
-            'id_kategori' => $idKategori,
-            'link_video' => $post['link_video'] ?? null,
-            'keyword' => $post['keyword'] ?? null,
-            'feat_image' => $featImagePath,
-            'additional_images' => !empty($additionalImages) ? json_encode($additionalImages) : null,
-            'slug' => url_title($post['judul'], '-', true),
-            'hash_berita' => bin2hex(random_bytes(16)),
-            'status' => $post['status'] ?? 0,
-            'status_berita' => $post['status_berita'] ?? 0,
-            'created_by_id' => session()->get('id_user'),
-            'created_by_name' => session()->get('username'),
-            'created_at' => date('Y-m-d H:i:s')
-        ];
-
-        if (!$this->beritaModel->save($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
-        }
-
-        $idBerita = $this->beritaModel->getInsertID();
-        if (!empty($kategoriIds)) $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
-        $this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? 0);
-
-        $this->clearTemporaryImages();
-        return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
+    if (!$access['can_create']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
     }
+
+    $validation = \Config\Services::validation();
+
+    // ================================
+    // VALIDATION RULES + CUSTOM ERROR
+    // ================================
+    $rules = [
+        'judul' => [
+            'rules' => 'required|min_length[5]|max_length[255]',
+            'errors' => [
+                'required'   => 'Judul wajib diisi.',
+                'min_length' => 'Judul minimal harus 5 karakter.',
+                'max_length' => 'Judul maksimal 255 karakter.'
+            ]
+        ],
+        'topik' => [
+            'rules' => 'required|min_length[5]|max_length[255]',
+            'errors' => [
+                'required'   => 'Topik wajib diisi.',
+                'min_length' => 'Topik minimal harus 5 karakter.',
+                'max_length' => 'Topik maksimal 255 karakter.'
+            ]
+        ],
+        'content' => [
+            'rules' => 'permit_empty|string|min_length[5]',
+            'errors' => [
+                'string'     => 'Konten harus berupa teks.',
+                'min_length' => 'Konten minimal harus 5 karakter.'
+            ]
+        ],
+        'content2' => [
+            'rules' => 'permit_empty|string|min_length[5]',
+            'errors' => [
+                'string'     => 'Konten lanjutan harus berupa teks.',
+                'min_length' => 'Konten lanjutan minimal harus 5 karakter.'
+            ]
+        ],
+        'caption' => [
+            'rules' => 'permit_empty|string|min_length[5]|max_length[255]',
+            'errors' => [
+                'min_length' => 'Caption minimal harus 5 karakter.',
+                'max_length' => 'Caption maksimal 255 karakter.'
+            ]
+        ],
+        'intro' => [
+            'rules' => 'permit_empty|string|min_length[5]|max_length[255]',
+            'errors' => [
+                'min_length' => 'Intro minimal 5 karakter.',
+                'max_length' => 'Intro maksimal 255 karakter.'
+            ]
+        ],
+        'kata_kunci' => [
+            'rules' => 'permit_empty|string|min_length[5]|max_length[255]',
+            'errors' => [
+                'min_length' => 'Kata kunci minimal 5 karakter.',
+                'max_length' => 'Kata kunci maksimal 255 karakter.'
+            ]
+        ],
+        'sumber' => [
+            'rules' => 'permit_empty|string|min_length[5]|max_length[255]',
+            'errors' => [
+                'min_length' => 'Sumber minimal 5 karakter.',
+                'max_length' => 'Sumber maksimal 255 karakter.'
+            ]
+        ],
+        'id_kategori' => [
+            'rules' => 'required',
+            'errors' => [
+                'required' => 'Kategori wajib dipilih.'
+            ]
+        ],
+    ];
+
+    // VALIDASI GAMBAR COVER
+    if (!session()->has('temp_cover_image')) {
+        $rules['feat_image'] = [
+            'rules' => 'uploaded[feat_image]|max_size[feat_image,2048]|is_image[feat_image]',
+            'errors' => [
+                'uploaded'  => 'Gambar cover wajib diupload.',
+                'max_size'  => 'Ukuran gambar maksimal 2MB.',
+                'is_image'  => 'File harus berupa gambar.'
+            ]
+        ];
+    }
+
+    // ================================
+    // EXECUTE VALIDATION
+    // ================================
+    if (!$this->validate($rules)) {
+        $this->saveTemporaryImages();
+        return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+    }
+
+    // ================================
+    // COVER IMAGE
+    // ================================
+    $featImagePath = null;
+
+    if (session()->has('temp_cover_image')) {
+        $tempFile = session()->get('temp_cover_image');
+        $tempPath = WRITEPATH . '../public/uploads/temp/' . $tempFile;
+
+        if (file_exists($tempPath)) {
+            $finalPath = WRITEPATH . '../public/uploads/berita/' . $tempFile;
+            rename($tempPath, $finalPath);
+            $featImagePath = 'uploads/berita/' . $tempFile;
+        }
+
+        session()->remove('temp_cover_image');
+    } else {
+        $featImage = $this->request->getFile('feat_image');
+
+        if ($featImage && $featImage->isValid() && !$featImage->hasMoved()) {
+            $newName = $featImage->getRandomName();
+            $featImage->move(WRITEPATH . '../public/uploads/berita', $newName);
+            $featImagePath = 'uploads/berita/' . $newName;
+        }
+    }
+
+    // ================================
+    // ADDITIONAL IMAGES
+    // ================================
+    $additionalImages = [];
+
+    if (session()->has('temp_additional_images')) {
+        foreach (session()->get('temp_additional_images') as $tempFile) {
+            $tempPath = WRITEPATH . '../public/uploads/temp/' . $tempFile;
+
+            if (file_exists($tempPath)) {
+                $finalDir = WRITEPATH . '../public/uploads/berita/additional/';
+                if (!is_dir($finalDir)) mkdir($finalDir, 0755, true);
+
+                $finalPath = $finalDir . $tempFile;
+                rename($tempPath, $finalPath);
+
+                $additionalImages[] = 'uploads/berita/additional/' . $tempFile;
+            }
+        }
+
+        session()->remove('temp_additional_images');
+    }
+
+    $files = $this->request->getFileMultiple('additional_images');
+    if ($files) {
+        foreach ($files as $file) {
+            if ($file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move(WRITEPATH . '../public/uploads/berita/additional', $newName);
+                $additionalImages[] = 'uploads/berita/additional/' . $newName;
+            }
+        }
+    }
+
+    // ================================
+    // SIMPAN DATABASE
+    // ================================
+    $post = $this->request->getPost();
+
+    $kategoriIds = is_array($post['id_kategori']) ? $post['id_kategori'] : explode(',', $post['id_kategori']);
+    $idKategori = $kategoriIds[0] ?? null;
+
+    $data = [
+        'judul'             => $post['judul'],
+        'topik'             => $post['topik'],
+        'intro'             => $post['intro'],
+        'sumber'            => $post['sumber'],
+        'content'           => $post['content'],
+        'content2'          => $post['content2'],
+        'id_kategori'       => $idKategori,
+        'link_video'        => $post['link_video'] ?? null,
+        'keyword'           => $post['keyword'] ?? null,
+        'feat_image'        => $featImagePath,
+        'additional_images' => !empty($additionalImages) ? json_encode($additionalImages) : null,
+        'slug'              => url_title($post['judul'], '-', true),
+        'hash_berita'       => bin2hex(random_bytes(16)),
+        'status'            => $post['status'] ?? 0,
+        'status_berita'     => $post['status_berita'] ?? 0,
+        'created_by_id'     => session()->get('id_user'),
+        'created_by_name'   => session()->get('username'),
+        'created_at'        => date('Y-m-d H:i:s')
+    ];
+
+    if (!$this->beritaModel->save($data)) {
+        return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
+    }
+
+    $idBerita = $this->beritaModel->getInsertID();
+
+    if (!empty($kategoriIds)) {
+        $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
+    }
+
+    $this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? 0);
+
+    $this->clearTemporaryImages();
+
+    return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
+}
 
     // ========================================================
 // Form Edit Berita
@@ -305,64 +402,169 @@ public function update($id)
         return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
     }
 
-    $post = $this->request->getPost();
     $berita = $this->beritaModel->find($id);
     if (!$berita) {
         return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
     }
 
-    // --- Cover Image ---
-    $featImagePath = $berita['feat_image'];
-    $featImage = $this->request->getFile('feat_image');
-    if ($featImage && $featImage->isValid() && !$featImage->hasMoved()) {
-        $newName = $featImage->getRandomName();
-        $featImage->move(WRITEPATH . '../public/uploads/berita', $newName);
-        $featImagePath = 'uploads/berita/' . $newName;
+    $post = $this->request->getPost();
+    $validation = \Config\Services::validation();
+
+    // ================================
+    // VALIDATION RULES EDIT
+    // ================================
+    $rules = [
+        'judul' => [
+            'rules' => 'required|min_length[5]|max_length[255]',
+            'errors' => [
+                'required'   => 'Judul wajib diisi.',
+                'min_length' => 'Judul minimal 5 karakter.',
+                'max_length' => 'Judul maksimal 255 karakter.',
+            ]
+        ],
+        'topik' => [
+            'rules' => 'required|min_length[5]|max_length[255]',
+            'errors' => [
+                'required'   => 'Topik wajib diisi.',
+                'min_length' => 'Topik minimal 5 karakter.',
+                'max_length' => 'Topik maksimal 255 karakter.',
+            ]
+        ],
+        'id_kategori' => [
+            'rules' => 'required',
+            'errors' => [
+                'required' => 'Kategori wajib dipilih.',
+            ]
+        ]
+    ];
+
+    // Jika user upload cover baru tanpa temp session
+    if (!session()->has('temp_cover_image')) {
+        $rules['feat_image'] = [
+            'rules' => 'permit_empty|max_size[feat_image,2048]|is_image[feat_image]',
+            'errors' => [
+                'max_size'  => 'Ukuran gambar maksimal 2MB.',
+                'is_image'  => 'File harus berupa gambar.',
+            ]
+        ];
     }
 
-    // --- Additional Images ---
-    $additionalImages = !empty($berita['additional_images']) ? json_decode($berita['additional_images'], true) : [];
+    if (!$this->validate($rules)) {
+        $this->saveTemporaryImages(); // simpan ke temp saat validasi gagal
+        return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+    }
+
+    // ================================
+    // COVER IMAGE PROCESS
+    // ================================
+    $featImagePath = $berita['feat_image'];
+
+    if (session()->has('temp_cover_image')) {
+
+        // Ambil temp image dari session
+        $tempFile = session()->get('temp_cover_image');
+        $tempPath = WRITEPATH . '../public/uploads/temp/' . $tempFile;
+
+        if (file_exists($tempPath)) {
+            // Pindahkan ke folder utama
+            $finalPath = WRITEPATH . '../public/uploads/berita/' . $tempFile;
+            rename($tempPath, $finalPath);
+
+            $featImagePath = 'uploads/berita/' . $tempFile;
+        }
+
+        session()->remove('temp_cover_image');
+
+    } else {
+        // Upload langsung tanpa temp
+        $featImage = $this->request->getFile('feat_image');
+        if ($featImage && $featImage->isValid() && !$featImage->hasMoved()) {
+
+            $newName = $featImage->getRandomName();
+            $featImage->move(WRITEPATH . '../public/uploads/berita', $newName);
+
+            $featImagePath = 'uploads/berita/' . $newName;
+        }
+    }
+
+    // ================================
+    // ADDITIONAL IMAGES
+    // ================================
+    $additionalImages = !empty($berita['additional_images'])
+        ? json_decode($berita['additional_images'], true)
+        : [];
+
+    // Pindahkan dari temp (jika ada)
+    if (session()->has('temp_additional_images')) {
+
+        foreach (session()->get('temp_additional_images') as $fileTemp) {
+
+            $tempPath = WRITEPATH . '../public/uploads/temp/' . $fileTemp;
+
+            if (file_exists($tempPath)) {
+
+                $finalDir = WRITEPATH . '../public/uploads/berita/additional/';
+                if (!is_dir($finalDir)) mkdir($finalDir, 0755, true);
+
+                $finalPath = $finalDir . $fileTemp;
+                rename($tempPath, $finalPath);
+
+                $additionalImages[] = 'uploads/berita/additional/' . $fileTemp;
+            }
+        }
+
+        session()->remove('temp_additional_images');
+    }
+
+    // Upload langsung dari input
     $files = $this->request->getFileMultiple('additional_images');
     if ($files) {
         foreach ($files as $file) {
             if ($file->isValid() && !$file->hasMoved()) {
+
                 $newName = $file->getRandomName();
                 $file->move(WRITEPATH . '../public/uploads/berita/additional', $newName);
+
                 $additionalImages[] = 'uploads/berita/additional/' . $newName;
             }
         }
     }
 
-    // --- Ambil kategori ---
+    // ================================
+    // HANDLE KATEGORI
+    // ================================
     $kategoriIds = $post['id_kategori'] ?? [];
+
     if (is_string($kategoriIds)) {
         $kategoriIds = array_filter(array_map('trim', explode(',', $kategoriIds)));
     }
-    if (empty($kategoriIds)) {
-        $kategoriPivot = $this->beritaModel->getKategoriByBerita($id);
-        $kategoriIds = array_column($kategoriPivot, 'id_kategori');
-    }
-    $idKategori = (!empty($kategoriIds) && isset($kategoriIds[0])) ? (int)$kategoriIds[0] : null;
 
-    // --- Data Update ---
+    if (empty($kategoriIds)) {
+        $pivot = $this->beritaModel->getKategoriByBerita($id);
+        $kategoriIds = array_column($pivot, 'id_kategori');
+    }
+
+    $idKategori = $kategoriIds[0] ?? null;
+
+    // ================================
+    // DATA UPDATE
+    // ================================
     $data = [
-        'judul'             => $post['judul'] ?? null,
-        'topik'             => $post['topik'] ?? null,
-        'intro'             => $post['intro'] ?? null,
-        'sumber'            => $post['sumber'] ?? null,
-        'content'           => $post['content'] ?? null,
-        'content2'          => $post['content2'] ?? null,
-        'id_berita_terkait' => $post['id_berita_terkait'] ?? null,
-        'id_berita_terkait2' => $post['id_berita_terkait2'] ?? null,
+        'id_berita'         => $id,
+        'judul'             => $post['judul'],
+        'topik'             => $post['topik'],
+        'intro'             => $post['intro'],
+        'sumber'            => $post['sumber'],
+        'content'           => $post['content'],
+        'content2'          => $post['content2'],
         'id_kategori'       => $idKategori,
         'link_video'        => $post['link_video'] ?? null,
         'keyword'           => $post['keyword'] ?? null,
         'feat_image'        => $featImagePath,
         'additional_images' => !empty($additionalImages) ? json_encode($additionalImages) : null,
         'slug'              => url_title($post['judul'], '-', true),
-        'hash_berita'       => $berita['hash_berita'] ?? bin2hex(random_bytes(16)),
-        'status'            => (string)$post['status'],
-        'status_berita'     => (int)$post['status_berita'],
+        'status'            => $post['status'] ?? 0,
+        'status_berita'     => $post['status_berita'] ?? 0,
         'updated_by_id'     => session()->get('id_user'),
         'updated_by_name'   => session()->get('username'),
         'updated_at'        => date('Y-m-d H:i:s'),
@@ -370,38 +572,25 @@ public function update($id)
         'note_revisi'       => $post['note_revisi'] ?? null,
     ];
 
-    // --- Simpan dengan validasi model ---
-    if (!$this->beritaModel->save(array_merge($data, ['id_berita' => $id]))) {
-        return redirect()->back()
-            ->withInput()
-            ->with('errors', $this->beritaModel->errors());
+    // SIMPAN
+    if (!$this->beritaModel->save($data)) {
+        return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
     }
 
-    // --- Update kategori pivot ---
+    // UPDATE KATEGORI PIVOT
     if (!empty($kategoriIds)) {
         $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
     }
 
-    // --- Buat keterangan log otomatis berdasarkan perubahan ---
-    $keteranganArr = [];
-    $fields = [
-        'judul','topik','intro','sumber','content','content2',
-        'id_berita_terkait','id_berita_terkait2','id_kategori',
-        'link_video','keyword','feat_image','additional_images'
-    ];
-    foreach ($fields as $field) {
-        if (isset($data[$field]) && $berita[$field] != $data[$field]) {
-            $fieldName = str_replace('_', ' ', $field);
-            $keteranganArr[] = "Mengubah $fieldName";
-        }
-    }
-    $keterangan = !empty($keteranganArr) ? implode(', ', $keteranganArr) : 'Melakukan update berita';
+    // LOG AUTO
+    $this->saveLog($id, 'Berita diperbarui', $data['status'], $data['note'], $data['note_revisi']);
 
-    // --- Simpan log ---
-    $this->saveLog($id, $keterangan, $data['status'], $data['note'], $data['note_revisi']);
+    // CLEAR TEMP
+    $this->clearTemporaryImages();
 
     return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
 }
+
 
 
 
