@@ -6,6 +6,7 @@ use CodeIgniter\RESTful\ResourceController;
 use App\Models\BeritaModel;
 use App\Models\BeritaUtamaModel;
 use App\Models\KategoriModel;
+use App\Models\BeritaTagModel;
 
 class ApiBeritaController extends ResourceController
 {
@@ -14,11 +15,13 @@ class ApiBeritaController extends ResourceController
 
     protected $utamaModel; // model kedua
     protected $katemodel;
+    protected $tagmodel;
 
     public function __construct()
     {
         $this->utamaModel = new BeritaUtamaModel(); // instance manual model kedua
         $this->katemodel = new KategoriModel();
+        $this->tagmodel = new BeritaTagModel();
     }
 
     // ================================
@@ -26,7 +29,12 @@ class ApiBeritaController extends ResourceController
     // ================================
 public function index()
 {
-      $kategories = $this->katemodel
+    $tagmodes = $this->tagmodel
+    ->orderBy('created_at', 'DESC')
+    ->findAll();
+
+
+    $kategories = $this->katemodel
         ->where('trash', '0')
         ->where('is_show_nav', '1')
         ->orderBy('created_on', 'DESC')
@@ -49,7 +57,8 @@ public function index()
         'data'    => [
             'utama'  => $beritautama,
             'berita' => $beritas,
-            'kategori' => $kategories
+            'kategori' => $kategories,
+            'tag' => $tagmodes
         ]
     ]);
 }

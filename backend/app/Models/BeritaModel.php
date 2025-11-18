@@ -206,8 +206,8 @@ return $this->db->table($this->table)
 protected $validationRules = [
     'judul'           => 'required|min_length[5]|max_length[255]',
     'topik'           => 'required|min_length[5]|max_length[255]',
-    'content'         => 'permit_empty|string',
-    'content2'        => 'permit_empty|string',
+    'content'         => 'permit_empty|string|min_length[5]',
+    'content2'        => 'permit_empty|string|min_length[5]',
     'caption'         => 'permit_empty|string|min_length[5]|max_length[255]',
     'intro'           => 'permit_empty|string|min_length[5]|max_length[255]',
     'kata_kunci'      => 'permit_empty|string|min_length[5]|max_length[255]',

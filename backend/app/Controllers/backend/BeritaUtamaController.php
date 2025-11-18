@@ -93,6 +93,8 @@ class BeritaUtamaController extends BaseController
         $this->utamaModel->insert([
             'id_berita' => $id_berita,
             'jenis' => $this->request->getPost('jenis'),
+            'content' => $this->request->getPost('content'),
+            'content2' => $this->request->getPost('content2'),
             'status' => $this->request->getPost('status'),
             'created_date' => date('Y-m-d H:i:s'),
             'created_by_id' => session()->get('id_user'),
