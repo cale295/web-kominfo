@@ -24,7 +24,7 @@ class ApiBeritaController extends ResourceController
 public function index()
 {
     $beritautama = $this->utamaModel
-        ->where('status', '0')
+        ->where('status', '1')
         ->orderBy('created_date', 'DESC')
         ->first();
 
