@@ -118,6 +118,21 @@
                     </div>
 
                     <div class="col-md-6 mb-4">
+    <label for="order_number" class="form-label form-label-gov">
+        <i class="bi bi-list-ol"></i> Urutan Menu <span class="required">*</span>
+    </label>
+    <div class="input-group-gov">
+        <i class="bi bi-sort-numeric-down input-icon"></i>
+        <input type="number"
+               class="form-control form-control-gov"
+               id="order_number"
+               name="order_number"
+               value="<?= esc($menu['order_number']) ?>"
+               required>
+    </div>
+</div>
+
+                    <div class="col-md-6 mb-4">
                         <label for="status" class="form-label form-label-gov">
                             <i class="bi bi-toggle-on"></i> Status Menu <span class="required">*</span>
                         </label>
