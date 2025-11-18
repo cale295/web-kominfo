@@ -9,12 +9,14 @@ import HubungiKami from "../sections/homepage/contact";
 import Structure from "../sections/homepage/Structure";
 import Modal from "../sections/homepage/Modal";
 import Footer from "../sections/homepage/footer";
+import BeritaNavbar from "../sections/berita/Navbar";
 import Berita from "../sections/berita/Berita";
 import AccessibilityPanel from "../sections/homepage/AccessibilityPanel";
 
 const HomePage: React.FC = () => {
   return (
     <>
+      <Navbar />
       <HeroSection />
       <ServiceGrid />
       <TangerangNewsApp />
@@ -26,14 +28,21 @@ const HomePage: React.FC = () => {
     </>
   );
 };
+const BeritaPage: React.FC = () => {
+  return (
+    <>
+    <BeritaNavbar />
+    <Berita />
+  </>
+  )
+}
 
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
-      <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/berita" element={<Berita />} />
+        <Route path="/berita" element={<BeritaPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
       <AccessibilityPanel />

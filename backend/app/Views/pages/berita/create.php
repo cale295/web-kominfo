@@ -207,11 +207,6 @@
         border: none;
     }
 
-    .btn-sm {
-        padding: 6px 12px;
-        font-size: 0.8125rem;
-    }
-
     .btn-primary {
         background: var(--primary);
     }
@@ -305,67 +300,56 @@
         border-radius: 8px;
         border: 2px solid var(--gray-200);
     }
-
-    /* Dropdown Kategori dengan Pencarian */
-    #kategori-toggle {
-        cursor: pointer;
-        font-size: 0.9375rem;
-        color: var(--gray-700);
-    }
-
-    #kategori-toggle:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-    }
-
-    .kategori-list .form-check {
-        cursor: pointer;
-        border-radius: 6px;
-        margin: 2px 0;
-    }
-
-    .kategori-list .form-check:hover {
-        background-color: var(--gray-50);
-    }
-
-    .kategori-list .form-check-label {
-        font-size: 0.9375rem;
-        user-select: none;
-    }
-
-    .selected-badge {
-        display: inline-flex;
-        align-items: center;
-        background: var(--primary);
-        color: white;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.8125rem;
-        margin: 2px 6px 2px 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .selected-badge i {
-        margin-left: 6px;
-        font-size: 0.75rem;
-        cursor: pointer;
-        opacity: 0.8;
-    }
-
-    .selected-badge i:hover {
-        opacity: 1;
-        color: rgba(255, 255, 255, 0.9);
-    }
-
-    .kategori-item {
-        display: flex;
-        align-items: center;
-    }
-
-    .kategori-no-results {
-        font-size: 0.875rem;
-    }
-
+   /* Dropdown Kategori dengan Pencarian */
+#kategori-toggle {
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: var(--gray-700);
+}
+#kategori-toggle:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+.kategori-list .form-check {
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 2px 0;
+}
+.kategori-list .form-check:hover {
+    background-color: var(--gray-50);
+}
+.kategori-list .form-check-label {
+    font-size: 0.9375rem;
+    user-select: none;
+}
+.selected-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    margin: 2px 6px 2px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.selected-badge i {
+    margin-left: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0.8;
+}
+.selected-badge i:hover {
+    opacity: 1;
+    color: rgba(255,255,255,0.9);
+}
+.kategori-item {
+    display: flex;
+    align-items: center;
+}
+.kategori-no-results {
+    font-size: 0.875rem;
+}
     .retained-image-info {
         background-color: #e0f2fe;
         border-left: 4px solid #0284c7;
@@ -392,55 +376,18 @@
         border-radius: 6px;
         font-size: 0.75rem;
         margin-top: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     .temp-image-badge i {
         margin-right: 4px;
-    }
-
-    /* Gaya untuk tombol hapus gambar individu */
-    .remove-image-btn {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background-color: var(--danger);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 0.8rem;
-        opacity: 0.8;
-        transition: opacity 0.2s;
-        z-index: 10; /* Pastikan tombol muncul di atas gambar */
-    }
-
-    .remove-image-btn:hover {
-        opacity: 1;
-    }
-
-    .image-preview-item {
-        position: relative;
-        display: inline-block; /* Atau inline-flex sesuai kebutuhan layout */
-    }
-
-    /* Gaya untuk pesan info jika tidak ada file yang dipilih */
-    .no-images-info {
-        font-style: italic;
-        color: var(--gray-500);
-        font-size: 0.875rem;
     }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 
-<?php
+<?= 
 $oldContent1 = old('content', '');
 $oldContent2 = old('content2', '');
 
@@ -676,7 +623,7 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 <div id="cover-preview" class="preview-container"></div>
             </div>
 
-            <!-- ADDITIONAL IMAGES dengan Support Temporary dan Hapus Individu -->
+            <!-- ADDITIONAL IMAGES dengan Support Temporary -->
             <div class="mb-4">
                 <label class="form-label">Foto Tambahan</label>
                 <input type="file" 
@@ -694,23 +641,7 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                     </div>
                 <?php endif; ?>
                 
-                <div id="additional-preview" class="additional-preview">
-                    <!-- Pratinjau gambar dipilih akan muncul di sini -->
-                    <?php if (!empty($tempAdditionalImages)): ?>
-                        <?php foreach ($tempAdditionalImages as $tempImage): ?>
-                            <div class="image-preview-item position-relative">
-                                <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview Tambahan">
-                                <div class="temp-image-badge position-absolute top-0 end-0 m-1">
-                                    <i class="bi bi-clock-history"></i>
-                                </div>
-                                <!-- Tombol hapus untuk gambar temporary (opsional, bisa ditambahkan logika server-side jika ingin hapus langsung) -->
-                                <!-- <button type="button" class="remove-image-btn" data-filename="<?= $tempImage ?>">×</button> -->
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="no-images-info">Belum ada gambar tambahan yang dipilih.</div>
-                    <?php endif; ?>
-                </div>
+                <div id="additional-preview" class="additional-preview"></div>
             </div>
 
             <div class="mb-3">
@@ -796,18 +727,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- Masukkan old content dari server ---
-    const oldContent1 = <?= json_encode($oldContent1) ?>;
-    const oldContent2 = <?= json_encode($oldContent2) ?>;
+const oldContent1 = <?= json_encode($oldContent1) ?>;
+const oldContent2 = <?= json_encode($oldContent2) ?>;
 
-    if (oldContent1 && typeof oldContent1 === 'string') {
-        // Kosongkan dulu agar tidak double
-        quillContent.setContents([]);
-        quillContent.clipboard.dangerouslyPasteHTML(0, oldContent1);
-    }
-    if (oldContent2 && typeof oldContent2 === 'string') {
-        quillContent2.setContents([]);
-        quillContent2.clipboard.dangerouslyPasteHTML(0, oldContent2);
-    }
+if (oldContent1 && typeof oldContent1 === 'string') {
+    // Kosongkan dulu agar tidak double
+    quillContent.setContents([]);
+    quillContent.clipboard.dangerouslyPasteHTML(0, oldContent1);
+}
+if (oldContent2 && typeof oldContent2 === 'string') {
+    quillContent2.setContents([]);
+    quillContent2.clipboard.dangerouslyPasteHTML(0, oldContent2);
+}
 
     // --- Update hidden textarea sebelum submit ---
     const form = document.querySelector('form');
@@ -832,153 +763,108 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('content2-hidden').value = content2;
     });
 
-    // ========================================================
-    // PREVIEW COVER IMAGE dengan Temporary Support
-    // ========================================================
-    const coverInput = document.getElementById('cover-image');
-    const coverPreview = document.getElementById('cover-preview');
+// ========================================================
+// PREVIEW COVER IMAGE dengan Temporary Support
+// ========================================================
+const coverInput = document.getElementById('cover-image');
+const coverPreview = document.getElementById('cover-preview');
 
-    // Tampilkan gambar temporary dari session jika ada
-    <?php if (!empty($tempCoverImage)): ?>
-        coverPreview.innerHTML = `
-            <div class="position-relative d-inline-block mt-3">
-                <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" 
-                     class="preview-img"
-                     alt="Preview Cover">
-                <div class="temp-image-badge">
-                    <i class="bi bi-clock-history"></i> Gambar Sebelumnya
+// Tampilkan gambar temporary dari session jika ada
+<?php if (!empty($tempCoverImage)): ?>
+    coverPreview.innerHTML = `
+        <div class="position-relative d-inline-block mt-3">
+            <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" 
+                 class="preview-img"
+                 alt="Preview Cover">
+            <div class="temp-image-badge">
+                <i class="bi bi-clock-history"></i> Gambar Sebelumnya
+            </div>
+        </div>
+    `;
+<?php endif; ?>
+
+coverInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            coverPreview.innerHTML = `
+                <div class="mt-3">
+                    <img src="${evt.target.result}" class="preview-img" alt="Preview">
                 </div>
+            `;
+        }
+        reader.readAsDataURL(file);
+    } else {
+        <?php if (!empty($tempCoverImage)): ?>
+            coverPreview.innerHTML = `
+                <div class="position-relative d-inline-block mt-3">
+                    <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" 
+                         class="preview-img"
+                         alt="Preview Cover">
+                    <div class="temp-image-badge">
+                        <i class="bi bi-clock-history"></i> Gambar Sebelumnya
+                    </div>
+                </div>
+            `;
+        <?php endif; ?>
+    }
+});
+
+// ========================================================
+// PREVIEW ADDITIONAL IMAGES dengan Temporary Support
+// ========================================================
+const additionalInput = document.getElementById('additional-images');
+const additionalPreview = document.getElementById('additional-preview');
+
+<?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
+    additionalPreview.innerHTML = '';
+    <?php foreach ($tempAdditionalImages as $tempImage): ?>
+        const tempDiv<?= md5($tempImage) ?> = document.createElement('div');
+        tempDiv<?= md5($tempImage) ?>.className = 'position-relative';
+        tempDiv<?= md5($tempImage) ?>.innerHTML = `
+            <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview">
+            <div class="temp-image-badge position-absolute top-0 end-0 m-1">
+                <i class="bi bi-clock-history"></i>
             </div>
         `;
-    <?php endif; ?>
+        additionalPreview.appendChild(tempDiv<?= md5($tempImage) ?>);
+    <?php endforeach; ?>
+<?php endif; ?>
 
-    coverInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                coverPreview.innerHTML = `
-                    <div class="mt-3">
-                        <img src="${evt.target.result}" class="preview-img" alt="Preview">
-                    </div>
-                `;
-            }
-            reader.readAsDataURL(file);
-        } else {
-            <?php if (!empty($tempCoverImage)): ?>
-                coverPreview.innerHTML = `
-                    <div class="position-relative d-inline-block mt-3">
-                        <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" 
-                             class="preview-img"
-                             alt="Preview Cover">
-                        <div class="temp-image-badge">
-                            <i class="bi bi-clock-history"></i> Gambar Sebelumnya
-                        </div>
-                    </div>
-                `;
-            <?php endif; ?>
-        }
-    });
-
-    // ========================================================
-    // PREVIEW ADDITIONAL IMAGES dengan Temporary Support dan Hapus Individu
-    // ========================================================
-    const additionalInput = document.getElementById('additional-images');
-    const additionalPreview = document.getElementById('additional-preview');
-    let currentFiles = []; // Array untuk menyimpan file-file yang dipilih
-
-    // Ambil gambar temporary jika ada saat halaman dimuat
-    <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
-        currentFiles = currentFiles.concat(<?php echo json_encode(array_map(function($img) { return ['name' => $img, 'isTemp' => true]; }, $tempAdditionalImages)); ?>);
-    <?php endif; ?>
-
-
-    additionalInput.addEventListener('change', function(e) {
-        const newFiles = Array.from(e.target.files);
-
-        // Filter file baru agar tidak melebihi total maksimum (misalnya 5 total)
-        const maxTotalFiles = 5;
-        const currentNonTempCount = currentFiles.filter(f => !f.isTemp).length; // Hitung file non-temporary saat ini
-        const availableSlots = maxTotalFiles - currentNonTempCount; // Slot yang tersedia
-
-        if (newFiles.length > availableSlots) {
-            alert(`Maksimal total ${maxTotalFiles} gambar. Anda hanya dapat menambahkan ${availableSlots} gambar lagi.`);
-            newFiles.splice(availableSlots); // Potong array jika melebihi slot
-        }
-
-        // Tambahkan file-file baru ke array currentFiles
-        newFiles.forEach(file => {
-            // Pastikan tidak ada file dengan nama yang sama (jika perlu)
-            if (!currentFiles.some(f => f.name === file.name && !f.isTemp)) {
-                 currentFiles.push(file); // Tambahkan file baru
-            }
-        });
-
-        // Update pratinjau
-        updateAdditionalPreview();
-        // Kosongkan input file agar event change bisa dipicu lagi bahkan jika file yang sama dipilih
-        e.target.value = '';
-    });
-
-    function updateAdditionalPreview() {
-        additionalPreview.innerHTML = ''; // Kosongkan kontainer
-
-        if (currentFiles.length === 0) {
-            // Tampilkan pesan jika tidak ada file
-            additionalPreview.innerHTML = '<div class="no-images-info">Belum ada gambar tambahan yang dipilih.</div>';
-            return;
-        }
-
-        currentFiles.forEach((file, index) => {
-            const div = document.createElement('div');
-            div.className = 'image-preview-item position-relative';
-
-            if (file.isTemp) {
-                // Jika file adalah temporary, gunakan path dari server
-                div.innerHTML = `
-                    <img src="<?= base_url('uploads/temp/') ?>/${file.name}" alt="Preview Tambahan">
+additionalInput.addEventListener('change', function(e) {
+    if (e.target.files.length === 0) {
+        additionalPreview.innerHTML = '';
+        <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
+            <?php foreach ($tempAdditionalImages as $tempImage): ?>
+                const tempDiv<?= md5($tempImage) ?> = document.createElement('div');
+                tempDiv<?= md5($tempImage) ?>.className = 'position-relative';
+                tempDiv<?= md5($tempImage) ?>.innerHTML = `
+                    <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview">
                     <div class="temp-image-badge position-absolute top-0 end-0 m-1">
                         <i class="bi bi-clock-history"></i>
                     </div>
-                    <!-- Tombol hapus untuk gambar temporary (opsional, logika hapus server-side bisa ditambahkan) -->
-                    <!-- <button type="button" class="remove-image-btn" data-filename="${file.name}">×</button> -->
                 `;
-            } else {
-                // Jika file adalah dari input pengguna, gunakan URL.createObjectURL
-                const objectUrl = URL.createObjectURL(file);
-                div.innerHTML = `
-                    <img src="${objectUrl}" alt="Preview Tambahan">
-                    <button type="button" class="remove-image-btn" data-index="${index}">×</button>
-                `;
-
-                // Hapus object URL saat elemen dihapus dari DOM untuk menghemat memori
-                div.addEventListener('remove', () => URL.revokeObjectURL(objectUrl));
+                additionalPreview.appendChild(tempDiv<?= md5($tempImage) ?>);
+            <?php endforeach; ?>
+        <?php endif; ?>
+    } else {
+        additionalPreview.innerHTML = '';
+        Array.from(e.target.files).slice(0, 5).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const div = document.createElement('div');
+                div.className = 'position-relative';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Preview';
+                div.appendChild(img);
+                additionalPreview.appendChild(div);
             }
-
-            additionalPreview.appendChild(div);
-        });
-
-        // Tambahkan event listener untuk tombol hapus setelah elemen ditambahkan
-        document.querySelectorAll('#additional-preview .remove-image-btn[data-index]').forEach(button => {
-            button.addEventListener('click', function() {
-                const fileIndex = parseInt(this.getAttribute('data-index'));
-                if (!isNaN(fileIndex) && fileIndex >= 0 && fileIndex < currentFiles.length) {
-                    // Hapus file dari array
-                    const removedFile = currentFiles.splice(fileIndex, 1)[0];
-                    // Hapus object URL jika file bukan temporary
-                    if (!removedFile.isTemp) {
-                        URL.revokeObjectURL(URL.createObjectURL(removedFile)); // Ini hanya berfungsi jika file adalah File/Blob
-                    }
-                    // Update pratinjau
-                    updateAdditionalPreview();
-                }
-            });
+            reader.readAsDataURL(file);
         });
     }
-
-    // Panggil sekali saat halaman dimuat untuk menampilkan temporary files
-    updateAdditionalPreview();
-
+});
 
     // ========================================================
     // DROPDOWN KATEGORI Multi-Select
