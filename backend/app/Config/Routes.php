@@ -25,6 +25,9 @@ $routes->resource('manage_user', ['controller' => 'backend\UserController']);
 // Kategori Berita
 $routes->resource('kategori_berita', ['controller' => 'backend\KategoriBeritaController']);
 
+//profile
+$routes->resource('menu_profile', ['controller' => 'frontend\ProfileController', 'except' => ['show']]);
+
 // Agenda
 $routes->resource('agenda', ['controller' => 'backend\AgendaController','except' => ['show']]);
 

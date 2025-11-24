@@ -29,6 +29,34 @@
         background-color: var(--gray-50);
     }
 
+    .old-additional-img {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.old-additional-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.old-additional-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    background: var(--primary);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
     /* Header Styles */
     .gov-header {
         background: white;
@@ -248,6 +276,29 @@
         margin-top: 6px;
         display: block;
     }
+
+    .delete-old-image {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.delete-old-image:hover {
+    background: var(--danger);
+}
+
 
     /* Section Spacing */
     .form-section {
@@ -528,58 +579,123 @@
             </div>
         </div>
 
-        <!-- SECTION: Media & Gambar -->
         <div class="form-section">
             <div class="section-title">
                 <i class="bi bi-images"></i>
                 Media & Gambar
             </div>
 
+            <!-- COVER IMAGE dengan Support Temporary -->
             <div class="mb-4">
                 <label class="form-label">Foto Cover (Utama)</label>
-                <?php if(!empty($berita['feat_image'])): ?>
+                
+                <?php if(!empty($berita['feat_image']) || !empty($tempCoverImage)): ?>
                     <div class="preview-container">
                         <div class="current-image-wrapper">
-                            <span class="current-image-badge">
-                                <i class="bi bi-check-circle me-1"></i>Gambar Saat Ini
-                            </span>
-                            <img src="<?= base_url($berita['feat_image']) ?>" 
-                                 class="preview-img" 
-                                 alt="Current Cover">
+                            <?php if(!empty($tempCoverImage)): ?>
+                                <span class="current-image-badge" style="background: var(--info);">
+                                    <i class="bi bi-clock-history me-1"></i>Gambar Temporary
+                                </span>
+                                <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" 
+                                     class="preview-img" 
+                                     alt="Temporary Cover">
+                            <?php else: ?>
+                                <span class="current-image-badge">
+                                    <i class="bi bi-check-circle me-1"></i>Gambar Saat Ini
+                                </span>
+                                <img src="<?= base_url($berita['feat_image']) ?>" 
+                                     class="preview-img" 
+                                     alt="Current Cover">
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endif; ?>
+                
                 <input type="file" name="feat_image" class="form-control" accept="image/*" id="cover-image">
                 <small class="text-muted">Upload gambar baru untuk mengganti yang lama. Format: JPG, PNG, GIF (Maksimal 2MB)</small>
+                
+                <?php if (!empty($tempCoverImage)): ?>
+                    <div class="retained-image-info">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <strong>Gambar temporary tersimpan.</strong> Upload gambar baru jika ingin menggantinya.
+                    </div>
+                <?php endif; ?>
+                
                 <div id="cover-preview" class="preview-container"></div>
             </div>
 
+            <!-- ADDITIONAL IMAGES dengan Support Temporary -->
             <div class="mb-4">
-    <label class="form-label">Foto Tambahan</label>
-    <?php if(!empty($berita['additional_images'])): ?>
-        <?php
-        // Assuming $berita['additional_images'] is a JSON string from the DB
-        $additionalImages = json_decode($berita['additional_images'], true);
-        if (is_array($additionalImages) && !empty($additionalImages)):
-        ?>
-            <div class="preview-container">
-                <div class="additional-preview">
-                    <?php foreach($additionalImages as $img): ?>
-                        <div class="current-image-wrapper position-relative d-inline-block me-2 mb-2">
-                            <span class="current-image-badge position-absolute top-0 start-0 m-1">
-                                <i class="bi bi-check-circle me-1"></i>Foto Lama
-                            </span>
-                            <img src="<?= base_url($img) ?>" class="preview-img" style="width: 150px; height: 150px;" alt="Current Additional Image">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+                <label class="form-label">Foto Tambahan</label>
+                <!-- FOTO TAMBAHAN LAMA (Sebelumnya) -->
+<?php 
+$oldAdditional = !empty($berita['additional_images']) 
+    ? json_decode($berita['additional_images'], true) 
+    : [];
+?>
+
+<?php if (!empty($oldAdditional)): ?>
+    <label class="form-label mb-2">Foto Tambahan Sebelumnya</label>
+    <div class="additional-preview mb-3">
+        <?php foreach ($oldAdditional as $img): ?>
+
+            <?php 
+            // CEK apakah file benar-benar masih ada di folder
+            $filePath = FCPATH . ltrim($img, '/');
+            if (!file_exists($filePath)) {
+                continue; // lewati gambar rusak
+            }
+            ?>
+
+            <div class="old-additional-img position-relative">
+                <img src="<?= base_url($img) ?>" alt="Old Additional">
+
+                <!-- TOMBOL X -->
+                <button type="button" 
+                        class="delete-old-image" 
+                        data-image="<?= $img ?>">
+                    ✕
+                </button>
+
+                <span class="old-additional-badge">Lama</span>
             </div>
-        <?php endif; ?>
-    <?php endif; ?>
-    <input type="file" name="additional_images[]" class="form-control" accept="image/*" id="additional-images" multiple>
-    <small class="text-muted">Pilih beberapa foto sekaligus (maksimal 5 foto, @2MB)</small>
-    <div id="additional-preview" class="additional-preview mt-2"></div>
-</div>
+
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+
+                <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
+                    <div class="additional-preview" id="temp-additional-images">
+                        <?php foreach ($tempAdditionalImages as $tempImage): ?>
+                            <div class="position-relative">
+                                <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview">
+                                <div class="temp-image-badge position-absolute top-0 end-0 m-1">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <input type="file" 
+                       name="additional_images[]" 
+                       class="form-control" 
+                       accept="image/*" 
+                       id="additional-images" 
+                       multiple>
+                <small class="text-muted">Pilih beberapa foto sekaligus (maksimal 5 foto, @2MB)</small>
+                
+                <?php if (!empty($tempAdditionalImages)): ?>
+                    <div class="retained-image-info">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <strong><?= count($tempAdditionalImages) ?> gambar tambahan tersimpan.</strong> Upload gambar baru untuk menambah atau mengganti.
+                    </div>
+                <?php endif; ?>
+                
+                <div id="additional-preview" class="additional-preview"></div>
+            </div>
+
 
             <div class="mb-3">
                 <label class="form-label">Caption Gambar</label>
@@ -710,6 +826,22 @@ document.addEventListener('DOMContentLoaded', function() {
         theme: 'snow',
         placeholder: 'Tulis isi berita bagian kedua di sini...'
     });
+
+document.querySelectorAll('.delete-old-image').forEach(btn => {
+    btn.addEventListener('click', function() {
+        let img = this.getAttribute('data-image');
+
+        // buat input hidden agar controller tau gambar mana yang dihapus
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'delete_old_images[]';
+        input.value = img;
+        document.getElementById('form-berita').appendChild(input);
+
+        // sembunyikan preview gambarnya
+        this.parentElement.remove();
+    });
+});
 
     // Update hidden textareas before form submit
     const form = document.getElementById('form-berita');
@@ -850,53 +982,106 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     observer.observe(dropdownMenu, { attributes: true, attributeFilter: ['class'] });
 
-    // Preview Cover Image (New Upload)
-    document.getElementById('cover-image').addEventListener('change', function(e) {
-        const preview = document.getElementById('cover-preview');
-        preview.innerHTML = '';
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                preview.innerHTML = `
-                    <div class="current-image-wrapper">
-                        <span class="current-image-badge" style="background: var(--warning);">
-                            <i class="bi bi-upload me-1"></i>Gambar Baru
-                        </span>
-                        <img src="${e.target.result}" class="preview-img" alt="Preview New Cover">
+// ========================================================
+// PREVIEW COVER IMAGE dengan Temporary Support
+// ========================================================
+const coverInput = document.getElementById('cover-image');
+const coverPreview = document.getElementById('cover-preview');
+
+// Tampilkan gambar temporary dari session jika ada
+<?php if (!empty($tempCoverImage)): ?>
+    coverPreview.innerHTML = `
+        <div class="position-relative d-inline-block mt-3">
+            <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" 
+                 class="preview-img"
+                 alt="Preview Cover">
+            <div class="temp-image-badge">
+                <i class="bi bi-clock-history"></i> Gambar Sebelumnya
+            </div>
+        </div>
+    `;
+<?php endif; ?>
+
+coverInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            coverPreview.innerHTML = `
+                <div class="mt-3">
+                    <img src="${evt.target.result}" class="preview-img" alt="Preview">
+                </div>
+            `;
+        }
+        reader.readAsDataURL(file);
+    } else {
+        <?php if (!empty($tempCoverImage)): ?>
+            coverPreview.innerHTML = `
+                <div class="position-relative d-inline-block mt-3">
+                    <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" 
+                         class="preview-img"
+                         alt="Preview Cover">
+                    <div class="temp-image-badge">
+                        <i class="bi bi-clock-history"></i> Gambar Sebelumnya
+                    </div>
+                </div>
+            `;
+        <?php endif; ?>
+    }
+});
+
+// ========================================================
+// PREVIEW ADDITIONAL IMAGES dengan Temporary Support
+// ========================================================
+const additionalInput = document.getElementById('additional-images');
+const additionalPreview = document.getElementById('additional-preview');
+
+<?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
+    additionalPreview.innerHTML = '';
+    <?php foreach ($tempAdditionalImages as $tempImage): ?>
+        const tempDiv<?= md5($tempImage) ?> = document.createElement('div');
+        tempDiv<?= md5($tempImage) ?>.className = 'position-relative';
+        tempDiv<?= md5($tempImage) ?>.innerHTML = `
+            <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview">
+            <div class="temp-image-badge position-absolute top-0 end-0 m-1">
+                <i class="bi bi-clock-history"></i>
+            </div>
+        `;
+        additionalPreview.appendChild(tempDiv<?= md5($tempImage) ?>);
+    <?php endforeach; ?>
+<?php endif; ?>
+
+additionalInput.addEventListener('change', function(e) {
+    if (e.target.files.length === 0) {
+        additionalPreview.innerHTML = '';
+        <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
+            <?php foreach ($tempAdditionalImages as $tempImage): ?>
+                const tempDiv<?= md5($tempImage) ?> = document.createElement('div');
+                tempDiv<?= md5($tempImage) ?>.className = 'position-relative';
+                tempDiv<?= md5($tempImage) ?>.innerHTML = `
+                    <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview">
+                    <div class="temp-image-badge position-absolute top-0 end-0 m-1">
+                        <i class="bi bi-clock-history"></i>
                     </div>
                 `;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    // Preview Additional Images (New Uploads)
-document.getElementById('additional-images').addEventListener('change', function(e) {
-    const preview = document.getElementById('additional-preview');
-    preview.innerHTML = ''; // Clear previous previews
-
-    const files = e.target.files;
-    if (files.length > 0) {
-        const fragment = document.createDocumentFragment(); // Use fragment for better performance
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'position-relative d-inline-block me-2 mb-2';
-                    imgContainer.innerHTML = `
-                        <span class="current-image-badge position-absolute top-0 start-0 m-1" style="background: var(--warning);">
-                            <i class="bi bi-upload me-1"></i>Foto Baru
-                        </span>
-                        <img src="${e.target.result}" class="preview-img" style="width: 150px; height: 150px;" alt="Preview Additional Image">
-                    `;
-                    preview.appendChild(imgContainer); // Append to fragment
-                };
-                reader.readAsDataURL(file);
+                additionalPreview.appendChild(tempDiv<?= md5($tempImage) ?>);
+            <?php endforeach; ?>
+        <?php endif; ?>
+    } else {
+        additionalPreview.innerHTML = '';
+        Array.from(e.target.files).slice(0, 5).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const div = document.createElement('div');
+                div.className = 'position-relative';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Preview';
+                div.appendChild(img);
+                additionalPreview.appendChild(div);
             }
-        }
+            reader.readAsDataURL(file);
+        });
     }
 });
 

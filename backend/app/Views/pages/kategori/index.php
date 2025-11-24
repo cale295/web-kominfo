@@ -7,9 +7,6 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Daftar Kategori</h3>
         <div class="d-flex gap-2">
-            <a href="<?= site_url('kategori/trash') ?>" class="btn btn-outline-secondary">
-                <i class="fas fa-trash-alt me-1"></i> Trash
-            </a>
             <a href="<?= site_url('kategori/new') ?>" class="btn btn-primary">
                 <i class="fas fa-plus me-1"></i> Tambah Kategori
             </a>
@@ -66,17 +63,15 @@
                                            title="Edit">
                                             Edit
                                         </a>
-                                        <form action="<?= site_url('kategori/' . $row['id_kategori']) ?>" 
-                                              method="post" 
-                                              style="display:inline;">
-                                            <?= csrf_field() ?>
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <button class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Yakin Membuang kategori ini?')"
-                                                    title="Hapus">
-                                                Trash
-                                            </button>
-                                        </form>
+                                    <form action="<?= site_url('kategori/'.$row['id_kategori']) ?>" method="post" class="d-inline">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" 
+                                                class="btn-action btn-delete" 
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus tema ini?')"
+                                                title="Hapus Tema">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                     </td>
                                 </tr>
                             <?php endforeach ?>

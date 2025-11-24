@@ -368,6 +368,33 @@
         font-size: 1rem;
     }
 
+    .image-box {
+    position: relative;
+    display: inline-block;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(220, 38, 38, 0.9);
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+.remove-btn:hover {
+    background: rgba(185, 28, 28, 0.95);
+}
+
+
     .temp-image-badge {
         display: inline-block;
         background: var(--info);
@@ -628,7 +655,7 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 <label class="form-label">Foto Tambahan</label>
                 <input type="file" 
                        name="additional_images[]" 
-                       class="form-control" 
+                       clasx`s="form-control" 
                        accept="image/*" 
                        id="additional-images" 
                        multiple>
@@ -726,6 +753,8 @@ document.addEventListener('DOMContentLoaded', function() {
         placeholder: 'Tulis isi berita bagian kedua di sini...'
     });
 
+
+
     // --- Masukkan old content dari server ---
 const oldContent1 = <?= json_encode($oldContent1) ?>;
 const oldContent2 = <?= json_encode($oldContent2) ?>;
@@ -814,57 +843,102 @@ coverInput.addEventListener('change', function(e) {
 // ========================================================
 // PREVIEW ADDITIONAL IMAGES dengan Temporary Support
 // ========================================================
+let storedFiles = [];
+
 const additionalInput = document.getElementById('additional-images');
 const additionalPreview = document.getElementById('additional-preview');
 
+// ===============================
+// 1. LOAD TEMPORARY IMAGES (from PHP)
+// ===============================
 <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
-    additionalPreview.innerHTML = '';
     <?php foreach ($tempAdditionalImages as $tempImage): ?>
-        const tempDiv<?= md5($tempImage) ?> = document.createElement('div');
-        tempDiv<?= md5($tempImage) ?>.className = 'position-relative';
-        tempDiv<?= md5($tempImage) ?>.innerHTML = `
-            <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview">
-            <div class="temp-image-badge position-absolute top-0 end-0 m-1">
-                <i class="bi bi-clock-history"></i>
-            </div>
-        `;
-        additionalPreview.appendChild(tempDiv<?= md5($tempImage) ?>);
+        storedFiles.push("TEMP::<?= $tempImage ?>");
     <?php endforeach; ?>
 <?php endif; ?>
 
+renderAdditionalPreview();
+
+// ===============================
+// 2. SAAT USER MEMILIH GAMBAR BARU
+// ===============================
 additionalInput.addEventListener('change', function(e) {
-    if (e.target.files.length === 0) {
-        additionalPreview.innerHTML = '';
-        <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
-            <?php foreach ($tempAdditionalImages as $tempImage): ?>
-                const tempDiv<?= md5($tempImage) ?> = document.createElement('div');
-                tempDiv<?= md5($tempImage) ?>.className = 'position-relative';
-                tempDiv<?= md5($tempImage) ?>.innerHTML = `
-                    <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Preview">
-                    <div class="temp-image-badge position-absolute top-0 end-0 m-1">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
-                `;
-                additionalPreview.appendChild(tempDiv<?= md5($tempImage) ?>);
-            <?php endforeach; ?>
-        <?php endif; ?>
-    } else {
-        additionalPreview.innerHTML = '';
-        Array.from(e.target.files).slice(0, 5).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'position-relative';
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.alt = 'Preview';
-                div.appendChild(img);
-                additionalPreview.appendChild(div);
-            }
-            reader.readAsDataURL(file);
-        });
+
+    const files = Array.from(e.target.files);
+
+    files.forEach(file => storedFiles.push(file));
+
+    renderAdditionalPreview();
+});
+
+// ===============================
+// 3. FUNGSI RENDER PREVIEW
+// ===============================
+function renderAdditionalPreview() {
+    additionalPreview.innerHTML = "";
+
+    storedFiles.forEach((file, index) => {
+        const box = document.createElement("div");
+        box.classList.add("image-box");
+
+        // Jika file berasal dari TEMP (string)
+        if (typeof file === "string" && file.startsWith("TEMP::")) {
+
+            const filename = file.replace("TEMP::", "");
+
+            box.innerHTML = `
+                <button class="remove-btn" data-index="${index}">×</button>
+                <img src="<?= base_url('uploads/temp/') ?>${filename}" class="preview-img">
+            `;
+
+            additionalPreview.appendChild(box);
+            return;
+        }
+
+        // Jika file benar dari input (object File)
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            box.innerHTML = `
+                <button class="remove-btn" data-index="${index}">×</button>
+                <img src="${e.target.result}" class="preview-img">
+            `;
+            additionalPreview.appendChild(box);
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    updateFileInput();
+}
+
+// ===============================
+// 4. UPDATE INPUT FILE (DataTransfer trick)
+// ===============================
+function updateFileInput() {
+
+    const dt = new DataTransfer();
+
+    storedFiles.forEach(file => {
+        if (file instanceof File) {
+            dt.items.add(file);
+        }
+    });
+
+    additionalInput.files = dt.files;
+}
+
+// ===============================
+// 5. HANDLE TOMBOL HAPUS (X)
+// ===============================
+document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("remove-btn")) {
+        const index = parseInt(e.target.getAttribute("data-index"));
+        storedFiles.splice(index, 1);
+        renderAdditionalPreview();
     }
 });
+
 
     // ========================================================
     // DROPDOWN KATEGORI Multi-Select

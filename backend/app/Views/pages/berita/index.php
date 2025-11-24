@@ -322,19 +322,41 @@
                                 </td>
 
                                 <!-- Additional Images -->
-                                <td class="text-center">
-                                    <?php
-                                    $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
-                                    if (!empty($additional)):
-                                        foreach ($additional as $img): ?>
-                                            <img src="<?= base_url($img) ?>"
-                                                alt="Foto Tambahan" class="img-thumbnail mb-1"
-                                                style="width:50px;height:40px;object-fit:cover;">
-                                        <?php endforeach;
-                                    else: ?>
-                                        <span class="text-muted">-</span>
-                                    <?php endif; ?>
-                                </td>
+<td class="text-center">
+    <?php
+    $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
+
+    // Flag untuk cek apakah ada gambar valid
+    $hasValidImage = false;
+
+    if (!empty($additional)):
+        foreach ($additional as $img):
+
+            // Cek file fisik
+            $filePath = FCPATH . ltrim($img, '/');
+            if (!file_exists($filePath)) {
+                continue; // lewati gambar rusak
+            }
+
+            $hasValidImage = true; ?>
+            
+            <img src="<?= base_url($img) ?>"
+                alt="Foto Tambahan"
+                class="img-thumbnail mb-1"
+                style="width:50px;height:40px;object-fit:cover;">
+            
+        <?php endforeach;
+
+        // Jika semua file hilang → tampilkan tanda "-"
+        if (!$hasValidImage): ?>
+            <span class="text-muted">-</span>
+        <?php endif;
+
+    else: ?>
+        <span class="text-muted">-</span>
+    <?php endif; ?>
+</td>
+
 
                                 <!-- Judul -->
                                 <td style="min-width: 200px;">
