@@ -1,5 +1,5 @@
 import React from "react";
-import "./css/services.css";
+import "./services.css";
 import { Container, Row, Col } from "react-bootstrap";
 
 interface ServiceItem {

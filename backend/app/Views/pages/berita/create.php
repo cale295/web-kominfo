@@ -316,7 +316,7 @@
     margin: 2px 0;
 }
 .kategori-list .form-check:hover {
-    background-color: var(--gray-50);
+    background-color: var(--gray-100);
 }
 .kategori-list .form-check-label {
     font-size: 0.9375rem;
@@ -548,7 +548,7 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                             </div>
                         </div>
                         <!-- Scrollable List -->
-                        <div class="kategori-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                        <div class="kategori-list px-3 py-1" style="max-height: 240px; overflow-y: auto;">
                             <?php
                             $oldKategori = old('id_kategori', []);
                             if (!is_array($oldKategori)) {

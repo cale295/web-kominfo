@@ -44,7 +44,7 @@ public function index()
     $beritautama = $this->utamaModel
         ->where('status', '1')
         ->orderBy('created_date', 'DESC')
-        ->first();
+        ->findAll();
 
     $beritas = $this->model
         ->where('trash', '0')

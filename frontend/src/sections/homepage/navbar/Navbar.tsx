@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Youtube, Facebook, Instagram, Twitter } from "lucide-react";
-import "./css/navbar.css";
-import api from "../../services/api";
+import "./navbar.css";
+import api from "../../../services/api";
 
 interface Menu {
   id_menu: string | number;

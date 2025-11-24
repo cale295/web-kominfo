@@ -1,5 +1,5 @@
 import React from "react";
-import "./css/hero.css";
+import "./hero.css";
 import { Search, Accessibility } from "lucide-react";
 
 const HeroSection: React.FC = () => {

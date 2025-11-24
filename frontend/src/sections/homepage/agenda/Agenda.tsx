@@ -5,7 +5,7 @@ import {
   Bell,
   Image as ImageIcon,
 } from "lucide-react";
-import "./css/news.css";
+import "./agenda.css";
 
 interface AnnouncementItem {
   id: number;
@@ -95,7 +95,7 @@ const announcementData: AnnouncementItem[] = [
   },
 ];
 
-export default function TangerangNewsApp() {
+export default function Agenda() {
   const today = new Date();
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<TabType>("agenda");

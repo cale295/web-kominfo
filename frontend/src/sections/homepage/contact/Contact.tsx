@@ -10,7 +10,7 @@ import {
   Instagram,
   Twitter,
 } from 'lucide-react';
-import './css/contact.css'; // file CSS custom di bawah
+import './contact.css'; // file CSS custom di bawah
 
 export default function HubungiKami() {
   const contactItems = [

@@ -554,6 +554,33 @@
                 <div id="cover-preview" class="preview-container"></div>
             </div>
 
+            <div class="mb-4">
+    <label class="form-label">Foto Tambahan</label>
+    <?php if(!empty($berita['additional_images'])): ?>
+        <?php
+        // Assuming $berita['additional_images'] is a JSON string from the DB
+        $additionalImages = json_decode($berita['additional_images'], true);
+        if (is_array($additionalImages) && !empty($additionalImages)):
+        ?>
+            <div class="preview-container">
+                <div class="additional-preview">
+                    <?php foreach($additionalImages as $img): ?>
+                        <div class="current-image-wrapper position-relative d-inline-block me-2 mb-2">
+                            <span class="current-image-badge position-absolute top-0 start-0 m-1">
+                                <i class="bi bi-check-circle me-1"></i>Foto Lama
+                            </span>
+                            <img src="<?= base_url($img) ?>" class="preview-img" style="width: 150px; height: 150px;" alt="Current Additional Image">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+    <input type="file" name="additional_images[]" class="form-control" accept="image/*" id="additional-images" multiple>
+    <small class="text-muted">Pilih beberapa foto sekaligus (maksimal 5 foto, @2MB)</small>
+    <div id="additional-preview" class="additional-preview mt-2"></div>
+</div>
+
             <div class="mb-3">
                 <label class="form-label">Caption Gambar</label>
                 <textarea name="caption" class="form-control" rows="2" 
@@ -843,6 +870,35 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsDataURL(file);
         }
     });
+    // Preview Additional Images (New Uploads)
+document.getElementById('additional-images').addEventListener('change', function(e) {
+    const preview = document.getElementById('additional-preview');
+    preview.innerHTML = ''; // Clear previous previews
+
+    const files = e.target.files;
+    if (files.length > 0) {
+        const fragment = document.createDocumentFragment(); // Use fragment for better performance
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'position-relative d-inline-block me-2 mb-2';
+                    imgContainer.innerHTML = `
+                        <span class="current-image-badge position-absolute top-0 start-0 m-1" style="background: var(--warning);">
+                            <i class="bi bi-upload me-1"></i>Foto Baru
+                        </span>
+                        <img src="${e.target.result}" class="preview-img" style="width: 150px; height: 150px;" alt="Preview Additional Image">
+                    `;
+                    preview.appendChild(imgContainer); // Append to fragment
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+});
 
     // Inisialisasi UI kategori saat pertama load
     updateUI();
