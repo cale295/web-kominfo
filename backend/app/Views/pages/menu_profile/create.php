@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Sorting</label>
+                    <label class="form-label fw-bold">Urutan</label>
                     <input type="number" name="sorting" class="form-control" required>
                 </div>
 
@@ -70,7 +70,7 @@
 
         <div class="mt-3">
             <button class="btn btn-primary">Simpan</button>
-            <a href="<?= base_url('profile') ?>" class="btn btn-secondary">Kembali</a>
+            <a href="<?= base_url('menu_profile') ?>" class="btn btn-secondary">Kembali</a>
         </div>
 
     </form>

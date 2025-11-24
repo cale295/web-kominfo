@@ -179,13 +179,6 @@ public function create()
                 'min_length' => 'Konten minimal harus 5 karakter.'
             ]
         ],
-        'content2' => [
-            'rules' => 'permit_empty|string|min_length[5]',
-            'errors' => [
-                'string'     => 'Konten lanjutan harus berupa teks.',
-                'min_length' => 'Konten lanjutan minimal harus 5 karakter.'
-            ]
-        ],
         'caption' => [
             'rules' => 'permit_empty|string|min_length[5]|max_length[255]',
             'errors' => [
@@ -435,12 +428,35 @@ public function update($id)
                 'max_length' => 'Judul maksimal 255 karakter.',
             ]
         ],
+        'intro' => [
+            'rules' => 'required|min_length[5]|max_length[255]',
+            'errors' => [
+                'required'   => 'Intro wajib diisi.',
+                'min_length' => 'Intro minimal 5 karakter.',
+                'max_length' => 'Intro maksimal 255 karakter.',
+            ]
+        ],
         'topik' => [
             'rules' => 'required|min_length[5]|max_length[255]',
             'errors' => [
                 'required'   => 'Topik wajib diisi.',
                 'min_length' => 'Topik minimal 5 karakter.',
                 'max_length' => 'Topik maksimal 255 karakter.',
+            ]
+        ],
+        'content' => [
+            'rules' => 'required',
+            'errors' => [
+                'required' => 'Konten wajib diisi.',
+            ],
+        ],
+        'caption' => [
+            'rules' => 'required|min_length[5]|max_length[255]',
+            'errors' => [
+                'required'   => 'Caption wajib diisi.',
+                'min_length' => 'Caption minimal 5 karakter.',
+                'max_length' => 'Caption maksimal 255 karakter.',
+
             ]
         ],
         'id_kategori' => [
