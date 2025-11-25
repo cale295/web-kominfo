@@ -55,8 +55,7 @@
 
                 <div class="mb-3">
                     <label for="file_lampiran" class="form-label">File Lampiran (PDF/Excel/Doc)</label>
-                    <input class="form-control" type="file" id="file_lampiran" name="file_lampiran" required>
-                    <div class="form-text text-danger">* Wajib diupload saat membuat baru.</div>
+                    <input class="form-control" type="file" id="file_lampiran" name="file_lampiran">
                 </div>
 
                 <div class="mb-3 form-check">

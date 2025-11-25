@@ -70,42 +70,46 @@ class ProgramController extends BaseController
         return view('pages/program/create');
     }
 
-    public function create()
+public function create()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_create']) {
-            return redirect()->to('/program')->with('error', 'Kamu tidak punya izin menambah menu_profile.');
+            return redirect()->to('/program')->with('error', 'Kamu tidak punya izin menambah program.');
         }
+
         $data = [
-            'nama_program' => $this->request->getPost('nama_program'),
-            'nama_kegiatan' => $this->request->getPost('nama_kegiatan'),
+            'nama_program'   => $this->request->getPost('nama_program'),
+            'nama_kegiatan'  => $this->request->getPost('nama_kegiatan'),
             'nilai_anggaran' => $this->request->getPost('nilai_anggaran'),
-            'tahun' => $this->request->getPost('tahun'),
-            'slug' => url_title($this->request->getPost('nama_program'), '-', true),
-            'sorting' => $this->request->getPost('sorting'),
-            'is_active' => $this->request->getPost('is_active'),
-            'hash' => $this->request->getPost('hash'),
-            
+            'tahun'          => $this->request->getPost('tahun'),
+            'slug'           => url_title($this->request->getPost('nama_program'), '-', true),
+            'sorting'        => $this->request->getPost('sorting'),
+            'is_active'      => $this->request->getPost('is_active'),
+            'hash'           => $this->request->getPost('hash'),
+            // Set default null agar tidak error jika tidak ada file
+            'file_lampiran'  => null, 
         ];
 
-        // VALIDASI FILE WAJIB UPLOAD
+        // AMBIL FILE TAPI JANGAN DIPAKSA ERROR
         $file = $this->request->getFile('file_lampiran');
-        if (!$file || !$file->isValid()) {
-            return redirect()->back()->withInput()->with('errors', [
-                'file_lampiran' => 'File dokumen harus diupload.'
-            ]);
-        }
-    $original = $file->getName();
-    $newName  = time() . '-' . $original;
 
-    $file->move('uploads/program', $newName);
+        // Cek: Apakah file ada DAN valid DAN belum dipindahkan?
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $original = $file->getName();
+            $newName  = time() . '-' . $original;
 
-    $data['file_lampiran'] = 'uploads/program/' . $newName;
+            $file->move('uploads/program', $newName);
+
+            // Jika file berhasil diupload, update array data
+            $data['file_lampiran'] = 'uploads/program/' . $newName;
+        } 
+        // Jika tidak ada file, kode akan lanjut dengan $data['file_lampiran'] = null
 
         if (!$this->programModel->insert($data)) {
             return redirect()->back()->withInput()->with('errors', $this->programModel->errors());
         }
-        return redirect()->to('/program')->with('success', 'menu_profile berhasil ditambahkan.');
+        
+        return redirect()->to('/program')->with('success', 'Data program berhasil ditambahkan.');
     }
     // ... (Kode sebelumnya: __construct, getAccess, index, new, create)
 
