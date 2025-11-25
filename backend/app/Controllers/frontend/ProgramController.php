@@ -12,7 +12,7 @@ class ProgramController extends BaseController
     protected $programModel;
     protected $accessRightsModel;
 
-    protected $module = 'Program';
+    protected $module = 'program';
 
     public function __construct()
     {
