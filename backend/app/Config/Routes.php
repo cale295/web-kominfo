@@ -28,6 +28,9 @@ $routes->resource('manage_user', ['controller' => 'backend\UserController']);
 // Kategori Berita
 $routes->resource('kategori_berita', ['controller' => 'backend\KategoriBeritaController']);
 
+//program
+$routes->resource('program', ['controller' => 'frontend\ProgramController', 'except' => ['show']]);
+
 //profile
 $routes->resource('menu_profile', ['controller' => 'frontend\ProfileController', 'except' => ['show']]);
 

@@ -14,15 +14,7 @@
         </div>
         <div class="card-body">
             
-            <?php if (session()->has('errors')) : ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error) : ?>
-                            <li><?= $error ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif ?>
+
 
             <!-- Perhatikan action URL mengarah ke ID spesifik -->
             <form action="<?= base_url('pejabat/' . $pejabat['id_pejabat']) ?>" method="post" enctype="multipart/form-data">
