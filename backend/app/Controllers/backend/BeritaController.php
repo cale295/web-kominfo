@@ -204,12 +204,6 @@ class BeritaController extends BaseController
                     'required' => 'Kategori wajib dipilih minimal satu.'
                 ]
             ],
-            'caption_cover' => [
-                'rules'  => 'permit_empty|max_length[255]',
-                'errors' => [
-                    'max_length' => 'Caption cover maksimal 255 karakter.'
-                ]
-            ],
             'sumber' => [
                 'rules'  => 'permit_empty|max_length[255]',
                 'errors' => [
@@ -453,12 +447,6 @@ class BeritaController extends BaseController
                     'required' => 'Kategori wajib dipilih minimal satu.'
                 ]
             ],
-            'caption_cover' => [
-                'rules'  => 'permit_empty|max_length[255]',
-                'errors' => [
-                    'max_length' => 'Caption cover maksimal 255 karakter.'
-                ]
-            ]
         ];
 
         // Validasi Cover Image (Optional saat update)
