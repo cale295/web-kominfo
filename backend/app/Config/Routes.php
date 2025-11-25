@@ -16,6 +16,9 @@ $routes->get('/logout', 'backend\AuthController::logout');
 // Dashboard
 $routes->get('/dashboard', 'backend\DashboardController::index');
 
+//Pejabat
+$routes->resource('pejabat', ['controller' => 'frontend\PejabatController', 'except' => ['show']]);
+
 // Berita Kategori Tema
 $routes->resource('tema', ['controller' => 'backend\TemaKategoriController', 'except' => ['show']]);
 
