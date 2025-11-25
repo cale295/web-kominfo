@@ -46,10 +46,10 @@ const anggota = [
 
 export default function Structure() {
   return (
-    <div className="container-fluid px-3 px-md-4 bg-blue-light">
+    <div className="container-fluid px-3 py-3 bg-blue-light">
       <div className="text-center mb-3 mb-md-4">
         <h1 className="text-blue-dark fw-bold fs-3 fs-md-1">
-          Struktur Organisasi
+          Daftar Pejabat Struktural
         </h1>
         <p className="fw-semibold fs-5 fs-md-3">
           Dinas Komunikasi dan Informatika

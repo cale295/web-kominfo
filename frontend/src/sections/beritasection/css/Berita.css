@@ -2,7 +2,7 @@
    Berita Container
    ============================ */
 .berita-container {
-  max-width: 1200px;
+  padding: 0rem 1rem;
 }
 
 /* ============================
@@ -22,6 +22,7 @@
   width: 16px;
   height: 16px;
   fill: #1e40af;
+  rotate: 90deg;
 }
 
 /* ============================
@@ -70,15 +71,13 @@
 .carousel-indicators button {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
   margin: 0 4px;
   background-color: rgba(255, 255, 255, 0.5);
   border: none;
 }
 
 .carousel-indicators button.active {
-  width: 24px;
-  border-radius: 4px;
+  width: 50px;
   background-color: #ffffff;
 }
 
@@ -89,7 +88,7 @@
   top: 50%;
   transform: translateY(-50%);
   opacity: 0.8;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(49, 49, 49, 0.9);
   border-radius: 50%;
   transition: opacity 0.3s, background-color 0.3s;
 }
@@ -105,7 +104,7 @@
 .carousel-control-prev:hover,
 .carousel-control-next:hover {
   opacity: 1;
-  background-color: #ffffff;
+  background-color: rgba(106, 106, 106, 0.9);
 }
 
 .carousel-control-prev-icon,

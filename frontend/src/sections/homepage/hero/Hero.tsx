@@ -1,8 +1,50 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./hero.css";
 import { Search, Accessibility } from "lucide-react";
+import api from "../../../services/api";
+
+interface Banner {
+  id_banner: string;
+  title: string;
+  status: string;
+  image: string;
+  media_type: string;
+  url: string;
+  url_yt: string;
+  sorting: string;
+  keterangan: string;
+  category_banner: string;
+}
 
 const HeroSection: React.FC = () => {
+  const [bannerImage, setBannerImage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchBanner = async () => {
+      try {
+        const res = await api.get("/banner");
+        const banners: Banner[] = res?.data?.data || [];
+        
+        // Filter banner dengan category_banner = "3" (banner berita) dan status aktif
+        const heroBanner = banners.find(
+          (banner) => banner.category_banner === "3" && banner.status === "1"
+        );
+        
+        if (heroBanner) {
+          const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
+          setBannerImage(`${ROOT}/uploads/banner/${heroBanner.image}`);
+        }
+      } catch (error) {
+        console.error("Gagal fetch banner:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBanner();
+  }, []);
+
   return (
     <div className="hero-container">
       {/* Header Bar */}
@@ -16,7 +58,6 @@ const HeroSection: React.FC = () => {
           <Accessibility className="icon-accessibility" />
           <span className="disabilitas">DISABILITAS</span>
         </button>
-
         <div className="search-wrapper d-flex align-items-center">
           <div className="search-input-wrapper">
             <input
@@ -31,26 +72,23 @@ const HeroSection: React.FC = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="hero-content d-flex flex-column flex-md-row align-items-center">
-        <div className="hero-text p-4 p-md-5 p-lg-6">
-          <h1 className="hero-title mb-3">
-            Mau ikut pelatihan kerja? Ikut Cakap Kerja, Yuk!
-          </h1>
-          <p className="hero-subtitle">
-            Tangerang Cakap kerja adalah Lorem ipsum dolor sit amet, consectetur
-            adipiscing elit. Ut posuere vitae felis quis pretium. Maecenas
-            ultricies rutrum mattis.
-          </p>
-        </div>
-
-        <div className="hero-image-wrapper">
+      {/* Hero Section with Banner */}
+      <section className="hero-banner-section">
+        {isLoading ? (
+          <div className="hero-banner-loading">
+            <p>Memuat banner...</p>
+          </div>
+        ) : bannerImage ? (
           <img
-            src="/assets/mbak.png"
-            alt="Woman smiling with laptop"
-            className="hero-image"
+            src={bannerImage}
+            alt="Banner Utama"
+            className="hero-banner-image"
           />
-        </div>
+        ) : (
+          <div className="hero-banner-placeholder">
+            <p>Banner tidak tersedia</p>
+          </div>
+        )}
       </section>
     </div>
   );

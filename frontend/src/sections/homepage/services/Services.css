@@ -1,145 +1,79 @@
-/* Custom CSS untuk ServiceGrid */
-
-.py-16 {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
-.bg-gray-50 {
-  background-color: #f9fafb;
-}
-
-.container-fluid {
-  max-width: 100%;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-/* Row dan Col */
-
-
-.g-4 {
-  gap: 1rem;
-}
-
-.justify-content-center {
+.service-container {
+  padding: 30px 0;
+  background: #f8f9fa;
+  display: flex;
   justify-content: center;
 }
 
-.d-flex {
-  display: flex;
+/* Wrapper supaya grid tidak melebar lebih dari 5 kolom */
+.service-wrapper {
+  width: 100%;
+  max-width: 1450px; /* 5 kolom */
+  padding: 0 20px;
 }
 
-.col {
-  flex: 1;
+/* GRID: maksimum 5 kolom */
+.service-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-/* Card Styling */
+
 .service-card {
-  background-color: #EDEDED;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  padding: 1.5rem;
-  width: 14.375rem;
-  height: 7.938rem;
-  transition: all 0.3s ease;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 10px;
+  min-height: 135px;
+
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-}
 
-.service-card-link {
+  border: 1px solid #e8e8e8;
+  transition: 0.2s ease;
+  cursor: pointer;
   text-decoration: none;
+  color: inherit;
 }
 
-.w-48 {
-  width: 12rem;
-}
-
-.h-28 {
-  height: 7rem;
-}
-
-.max-h-16 {
-  max-height: 4rem;
-}
-
-.object-contain {
+.service-card img {
+  width: 80px;
+  height: 80px;
   object-fit: contain;
+  margin-bottom: 14px;
 }
 
-.text-center {
-  text-align: center;
-}
-
-.mt-4 {
-  margin-top: 1rem;
-}
-
-.font-semibold {
+.service-card .title {
+  font-size: 15px;
   font-weight: 600;
+  text-align: center;
+  line-height: 1.35;
 }
-
-.text-gray-900 {
-  color: #111827;
-}
-
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
-.text-md-base {
-  font-size: 1rem;
-}
-
-/* Hover Effects */
-.service-hover-effect:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-  transform: scale(1.05);
-}
-
-.service-title-hover:hover {
-  color: #2563eb; /* text-blue-700 */
-}
-
-/* Focus Ring */
-.focus-outline-none:focus {
-  outline: none;
-}
-
-.focus-ring-4:focus {
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.5); /* focus:ring-blue-400 */
-}
-
-.rounded-xl {
-  border-radius: 0.75rem;
-}
-
-/* Spacing */
-.mt-15 {
-  margin-top: 3.75rem; /* Atau sesuaikan dengan kebutuhan */
-}
-
-/* Responsive */
-@media (min-width: 768px) {
-  .text-md-base {
-    font-size: 1rem;
+@media (max-width: 992px) {
+  .service-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (min-width: 992px) {
-  .text-md-base {
-    font-size: 1rem;
+@media (max-width: 576px) {
+  .service-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .service-card {
+    min-height: 170px;
+    padding: 16px 12px;
+  }
+
+  .service-card img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .service-card .title {
+    font-size: 13px;
   }
 }
+

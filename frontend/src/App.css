@@ -3,8 +3,8 @@
     padding-right: 1rem;
 }
 .py-10 {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 .md\:px-10 {
     @media (min-width: 768px) {

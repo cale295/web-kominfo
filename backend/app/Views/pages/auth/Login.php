@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -260,6 +261,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-wrapper">
@@ -292,11 +294,11 @@
 
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input 
-                                type="text" 
-                                name="username" 
-                                id="username" 
-                                class="form-control" 
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                class="form-control"
                                 placeholder="Masukkan username"
                                 value="<?= old('username') ?>"
                                 required>
@@ -305,11 +307,11 @@
                         <div class="mb-4">
                             <label for="password" class="form-label">Password</label>
                             <div class="password-toggle">
-                                <input 
-                                    type="password" 
-                                    name="password" 
-                                    id="password" 
-                                    class="form-control" 
+                                <input
+                                    type="password"
+                                    name="password"
+                                    id="password"
+                                    class="form-control"
                                     placeholder="Masukkan password"
                                     required>
                                 <button type="button" class="password-toggle-btn" onclick="togglePassword()">
@@ -326,20 +328,21 @@
                                 </button>
                                 <div class="captcha-text" id="captchaDisplay"></div>
                             </div>
-                            <input 
-                                type="text" 
-                                name="captcha" 
-                                id="captchaInput" 
-                                class="form-control" 
+                            <input
+                                type="text"
+                                name="captcha"
+                                id="captchaInput"
+                                class="form-control"
                                 placeholder="Masukkan kode di atas"
                                 autocomplete="off"
                                 required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">
+                        <button type="button" class="btn btn-primary w-100" onclick="validateForm()">
                             <i class="bi bi-box-arrow-in-right"></i>
                             Masuk
                         </button>
+
                     </form>
                 </div>
             </div>
@@ -347,9 +350,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    
+
     <script>
         let captchaCode = '';
+
+        function validateForm() {
+            const input = document.getElementById('captchaInput').value;
+
+            if (input !== captchaCode) {
+                alert("Kode keamanan salah!");
+                return false;
+            }
+
+            // submit form kalau benar
+            document.querySelector('form').submit();
+        }
 
         function generateCaptcha() {
             captchaCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -360,7 +375,7 @@
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.className = 'bi bi-eye-slash';
@@ -375,4 +390,5 @@
         };
     </script>
 </body>
+
 </html>

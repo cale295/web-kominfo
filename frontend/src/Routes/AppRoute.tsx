@@ -9,8 +9,9 @@ import HubungiKami from "../sections/homepage/contact/Contact";
 import Structure from "../sections/homepage/structure/Structure";
 import Modal from "../sections/homepage/modal/Modal";
 import Footer from "../sections/homepage/footer/Footer";
-import BeritaNavbar from "../sections/berita/Navbar";
-import Berita from "../sections/berita/Berita";
+import BeritaNavbar from "../sections/beritasection/Navbar";
+import Berita from "../sections/beritasection/Berita";
+import BeritaDetail from "../sections/beritasection/BeritaDetail";
 import AccessibilityPanel from "../sections/homepage/AccessibilityPanel";
 
 const HomePage: React.FC = () => {
@@ -28,14 +29,26 @@ const HomePage: React.FC = () => {
     </>
   );
 };
+
 const BeritaPage: React.FC = () => {
   return (
     <>
-    <BeritaNavbar />
-    <Berita />
-  </>
-  )
-}
+      <BeritaNavbar />
+      <Berita />
+      <Footer />
+    </>
+  );
+};
+
+const BeritaDetailPage: React.FC = () => {
+  return (
+    <>
+      <BeritaNavbar />
+      <BeritaDetail />
+      <Footer />
+    </>
+  );
+};
 
 const AppRouter: React.FC = () => {
   return (
@@ -43,6 +56,7 @@ const AppRouter: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/berita" element={<BeritaPage />} />
+        <Route path="/berita/:id" element={<BeritaDetailPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
       <AccessibilityPanel />

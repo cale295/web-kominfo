@@ -115,7 +115,7 @@ const Berita: React.FC = () => {
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
 
   return (
-    <div className="container my-5 berita-container">
+    <div className="container-fluid my-5 berita-container">
       <div className="row">
         {/* Berita Utama */}
         <div className="col-lg-8 mb-4">
@@ -145,8 +145,8 @@ const Berita: React.FC = () => {
 
               <div className="carousel-inner">
                 {beritaUtamaList.map((item, index) => (
-                  <div
-                    key={item.id_berita}
+                  <a
+                    href={`/berita/${item.id_berita}`}
                     className={`carousel-item ${index === 0 ? "active" : ""}`}
                   >
                     <img
@@ -156,9 +156,11 @@ const Berita: React.FC = () => {
                     />
                     <div className="carousel-caption-custom">
                       <h5 className="caption-title">{item.judul}</h5>
-                      <p className="caption-date">{formatDate(item.created_at)}</p>
+                      <p className="caption-date">
+                        {formatDate(item.created_at)}
+                      </p>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
 
@@ -168,7 +170,10 @@ const Berita: React.FC = () => {
                 data-bs-target="#carouselBeritaUtama"
                 data-bs-slide="prev"
               >
-                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span
+                  className="carousel-control-prev-icon"
+                  aria-hidden="true"
+                ></span>
                 <span className="visually-hidden">Previous</span>
               </button>
               <button
@@ -177,7 +182,10 @@ const Berita: React.FC = () => {
                 data-bs-target="#carouselBeritaUtama"
                 data-bs-slide="next"
               >
-                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                <span
+                  className="carousel-control-next-icon"
+                  aria-hidden="true"
+                ></span>
                 <span className="visually-hidden">Next</span>
               </button>
             </div>
@@ -203,7 +211,9 @@ const Berita: React.FC = () => {
                       >
                         <span className="berita-number">{index + 1}#</span>
                         <div className="berita-content">
-                          <span className="berita-title">{item.judul}</span>
+                          <span className="berita-title text-break">
+                            {item.judul}
+                          </span>
                           <span className="berita-date">Sabtu 2019 Mei</span>
                         </div>
                       </a>
@@ -230,7 +240,10 @@ const Berita: React.FC = () => {
 
           {beritaTerkini.length > 0 ? (
             beritaTerkini.map((item) => (
-              <div key={item.id_berita} className="card berita-terkini-card mb-3">
+              <a
+                href={`/berita/${item.id_berita}`}
+                className="card berita-terkini-card mb-3"
+              >
                 <div className="card-body">
                   <div className="row g-3">
                     <div className="col-auto">
@@ -249,7 +262,7 @@ const Berita: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             ))
           ) : (
             <p>Memuat berita terkini...</p>

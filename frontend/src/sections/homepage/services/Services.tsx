@@ -1,141 +1,106 @@
 import React from "react";
-import "./services.css";
-import { Container, Row, Col } from "react-bootstrap";
+import "./Services.css"; // CSS Eksternal
 
-interface ServiceItem {
-  id: number;
-  image: string;
+interface ServiceCardProps {
   title: string;
+  imageUrl: string;
   link: string;
 }
 
-const services: ServiceItem[] = [
-  {
-    id: 1,
-    image: "/assets/PPID LOGO.png",
-    title: "Layanan Komunikasi Publik",
-    link: "https://ppid.tangerangkota.go.id",
-  },
-  {
-    id: 2,
-    image: "/assets/logo-kota-tangerang.png",
-    title: "Website Resmi Kota Tangerang",
-    link: "https://tangerangkota.go.id",
-  },
-  {
-    id: 3,
-    image: "/assets/egov.png",
-    title: "Layanan EGOV",
-    link: "https://egov.tangerangkota.go.id",
-  },
-  {
-    id: 4,
-    image: "/assets/statistik.png",
-    title: "Layanan Statistik",
-    link: "https://statistik.tangerangkota.go.id",
-  },
-  {
-    id: 5,
-    image: "/assets/tangerang_live.png",
-    title: "Layanan Tangerang LIVE Room",
-    link: "https://live.tangerangkota.go.id",
-  },
-  {
-    id: 6,
-    image: "",
-    title: "Layanan Pengaduan SP4N-LAPOR",
-    link: "https://lapor.go.id",
-  },
-  {
-    id: 7,
-    image: "/assets/sandi.png",
-    title: "Layanan Persandian",
-    link: "#",
-  },
-  {
-    id: 8,
-    image: "/assets/upt.png",
-    title: "Layanan UPT Pengelola Ruang Kendali Kota",
-    link: "#",
-  },
-  {
-    id: 9,
-    image: "/assets/layanan-tik.png",
-    title: "Layanan TIK",
-    link: "#",
-  },
-  {
-    id: 10,
-    image: "/assets/layanan-informasi.png",
-    title: "Layanan Informasi dan Komunikasi Publik",
-    link: "#",
-  },
-];
+const ServiceCard: React.FC<ServiceCardProps> = ({ title, imageUrl, link }) => {
+  return (
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="service-card"
+    >
+      <img src={imageUrl} alt={title} />
+      <p className="title">{title}</p>
+    </a>
+  );
+};
 
-const ServiceGrid: React.FC<{ service: ServiceItem }> = ({ service }) => {
-  const cardStyle: React.CSSProperties = {
-    height: "127px",
-    width: "231px",
-    borderRadius: "20px",
-    backgroundColor: "#EDEDED",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  };
+const Service: React.FC = () => {
+  const services = [
+    {
+      id: 1,
+      image: "/assets/PPID LOGO.png",
+      title: "Layanan Komunikasi Publik",
+      link: "https://ppid.tangerangkota.go.id",
+    },
+    {
+      id: 2,
+      image: "/assets/logo-kota-tangerang.png",
+      title: "Website Resmi Kota Tangerang",
+      link: "https://tangerangkota.go.id",
+    },
+    {
+      id: 3,
+      image: "/assets/egov.png",
+      title: "Layanan EGOV",
+      link: "https://egov.tangerangkota.go.id",
+    },
+    {
+      id: 4,
+      image: "/assets/statistik.png",
+      title: "Layanan Statistik",
+      link: "https://statistik.tangerangkota.go.id",
+    },
+    {
+      id: 5,
+      image: "/assets/tangerang_live.png",
+      title: "Layanan Tangerang LIVE Room",
+      link: "https://live.tangerangkota.go.id",
+    },
+    {
+      id: 6,
+      image: "",
+      title: "Layanan Pengaduan SP4N-LAPOR",
+      link: "https://lapor.go.id",
+    },
+    {
+      id: 7,
+      image: "/assets/sandi.png",
+      title: "Layanan Persandian",
+      link: "#",
+    },
+    {
+      id: 8,
+      image: "/assets/upt.png",
+      title: "Layanan UPT Pengelola Ruang Kendali Kota",
+      link: "#",
+    },
+    {
+      id: 9,
+      image: "/assets/layanan-tik.png",
+      title: "Layanan TIK",
+      link: "#",
+    },
+    {
+      id: 10,
+      image: "/assets/layanan-informasi.png",
+      title: "Layanan Informasi dan Komunikasi Publik",
+      link: "#",
+    },
+  ];
 
   return (
-    <div className="text-center">
-      <a
-        href={service.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-decoration-none text-dark d-flex flex-column align-items-center"
-      >
-        <div style={cardStyle} className=" mb-2">
-          {service.image && (
-            <img
-              src={service.image}
-              alt={service.title}
-              className="img-fluid"
-              style={{
-                maxWidth: "100px",
-                maxHeight: "100px",
-                objectFit: "contain",
-              }}
+    <div className="service-container">
+      <div className="service-wrapper">
+        <div className="service-grid">
+          {services.map((service) => (
+            <ServiceCard
+              key={service.id}
+              title={service.title}
+              imageUrl={service.image}
+              link={service.link}
             />
-          )}
+          ))}
         </div>
-        <h6
-          className="fw-bold text-center"
-          style={{
-            fontSize: "0.9rem",
-            lineHeight: "1.2",
-            maxWidth: "140px",
-          }}
-        >
-          {service.title}
-        </h6>
-      </a>
+      </div>
     </div>
   );
 };
 
-// Komponen Utama
-const ServicesSection: React.FC = () => {
-  return (
-    <Container className="py-4">
-      {/* Baris Pertama */}
-      <Row className="g-4 mb-4 justify-content-between">
-        {services.map((service) => (
-          <Col key={service.id} xs={12} sm={6} md={4} lg={2} xl={2}>
-            <ServiceGrid service={service} />
-          </Col>
-        ))}
-      </Row>
-    </Container>
-  );
-};
-
-// Ekspor komponen utama
-export default ServicesSection;
+export default Service;
