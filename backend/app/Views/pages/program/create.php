@@ -14,16 +14,6 @@
         </div>
         <div class="card-body">
             
-            <?php if (session()->has('errors')) : ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error) : ?>
-                            <li><?= $error ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif ?>
-
             <form action="<?= base_url('program') ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field() ?>
 

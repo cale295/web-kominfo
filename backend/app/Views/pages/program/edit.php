@@ -13,16 +13,7 @@
             <i class="fas fa-edit me-1"></i> Form Edit Program
         </div>
         <div class="card-body">
-            
-            <?php if (session()->has('errors')) : ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error) : ?>
-                            <li><?= $error ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif ?>
+        
 
             <!-- Action URL ke ID Program spesifik -->
             <form action="<?= base_url('program/' . $program['id_program']) ?>" method="post" enctype="multipart/form-data">

@@ -13,16 +13,6 @@
             <i class="fas fa-user-plus me-1"></i> Form Tambah Pejabat
         </div>
         <div class="card-body">
-            <!-- Tampilkan Error Validasi Global -->
-            <?php if (session()->has('errors')) : ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error) : ?>
-                            <li><?= $error ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif ?>
 
             <form action="<?= base_url('pejabat') ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field() ?>
