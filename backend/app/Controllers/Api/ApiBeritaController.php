@@ -48,6 +48,7 @@ public function index()
 
     $beritas = $this->model
         ->where('trash', '0')
+        ->where('status', '1')
         ->orderBy('created_at', 'DESC')
         ->findAll();
 
@@ -88,7 +89,7 @@ public function index()
 
         // Jika belum, simpan ke cache selama 1 JAM (3600 detik)
         // Artinya 1 IP hanya bisa menambah 1 hit per jam per berita
-        $cache->save($cacheKey, true, 3600);
+        $cache->save($cacheKey, true, 60);
         
         return true;
     }
