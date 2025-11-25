@@ -123,6 +123,9 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 $routes->group('api', function ($routes) {
 
 
+    //banner
+    $routes->get('banner', 'Api\ApiBannerController::index');
+    $routes->get('banner/(:num)', 'Api\ApiBannerController::show/$1');
     //dokumen
     $routes->get('dokument', 'Api\ApiDokumentController::index');
     $routes->get('dokument/(:num)', 'Api\ApiDokumenController::show/$1');
