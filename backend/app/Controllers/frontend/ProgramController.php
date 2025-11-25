@@ -32,6 +32,182 @@ class ProgramController extends BaseController
     }
     public function index()
     {
-        //
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access['can_read']) {
+            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
+        }        $role = session()->get('role');
+        $access = $this->getAccess($role);
+
+        if (!$access) {
+            return view('pages/program/index', [
+                'Program' => [],
+                'error'   => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
+            ]);
+        }
+
+        if (!$access['can_read']) {
+            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat agenda.');
+        }
+
+        $menu_profiles = $this->programModel->orderBy('created_at', 'DESC')->findAll();
+
+        $data = [
+            'menu_profiles'    => $menu_profiles,
+            'can_create' => $access['can_create'],
+            'can_update' => $access['can_update'],
+            'can_delete' => $access['can_delete'],
+        ];
+
+        return view('pages/program/index', $data);
+    }
+
+    public function new()
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_create']) {
+            return redirect()->to('/menu_profile')->with('error', 'Kamu tidak punya izin menambah menu_profile.');
+        }
+        return view('pages/program/create');
+    }
+
+    public function create()
+    {
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_create']) {
+            return redirect()->to('/program')->with('error', 'Kamu tidak punya izin menambah menu_profile.');
+        }
+        $data = [
+            'nama_program' => $this->request->getPost('nama_program'),
+            'nama_kegiatan' => $this->request->getPost('nama_kegiatan'),
+            'nilai_anggaran' => $this->request->getPost('nilai_anggaran'),
+            'tahun' => $this->request->getPost('tahun'),
+            'slug' => url_title($this->request->getPost('nama_program'), '-', true),
+            'sorting' => $this->request->getPost('sorting'),
+            'is_active' => $this->request->getPost('is_active'),
+            'hash' => $this->request->getPost('hash'),
+            
+        ];
+
+        // VALIDASI FILE WAJIB UPLOAD
+        $file = $this->request->getFile('file_lampiran');
+        if (!$file || !$file->isValid()) {
+            return redirect()->back()->withInput()->with('errors', [
+                'file_lampiran' => 'File dokumen harus diupload.'
+            ]);
+        }
+    $original = $file->getName();
+    $newName  = time() . '-' . $original;
+
+    $file->move('uploads/program', $newName);
+
+    $data['file_lampiran'] = 'uploads/program/' . $newName;
+
+        if (!$this->programModel->insert($data)) {
+            return redirect()->back()->withInput()->with('errors', $this->programModel->errors());
+        }
+        return redirect()->to('/program')->with('success', 'menu_profile berhasil ditambahkan.');
+    }
+    // ... (Kode sebelumnya: __construct, getAccess, index, new, create)
+
+    public function edit($id)
+    {
+        // 1. Cek Hak Akses
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/program')->with('error', 'Kamu tidak punya izin mengedit program.');
+        }
+
+        // 2. Ambil data
+        $program = $this->programModel->find($id);
+
+        if (!$program) {
+            return redirect()->to('/program')->with('error', 'Data program tidak ditemukan.');
+        }
+
+        // 3. Tampilkan view
+        return view('pages/program/edit', [
+            'program' => $program
+        ]);
+    }
+
+    public function update($id)
+    {
+        // 1. Cek Hak Akses
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_update']) {
+            return redirect()->to('/program')->with('error', 'Kamu tidak punya izin mengupdate program.');
+        }
+
+        // 2. Cek Data Lama
+        $programLama = $this->programModel->find($id);
+        if (!$programLama) {
+            return redirect()->to('/program')->with('error', 'Data tidak ditemukan.');
+        }
+
+        // 3. Siapkan Data Update
+        $data = [
+            'nama_program'   => $this->request->getPost('nama_program'),
+            'nama_kegiatan'  => $this->request->getPost('nama_kegiatan'),
+            'nilai_anggaran' => $this->request->getPost('nilai_anggaran'),
+            'tahun'          => $this->request->getPost('tahun'),
+            // Update slug jika nama program berubah
+            'slug'           => url_title($this->request->getPost('nama_program'), '-', true),
+            'sorting'        => $this->request->getPost('sorting'),
+            // Handle checkbox: jika tidak dicentang nilainya null, jadi kita set ke 0
+            'is_active'      => $this->request->getPost('is_active') ?? 0, 
+        ];
+
+        // 4. Logika Update File Lampiran
+        $file = $this->request->getFile('file_lampiran');
+
+        // Cek apakah ada file baru yang diupload valid
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            
+            // a. Upload file baru
+            $originalName = $file->getName();
+            $newName      = time() . '-' . $originalName;
+            $file->move('uploads/program', $newName);
+            
+            // Simpan path baru ke array data
+            $data['file_lampiran'] = 'uploads/program/' . $newName;
+
+            // b. Hapus file lama fisik (jika ada)
+            // Cek apakah path file lama ada di database dan filenya ada di server
+            if (!empty($programLama['file_lampiran']) && file_exists($programLama['file_lampiran'])) {
+                unlink($programLama['file_lampiran']);
+            }
+        }
+
+        // 5. Eksekusi Update ke Database
+        if (!$this->programModel->update($id, $data)) {
+            return redirect()->back()->withInput()->with('errors', $this->programModel->errors());
+        }
+
+        return redirect()->to('/program')->with('success', 'Data program berhasil diperbarui.');
+    }
+
+    public function delete($id)
+    {
+        // 1. Cek Hak Akses
+        $access = $this->getAccess(session()->get('role'));
+        if (!$access || !$access['can_delete']) {
+            return redirect()->to('/program')->with('error', 'Kamu tidak punya izin menghapus program.');
+        }
+
+        // 2. Ambil data untuk mendapatkan path file
+        $program = $this->programModel->find($id);
+        if (!$program) {
+            return redirect()->to('/program')->with('error', 'Data tidak ditemukan.');
+        }
+
+        // 3. Hapus File Fisik Lampiran
+        if (!empty($program['file_lampiran']) && file_exists($program['file_lampiran'])) {
+            unlink($program['file_lampiran']);
+        }
+
+        // 4. Hapus Data dari Database
+        $this->programModel->delete($id);
+
+        return redirect()->to('/program')->with('success', 'Data program berhasil dihapus.');
     }
 }

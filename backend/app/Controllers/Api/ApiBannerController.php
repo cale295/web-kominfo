@@ -15,8 +15,7 @@ class ApiBannerController extends ResourceController
     public function index()
     {
         $banners = $this->model
-        ->where('status', 'active')
-        ->orderBy('sorting', 'ASC')
+        ->where('status', '1')
         ->findAll();
         return $this->respond([
             'status'  => true,
