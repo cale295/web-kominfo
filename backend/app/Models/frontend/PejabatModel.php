@@ -12,7 +12,7 @@ class PejabatModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nama','nip','jabatan','foto','slug','urutan','is_active','hash'];
+    protected $allowedFields    = ['nama','nip','alamat_kantor','tempat_tanggal_lahir','jabatan','foto','slug','urutan','is_active','hash'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

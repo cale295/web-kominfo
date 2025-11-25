@@ -304,33 +304,36 @@ class BeritaController extends BaseController
         $kategoriIds = is_array($post['id_kategori']) ? $post['id_kategori'] : explode(',', $post['id_kategori']);
         $idKategori = $kategoriIds[0] ?? null;
 
-        $data = [
-            'judul'             => $post['judul'],
-            'topik'             => $post['topik'],
-            'intro'             => $post['intro'],
-            'sumber'            => $post['sumber'],
-            'content'           => $post['content'],
-            'content2'          => $post['content2'],
-            'id_kategori'       => $idKategori,
-            'link_video'        => $post['link_video'] ?? null,
-            'keyword'           => $post['keyword'] ?? null,
-            'feat_image'        => $featImagePath,
-            
-            // Simpan Caption Cover
-            'caption'           => $post['caption_cover'] ?? null, 
-            
-            // Simpan JSON Additional
-            'additional_images' => !empty($additionalData) ? json_encode($additionalData) : null,
-            
-            'slug'              => url_title($post['judul'], '-', true),
-            'hash_berita'       => bin2hex(random_bytes(16)),
-            'status'            => $post['status'] ?? 0,
-            'status_berita'     => $post['status_berita'] ?? 0,
-            'created_by_id'     => session()->get('id_user'),
-            'created_by_role'   => session()->get('role'),
-            'created_by_name'   => session()->get('username'),
-            'created_at'        => date('Y-m-d H:i:s')
-        ];
+// ... (kode sebelumnya)
+    $data = [
+        'judul'             => $post['judul'],
+        'topik'             => $post['topik'],
+        'intro'             => $post['intro'],
+        'sumber'            => $post['sumber'],
+        'content'           => $post['content'],
+        'content2'          => $post['content2'],
+        'id_kategori'       => $idKategori,
+        'link_video'        => $post['link_video'] ?? null,
+        'keyword'           => $post['keyword'] ?? null,
+        'feat_image'        => $featImagePath,
+        
+        // --- TAMBAHKAN BAGIAN INI ---
+        'id_berita_terkait'  => !empty($post['id_berita_terkait']) ? $post['id_berita_terkait'] : null,
+        'id_berita_terkait2' => !empty($post['id_berita_terkait2']) ? $post['id_berita_terkait2'] : null,
+        // -----------------------------
+
+        'caption'           => $post['caption_cover'] ?? null, 
+        'additional_images' => !empty($additionalData) ? json_encode($additionalData) : null,
+        'slug'              => url_title($post['judul'], '-', true),
+        'hash_berita'       => bin2hex(random_bytes(16)),
+        'status'            => $post['status'] ?? 0,
+        'status_berita'     => $post['status_berita'] ?? 0,
+        'created_by_id'     => session()->get('id_user'),
+        'created_by_role'   => session()->get('role'),
+        'created_by_name'   => session()->get('username'),
+        'created_at'        => date('Y-m-d H:i:s')
+    ];
+    // ... (kode selanjutnya)
 
         if (!$this->beritaModel->save($data)) {
             return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
@@ -572,29 +575,37 @@ class BeritaController extends BaseController
         $idKategori = $kategoriIds[0] ?? null;
         $captionCover = $post['caption_cover'] ?? $berita['caption']; 
 
-        $data = [
-            'id_berita'         => $id,
-            'judul'             => $post['judul'],
-            'topik'             => $post['topik'],
-            'intro'             => $post['intro'],
-            'sumber'            => $post['sumber'],
-            'content'           => $post['content'],
-            'content2'          => $post['content2'],
-            'id_kategori'       => $idKategori,
-            'link_video'        => $post['link_video'] ?? null,
-            'keyword'           => $post['keyword'] ?? null,
-            'feat_image'        => $featImagePath,
-            'additional_images' => json_encode($finalAdditionalImages, JSON_UNESCAPED_SLASHES),
-            'slug'              => url_title($post['judul'], '-', true),
-            'caption'           => $captionCover,
-            'status'            => $post['status'] ?? 0,
-            'status_berita'     => $post['status_berita'] ?? 0,
-            'updated_by_id'     => session()->get('id_user'),
-            'updated_by_name'   => session()->get('username'),
-            'updated_at'        => date('Y-m-d H:i:s'),
-            'note'              => $post['note'] ?? null,
-            'note_revisi'       => $post['note_revisi'] ?? null,
-        ];
+// ... (kode sebelumnya)
+    $data = [
+        'id_berita'         => $id,
+        'judul'             => $post['judul'],
+        'topik'             => $post['topik'],
+        'intro'             => $post['intro'],
+        'sumber'            => $post['sumber'],
+        'content'           => $post['content'],
+        'content2'          => $post['content2'],
+        'id_kategori'       => $idKategori,
+        'link_video'        => $post['link_video'] ?? null,
+        'keyword'           => $post['keyword'] ?? null,
+        'feat_image'        => $featImagePath,
+        
+        // --- TAMBAHKAN BAGIAN INI ---
+        'id_berita_terkait'  => !empty($post['id_berita_terkait']) ? $post['id_berita_terkait'] : null,
+        'id_berita_terkait2' => !empty($post['id_berita_terkait2']) ? $post['id_berita_terkait2'] : null,
+        // -----------------------------
+
+        'additional_images' => json_encode($finalAdditionalImages, JSON_UNESCAPED_SLASHES),
+        'slug'              => url_title($post['judul'], '-', true),
+        'caption'           => $captionCover,
+        'status'            => $post['status'] ?? 0,
+        'status_berita'     => $post['status_berita'] ?? 0,
+        'updated_by_id'     => session()->get('id_user'),
+        'updated_by_name'   => session()->get('username'),
+        'updated_at'        => date('Y-m-d H:i:s'),
+        'note'              => $post['note'] ?? null,
+        'note_revisi'       => $post['note_revisi'] ?? null,
+    ];
+    // ... (kode selanjutnya)
 
         if (!$this->beritaModel->save($data)) {
             return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
