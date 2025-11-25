@@ -323,39 +323,55 @@
 
                                 <!-- Additional Images -->
 <td class="text-center">
-    <?php
-    $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
+                                    <?php
+                                    $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
+                                    $hasValidImage = false;
 
-    // Flag untuk cek apakah ada gambar valid
-    $hasValidImage = false;
+                                    if (!empty($additional)):
+                                        foreach ($additional as $img):
+                                            // 1. Normalisasi: Cek apakah ini format baru (array) atau lama (string)
+                                            $pathGambar = '';
+                                            $captionTooltip = '';
 
-    if (!empty($additional)):
-        foreach ($additional as $img):
+                                            if (is_array($img)) {
+                                                // Format Baru: ['path' => '...', 'caption' => '...']
+                                                $pathGambar = $img['path'] ?? '';
+                                                $captionTooltip = $img['caption'] ?? '';
+                                            } else {
+                                                // Format Lama: hanya string path 'uploads/...'
+                                                $pathGambar = $img;
+                                            }
 
-            // Cek file fisik
-            $filePath = FCPATH . ltrim($img, '/');
-            if (!file_exists($filePath)) {
-                continue; // lewati gambar rusak
-            }
+                                            // Jika path kosong, skip
+                                            if (empty($pathGambar)) continue;
 
-            $hasValidImage = true; ?>
-            
-            <img src="<?= base_url($img) ?>"
-                alt="Foto Tambahan"
-                class="img-thumbnail mb-1"
-                style="width:50px;height:40px;object-fit:cover;">
-            
-        <?php endforeach;
+                                            // 2. Cek file fisik
+                                            // Gunakan $pathGambar yang sudah distring-kan, bukan $img (array)
+                                            $filePath = FCPATH . ltrim($pathGambar, '/');
+                                            
+                                            if (!file_exists($filePath)) {
+                                                continue; 
+                                            }
 
-        // Jika semua file hilang → tampilkan tanda "-"
-        if (!$hasValidImage): ?>
-            <span class="text-muted">-</span>
-        <?php endif;
+                                            $hasValidImage = true; 
+                                            ?>
+                                            
+                                            <img src="<?= base_url($pathGambar) ?>"
+                                                 alt="Foto Tambahan"
+                                                 title="<?= esc($captionTooltip) ?>"
+                                                 class="img-thumbnail mb-1"
+                                                 style="width:50px;height:40px;object-fit:cover;cursor:help;">
+                                            
+                                        <?php endforeach;
 
-    else: ?>
-        <span class="text-muted">-</span>
-    <?php endif; ?>
-</td>
+                                        if (!$hasValidImage): ?>
+                                            <span class="text-muted">-</span>
+                                        <?php endif;
+
+                                    else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
 
 
                                 <!-- Judul -->
