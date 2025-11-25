@@ -88,12 +88,21 @@ public function new()
     // ========================================================
     // Simpan kategori baru
     // ========================================================
-    public function create()
+public function create()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_create']) {
             return redirect()->to('/kategori')->with('error', 'Kamu tidak punya izin menambah kategori.');
         }
+
+        // --- TAMBAHAN: Validasi Manual ---
+        $inputSorting = $this->request->getPost('sorting_nav');
+        
+        // Cek apakah nilai lebih dari 9
+        if ($inputSorting > 9) {
+            return redirect()->back()->withInput()->with('error', 'Urutan Navigasi (Sorting) maksimal angka 9.');
+        }
+        // ---------------------------------
 
         $data = [
             'id_parent'   => $this->request->getPost('id_parent'),
@@ -103,7 +112,7 @@ public function new()
             'keterangan'  => $this->request->getPost('keterangan'),
             'status'      => $this->request->getPost('status') ?? 'active',
             'is_show_nav' => $this->request->getPost('is_show_nav') ?? '0',
-            'sorting_nav' => $this->request->getPost('sorting_nav'),
+            'sorting_nav' => $inputSorting, // Gunakan variabel yang sudah divalidasi
         ];
 
         if (!$this->kategoriModel->insert($data)) {
