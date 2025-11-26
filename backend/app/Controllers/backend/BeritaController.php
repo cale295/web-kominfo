@@ -7,10 +7,13 @@ use App\Models\BeritaModel;
 use App\Models\KategoriModel;
 use App\Models\AccessRightsModel;
 use App\Models\BeritaLogModel;
+use App\Models\BeritaTagModel;
 
 class BeritaController extends BaseController
 {
     protected $beritaModel;
+
+    protected $beritaTagModel;
     protected $kategoriModel;
     protected $accessRightsModel;
     protected $beritaLogModel;
@@ -22,12 +25,13 @@ class BeritaController extends BaseController
         $this->kategoriModel = new KategoriModel();
         $this->accessRightsModel = new AccessRightsModel();
         $this->beritaLogModel = new BeritaLogModel();
+        $this->beritaTagModel = new BeritaTagModel();
     }
 
     // ========================================================
     // Index / Daftar Berita
     // ========================================================
-    public function index()
+public function index()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access['can_read']) {
@@ -43,8 +47,9 @@ class BeritaController extends BaseController
             $kategoriMap[$k['id_kategori']] = $k['kategori'];
         }
 
-        // Ambil kategori tiap berita
+        // Loop berita untuk ambil Kategori & Tags
         foreach ($berita as &$b) {
+            // 1. Ambil Kategori (Existing)
             $kats = $this->beritaModel->db->table('t_berita_kategori')
                 ->select('m_kategori_berita.id_kategori, m_kategori_berita.kategori')
                 ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita_kategori.id_kategori')
@@ -54,6 +59,17 @@ class BeritaController extends BaseController
 
             $b['kategori'] = array_column($kats, 'kategori');
             $b['kategori_ids'] = array_column($kats, 'id_kategori');
+
+            // 2. ✅ TAMBAHAN TAGS: Ambil Tags untuk ditampilkan di Index (Optional)
+            // Asumsi tabel master tags: m_berita_tag, PK: id_tags, Nama: nama_tag
+            $tags = $this->beritaModel->db->table('t_berita_tag')
+                ->select('m.nama_tag')
+                ->join('m_berita_tag m', 'm.id_tags = t_berita_tag.id_tags')
+                ->where('t_berita_tag.id_berita', $b['id_berita'])
+                ->get()
+                ->getResultArray();
+            
+            $b['tags'] = array_column($tags, 'nama_tag'); // Array nama tags
         }
 
         $data = [
@@ -68,36 +84,37 @@ class BeritaController extends BaseController
 
         return view('pages/berita/index', $data);
     }
-
     // ========================================================
     // Form Tambah Berita
     // ========================================================
-    public function new()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access['can_create']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
-        }
-
-        if (!old('judul')) {
-            $this->clearTemporaryImages();
-        }
-
-        $data = [
-            'title' => 'Tambah Berita',
-            'kategori' => $this->kategoriModel->where('trash', '0')->where('status', '1')->findAll(),
-            'beritaAll' => $this->beritaModel->findAll(),
-            'tempCoverImage' => session()->get('temp_cover_image'),
-            'tempAdditionalImages' => session()->get('temp_additional_images') ?? []
-        ];
-
-        return view('pages/berita/create', $data);
+public function new()
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access['can_create']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin menambah berita.');
     }
+
+    if (!old('judul')) {
+        $this->clearTemporaryImages();
+    }
+
+    // ✅ PERBAIKAN: Konsisten pakai beritaTagModel
+    $data = [
+        'title' => 'Tambah Berita',
+        'kategori' => $this->kategoriModel->where('trash', '0')->where('status', '1')->findAll(),
+        'tags' => $this->beritaTagModel->findAll(), // ✅ Sudah Benar
+        'beritaAll' => $this->beritaModel->findAll(),
+        'tempCoverImage' => session()->get('temp_cover_image'),
+        'tempAdditionalImages' => session()->get('temp_additional_images') ?? []
+    ];
+
+    return view('pages/berita/create', $data);
+}
 
     // ========================================================
     // Detail Berita (Show)
     // ========================================================
-    public function show($id)
+public function show($id)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_read']) {
@@ -109,14 +126,14 @@ class BeritaController extends BaseController
             return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
         }
 
-        // === HIT++ (Tambah jumlah pembaca) ===
-        $this->beritaModel->set('hit', 'hit + 1', false)
-                          ->where('id_berita', $id)
-                          ->update();
-
         // Ambil kategori berita
         $kategori = $this->beritaModel->getKategoriByBerita($id);
         $kategoriNames = array_column($kategori, 'kategori');
+
+        // ✅ TAMBAHAN TAGS: Ambil tags berita
+        // Pastikan function getTagsByBerita sudah ada di Model (sesuai jawaban sebelumnya)
+        $tags = $this->beritaModel->getTagsByBerita($id); 
+        $tagNames = array_column($tags, 'nama_tag'); // Asumsi kolom nama_tag
 
         // Ambil berita terkait
         $beritaTerkait = [];
@@ -133,13 +150,8 @@ class BeritaController extends BaseController
         
         foreach($rawImages as $img) {
             if (is_string($img)) {
-                // Format Lama (Hanya string path)
-                $additionalImages[] = [
-                    'path' => $img,
-                    'caption' => '' // Default caption kosong
-                ];
+                $additionalImages[] = ['path' => $img, 'caption' => ''];
             } else {
-                // Format Baru (Array/Object)
                 $additionalImages[] = $img;
             }
         }
@@ -148,13 +160,13 @@ class BeritaController extends BaseController
             'title' => 'Detail Berita',
             'berita' => $berita,
             'kategori' => $kategoriNames,
+            'tags' => $tagNames, // ✅ Kirim ke view
             'additionalImages' => $additionalImages,
             'beritaTerkait' => $beritaTerkait,
         ];
 
         return view('pages/berita/show', $data);
     }
-
     // ========================================================
     // Simpan Berita Baru (Create)
     // ========================================================
@@ -314,10 +326,18 @@ class BeritaController extends BaseController
         }
 
         // 3. SIMPAN DATA
-        $post = $this->request->getPost();
-        $kategoriIds = is_array($post['id_kategori']) ? $post['id_kategori'] : explode(',', $post['id_kategori']);
-        $idKategori = $kategoriIds[0] ?? null;
+ $post = $this->request->getPost();
+$kategoriIds = is_array($post['id_kategori']) ? $post['id_kategori'] : explode(',', $post['id_kategori']);
+$idKategori = $kategoriIds[0] ?? null;
 
+// ✅ TAMBAHKAN BAGIAN INI (BARU)
+$tagsIds = $post['id_tags'] ?? '';
+if (is_string($tagsIds) && !empty($tagsIds)) {
+    $tagsIds = array_filter(array_map('trim', explode(',', $tagsIds)));
+} elseif (!is_array($tagsIds)) {
+    $tagsIds = [];
+}
+$idTagsUtama = !empty($tagsIds) ? $tagsIds[0] : null;
 // ... (kode sebelumnya)
     $data = [
         'judul'             => $post['judul'],
@@ -327,6 +347,7 @@ class BeritaController extends BaseController
         'content'           => $post['content'],
         'content2'          => $post['content2'],
         'id_kategori'       => $idKategori,
+        'id_tags'           => $idTagsUtama, // ✅ TAMBAHKAN BARIS INI
         'link_video'        => $post['link_video'] ?? null,
         'keyword'           => $post['keyword'] ?? null,
         'feat_image'        => $featImagePath,
@@ -354,60 +375,89 @@ class BeritaController extends BaseController
         }
 
         $idBerita = $this->beritaModel->getInsertID();
-        if (!empty($kategoriIds)) {
-            $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
-        }
+   if (!empty($kategoriIds)) {
+    $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
+}
 
-        $this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? '5');
-        $this->clearTemporaryImages();
+// ✅ PERBAIKAN: Ganti id_tagss jadi id_tags
+$tagsIds = $post['id_tags'] ?? ''; // ✅ Perbaiki nama field
 
-        return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
+// Normalisasi: Handle string comma-separated atau array
+if (is_string($tagsIds) && !empty($tagsIds)) {
+    $tagsIds = array_filter(array_map('trim', explode(',', $tagsIds)));
+} elseif (!is_array($tagsIds)) {
+    $tagsIds = [];
+}
+
+// ✅ GANTI BAGIAN INI JUGA
+if (!empty($tagsIds)) {
+    $this->beritaModel->saveTagsBerita($idBerita, $tagsIds);
+}
+
+$this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? '5');
+$this->clearTemporaryImages();
+
+return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
     }
 
     // ========================================================
     // Form Edit Berita
     // ========================================================
-    public function edit($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
-        }
-
-        $berita = $this->beritaModel->find($id);
-        if (!$berita) {
-            return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
-        }
-
-        if (!old('judul')) {
-            $this->clearTemporaryImages();
-        }
-
-        $additionalImages = [];
-        if (!empty($berita['additional_images'])) {
-            $decoded = json_decode($berita['additional_images'], true);
-            if (is_array($decoded)) {
-                $additionalImages = $decoded;
-            }
-        }
-
-        $kategori = $this->kategoriModel->findAll();
-        $selected = array_column(
-            $this->beritaModel->getKategoriByBerita($id),
-            'id_kategori'
-        );
-        $beritaAll = $this->beritaModel->findAll();
-
-        return view('pages/berita/edit', [
-            'berita' => $berita,
-            'kategori' => $kategori,
-            'beritaAll' => $beritaAll,
-            'additionalImages' => $additionalImages,
-            'selected' => $selected,
-            'tempCoverImage' => session()->get('temp_cover_image'),
-            'tempAdditionalImages' => session()->get('temp_additional_images') ?? []
-        ]);
+public function edit($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin mengubah berita.');
     }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    if (!old('judul')) {
+        $this->clearTemporaryImages();
+    }
+
+    // Normalisasi Additional Images
+    $additionalImages = [];
+    if (!empty($berita['additional_images'])) {
+        $decoded = json_decode($berita['additional_images'], true);
+        if (is_array($decoded)) {
+            $additionalImages = $decoded;
+        }
+    }
+
+    // Kategori
+    $kategori = $this->kategoriModel->findAll();
+    $selected = array_column(
+        $this->beritaModel->getKategoriByBerita($id),
+        'id_kategori'
+    );
+
+    // ✅ PERBAIKAN TAGS
+    $allTags = $this->beritaTagModel->findAll(); // ✅ Pakai model
+    
+    $selectedTags = array_column(
+        $this->beritaModel->getTagsByBerita($id), 
+        'id_tags'
+    );
+    
+    $beritaAll = $this->beritaModel->findAll();
+
+    return view('pages/berita/edit', [
+        'title' => 'Edit Berita',
+        'berita' => $berita,
+        'kategori' => $kategori,
+        'beritaAll' => $beritaAll,
+        'tags' => $allTags,            // ✅ Semua Tag
+        'selectedTags' => $selectedTags, // ✅ Tag Terpilih
+        'additionalImages' => $additionalImages,
+        'selected' => $selected,
+        'tempCoverImage' => session()->get('temp_cover_image'),
+        'tempAdditionalImages' => session()->get('temp_additional_images') ?? []
+    ]);
+}
 
     // ========================================================
     // Update Berita
@@ -589,6 +639,12 @@ class BeritaController extends BaseController
         $idKategori = $kategoriIds[0] ?? null;
         $captionCover = $post['caption_cover'] ?? $berita['caption']; 
 
+        $tagsIds = $post['id_tags'] ?? [];
+        if (is_string($tagsIds)) {
+            $tagsIds = array_filter(array_map('trim', explode(',', $tagsIds)));
+        }
+        $idtags = $tagsIds[0] ?? null;
+
 // ... (kode sebelumnya)
     $data = [
         'id_berita'         => $id,
@@ -599,6 +655,7 @@ class BeritaController extends BaseController
         'content'           => $post['content'],
         'content2'          => $post['content2'],
         'id_kategori'       => $idKategori,
+        'id_tags'           => $idtags,
         'link_video'        => $post['link_video'] ?? null,
         'keyword'           => $post['keyword'] ?? null,
         'feat_image'        => $featImagePath,
@@ -625,14 +682,27 @@ class BeritaController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
         }
 
-        if (!empty($kategoriIds)) {
-            $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
-        }
+if (!empty($kategoriIds)) {
+    $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
+}
 
-        $this->saveLog($id, 'Berita diperbarui', $data['status'], $data['note'], $data['note_revisi']);
-        $this->clearTemporaryImages();
+// ✅ PERBAIKAN: Ganti id_tagss jadi id_tags
+$tagsIds = $post['id_tags'] ?? ''; // ✅ Perbaiki nama field
 
-        return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
+// Normalisasi
+if (is_string($tagsIds) && !empty($tagsIds)) {
+    $tagsIds = array_filter(array_map('trim', explode(',', $tagsIds)));
+} elseif (!is_array($tagsIds)) {
+    $tagsIds = [];
+}
+
+// Sync tags (akan hapus yang lama dan insert yang baru)
+$this->beritaModel->saveTagsBerita($id, $tagsIds);
+
+$this->saveLog($id, 'Berita diperbarui', $data['status'], $data['note'], $data['note_revisi']);
+$this->clearTemporaryImages();
+
+return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
     }
 
     // ========================================================

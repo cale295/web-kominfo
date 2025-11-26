@@ -33,7 +33,7 @@
                 <?php foreach ($tags as $tag): ?>
                     <tr>
                         <td><?= $i++ ?></td>
-                        <td><?= esc($tag['name']) ?></td>
+                        <td><?= esc($tag['nama_tag']) ?></td>
                         <td><?= esc($tag['slug']) ?></td>
                         <td><?= esc($tag['created_by_name'] ?? '-') ?></td>
                         <td><?= esc($tag['created_at'] ?? '-') ?></td>

@@ -285,6 +285,7 @@
                         <th>Konten</th>
                         <th>Konten 2</th>
                         <th>Kategori</th>
+                        <th>Tags</th>
                         <th class="text-center">Status Tayang</th>
                         <th class="text-center">Status Berita</th>
                         <th>Dibuat Oleh</th>
@@ -402,6 +403,18 @@
                                     if (!empty($row['kategori'])) {
                                         foreach ($row['kategori'] as $katName) {
                                             echo '<span class="badge bg-secondary me-1 mb-1">' . esc($katName) . '</span>';
+                                        }
+                                    } else {
+                                        echo '<span class="text-muted">-</span>';
+                                    }
+                                    ?>
+                                </td>
+
+                                <td>
+                                    <?php
+                                    if (!empty($row['tags'])) {
+                                        foreach ($row['tags'] as $tag) {
+                                            echo '<span class="badge bg-secondary me-1 mb-1">' . esc($tag) . '</span>';
                                         }
                                     } else {
                                         echo '<span class="text-muted">-</span>';
