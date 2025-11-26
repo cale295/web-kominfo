@@ -15,9 +15,9 @@ interface BeritaItem {
 
 interface Tag {
   id_tags: string;
-  name: string;
+  nama_tag: string;
   slug: string;
-  trash: string;
+  is_delete: string;
 }
 
 interface BeritaUtamaItem {
@@ -86,7 +86,7 @@ const Berita: React.FC = () => {
         setBeritaUtamaList(beritaUtamaDetailList);
 
         if (data.tag) {
-          const filteredTags = data.tag.filter((t: Tag) => t.trash === "0");
+          const filteredTags = data.tag.filter((t: Tag) => t.is_delete === "0");
           setTagPopuler(filteredTags);
         }
 
@@ -148,6 +148,7 @@ const Berita: React.FC = () => {
                   <a
                     href={`/berita/${item.id_berita}`}
                     className={`carousel-item ${index === 0 ? "active" : ""}`}
+                    style={{ textDecoration: "none" }}
                   >
                     <img
                       src={`${ROOT}/${item.feat_image.replace(/^\/+/, "")}`}
@@ -199,8 +200,7 @@ const Berita: React.FC = () => {
           <h5 className="section-title">
             <Triangle className="icon-triangle" /> Berita Populer
           </h5>
-          <div className="card berita-populer-card">
-            <div className="card-body">
+          <div className="berita-populer-card">
               <ul className="list-unstyled berita-populer-list">
                 {beritaPopuler.length > 0 ? (
                   beritaPopuler.map((item, index) => (
@@ -214,7 +214,7 @@ const Berita: React.FC = () => {
                           <span className="berita-title text-break">
                             {item.judul}
                           </span>
-                          <span className="berita-date">Sabtu 2019 Mei</span>
+                          <span className="berita-date">dibaca {item.hit} kali</span>
                         </div>
                       </a>
                     </li>
@@ -226,7 +226,6 @@ const Berita: React.FC = () => {
               <a href="#" className="btn-link-more">
                 Lihat berita populer lainnya
               </a>
-            </div>
           </div>
         </div>
       </div>
@@ -242,10 +241,9 @@ const Berita: React.FC = () => {
             beritaTerkini.map((item) => (
               <a
                 href={`/berita/${item.id_berita}`}
-                className="card berita-terkini-card mb-3"
+                className=" berita-terkini-card mb-3"
               >
-                <div className="card-body">
-                  <div className="row g-3">
+                  <div className="berita-terkini-card-body">
                     <div className="col-auto">
                       <img
                         src={`${ROOT}/${item.feat_image.replace(/^\/+/, "")}`}
@@ -253,15 +251,14 @@ const Berita: React.FC = () => {
                         alt={item.judul}
                       />
                     </div>
-                    <div className="col">
+                    <div className="berita-terkini-card-item">
                       <h6 className="berita-terkini-title">{item.judul}</h6>
+                      <p className="berita-terkini-intro">{item.intro}</p>
                       <p className="berita-terkini-date">
                         {formatDate(item.created_at)}
                       </p>
-                      <p className="berita-terkini-intro">{item.intro}</p>
                     </div>
                   </div>
-                </div>
               </a>
             ))
           ) : (
@@ -274,8 +271,7 @@ const Berita: React.FC = () => {
           <h5 className="section-title">
             <Triangle className="icon-triangle" /> Tag Paling Dicari
           </h5>
-          <div className="card tag-populer-card">
-            <div className="card-body">
+          <div className="tag-populer-card">
               <ul className="list-unstyled tag-populer-list">
                 {tagPopuler.length > 0 ? (
                   tagPopuler.map((tag, index) => (
@@ -285,7 +281,7 @@ const Berita: React.FC = () => {
                         className="tag-populer-link"
                       >
                         <span className="tag-number">#{index + 1}</span>
-                        <span className="tag-name">{tag.name}</span>
+                        <span className="tag-name">{tag.nama_tag}</span>
                       </a>
                     </li>
                   ))
@@ -293,7 +289,6 @@ const Berita: React.FC = () => {
                   <p className="text-muted small">Memuat tag...</p>
                 )}
               </ul>
-            </div>
           </div>
         </div>
       </div>
