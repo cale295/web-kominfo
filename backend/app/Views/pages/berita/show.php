@@ -9,6 +9,15 @@
 
     <article class="mb-5">
         <header class="mb-4">
+            <?php if(!empty($tags)): ?>
+                <div class="mb-3">
+                    <?php foreach($tags as $t): ?>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill px-3 py-2 me-2">
+                            #<?= esc($t) ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
             <?php if(!empty($kategori)): ?>
                 <div class="mb-3">
                     <?php foreach($kategori as $k): ?>
@@ -19,6 +28,7 @@
                 </div>
             <?php endif; ?>
 
+            
             <h1 class="display-5 fw-bold mb-3 lh-sm"><?= esc($berita['judul']) ?></h1>
             
             <div class="d-flex flex-wrap align-items-center text-muted mb-3 border-bottom pb-3">
