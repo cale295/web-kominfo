@@ -904,8 +904,8 @@ return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.')
             'status' => $status ?? $berita['status'] ?? 0,
             'note_perbaikan' => $notePerbaikan,
             'note_revisi' => $noteRevisi,
-            'fullname' => session()->get('username'),
-        ];
+// ✅ PERBAIKAN DISINI: Gunakan 'username', bukan 'user_name'
+            'username '   => session()->get('username '),        ];
 
         $this->beritaLogModel->insert($logData);
     }
@@ -921,21 +921,21 @@ return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.')
         if (!$berita) return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
 
 // Pastikan sesuaikan nama tabel dan nama kolom ID-nya
-$logs = $this->beritaLogModel
-    // 1. Pilih semua data log, DAN full_name dari tabel users
-    ->select('t_berita_log.*, m_users.full_name') 
-    
-    // 2. Sambungkan (Join) ke tabel users
-    // Asumsi: tabel log punya kolom 'id_user' yang nyambung ke 'id' di tabel users
-    ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left') 
-    
-    ->where('id_berita', $id)
-    ->orderBy('t_berita_log.created_date', 'DESC')
-    ->findAll();
-        return view('pages/berita/logs', [
-            'title' => 'Log Berita',
-            'berita' => $berita,
-            'logs' => $logs
-        ]);
-    }
+                $logs = $this->beritaLogModel
+                    // 1. Pilih semua data log, DAN full_name dari tabel users
+                    ->select('t_berita_log.*, m_users.full_name') 
+                    
+                    // 2. Sambungkan (Join) ke tabel users
+                    // Asumsi: tabel log punya kolom 'id_user' yang nyambung ke 'id' di tabel users
+                    ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left') 
+                    
+                    ->where('id_berita', $id)
+                    ->orderBy('t_berita_log.created_date', 'DESC')
+                    ->findAll();
+                        return view('pages/berita/logs', [
+                            'title' => 'Log Berita',
+                            'berita' => $berita,
+                            'logs' => $logs
+                        ]);
+                    }
 }
