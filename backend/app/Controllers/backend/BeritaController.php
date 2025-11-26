@@ -210,6 +210,20 @@ class BeritaController extends BaseController
                     'max_length' => 'Sumber maksimal 255 karakter.'
                 ]
             ],
+// Tambahkan ini di dalam array $rules
+            'additional_images' => [
+                // 'permit_empty' adalah kuncinya agar tidak wajib diisi
+                'rules'  => 'permit_empty', 
+            ],
+            // Jika ingin memvalidasi file hanya jika user mengupload (opsional tapi divalidasi):
+            'additional_images.*' => [
+                'rules'  => 'permit_empty|max_size[additional_images,2048]|is_image[additional_images]|mime_in[additional_images,image/jpg,image/jpeg,image/png]',
+                'errors' => [
+                    'max_size' => 'Ukuran foto tambahan maksimal 2MB.',
+                    'is_image' => 'File tambahan harus berupa gambar.',
+                    'mime_in'  => 'Format harus JPG/PNG.'
+                ]
+            ],
         ];
 
         // Validasi Cover Image
@@ -326,8 +340,8 @@ class BeritaController extends BaseController
         'additional_images' => !empty($additionalData) ? json_encode($additionalData) : null,
         'slug'              => url_title($post['judul'], '-', true),
         'hash_berita'       => bin2hex(random_bytes(16)),
-        'status'            => $post['status'] ?? 0,
-        'status_berita'     => $post['status_berita'] ?? 0,
+        'status'            => '5',
+        'status_berita'     => 0,
         'created_by_id'     => session()->get('id_user'),
         'created_by_role'   => session()->get('role'),
         'created_by_name'   => session()->get('username'),
@@ -344,7 +358,7 @@ class BeritaController extends BaseController
             $this->beritaModel->saveKategoriBerita($idBerita, $kategoriIds);
         }
 
-        $this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? 0);
+        $this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? '5');
         $this->clearTemporaryImages();
 
         return redirect()->to('/berita')->with('success', 'Berita berhasil ditambahkan.');
@@ -836,9 +850,19 @@ class BeritaController extends BaseController
         $berita = $this->beritaModel->find($id);
         if (!$berita) return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
 
-        $logs = $this->beritaLogModel->where('id_berita', $id)->orderBy('created_date', 'DESC')->findAll();
-
-        return view('pages/berita/log', [
+// Pastikan sesuaikan nama tabel dan nama kolom ID-nya
+$logs = $this->beritaLogModel
+    // 1. Pilih semua data log, DAN full_name dari tabel users
+    ->select('t_berita_log.*, m_users.full_name') 
+    
+    // 2. Sambungkan (Join) ke tabel users
+    // Asumsi: tabel log punya kolom 'id_user' yang nyambung ke 'id' di tabel users
+    ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left') 
+    
+    ->where('id_berita', $id)
+    ->orderBy('t_berita_log.created_date', 'DESC')
+    ->findAll();
+        return view('pages/berita/logs', [
             'title' => 'Log Berita',
             'berita' => $berita,
             'logs' => $logs

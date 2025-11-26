@@ -54,6 +54,7 @@ public function index()
 
     $beritas = $this->model
         ->where('trash', '0')
+        ->where('status', '1')
         ->orderBy('created_at', 'DESC')
         ->findAll();
 
@@ -233,5 +234,9 @@ public function index()
     } catch (\Exception $e) {
         return $this->failServerError($e->getMessage());
     }
+<<<<<<< HEAD
 }
 }
+=======
+}
+>>>>>>> f86f834e9b17996ed00a223e61442292651f27cc
