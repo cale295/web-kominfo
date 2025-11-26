@@ -274,7 +274,7 @@
                                 <td>
                                     <div class="log-user">
                                         <i class="bi bi-person-circle"></i>
-                                        <?= esc($log['user_name']) ?>
+                                        <?= esc($log['full_name']) ?>
                                     </div>
                                 </td>
                                 <td>
