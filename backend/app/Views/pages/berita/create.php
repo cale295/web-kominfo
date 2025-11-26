@@ -232,12 +232,42 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= implode(',', $oldKategori) ?>">
                 <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Sub Kategori</label>
-                <input type="text" name="id_sub_kategori" class="form-control" placeholder="Sub kategori (opsional)" value="<?= old('id_sub_kategori') ?>">
+<div class="mb-3">
+                <label class="form-label">Tags</label>
+                <div class="dropdown" id="tags-dropdown">
+                    <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle" aria-haspopup="true" aria-expanded="false">
+                        <span id="tags-placeholder">Pilih tags (opsional)</span>
+                        <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
+                    </button>
+                    <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
+                        <div class="px-3 py-2 border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
+                                <input type="text" class="form-control border-gray-300" id="tags-search" placeholder="Cari tags..." autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="tags-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                            <?php
+                            $oldTags = old('id_tags', []);
+                            if (!is_array($oldTags)) $oldTags = !empty($oldTags) ? explode(',', $oldTags) : [];
+                            ?>
+                            <?php foreach ($tags as $tag): ?>
+                                <div class="form-check ps-3 py-1 tags-item" data-name="<?= esc(strtolower($tag['nama_tag'])) ?>">
+                                    <input class="form-check-input tags-checkbox" type="checkbox" 
+                                           id="tag-<?= $tag['id_tags'] ?>" value="<?= $tag['id_tags'] ?>"
+                                           <?= in_array($tag['id_tags'], $oldTags) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="tag-<?= $tag['id_tags'] ?>"><?= esc($tag['nama_tag']) ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div id="tags-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
+                            <small>Tidak ada tags yang cocok</small>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $oldTags) ?>">
+                <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
-
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (SEO)</label>
                 <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma"><?= old('keyword') ?></textarea>
@@ -583,6 +613,114 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('content-hidden').value = content1;
         document.getElementById('content2-hidden').value = content2;
     });
+    // ============================================================
+// TAMBAHKAN SCRIPT INI SETELAH SECTION 4 (DROPDOWN KATEGORI)
+// LETAKKAN SEBELUM SECTION 5 (FORM SUBMIT)
+// ============================================================
+
+// ============================================================
+// 4B. DROPDOWN TAGS (SAMA SEPERTI KATEGORI)
+// ============================================================
+const tagsToggleBtn = document.getElementById('tags-toggle');
+const tagsDropdownMenu = tagsToggleBtn.nextElementSibling;
+const tagsSearchInput = document.getElementById('tags-search');
+const tagsItems = Array.from(document.querySelectorAll('.tags-item'));
+const tagsCheckboxes = document.querySelectorAll('.tags-checkbox');
+const tagsHiddenInput = document.getElementById('tags-hidden');
+const tagsPlaceholder = document.getElementById('tags-placeholder');
+const tagsBadgeContainer = document.getElementById('selected-tags-badges');
+const tagsNoResults = document.getElementById('tags-no-results');
+
+// Toggle Dropdown
+tagsToggleBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const isShown = tagsDropdownMenu.classList.contains('show');
+    tagsDropdownMenu.classList.toggle('show', !isShown);
+    tagsToggleBtn.setAttribute('aria-expanded', !isShown);
+    if (!isShown) setTimeout(() => tagsSearchInput.focus(), 100);
+});
+
+// Close dropdown when click outside
+document.addEventListener('click', function(e) {
+    if (!tagsToggleBtn.contains(e.target) && !tagsDropdownMenu.contains(e.target)) {
+        tagsDropdownMenu.classList.remove('show');
+        tagsToggleBtn.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Search/Filter Tags
+tagsSearchInput.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    let hasVisible = false;
+    tagsItems.forEach(item => {
+        const text = item.getAttribute('data-name');
+        if (text.includes(term)) {
+            item.style.display = 'flex'; 
+            hasVisible = true;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    tagsNoResults.style.display = hasVisible ? 'none' : 'block';
+});
+
+// Update Selection & Badges
+function updateTagsSelection() {
+    const selectedIds = [];
+    const selectedNames = [];
+    
+    tagsCheckboxes.forEach(cb => {
+        if (cb.checked) {
+            selectedIds.push(cb.value);
+            selectedNames.push(cb.nextElementSibling.innerText.trim());
+            cb.closest('.tags-item').style.backgroundColor = '#eff6ff';
+        } else {
+            cb.closest('.tags-item').style.backgroundColor = '';
+        }
+    });
+
+    // Update hidden input
+    tagsHiddenInput.value = selectedIds.join(',');
+    
+    // Clear badges container
+    tagsBadgeContainer.innerHTML = '';
+    
+    // Create badges
+    selectedNames.forEach((name, index) => {
+        const badge = document.createElement('div');
+        badge.className = 'selected-badge';
+        badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-tag-badge" data-id="${selectedIds[index]}"></i>`;
+        tagsBadgeContainer.appendChild(badge);
+    });
+
+    // Update placeholder
+    if (selectedNames.length > 0) {
+        tagsPlaceholder.textContent = `${selectedNames.length} Tags Dipilih`;
+        tagsPlaceholder.classList.add('text-primary', 'fw-bold');
+    } else {
+        tagsPlaceholder.textContent = 'Pilih tags (opsional)';
+        tagsPlaceholder.classList.remove('text-primary', 'fw-bold');
+    }
+
+    // Add event listener to remove badges
+    document.querySelectorAll('.remove-tag-badge').forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const id = this.getAttribute('data-id');
+            const cb = document.getElementById('tag-' + id);
+            if(cb) { 
+                cb.checked = false; 
+                updateTagsSelection(); 
+            }
+        });
+    });
+}
+
+// Listen to checkbox changes
+tagsCheckboxes.forEach(cb => cb.addEventListener('change', updateTagsSelection));
+
+// Initialize on page load
+updateTagsSelection();
 });
 </script>
 

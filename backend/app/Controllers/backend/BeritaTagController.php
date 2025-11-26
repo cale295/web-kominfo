@@ -77,7 +77,7 @@ class BeritaTagController extends BaseController
         }
 
         $data = [
-            'name' => $this->request->getPost('name'),
+            'nama_tag' => $this->request->getPost('name'),
             'slug' => url_title($this->request->getPost('name'), '-', true),
             'created_at' => date('Y-m-d H:i:s'),
             'created_by_id' => session()->get('user_id'), // Sesuaikan 'user_id' jika key session Anda berbeda
@@ -132,7 +132,7 @@ class BeritaTagController extends BaseController
         }
 
         $data = [
-            'name' => $this->request->getPost('name'),
+            'nama_tag' => $this->request->getPost('name'),
             'slug' => url_title($this->request->getPost('name'), '-', true),
             // 'updated_at' bisa ditambahkan jika model tidak 'useTimestamps'
         ];

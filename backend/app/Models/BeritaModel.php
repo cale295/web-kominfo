@@ -22,7 +22,7 @@ protected $allowedFields = [
     'is_delete_by_id', 'is_delete_by_name', 'is_delete', 'delete_at', 'posted_at',
     'dokumen_title', 'dokumen_duo_title', 'dokumen_tigo_title', 'dokumen_quatro_title',
     'dokumen', 'dokumen_duo', 'dokumen_tigo', 'dokumen_quatro',
-    'old_berita', 'note', 'note_revisi', 'trash',
+    'old_berita', 'note', 'note_revisi', 'trash','id_tags',
     'additional_images'  // ✅ tambahkan ini
 ];
 
@@ -32,6 +32,55 @@ protected $allowedFields = [
     protected $updatedField  = 'updated_at';
 
     
+
+    // =========================================================
+    // START: FUNGSI TAGS (Sama seperti Kategori)
+    // =========================================================
+
+    // 1. Ambil tags untuk berita tertentu (Lewat Pivot t_berita_tag)
+    public function getTagsByBerita($idBerita)
+    {
+        $db = \Config\Database::connect();
+        
+        // Asumsi: 
+        // - Tabel master tags bernama: m_berita_tag
+        // - Primary Key tabel tags: id_tagg
+        // - Nama kolom label tags: nama_tag (sesuaikan jika namanya 'tag' atau 'judul_tag')
+        
+        return $db->table('t_berita_tag as bt')
+                  ->select('m.id_tags, m.nama_tag') // Sesuaikan nama kolom di m_berita_tag
+                  ->join('m_berita_tag m', 'm.id_tags = bt.id_tags')
+                  ->where('bt.id_berita', $idBerita)
+                  ->get()
+                  ->getResultArray();
+    }
+
+    // 2. Simpan Tags (Hapus yang lama, insert yang baru)
+    public function saveTagsBerita($idBerita, array $tagIds)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('t_berita_tag');
+
+        // A. Hapus dulu koneksi tags lama untuk berita ini
+        $builder->where('id_berita', $idBerita)->delete();
+
+        // B. Simpan tags baru jika ada yang dipilih
+        if (!empty($tagIds)) {
+            $dataInsert = [];
+            foreach ($tagIds as $idTag) {
+                $dataInsert[] = [
+                    'id_berita' => $idBerita,
+                    'id_tags'    => $idTag
+                ];
+            }
+            // Menggunakan insertBatch lebih efisien daripada looping insert satu per satu
+            $builder->insertBatch($dataInsert);
+        }
+    }
+
+    // =========================================================
+    // END: FUNGSI TAGS
+    // =========================================================
     // =========================================================
     // Ambil berita + join kategori, hanya kategori aktif
     // =========================================================
@@ -45,7 +94,11 @@ public function getBeritaWithKategori($onlyActive = true)
                        ->getResultArray();
 
     foreach ($berita as &$b) {
+        // Ambil Kategori (Existing)
         $b['kategori'] = $this->getKategoriBerita($b['id_berita']);
+        
+        // TAMBAHAN: Ambil Tags juga
+        $b['tags'] = $this->getTagsByBerita($b['id_berita']); 
     }
 
     return $berita;

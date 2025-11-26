@@ -184,34 +184,84 @@
         <div class="form-section">
             <div class="section-title"><i class="bi bi-tags"></i> Kategori</div>
             
-            <div class="mb-3">
-                <label class="form-label">Kategori <span class="text-danger">*</span></label>
-                <?php 
-                    $selected = old('id_kategori', $selected ?? []);
-                    if (!is_array($selected)) $selected = explode(',', $selected);
-                ?>
-                <div class="dropdown">
-                    <button type="button" class="form-select text-start" id="kategori-toggle" data-bs-toggle="dropdown">
-                        <span id="kategori-placeholder">Pilih Kategori</span>
-                    </button>
-                    <div class="dropdown-menu w-100 p-2 shadow" style="max-height:300px; overflow-y:auto;">
-                        <input type="text" class="form-control mb-2" id="kategori-search" placeholder="Cari...">
-                        <div class="kategori-list">
-                            <?php foreach ($kategori as $kat): ?>
-                                <div class="form-check kategori-item" data-name="<?= strtolower($kat['kategori']) ?>">
-                                    <input class="form-check-input kategori-checkbox" type="checkbox" 
-                                           id="kat-<?= $kat['id_kategori'] ?>" value="<?= $kat['id_kategori'] ?>"
-                                           <?= in_array($kat['id_kategori'], $selected) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="kat-<?= $kat['id_kategori'] ?>"><?= $kat['kategori'] ?></label>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
+<div class="mb-3">
+    <label class="form-label">Kategori <span class="text-danger">*</span></label>
+    <?php 
+        $selected = old('id_kategori', $selected ?? []);
+        if (!is_array($selected)) $selected = explode(',', $selected);
+    ?>
+    <div class="dropdown" id="kategori-dropdown">
+        <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="kategori-toggle" aria-haspopup="true" aria-expanded="false">
+            <span id="kategori-placeholder">Pilih minimal 1 kategori</span>
+            <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
+        </button>
+        <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
+            <div class="px-3 py-2 border-bottom">
+                <div class="input-group">
+                    <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
+                    <input type="text" class="form-control border-gray-300" id="kategori-search" placeholder="Cari kategori..." autocomplete="off">
                 </div>
-                <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= implode(',', $selected) ?>">
-                <div id="selected-kategori-badges" class="mt-2"></div>
             </div>
+            <div class="kategori-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                <?php foreach ($kategori as $kat): ?>
+                    <div class="form-check ps-3 py-1 kategori-item" data-name="<?= esc(strtolower($kat['kategori'])) ?>">
+                        <input class="form-check-input kategori-checkbox" type="checkbox" 
+                               id="kat-<?= $kat['id_kategori'] ?>" value="<?= $kat['id_kategori'] ?>"
+                               <?= in_array($kat['id_kategori'], $selected) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="kat-<?= $kat['id_kategori'] ?>"><?= esc($kat['kategori']) ?></label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div id="kategori-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
+                <small>Tidak ada kategori yang cocok</small>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= implode(',', $selected) ?>">
+    <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
+</div>
 
+<div class="mb-3">
+    <label class="form-label">Tags</label>
+    <div class="dropdown" id="tags-dropdown">
+        <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle" aria-haspopup="true" aria-expanded="false">
+            <span id="tags-placeholder">Pilih tags (opsional)</span>
+            <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
+        </button>
+        <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
+            <div class="px-3 py-2 border-bottom">
+                <div class="input-group">
+                    <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
+                    <input type="text" class="form-control border-gray-300" id="tags-search" placeholder="Cari tags..." autocomplete="off">
+                </div>
+            </div>
+            <div class="tags-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                <?php foreach ($tags as $tag): ?>
+                    <div class="form-check ps-3 py-1 tags-item" data-name="<?= esc(strtolower($tag['nama_tag'])) ?>">
+                        <input class="form-check-input tags-checkbox" type="checkbox" 
+                               id="tag-<?= $tag['id_tags'] ?>" 
+                               value="<?= $tag['id_tags'] ?>"
+                               <?= in_array($tag['id_tags'], $selectedTags) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="tag-<?= $tag['id_tags'] ?>">
+                            <?= esc($tag['nama_tag']) ?>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div id="tags-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
+                <small>Tidak ada tags yang cocok</small>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $selectedTags) ?>">
+    <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
+</div>
+
+            <div class="mb-3">
+                <label class="form-label">Kata Kunci (SEO)</label>
+                <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma"><?= old('keyword') ?></textarea>
+            </div>
+        </div>
              <div class="mb-3">
                 <label class="form-label">Sub Kategori</label>
                 <input type="text" name="id_sub_kategori" class="form-control" value="<?= esc(old('id_sub_kategori', $berita['id_sub_kategori'])) ?>">
@@ -447,27 +497,24 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             let imgPath = this.getAttribute('data-image');
             
-            // Create hidden input for deletion
             let input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'delete_old_images[]';
             input.value = imgPath;
             document.getElementById('form-berita').appendChild(input);
 
-            // Remove visual card
             this.closest('.old-image-card').remove();
         });
     });
 
     // ============================================================
-    // 3. PREVIEW & DELETE NEW IMAGES (DATATRANSFER LOGIC)
+    // 3. PREVIEW & DELETE NEW IMAGES (DATATRANSFER)
     // ============================================================
     const additionalInput = document.getElementById('additional-images');
     const additionalPreviewNew = document.getElementById('additional-preview-new');
-    let dt = new DataTransfer(); // Store files here
+    let dt = new DataTransfer();
 
     additionalInput.addEventListener('change', function(e) {
-        // Reset DT on new selection (behavior standard input file)
         dt = new DataTransfer();
         for (let i = 0; i < this.files.length; i++) {
             dt.items.add(this.files[i]);
@@ -476,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function renderNewPreviews() {
-        additionalPreviewNew.innerHTML = ''; // Clear preview container
+        additionalPreviewNew.innerHTML = '';
 
         Array.from(dt.files).forEach((file, index) => {
             if (!file.type.startsWith('image/')) return;
@@ -489,21 +536,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 col.innerHTML = `
                     <div class="card h-100 border-gray-200 shadow-sm position-relative">
                         <button type="button" class="btn-delete-img remove-new-image" data-index="${index}" title="Hapus">✕</button>
-                        
                         <img src="${evt.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;">
-                        
                         <div class="card-body p-2 bg-light">
                             <label class="form-label text-muted small mb-1">Caption:</label>
-                            <input type="text" 
-                                   name="caption_additional[]" 
-                                   class="form-control form-control-sm" 
-                                   placeholder="Ket. foto...">
+                            <input type="text" name="caption_additional[]" class="form-control form-control-sm" placeholder="Ket. foto...">
                         </div>
                     </div>
                 `;
                 additionalPreviewNew.appendChild(col);
 
-                // Add listener to remove button
                 col.querySelector('.remove-new-image').addEventListener('click', function() {
                     removeFile(index);
                 });
@@ -514,7 +555,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function removeFile(indexToRemove) {
         const newDt = new DataTransfer();
-        // Copy all files except the one to remove
         Array.from(dt.files).forEach((file, i) => {
             if (i !== indexToRemove) {
                 newDt.items.add(file);
@@ -522,8 +562,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         dt = newDt;
-        additionalInput.files = dt.files; // Update input element
-        renderNewPreviews(); // Re-render
+        additionalInput.files = dt.files;
+        renderNewPreviews();
     }
 
     // ============================================================
@@ -559,7 +599,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const hiddenInput = document.getElementById('kategori-hidden');
     const placeholder = document.getElementById('kategori-placeholder');
     const badgeContainer = document.getElementById('selected-kategori-badges');
-    const noResults = document.getElementById('kategori-no-results');
 
     toggleBtn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -578,17 +617,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchInput.addEventListener('input', function(e) {
         const term = e.target.value.toLowerCase();
-        let hasVisible = false;
         kategoriItems.forEach(item => {
             const text = item.getAttribute('data-name');
             if (text.includes(term)) {
                 item.style.display = 'flex';
-                hasVisible = true;
             } else {
                 item.style.display = 'none';
             }
         });
-        noResults.style.display = hasVisible ? 'none' : 'block';
     });
 
     function updateSelection() {
@@ -632,10 +668,101 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     checkboxes.forEach(cb => cb.addEventListener('change', updateSelection));
-    updateSelection(); // Init load
+    updateSelection();
 
     // ============================================================
-    // 6. FORM SUBMIT
+    // 6. DROPDOWN TAGS
+    // ============================================================
+    const tagsToggleBtn = document.getElementById('tags-toggle');
+    const tagsDropdownMenu = tagsToggleBtn.nextElementSibling;
+    const tagsSearchInput = document.getElementById('tags-search');
+    const tagsItems = Array.from(document.querySelectorAll('.tags-item'));
+    const tagsCheckboxes = document.querySelectorAll('.tags-checkbox');
+    const tagsHiddenInput = document.getElementById('tags-hidden');
+    const tagsPlaceholder = document.getElementById('tags-placeholder');
+    const tagsBadgeContainer = document.getElementById('selected-tags-badges');
+    const tagsNoResults = document.getElementById('tags-no-results');
+
+    tagsToggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const isShown = tagsDropdownMenu.classList.contains('show');
+        tagsDropdownMenu.classList.toggle('show', !isShown);
+        tagsToggleBtn.setAttribute('aria-expanded', !isShown);
+        if (!isShown) setTimeout(() => tagsSearchInput.focus(), 100);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!tagsToggleBtn.contains(e.target) && !tagsDropdownMenu.contains(e.target)) {
+            tagsDropdownMenu.classList.remove('show');
+            tagsToggleBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    tagsSearchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        let hasVisible = false;
+        tagsItems.forEach(item => {
+            const text = item.getAttribute('data-name');
+            if (text.includes(term)) {
+                item.style.display = 'flex'; 
+                hasVisible = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        tagsNoResults.style.display = hasVisible ? 'none' : 'block';
+    });
+
+    function updateTagsSelection() {
+        const selectedIds = [];
+        const selectedNames = [];
+        
+        tagsCheckboxes.forEach(cb => {
+            if (cb.checked) {
+                selectedIds.push(cb.value);
+                selectedNames.push(cb.nextElementSibling.innerText.trim());
+                cb.closest('.tags-item').style.backgroundColor = '#eff6ff';
+            } else {
+                cb.closest('.tags-item').style.backgroundColor = '';
+            }
+        });
+
+        tagsHiddenInput.value = selectedIds.join(',');
+        tagsBadgeContainer.innerHTML = '';
+        
+        selectedNames.forEach((name, index) => {
+            const badge = document.createElement('div');
+            badge.className = 'selected-badge';
+            badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-tag-badge" data-id="${selectedIds[index]}"></i>`;
+            tagsBadgeContainer.appendChild(badge);
+        });
+
+        if (selectedNames.length > 0) {
+            tagsPlaceholder.textContent = `${selectedNames.length} Tags Dipilih`;
+            tagsPlaceholder.classList.add('text-primary', 'fw-bold');
+        } else {
+            tagsPlaceholder.textContent = 'Pilih tags (opsional)';
+            tagsPlaceholder.classList.remove('text-primary', 'fw-bold');
+        }
+
+        document.querySelectorAll('.remove-tag-badge').forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = this.getAttribute('data-id');
+                const cb = document.getElementById('tag-' + id);
+                if(cb) { 
+                    cb.checked = false; 
+                    updateTagsSelection(); 
+                }
+            });
+        });
+    }
+
+    tagsCheckboxes.forEach(cb => cb.addEventListener('change', updateTagsSelection));
+    updateTagsSelection();
+
+    // ============================================================
+    // 7. FORM SUBMIT
     // ============================================================
     const form = document.getElementById('form-berita');
     form.addEventListener('submit', function(e) {
@@ -653,7 +780,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('content-hidden').value = content1;
         document.getElementById('content2-hidden').value = content2;
     });
-});
+
+}); // END DOMContentLoaded
 </script>
 
 <?= $this->endSection() ?>
