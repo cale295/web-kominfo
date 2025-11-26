@@ -1,8 +1,149 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./css/beritadetail.css";
 import api from "../../services/api";
 import { ArrowLeft, Calendar, Eye, Share2 } from "lucide-react";
+
+interface AdditionalImage {
+  url: string;
+  caption: string;
+}
+
+const parseAdditionalImages = (imagesData: any): AdditionalImage[] => {
+  if (!imagesData) return [];
+  
+  try {
+    if (Array.isArray(imagesData)) {
+      return imagesData.map((item: any) => ({
+        url: item.url || "",
+        caption: item.caption || "",
+      }));
+    }
+    
+    if (typeof imagesData === 'string') {
+      const trimmed = imagesData.trim();
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item: any) => ({
+            url: item.url || "",
+            caption: item.caption || "",
+          }));
+        }
+      }
+    }
+
+    console.warn("Format additional_images tidak dikenali:", imagesData);
+    return [];
+  } catch (e) {
+    console.warn("Gagal mem-parse additional_images:", e, "Data:", imagesData);
+    return [];
+  }
+};
+
+
+// Komponen Carousel
+interface CarouselProps {
+  images: AdditionalImage[];
+  getImageUrl: (path: string) => string | null;
+}
+
+const Carousel: React.FC<CarouselProps> = ({ images, getImageUrl }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const next = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prev = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  // Auto-advance setiap 5 detik (hanya berjalan ketika tidak dihover)
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      if (!isHovered) {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [images.length, isHovered]);
+
+  const currentImage = images[currentIndex];
+
+  if (images.length === 0) return null;
+
+  return (
+    <div
+      className="carousel-container position-relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      role="region"
+      aria-label="Galeri foto berita"
+    >
+      {/* Image */}
+      <div className="carousel-slide text-center">
+        <img
+  src={currentImage.url}
+  className="img-fluid rounded shadow-sm d-block mx-auto"
+  alt={currentImage.caption || `Foto ${currentIndex + 1}`}
+  style={{ maxHeight: "500px", objectFit: "contain" }}
+  onError={(e) => {
+    console.error("Carousel image failed to load:", currentImage.url);
+    e.currentTarget.style.display = "none";
+  }}
+/>
+
+        {currentImage.caption && (
+          <div className="carousel-caption mt-2 fst-italic text-muted small">
+            {currentImage.caption}
+          </div>
+        )}
+      </div>
+
+      {/* Navigation Buttons */}
+      {images.length > 1 && (
+        <>
+          <button
+            className="carousel-control-prev"
+            onClick={prev}
+            aria-label="Foto sebelumnya"
+          >
+            ‹
+          </button>
+          <button
+            className="carousel-control-next"
+            onClick={next}
+            aria-label="Foto selanjutnya"
+          >
+            ›
+          </button>
+
+          {/* Dots */}
+          <div className="carousel-indicators d-flex justify-content-center mt-3">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                className={`indicator-dot ${idx === currentIndex ? "active" : ""}`}
+                onClick={() => goToSlide(idx)}
+                aria-label={`Lihat foto ${idx + 1}`}
+                aria-current={idx === currentIndex ? "true" : undefined}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 interface BeritaDetail {
   id_berita: string;
@@ -11,7 +152,7 @@ interface BeritaDetail {
   content: string;
   content2?: string;
   feat_image: string;
-  additional_images?: string;
+  additional_images?: any; // Changed to any to handle both string and array
   created_at: string;
   updated_at: string;
   hit: string;
@@ -20,6 +161,10 @@ interface BeritaDetail {
   link_video?: string;
   caption?: string;
   topik?: string;
+  id_kategori: string;
+  id_sub_kategori: string | null;
+  kategori: string[];
+  kategori_ids: string[];
 }
 
 interface BeritaTerkait {
@@ -37,6 +182,10 @@ const BeritaDetail: React.FC = () => {
   const [beritaTerkait, setBeritaTerkait] = useState<BeritaTerkait[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const additionalImgs = useMemo(() => {
+    return parseAdditionalImages(berita?.additional_images);
+  }, [berita?.additional_images]);
 
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
 
@@ -98,6 +247,8 @@ const BeritaDetail: React.FC = () => {
           console.log("Data Berita Detail:", data);
           console.log("Featured Image Path:", data.feat_image);
           console.log("Full Image URL:", getImageUrl(data.feat_image));
+          console.log("Additional Images Raw:", data.additional_images);
+          console.log("Parsed Additional Images:", parseAdditionalImages(data.additional_images));
 
           // Filter berita terkait
           const allBerita = resAll?.data?.data?.berita || [];
@@ -216,27 +367,36 @@ const BeritaDetail: React.FC = () => {
               </button>
             </div>
 
-            {/* Featured Image */}
-            {berita.feat_image ? (
-              <div className="article-image-wrapper">
-                <img
-                  src={getImageUrl(berita.feat_image) || ""}
-                  className="article-image"
-                  alt={berita.judul}
-                  onError={(e) => {
-                    console.error("Image failed to load:", getImageUrl(berita.feat_image));
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement?.classList.add('image-error');
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="article-image-wrapper">
-                <div className="article-image-placeholder">
-                  <span>Tidak ada gambar</span>
+            {/* Featured Image + Carousel for Additional Images */}
+            <div className="article-image-section mt-4">
+              {/* Main Featured Image */}
+              {berita.feat_image && (
+                <div className="main-image-wrapper mb-4">
+                  <img
+                    src={getImageUrl(berita.feat_image) || ""}
+                    className="img-fluid rounded shadow-sm"
+                    alt={berita.judul}
+                    onError={(e) => {
+                      console.error("Featured image failed to load:", berita.feat_image);
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                  {berita.caption && (
+                    <div className="image-caption text-center mt-2 fst-italic text-muted small">
+                      {berita.caption}
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Additional Images Carousel */}
+              {additionalImgs.length > 0 && (
+                <div className="additional-images-carousel mt-4">
+                  <h5 className="mb-3">Galeri Foto</h5>
+                  <Carousel images={additionalImgs} getImageUrl={getImageUrl} />
+                </div>
+              )}
+            </div>
 
             {/* Intro */}
             <div className="article-intro">
@@ -257,48 +417,6 @@ const BeritaDetail: React.FC = () => {
               />
             )}
 
-            {/* Additional Images */}
-            {berita.additional_images && (() => {
-              const imagesData = berita.additional_images;
-
-              if (typeof imagesData !== 'string') {
-                return null;
-              }
-
-              try {
-                const trimmedData = imagesData.trim();
-                
-                if (trimmedData.startsWith('[') && trimmedData.endsWith(']')) {
-                  const images = JSON.parse(trimmedData);
-
-                  if (Array.isArray(images) && images.length > 0) {
-                    return (
-                      <div className="additional-images">
-                        <h5>Galeri Foto</h5>
-                        <div className="image-gallery">
-                          {images.map((img: string, idx: number) => (
-                            <img
-                              key={idx}
-                              src={getImageUrl(img) || ""}
-                              alt={`Gambar tambahan ${idx + 1}`}
-                              className="gallery-image"
-                              onError={(e) => {
-                                console.error("Gallery image failed to load:", img);
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  }
-                }
-              } catch (e) {
-                console.error("Error parsing additional images:", e);
-              }
-              return null;
-            })()}
-
             {/* Source & Video */}
             <div className="article-footer-info">
               {berita.sumber && (
@@ -316,11 +434,15 @@ const BeritaDetail: React.FC = () => {
               )}
             </div>
 
-            {/* Tags/Topik */}
-            {berita.topik && (
-              <div className="article-tags">
-                <strong>Topik:</strong>
-                <span className="tag-badge">{berita.topik}</span>
+            {/* Kategori */}
+            {berita.kategori && berita.kategori.length > 0 && (
+              <div className="article-tags mt-4">
+                <strong>Kategori:</strong>
+                {berita.kategori.map((cat, idx) => (
+                  <span key={idx} className="tag-badge bg-primary text-white px-2 py-1 rounded me-2">
+                    {cat}
+                  </span>
+                ))}
               </div>
             )}
           </article>

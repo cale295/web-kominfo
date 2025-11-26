@@ -461,3 +461,129 @@
     gap: 0.5rem;
   }
 }
+
+/* ============================
+   Carousel Styles
+   ============================ */
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.carousel-slide img {
+  max-height: 500px;
+  object-fit: contain;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.carousel-caption {
+  font-size: 0.9rem;
+  color: #6c757d;
+  padding: 0.5rem;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.3s;
+}
+
+.carousel-control-prev {
+  left: 15px;
+}
+
+.carousel-control-next {
+  right: 15px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-indicators {
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.indicator-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #dee2e6;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.indicator-dot.active {
+  background: #0d6efd;
+}
+
+.indicator-dot:hover {
+  background: #adb5bd;
+}
+
+/* Additional images section */
+.additional-images-carousel {
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+}
+
+.additional-images-carousel h5 {
+  color: #495057;
+  font-weight: 600;
+}
+
+/* Main image wrapper */
+.main-image-wrapper {
+  text-align: center;
+}
+
+.image-caption {
+  font-size: 0.85rem;
+  color: #6c757d;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Responsive carousel */
+@media (max-width: 768px) {
+  .carousel-slide img {
+    max-height: 300px;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+  
+  .carousel-control-prev {
+    left: 10px;
+  }
+  
+  .carousel-control-next {
+    right: 10px;
+  }
+}
