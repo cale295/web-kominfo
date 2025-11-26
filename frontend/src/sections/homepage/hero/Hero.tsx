@@ -69,38 +69,35 @@ const HeroSection: React.FC = () => {
         </div>
       </header>
 
-      <section className="hero-banner-section">
+   <section className="hero-banner-section">
   {isLoading ? (
     <div className="hero-banner-loading">
       <p>Memuat banner...</p>
     </div>
   ) : heroBanner ? (
-    <>
-      {heroBanner.media_type === "image" && (
-        <img
-          src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.image}`}
-          alt={heroBanner.title}
-          className="hero-banner-image"
-        />
-      )}
-
-      {heroBanner.media_type === "video" && heroBanner.url && (
-        <video
-          src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.url}`}
-          className="hero-banner-video"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-      )}
-    </>
+    heroBanner.media_type === "video" ? (
+      <video
+        src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.image}`}
+        className="hero-banner-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+    ) : (
+      <img
+        src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.image}`}
+        alt={heroBanner.title}
+        className="hero-banner-image"
+      />
+    )
   ) : (
     <div className="hero-banner-placeholder">
       <p>Banner tidak tersedia</p>
     </div>
   )}
 </section>
+
 
     </div>
   );
