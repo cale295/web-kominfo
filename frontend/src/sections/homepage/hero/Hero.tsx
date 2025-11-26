@@ -17,33 +17,30 @@ interface Banner {
 }
 
 const HeroSection: React.FC = () => {
-  const [bannerImage, setBannerImage] = useState<string>("");
+  const [heroBanner, setHeroBanner] = useState<Banner | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchBanner = async () => {
-      try {
-        const res = await api.get("/banner");
-        const banners: Banner[] = res?.data?.data || [];
-        
-        // Filter banner dengan category_banner = "3" (banner berita) dan status aktif
-        const heroBanner = banners.find(
-          (banner) => banner.category_banner === "3" && banner.status === "1"
-        );
-        
-        if (heroBanner) {
-          const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
-          setBannerImage(`${ROOT}/uploads/banner/${heroBanner.image}`);
-        }
-      } catch (error) {
-        console.error("Gagal fetch banner:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchBanner = async () => {
+    try {
+      const res = await api.get("/banner");
+      const banners: Banner[] = res?.data?.data || [];
 
-    fetchBanner();
-  }, []);
+      const selected = banners.find(
+        (b) => b.category_banner === "3" && b.status === "1"
+      );
+
+      if (selected) setHeroBanner(selected);
+    } catch (error) {
+      console.error("Gagal fetch banner:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchBanner();
+}, []);
+
 
   return (
     <div className="hero-container">
@@ -72,24 +69,39 @@ const HeroSection: React.FC = () => {
         </div>
       </header>
 
-      {/* Hero Section with Banner */}
       <section className="hero-banner-section">
-        {isLoading ? (
-          <div className="hero-banner-loading">
-            <p>Memuat banner...</p>
-          </div>
-        ) : bannerImage ? (
-          <img
-            src={bannerImage}
-            alt="Banner Utama"
-            className="hero-banner-image"
-          />
-        ) : (
-          <div className="hero-banner-placeholder">
-            <p>Banner tidak tersedia</p>
-          </div>
-        )}
-      </section>
+  {isLoading ? (
+    <div className="hero-banner-loading">
+      <p>Memuat banner...</p>
+    </div>
+  ) : heroBanner ? (
+    <>
+      {heroBanner.media_type === "image" && (
+        <img
+          src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.image}`}
+          alt={heroBanner.title}
+          className="hero-banner-image"
+        />
+      )}
+
+      {heroBanner.media_type === "video" && heroBanner.url && (
+        <video
+          src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.url}`}
+          className="hero-banner-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+      )}
+    </>
+  ) : (
+    <div className="hero-banner-placeholder">
+      <p>Banner tidak tersedia</p>
+    </div>
+  )}
+</section>
+
     </div>
   );
 };
