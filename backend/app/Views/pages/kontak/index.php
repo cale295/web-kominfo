@@ -13,17 +13,11 @@
         font-weight: 600;
     }
 
-    /* Kolom Status (kolom ke-7) */
-    table.table > tbody > tr > td:nth-child(7),
-    table.table > thead > tr > th:nth-child(7) {
-        color: #000 !important;
-        font-weight: 600;
-    }
-
     /* Menghindari overwrite dari dark mode / card theme */
     table.table td,
     table.table th {
         background-color: transparent !important;
+        vertical-align: middle; /* Agar konten di tengah secara vertikal */
     }
 </style>
 
@@ -49,13 +43,13 @@
 <table class="table table-bordered table-striped align-middle">
     <thead class="table-primary">
         <tr>
-            <th style="width: 60px;">No</th>
+            <th style="width: 50px;">No</th>
             <th>Nama Instansi</th>
             <th>Alamat</th>
             <th>Telepon</th>
             <th>Email</th>
             <th>Website</th>
-            <th>Peta</th> <!-- Tambahan baru -->
+            <th style="width: 220px;">Peta</th> <!-- Lebar kolom peta diset agar rapi -->
             <th>Status</th>
             <?php if ($can_update || $can_delete): ?>
                 <th style="width: 140px;">Aksi</th>
@@ -74,17 +68,24 @@
                 <td><?= esc($row['email']) ?></td>
                 <td><?= esc($row['website']) ?></td>
 
-                <!-- MAP LINK -->
-<td>
-    <?php if (!empty($row['map_link'])): ?>
-        <a href="<?= esc($row['map_link']) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-geo-alt-fill"></i> Buka Peta
-        </a>
-        
-        <?php else: ?>
-        <span class="text-muted small">Tidak ada link</span>
-    <?php endif; ?>
-</td>
+                <!-- MAP COLUMN (IFRAME ONLY) -->
+                <td>
+                    <?php if (!empty($row['map_link'])): ?>
+                        <!-- Container untuk Iframe agar ukurannya pas -->
+                        <div class="ratio ratio-16x9 shadow-sm" style="width: 200px; height: 120px; border-radius: 6px; overflow: hidden;">
+                            <iframe 
+                                src="<?= esc($row['map_link']) ?>" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <!-- Tombol "Buka Full" dihapus karena link embed tidak mendukung dibuka di tab baru -->
+                    <?php else: ?>
+                        <span class="text-muted small fst-italic">Tidak ada peta</span>
+                    <?php endif; ?>
+                </td>
 
                 <td>
                     <?php if ($row['status'] == 'aktif'): ?>
@@ -98,8 +99,8 @@
                     <td>
                         <div class="d-flex gap-2">
                             <?php if ($can_update): ?>
-                                <a href="kontak/<?= $row['id_kontak'].'/edit' ?>" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil-square"></i> Edit
+                                <a href="kontak/<?= $row['id_kontak'].'/edit' ?>" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
                                 </a>
                             <?php endif; ?>
 
@@ -108,8 +109,8 @@
                                       onsubmit="return confirm('Hapus data ini?')">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="_method" value="DELETE">
-                                    <button class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i> Hapus
+                                    <button class="btn btn-sm btn-danger" title="Hapus">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -129,6 +130,5 @@
     </div>
 
 </div>
-
 
 <?= $this->endSection() ?>

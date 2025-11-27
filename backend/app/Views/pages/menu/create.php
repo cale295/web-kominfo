@@ -5,6 +5,37 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?php
+// Daftar Bootstrap Icons Umum
+$bootstrapIcons = [
+    'bi bi-house-door'      => 'Home / Dashboard',
+    'bi bi-speedometer2'    => 'Speedometer',
+    'bi bi-grid'            => 'Grid / App',
+    'bi bi-columns-gap'     => 'Layout / Columns',
+    'bi bi-table'           => 'Table',
+    'bi bi-people'          => 'People / Users',
+    'bi bi-person-circle'   => 'User Profile',
+    'bi bi-gear'            => 'Settings / Gear',
+    'bi bi-file-text'       => 'File / Document',
+    'bi bi-journal-text'    => 'Journal / Log',
+    'bi bi-calendar-event'  => 'Calendar / Event',
+    'bi bi-chat-dots'       => 'Chat / Message',
+    'bi bi-bell'            => 'Notification / Bell',
+    'bi bi-envelope'        => 'Email / Envelope',
+    'bi bi-box-seam'        => 'Box / Product',
+    'bi bi-folder2-open'    => 'Folder',
+    'bi bi-check-circle'    => 'Success / Check',
+    'bi bi-question-circle' => 'Help / Question',
+    'bi bi-lock'            => 'Security / Lock',
+    'bi bi-list-task'       => 'Task List',
+    'bi bi-bar-chart'       => 'Chart / Analytics',
+    'bi bi-image'           => 'Image / Gallery',
+    'bi bi-newspaper'       => 'News / Article',
+    'bi bi-link-45deg'      => 'Link',
+    'bi bi-shield-check'    => 'Admin / Shield',
+];
+?>
+
 <?= $this->include('layouts/alerts') ?>
 
 <div class="container-fluid py-4">
@@ -60,12 +91,12 @@
                         </label>
                         <div class="input-group-gov">
                             <i class="bi bi-card-text input-icon"></i>
-                            <input type="text"
-                                   class="form-control form-control-gov"
-                                   id="menu_name"
-                                   name="menu_name"
-                                   value="<?= esc(old('menu_name')) ?>"
-                                   placeholder="Contoh: Dashboard, Berita, dll"
+                            <input type="text" 
+                                   class="form-control form-control-gov" 
+                                   id="menu_name" 
+                                   name="menu_name" 
+                                   value="<?= esc(old('menu_name')) ?>" 
+                                   placeholder="Contoh: Dashboard, Berita, dll" 
                                    required>
                         </div>
                         <div class="form-text-gov">
@@ -81,11 +112,11 @@
                         </label>
                         <div class="input-group-gov">
                             <i class="bi bi-globe input-icon"></i>
-                            <input type="text"
-                                   class="form-control form-control-gov"
-                                   id="menu_url"
-                                   name="menu_url"
-                                   value="<?= esc(old('menu_url')) ?>"
+                            <input type="text" 
+                                   class="form-control form-control-gov" 
+                                   id="menu_url" 
+                                   name="menu_url" 
+                                   value="<?= esc(old('menu_url')) ?>" 
                                    placeholder="/dashboard atau https://example.com">
                         </div>
                         <div class="form-text-gov">
@@ -103,16 +134,19 @@
                         </label>
                         <div class="input-group-gov">
                             <i class="bi bi-palette input-icon"></i>
-                            <input type="text"
-                                   class="form-control form-control-gov"
-                                   id="menu_icon"
-                                   name="menu_icon"
-                                   value="<?= esc(old('menu_icon', 'bi bi-question-circle')) ?>"
-                                   placeholder="bi-speedometer2">
+                            <!-- Ubah Input Text menjadi Select -->
+                            <select class="form-select form-select-gov ps-5" id="menu_icon" name="menu_icon">
+                                <option value="">-- Pilih Icon --</option>
+                                <?php foreach ($bootstrapIcons as $class => $label): ?>
+                                    <option value="<?= $class ?>" <?= old('menu_icon') === $class ? 'selected' : '' ?>>
+                                        <?= $label ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="form-text-gov">
                             <i class="bi bi-lightbulb"></i>
-                            Gunakan kelas dari Bootstrap Icons (contoh: <code>bi bi-speedometer2</code>)
+                            Pilih ikon yang sesuai untuk representasi menu
                         </div>
 
                         <!-- Icon Preview -->
@@ -197,14 +231,16 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    // Icon Preview Live Update
-    const iconInput = document.getElementById("menu_icon");
+    // Icon Preview Live Update (Modified for Select)
+    const iconSelect = document.getElementById("menu_icon");
     const previewIcon = document.getElementById("iconPreview");
 
-    if (iconInput) {
-        iconInput.addEventListener("input", function (e) {
-            const iconClass = e.target.value.trim();
-            previewIcon.className = ""; // reset
+    if (iconSelect) {
+        iconSelect.addEventListener("change", function (e) {
+            const iconClass = e.target.value;
+            // Reset class list
+            previewIcon.className = "";
+            // Set new class or default if empty
             previewIcon.className = iconClass || "bi bi-question-circle";
         });
     }
@@ -214,6 +250,7 @@
     if (urlInput) {
         urlInput.addEventListener("blur", function (e) {
             let url = e.target.value.trim();
+            // Hanya tambah slash jika bukan empty string dan tidak diawali http/https
             if (url && !url.startsWith("/") && !url.startsWith("http")) {
                 e.target.value = "/" + url;
             }

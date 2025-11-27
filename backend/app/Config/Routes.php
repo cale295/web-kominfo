@@ -55,6 +55,8 @@ $routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::d
 //////////////////////////////////////
 //kontak layanan
 $routes->resource('kontak_layanan', ['controller' => 'frontend\KontakLayananController', 'except' => ['show']]);
+//kontak Social
+$routes->resource('kontak_social', ['controller' => 'frontend\KontakSocialController', 'except' => ['show']]);
 
 
 
@@ -136,6 +138,18 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //kontak
+    $routes->get('kontak', 'Api\ApiKontakController::index');
+    $routes->get('kontak/(:num)', 'Api\ApiKontakController::show/$1');
+
+    //kontak social
+    $routes->get('kontak_social', 'Api\ApiKontakSocialController::index');
+    $routes->get('kontak_social/(:num)', 'Api\ApiKontakSocialController::show/$1');
+
+    //kontak layanan
+    $routes->get('kontak_layanan', 'Api\ApiKontakLayananController::index');
+    $routes->get('kontak_layanan/(:num)', 'Api\ApiKontakLayananController::show/$1');
 
     //profile
     $routes->get('profile', 'Api\ApiProfileController::index');
