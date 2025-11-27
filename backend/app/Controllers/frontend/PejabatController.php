@@ -88,8 +88,7 @@ class PejabatController extends BaseController
             'slug' => url_title($this->request->getPost('jabatan'), '-', true),
             'urutan' => $this->request->getPost('urutan'),
             'hash' => md5(uniqid()),
-            'is_active' => $this->request->getPost('is_active') ?? 1,
-        ];
+            'is_active' => $this->request->getPost('is_active') ? 1 : 0,        ];
         if ($img = $this->request->getFile('foto')) {
             if ($img->isValid() && !$img->hasMoved()) {
                 $newName = $img->getRandomName();
@@ -142,6 +141,7 @@ class PejabatController extends BaseController
 
         // 3. Siapkan data yang akan diupdate
         $data = [
+            'id_pejabat'           => $id,
             'nama'                 => $this->request->getPost('nama'),
             'nip'                  => $this->request->getPost('nip'),
             'alamat_kantor'        => $this->request->getPost('alamat_kantor'),
@@ -150,7 +150,7 @@ class PejabatController extends BaseController
             // Update slug jika jabatan berubah
             'slug'                 => url_title($this->request->getPost('jabatan'), '-', true),
             'urutan'               => $this->request->getPost('urutan'),
-            'is_active'            => $this->request->getPost('is_active') ?? 0, // Default 0 jika checkbox tidak dicentang
+            'is_active' => $this->request->getPost('is_active') ? 1 : 0, // Default 0 jika checkbox tidak dicentang
         ];
 
         // 4. Logika Upload Foto (Jika ada file baru diupload)

@@ -28,6 +28,9 @@ $routes->resource('manage_user', ['controller' => 'backend\UserController']);
 // Kategori Berita
 $routes->resource('kategori_berita', ['controller' => 'backend\KategoriBeritaController']);
 
+// Kontak
+$routes->resource('kontak', ['controller' => 'frontend\KontakController', 'except' => ['show']]);
+
 //program
 $routes->resource('program', ['controller' => 'frontend\ProgramController', 'except' => ['show']]);
 
@@ -45,6 +48,15 @@ $routes->resource('kategori', ['controller' => 'backend\KategoriController', 'ex
 $routes->get('kategori/trash', 'backend\KategoriController::trash');
 $routes->get('kategori/(:num)/restore', 'backend\KategoriController::restore/$1');
 $routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::destroyPermanent/$1');
+
+
+//////////////////////////////////////
+//route untuk front end controller////
+//////////////////////////////////////
+//kontak layanan
+$routes->resource('kontak_layanan', ['controller' => 'frontend\KontakLayananController', 'except' => ['show']]);
+
+
 
 
 // berita kategori
@@ -125,6 +137,9 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // =========================================================
 $routes->group('api', function ($routes) {
 
+    //Pejabat
+    $routes->get('pejabat', 'Api\ApiPejabatController::index');
+    $routes->get('pejabat/(:num)', 'Api\ApiPejabatController::show/$1');
 
     //banner
     $routes->get('banner', 'Api\ApiBannerController::index');

@@ -31,6 +31,9 @@ class PejabatModel extends Model
     // VALIDATION RULES
     // -------------------------------------------------------------------------
     protected $validationRules      = [
+        'id_pejabat' => [
+            'rules' => 'permit_empty|numeric'
+        ],
         'nama' => [
             'label' => 'Nama Lengkap',
             'rules' => 'required|min_length[3]|max_length[200]',
