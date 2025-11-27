@@ -478,7 +478,7 @@
                                 <td class="text-center" style="white-space: nowrap;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
-                                            <a href="<?= site_url('berita/show/' . $row['id_berita']) ?>" class="btn btn-info">
+                                            <a href="<?= site_url('berita/show/' . $row['slug']) ?>" class="btn btn-info">
                                                 <i class="bi bi-eye"></i> Lihat
                                             </a>
                                         <?php endif; ?>

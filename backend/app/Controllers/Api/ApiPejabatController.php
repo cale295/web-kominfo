@@ -47,19 +47,24 @@ class ApiPejabatController extends ResourceController
         ]);
     }
 
-    public function show($id = null)
+public function show($slug = null)
     {
-        $data = $this->model->find($id);
+        // ❌ SALAH: find($slug) hanya mencari ID (angka)
+        // $data = $this->model->find($slug);
+
+        // ✅ BENAR: Cari spesifik di kolom 'slug'
+        // Pastikan tabel database Anda memiliki kolom bernama 'slug'
+        $data = $this->model->where('slug', $slug)->first();
+
+        // (Opsional) Fallback: Jika slug tidak ketemu, coba cari pakai ID
+        // Berguna jika aplikasi lama masih akses pakai ID
+        if (!$data && is_numeric($slug)) {
+             $data = $this->model->find($slug);
+        }
 
         if (!$data) {
             return $this->failNotFound('Pejabat tidak ditemukan.');
         }
-
-        // Cek status aktif (Opsional: jika ingin membatasi akses detail user non-aktif)
-        /* if ($data['is_active'] == 0) {
-            return $this->failNotFound('Pejabat ini sedang tidak aktif.');
-        }
-        */
 
         // Tambahkan Full URL Foto
         if (!empty($data['foto'])) {

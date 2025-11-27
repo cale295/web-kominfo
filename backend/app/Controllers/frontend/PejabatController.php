@@ -85,7 +85,7 @@ class PejabatController extends BaseController
             'alamat_kantor' => $this->request->getPost('alamat_kantor'),
             'tempat_tanggal_lahir' => $this->request->getPost('tempat_tanggal_lahir'),
             'jabatan' => $this->request->getPost('jabatan'),
-            'slug' => url_title($this->request->getPost('jabatan'), '-', true),
+            'slug' => url_title($this->request->getPost('nama'), '-', true),
             'urutan' => $this->request->getPost('urutan'),
             'hash' => md5(uniqid()),
             'is_active' => $this->request->getPost('is_active') ? 1 : 0,        ];

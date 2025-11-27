@@ -7,6 +7,7 @@ import { Triangle, X } from "lucide-react";
 interface BeritaItem {
   id_berita: string;
   judul: string;
+  slug: string;
   intro: string;
   feat_image: string;
   created_at: string;
@@ -216,8 +217,12 @@ const Berita: React.FC = () => {
               <div className="carousel-inner">
                 {beritaUtamaList.map((item, index) => (
                   <a
+<<<<<<< HEAD
                     key={item.id_berita}
                     href={`/berita/${item.id_berita}`}
+=======
+                    href={`/berita/${item.slug}`}
+>>>>>>> 8ed3398fd3c96094aa9aeb162cb9fe8f02364ba8
                     className={`carousel-item ${index === 0 ? "active" : ""}`}
                     style={{ textDecoration: "none" }}
                   >
@@ -272,6 +277,7 @@ const Berita: React.FC = () => {
             <Triangle className="icon-triangle" /> Berita Populer
           </h5>
           <div className="berita-populer-card">
+<<<<<<< HEAD
             <ul className="list-unstyled berita-populer-list">
               {beritaPopuler.length > 0 ? (
                 beritaPopuler.map((item, index) => (
@@ -297,6 +303,33 @@ const Berita: React.FC = () => {
             <a href="#" className="btn-link-more">
               Lihat berita populer lainnya
             </a>
+=======
+              <ul className="list-unstyled berita-populer-list">
+                {beritaPopuler.length > 0 ? (
+                  beritaPopuler.map((item, index) => (
+                    <li key={item.id_berita} className="berita-populer-item">
+                      <a
+                        href={`/berita/${item.slug}`}
+                        className="berita-populer-link"
+                      >
+                        <span className="berita-number">{index + 1}#</span>
+                        <div className="berita-content">
+                          <span className="berita-title text-break">
+                            {item.judul}
+                          </span>
+                          <span className="berita-date">dibaca {item.hit} kali</span>
+                        </div>
+                      </a>
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-muted">Memuat...</li>
+                )}
+              </ul>
+              <a href="#" className="btn-link-more">
+                Lihat berita populer lainnya
+              </a>
+>>>>>>> 8ed3398fd3c96094aa9aeb162cb9fe8f02364ba8
           </div>
         </div>
       </div>
@@ -309,6 +342,7 @@ const Berita: React.FC = () => {
             {selectedTag ? `Berita dengan Tag: ${selectedTag.nama_tag}` : "Berita Terkini"}
           </h5>
 
+<<<<<<< HEAD
           {selectedTag ? (
             // Tampilkan berita berdasarkan tag
             loadingTag ? (
@@ -320,6 +354,14 @@ const Berita: React.FC = () => {
                   href={`/berita/${item.id_berita}`}
                   className="berita-terkini-card mb-3"
                 >
+=======
+          {beritaTerkini.length > 0 ? (
+            beritaTerkini.map((item) => (
+              <a
+                href={`/berita/${item.slug}`}
+                className=" berita-terkini-card mb-3"
+              >
+>>>>>>> 8ed3398fd3c96094aa9aeb162cb9fe8f02364ba8
                   <div className="berita-terkini-card-body">
                     <div className="col-auto">
                       <img

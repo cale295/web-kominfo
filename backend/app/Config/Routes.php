@@ -74,7 +74,7 @@ $routes->resource('dokument', ['controller' => 'backend\DokumenController', 'exc
 // BERITA ROUTES
 // ========================================================
 $routes->get('berita', 'backend\BeritaController::index');
-$routes->get('berita/show/(:num)', 'backend\BeritaController::show/$1');
+$routes->get('berita/show/(:segment)', 'backend\BeritaController::show/$1');
 $routes->put('berita/(:num)', 'backend\BeritaController::update/$1');
 $routes->get('berita/new', 'backend\BeritaController::new');
 $routes->post('berita', 'backend\BeritaController::create');
@@ -139,6 +139,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // =========================================================
 $routes->group('api', function ($routes) {
 
+    //program
+    $routes->get('program', 'Api\ApiProgramController::index');
+    $routes->get('program/(:segment)', 'Api\ApiProgramController::show/$1');
+
     //kontak
     $routes->get('kontak', 'Api\ApiKontakController::index');
     $routes->get('kontak/(:num)', 'Api\ApiKontakController::show/$1');
@@ -153,11 +157,11 @@ $routes->group('api', function ($routes) {
 
     //profile
     $routes->get('profile', 'Api\ApiProfileController::index');
-    $routes->get('profile/(:num)', 'Api\ApiProfileController::show/$1');
+    $routes->get('profile/(:segment)', 'Api\ApiProfileController::show/$1');
 
     //Pejabat
     $routes->get('pejabat', 'Api\ApiPejabatController::index');
-    $routes->get('pejabat/(:num)', 'Api\ApiPejabatController::show/$1');
+    $routes->get('pejabat/(:segment)', 'Api\ApiPejabatController::show/$1');
 
     //banner
     $routes->get('banner', 'Api\ApiBannerController::index');
@@ -168,7 +172,7 @@ $routes->group('api', function ($routes) {
     
     //berita
     $routes->get('berita', 'Api\ApiBeritaController::index');
-    $routes->get('berita/(:num)', 'Api\ApiBeritaController::show/$1');
+    $routes->get('berita/(:segment)', 'Api\ApiBeritaController::show/$1');
 
     //Photo Album
     $routes->get('album', 'Api\ApiPhotoAlbumController::index');
