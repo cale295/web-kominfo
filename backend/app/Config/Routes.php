@@ -57,6 +57,10 @@ $routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::d
 $routes->resource('kontak_layanan', ['controller' => 'frontend\KontakLayananController', 'except' => ['show']]);
 //kontak Social
 $routes->resource('kontak_social', ['controller' => 'frontend\KontakSocialController', 'except' => ['show']]);
+//footer opd
+$routes->resource('footer_opd', ['controller' => 'frontend\FooterOpdController', 'except' => ['show']]);
+//footer social
+$routes->resource('footer_social', ['controller' => 'frontend\FooterSocialController', 'except' => ['show']]);
 
 
 
@@ -138,6 +142,14 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //footer_social
+    $routes->get('footer_social', 'Api\ApiFooterSocialController::index');
+    $routes->get('footer_social/(:num)', 'Api\ApiFooterSocialController::show/$1');
+
+    //footer_opd
+    $routes->get('footer_opd', 'Api\ApiFooterOpdController::index');
+    $routes->get('footer_opd/(:num)', 'Api\ApiFooterOpdController::show/$1');
 
     //program
     $routes->get('program', 'Api\ApiProgramController::index');
