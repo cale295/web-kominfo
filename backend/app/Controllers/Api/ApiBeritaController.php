@@ -95,8 +95,9 @@ class ApiBeritaController extends ResourceController
             // Fungsi Format Data
             $formatData = function (&$listBerita) {
                 foreach ($listBerita as &$b) {
-                    // ❌ HAPUS base_url() AGAR TIDAK DOUBLE URL DI FRONTEND
-                    // Biarkan path apa adanya (misal: uploads/berita/foto.jpg)
+                    // ❌ PERBAIKAN: JANGAN PAKAI base_url() DI SINI
+                    // Biarkan path mentah (misal: "uploads/berita/foto.jpg")
+                    // Frontend akan menambahkan ROOT URL sendiri.
                     
                     // Kategori
                     $kats = $this->getKategoriByBerita($b['id_berita']);
@@ -130,6 +131,9 @@ class ApiBeritaController extends ResourceController
         }
     }
 
+    // =================================================================
+    // TAMPILKAN DETAIL BERITA (BY SLUG)
+    // =================================================================
     // =================================================================
     // TAMPILKAN DETAIL BERITA (BY SLUG)
     // =================================================================
@@ -199,9 +203,10 @@ class ApiBeritaController extends ResourceController
                 $berita['hit'] = (int)$berita['hit'] + 1;
             }
 
-            // ❌ HAPUS base_url() PADA GAMBAR UTAMA
-            // Frontend Anda sudah memiliki logic untuk menambahkan ROOT URL
-            // if (!empty($berita['feat_image'])) { $berita['feat_image'] = base_url($berita['feat_image']); }
+            // ✅ 2. GUNAKAN base_url() PADA GAMBAR UTAMA
+            if (!empty($berita['feat_image'])) { 
+                $berita['feat_image'] = base_url($berita['feat_image']); 
+            }
 
             // Gallery
             $gallery = [];
@@ -212,8 +217,10 @@ class ApiBeritaController extends ResourceController
                         $path = is_array($item) ? $item['path'] : $item;
                         $caption = is_array($item) ? ($item['caption'] ?? '') : '';
                         if (!empty($path)) {
+                            // ✅ 3. GUNAKAN base_url() PADA GAMBAR GALLERY
+                            // Ini akan memperbaiki masalah carousel
                             $gallery[] = [
-                                'url'     => $path, // ❌ Jangan pakai base_url() disini juga
+                                'url'     => base_url($path), 
                                 'caption' => $caption
                             ];
                         }
@@ -232,8 +239,8 @@ class ApiBeritaController extends ResourceController
                         'id_berita'  => $related['id_berita'],
                         'judul'      => $related['judul'],
                         'slug'       => $related['slug'],
-                        // ❌ HAPUS base_url() DI SINI
-                        'feat_image' => !empty($related['feat_image']) ? $related['feat_image'] : null,
+                        // ✅ 4. GUNAKAN base_url() PADA GAMBAR TERKAIT
+                        'feat_image' => !empty($related['feat_image']) ? base_url($related['feat_image']) : null,
                         'created_at' => $related['created_at']
                     ];
                 }
