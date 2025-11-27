@@ -44,11 +44,6 @@ class ProfileModel extends Model
             'rules' => 'required|min_length[3]|max_length[255]'
         ],
 
-        'type' => [
-            'label' => 'Type',
-            'rules' => 'required|in_list[1,2,3,4]'
-        ],
-
         'content' => [
             'label' => 'Konten',
             'rules' => 'permit_empty'
@@ -79,10 +74,6 @@ class ProfileModel extends Model
             'required' => 'Judul wajib diisi.',
             'min_length' => 'Judul minimal 3 karakter.',
             'max_length' => 'Judul maksimal 255 karakter.'
-        ],
-        'type' => [
-            'required' => 'Type wajib dipilih.',
-            'in_list' => 'Type tidak valid.'
         ],
         'is_active' => [
             'required' => 'Status wajib dipilih.',
