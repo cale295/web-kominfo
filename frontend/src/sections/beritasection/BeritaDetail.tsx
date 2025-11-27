@@ -170,6 +170,7 @@ interface BeritaDetail {
 interface BeritaTerkait {
   id_berita: string;
   judul: string;
+  slug: string;
   intro: string;
   feat_image: string;
   created_at: string;
@@ -293,10 +294,10 @@ const BeritaDetail: React.FC = () => {
     }
   };
 
-  const handleBeritaTerkaitClick = (beritaId: string) => {
+  const handleBeritaTerkaitClick = (slug: string) => {
     // Scroll ke atas dan navigate
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    navigate(`/berita/${beritaId}`);
+    navigate(`/berita/${slug}`);
   };
 
   if (loading) {
@@ -459,7 +460,7 @@ const BeritaDetail: React.FC = () => {
                   <div
                     key={item.id_berita}
                     className="berita-terkait-item"
-                    onClick={() => handleBeritaTerkaitClick(item.id_berita)}
+                    onClick={() => handleBeritaTerkaitClick(item.slug)}
                   >
                     {item.feat_image ? (
                       <img

@@ -7,6 +7,7 @@ import { Triangle } from "lucide-react";
 interface BeritaItem {
   id_berita: string;
   judul: string;
+  slug: string;
   intro: string;
   feat_image: string;
   created_at: string;
@@ -146,7 +147,7 @@ const Berita: React.FC = () => {
               <div className="carousel-inner">
                 {beritaUtamaList.map((item, index) => (
                   <a
-                    href={`/berita/${item.id_berita}`}
+                    href={`/berita/${item.slug}`}
                     className={`carousel-item ${index === 0 ? "active" : ""}`}
                     style={{ textDecoration: "none" }}
                   >
@@ -206,7 +207,7 @@ const Berita: React.FC = () => {
                   beritaPopuler.map((item, index) => (
                     <li key={item.id_berita} className="berita-populer-item">
                       <a
-                        href={`/berita/${item.id_berita}`}
+                        href={`/berita/${item.slug}`}
                         className="berita-populer-link"
                       >
                         <span className="berita-number">{index + 1}#</span>
@@ -240,7 +241,7 @@ const Berita: React.FC = () => {
           {beritaTerkini.length > 0 ? (
             beritaTerkini.map((item) => (
               <a
-                href={`/berita/${item.id_berita}`}
+                href={`/berita/${item.slug}`}
                 className=" berita-terkini-card mb-3"
               >
                   <div className="berita-terkini-card-body">
