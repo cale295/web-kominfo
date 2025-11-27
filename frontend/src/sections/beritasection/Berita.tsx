@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/berita.css";
 import api from "../../services/api";
-import { Triangle } from "lucide-react";
+import { Triangle, X } from "lucide-react";
 
 interface BeritaItem {
   id_berita: string;
@@ -11,6 +11,7 @@ interface BeritaItem {
   feat_image: string;
   created_at: string;
   hit: string;
+  tags?: Tag[];
 }
 
 interface Tag {
@@ -35,6 +36,10 @@ const Berita: React.FC = () => {
   const [beritaPopuler, setBeritaPopuler] = useState<BeritaItem[]>([]);
   const [beritaTerkini, setBeritaTerkini] = useState<BeritaItem[]>([]);
   const [tagPopuler, setTagPopuler] = useState<Tag[]>([]);
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+  const [beritaByTag, setBeritaByTag] = useState<BeritaItem[]>([]);
+  const [loadingTag, setLoadingTag] = useState<boolean>(false);
+  const [allBerita, setAllBerita] = useState<BeritaItem[]>([]);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -45,6 +50,7 @@ const Berita: React.FC = () => {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
+  // Fetch semua data berita
   useEffect(() => {
     const fetchBerita = async () => {
       try {
@@ -52,6 +58,10 @@ const Berita: React.FC = () => {
         const data = res?.data?.data;
 
         if (!data) return;
+
+        // Simpan semua berita untuk filtering
+        setAllBerita(data.berita || []);
+
         // berita utama
         const utamaArray: BeritaUtamaItem[] = data.utama || [];
         const beritaUtamaDetailList: BeritaItem[] = [];
@@ -95,6 +105,7 @@ const Berita: React.FC = () => {
           .sort((a, b) => Number(b.hit) - Number(a.hit))
           .slice(0, 5);
         setBeritaPopuler(populer);
+        
         // berita terkini
         const terkini = [...data.berita]
           .sort(
@@ -112,12 +123,71 @@ const Berita: React.FC = () => {
     fetchBerita();
   }, []);
 
+  // Fetch berita berdasarkan tag
+  const fetchBeritaByTag = async (tag: Tag) => {
+    try {
+      setLoadingTag(true);
+      setSelectedTag(tag);
+      
+      // Filter berita yang memiliki tag yang dipilih
+      // Asumsi: data berita sudah memiliki properti tags
+      const filteredBerita = allBerita.filter(berita => 
+        berita.tags?.some(t => t.id_tags === tag.id_tags)
+      );
+      
+      // Jika tidak ada data di local, fetch dari API
+      if (filteredBerita.length === 0) {
+        const res = await api.get(`/berita/tag/${tag.slug}`);
+        if (res.data?.data) {
+          setBeritaByTag(res.data.data);
+        }
+      } else {
+        setBeritaByTag(filteredBerita);
+      }
+    } catch (error) {
+      console.error("Gagal fetch berita by tag:", error);
+      // Fallback: filter dari data local berdasarkan judul/intro yang mengandung tag
+      const filteredByKeyword = allBerita.filter(berita => 
+        berita.judul.toLowerCase().includes(tag.nama_tag.toLowerCase()) ||
+        berita.intro.toLowerCase().includes(tag.nama_tag.toLowerCase())
+      );
+      setBeritaByTag(filteredByKeyword);
+    } finally {
+      setLoadingTag(false);
+    }
+  };
+
+  // Clear tag filter
+  const clearTagFilter = () => {
+    setSelectedTag(null);
+    setBeritaByTag([]);
+  };
+
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
 
   return (
     <div className="container-fluid my-5 berita-container">
+      {/* Tag Filter Indicator */}
+      {selectedTag && (
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="alert alert-info d-flex justify-content-between align-items-center">
+              <span>
+                Menampilkan berita dengan tag: <strong>{selectedTag.nama_tag}</strong>
+              </span>
+              <button 
+                className="btn btn-sm btn-outline-secondary"
+                onClick={clearTagFilter}
+              >
+                <X size={16} /> Clear Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="row">
-        {/* Berita Utama */}
+        {/* Berita Utama - TETAP MUNCUL meski ada filter tag */}
         <div className="col-lg-8 mb-4">
           <h5 className="section-title">
             <Triangle className="icon-triangle" /> Berita Utama
@@ -146,6 +216,7 @@ const Berita: React.FC = () => {
               <div className="carousel-inner">
                 {beritaUtamaList.map((item, index) => (
                   <a
+                    key={item.id_berita}
                     href={`/berita/${item.id_berita}`}
                     className={`carousel-item ${index === 0 ? "active" : ""}`}
                     style={{ textDecoration: "none" }}
@@ -195,54 +266,60 @@ const Berita: React.FC = () => {
           )}
         </div>
 
-        {/* Berita Populer */}
+        {/* Berita Populer - TETAP MUNCUL meski ada filter tag */}
         <div className="col-lg-4 mb-4">
           <h5 className="section-title">
             <Triangle className="icon-triangle" /> Berita Populer
           </h5>
           <div className="berita-populer-card">
-              <ul className="list-unstyled berita-populer-list">
-                {beritaPopuler.length > 0 ? (
-                  beritaPopuler.map((item, index) => (
-                    <li key={item.id_berita} className="berita-populer-item">
-                      <a
-                        href={`/berita/${item.id_berita}`}
-                        className="berita-populer-link"
-                      >
-                        <span className="berita-number">{index + 1}#</span>
-                        <div className="berita-content">
-                          <span className="berita-title text-break">
-                            {item.judul}
-                          </span>
-                          <span className="berita-date">dibaca {item.hit} kali</span>
-                        </div>
-                      </a>
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-muted">Memuat...</li>
-                )}
-              </ul>
-              <a href="#" className="btn-link-more">
-                Lihat berita populer lainnya
-              </a>
+            <ul className="list-unstyled berita-populer-list">
+              {beritaPopuler.length > 0 ? (
+                beritaPopuler.map((item, index) => (
+                  <li key={item.id_berita} className="berita-populer-item">
+                    <a
+                      href={`/berita/${item.id_berita}`}
+                      className="berita-populer-link"
+                    >
+                      <span className="berita-number">{index + 1}#</span>
+                      <div className="berita-content">
+                        <span className="berita-title text-break">
+                          {item.judul}
+                        </span>
+                        <span className="berita-date">dibaca {item.hit} kali</span>
+                      </div>
+                    </a>
+                  </li>
+                ))
+              ) : (
+                <li className="text-muted">Memuat...</li>
+              )}
+            </ul>
+            <a href="#" className="btn-link-more">
+              Lihat berita populer lainnya
+            </a>
           </div>
         </div>
       </div>
 
       <div className="row mt-4">
-        {/* Berita Terkini */}
+        {/* Berita Terkini - BERUBAH menjadi berita berdasarkan tag jika ada filter */}
         <div className="col-lg-8 mb-4">
           <h5 className="section-title">
-            <Triangle className="icon-triangle" /> Berita Terkini
+            <Triangle className="icon-triangle" /> 
+            {selectedTag ? `Berita dengan Tag: ${selectedTag.nama_tag}` : "Berita Terkini"}
           </h5>
 
-          {beritaTerkini.length > 0 ? (
-            beritaTerkini.map((item) => (
-              <a
-                href={`/berita/${item.id_berita}`}
-                className=" berita-terkini-card mb-3"
-              >
+          {selectedTag ? (
+            // Tampilkan berita berdasarkan tag
+            loadingTag ? (
+              <p>Memuat berita dengan tag {selectedTag.nama_tag}...</p>
+            ) : beritaByTag.length > 0 ? (
+              beritaByTag.map((item) => (
+                <a
+                  key={item.id_berita}
+                  href={`/berita/${item.id_berita}`}
+                  className="berita-terkini-card mb-3"
+                >
                   <div className="berita-terkini-card-body">
                     <div className="col-auto">
                       <img
@@ -259,36 +336,74 @@ const Berita: React.FC = () => {
                       </p>
                     </div>
                   </div>
-              </a>
-            ))
+                </a>
+              ))
+            ) : (
+              <p>Tidak ada berita dengan tag {selectedTag.nama_tag}.</p>
+            )
           ) : (
-            <p>Memuat berita terkini...</p>
+            // Tampilkan berita terkini normal
+            beritaTerkini.length > 0 ? (
+              beritaTerkini.map((item) => (
+                <a
+                  key={item.id_berita}
+                  href={`/berita/${item.id_berita}`}
+                  className="berita-terkini-card mb-3"
+                >
+                  <div className="berita-terkini-card-body">
+                    <div className="col-auto">
+                      <img
+                        src={`${ROOT}/${item.feat_image.replace(/^\/+/, "")}`}
+                        className="berita-terkini-img"
+                        alt={item.judul}
+                      />
+                    </div>
+                    <div className="berita-terkini-card-item">
+                      <h6 className="berita-terkini-title">{item.judul}</h6>
+                      <p className="berita-terkini-intro">{item.intro}</p>
+                      <p className="berita-terkini-date">
+                        {formatDate(item.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              ))
+            ) : (
+              <p>Memuat berita terkini...</p>
+            )
           )}
         </div>
 
-        {/* Tag Paling Dicari */}
+        {/* Tag Paling Dicari - TETAP MUNCUL meski ada filter tag */}
         <div className="col-lg-4 mb-4">
           <h5 className="section-title">
             <Triangle className="icon-triangle" /> Tag Paling Dicari
           </h5>
           <div className="tag-populer-card">
-              <ul className="list-unstyled tag-populer-list">
-                {tagPopuler.length > 0 ? (
-                  tagPopuler.map((tag, index) => (
-                    <li key={tag.id_tags} className="tag-populer-item">
-                      <a
-                        href={`/berita/tag/${tag.slug}`}
-                        className="tag-populer-link"
-                      >
-                        <span className="tag-number">#{index + 1}</span>
-                        <span className="tag-name">{tag.nama_tag}</span>
-                      </a>
-                    </li>
-                  ))
-                ) : (
-                  <p className="text-muted small">Memuat tag...</p>
-                )}
-              </ul>
+            <ul className="list-unstyled tag-populer-list">
+              {tagPopuler.length > 0 ? (
+                tagPopuler.map((tag, index) => (
+                  <li key={tag.id_tags} className="tag-populer-item">
+                    <button
+                      onClick={() => fetchBeritaByTag(tag)}
+                      className={`tag-populer-link ${selectedTag?.id_tags === tag.id_tags ? 'active' : ''}`}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        width: '100%', 
+                        textAlign: 'left',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <span className="tag-number">#{index + 1}</span>
+                      <span className="tag-name">{tag.nama_tag}</span>
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <p className="text-muted small">Memuat tag...</p>
+              )}
+            </ul>
           </div>
         </div>
       </div>

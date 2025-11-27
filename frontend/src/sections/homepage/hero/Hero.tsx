@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./hero.css";
-import { Search, Accessibility } from "lucide-react";
+import { Accessibility } from "lucide-react";
+import Searchbar from "../../../components/searchbar/Searchbar";
 import api from "../../../services/api";
 
 interface Banner {
@@ -21,26 +22,25 @@ const HeroSection: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-  const fetchBanner = async () => {
-    try {
-      const res = await api.get("/banner");
-      const banners: Banner[] = res?.data?.data || [];
+    const fetchBanner = async () => {
+      try {
+        const res = await api.get("/banner");
+        const banners: Banner[] = res?.data?.data || [];
 
-      const selected = banners.find(
-        (b) => b.category_banner === "3" && b.status === "1"
-      );
+        const selected = banners.find(
+          (b) => b.category_banner === "3" && b.status === "1"
+        );
 
-      if (selected) setHeroBanner(selected);
-    } catch (error) {
-      console.error("Gagal fetch banner:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        if (selected) setHeroBanner(selected);
+      } catch (error) {
+        console.error("Gagal fetch banner:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  fetchBanner();
-}, []);
-
+    fetchBanner();
+  }, []);
 
   return (
     <div className="hero-container">
@@ -55,50 +55,43 @@ const HeroSection: React.FC = () => {
           <Accessibility className="icon-accessibility" />
           <span className="disabilitas">DISABILITAS</span>
         </button>
-        <div className="search-wrapper d-flex align-items-center">
-          <div className="search-input-wrapper">
-            <input
-              type="text"
-              placeholder="Apa yang kamu cari"
-              className="search-input"
-            />
-          </div>
-          <button className="btn-search">
-            <Search className="icon-search" />
-          </button>
-        </div>
+        <Searchbar />
       </header>
 
-   <section className="hero-banner-section">
-  {isLoading ? (
-    <div className="hero-banner-loading">
-      <p>Memuat banner...</p>
-    </div>
-  ) : heroBanner ? (
-    heroBanner.media_type === "video" ? (
-      <video
-        src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.image}`}
-        className="hero-banner-video"
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
-    ) : (
-      <img
-        src={`${api.defaults.baseURL?.replace("/api", "")}/uploads/banner/${heroBanner.image}`}
-        alt={heroBanner.title}
-        className="hero-banner-image"
-      />
-    )
-  ) : (
-    <div className="hero-banner-placeholder">
-      <p>Banner tidak tersedia</p>
-    </div>
-  )}
-</section>
-
-
+      <section className="hero-banner-section">
+        {isLoading ? (
+          <div className="hero-banner-loading">
+            <p>Memuat banner...</p>
+          </div>
+        ) : heroBanner ? (
+          heroBanner.media_type === "video" ? (
+            <video
+              src={`${api.defaults.baseURL?.replace(
+                "/api",
+                ""
+              )}/uploads/banner/${heroBanner.image}`}
+              className="hero-banner-video"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <img
+              src={`${api.defaults.baseURL?.replace(
+                "/api",
+                ""
+              )}/uploads/banner/${heroBanner.image}`}
+              alt={heroBanner.title}
+              className="hero-banner-image"
+            />
+          )
+        ) : (
+          <div className="hero-banner-placeholder">
+            <p>Banner tidak tersedia</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 };

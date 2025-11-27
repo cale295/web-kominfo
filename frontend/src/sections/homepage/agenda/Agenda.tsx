@@ -3,9 +3,10 @@ import {
   Triangle,
   Calendar,
   Bell,
-  Image as ImageIcon,
+  Image,
 } from "lucide-react";
-import "./agenda.css";
+import './Agenda.css'
+import api from "../../../services/api";
 
 interface AnnouncementItem {
   id: number;
@@ -31,69 +32,26 @@ interface CalendarEvent {
   image?: string;
 }
 
-interface NewsItem {
-  id: number;
-  image: string;
-  subtitle: string;
-  desc: string;
-  source: string;
-  date: string;
+interface BeritaItem {
+  id_berita: string;
+  judul: string;
+  intro: string;
+  feat_image: string;
+  created_at: string;
+  hit: string;
+}
+
+interface BeritaUtamaItem {
+  id_berita_utama: string;
+  id_berita: string;
+  jenis: string;
+  created_date: string;
+  created_by_id: string;
+  created_by_name: string;
+  status: string;
 }
 
 type TabType = "agenda" | "pengumuman";
-
-const newsItems: NewsItem[] = [
-  {
-    id: 1,
-    image: "https://picsum.photos/seed/news1/400/200",
-    subtitle: "DIMULAI HARI INI!",
-    desc: "Optimalkan Pembangunan Infrastruktur, Pemkot Tangerang Perbaiki 40 Ruas Jalan Kota",
-    source: "Dinas Pendidikan Kota Tangerang",
-    date: "Selasa, 27 Desember 2022 16:50 WIB",
-  },
-  {
-    id: 2,
-    image: "https://picsum.photos/seed/news2/400/200",
-    subtitle: "PROYEK BARU DIMULAI!",
-    desc: "Pemerintah Kota Tangerang Luncurkan Program Jalan Pintar Berbasis Teknologi",
-    source: "Dinas PU Kota Tangerang",
-    date: "Rabu, 3 Januari 2023 09:00 WIB",
-  },
-  {
-    id: 3,
-    image: "https://picsum.photos/seed/news3/400/200",
-    subtitle: "DIBUKA SEKARANG!",
-    desc: "Pemkot Tangerang Buka Program Beasiswa untuk 1000 Pelajar Berprestasi",
-    source: "Dinas Pendidikan Kota Tangerang",
-    date: "Kamis, 5 Januari 2023 08:30 WIB",
-  },
-];
-
-const announcementData: AnnouncementItem[] = [
-  {
-    id: 1,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
-  },
-  { id: 2, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
-  {
-    id: 3,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
-  },
-  { id: 4, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
-  {
-    id: 5,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
-  },
-  { id: 6, title: "Lowongan Mobile App Programmer", date: "01 September 2025" },
-  {
-    id: 7,
-    title: "Hotline Aduan Dinas Sosial Kota Tangerang",
-    date: "01 September 2025",
-  },
-];
 
 export default function Agenda() {
   const today = new Date();
@@ -109,19 +67,117 @@ export default function Agenda() {
   >({});
   const [loadingAgenda, setLoadingAgenda] = useState<boolean>(true);
   const [errorAgenda, setErrorAgenda] = useState<string | null>(null);
+  const [agendaData, setAgendaData] = useState<ApiAgendaItem[]>([]);
+  
+  // State untuk Berita Utama
+  const [beritaUtamaList, setBeritaUtamaList] = useState<BeritaItem[]>([]);
+  const [loadingBerita, setLoadingBerita] = useState<boolean>(true);
+  const [errorBerita, setErrorBerita] = useState<string | null>(null);
+
+  const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return new Date(dateString).toLocaleDateString("id-ID", options);
+  };
+
+  // Format date untuk pengumuman (tanpa waktu)
+  const formatAnnouncementDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("id-ID", options);
+  };
+
+  // Generate data pengumuman dari agenda
+  const announcementData: AnnouncementItem[] = agendaData
+    .filter(agenda => agenda.status === "active" || agenda.status === "published")
+    .map((agenda, index) => ({
+      id: index + 1,
+      title: agenda.activity_name,
+      date: formatAnnouncementDate(agenda.start_date)
+    }))
+    .slice(0, 7); // Ambil maksimal 7 pengumuman
+
+  // Fetch Berita Utama dari API
+  useEffect(() => {
+    const fetchBerita = async () => {
+      try {
+        setLoadingBerita(true);
+        const res = await api.get("/berita");
+        const data = res?.data?.data;
+        
+        if (!data) {
+          setErrorBerita("Data berita tidak ditemukan");
+          return;
+        }
+        
+        const utamaArray: BeritaUtamaItem[] = data.utama || [];
+        const beritaUtamaDetailList: BeritaItem[] = [];
+
+        if (utamaArray.length > 0) {
+          for (const utamaItem of utamaArray) {
+            const idUtama = utamaItem.id_berita;
+
+            const foundInList = data.berita?.find(
+              (item: BeritaItem) => item.id_berita === idUtama
+            );
+
+            if (foundInList) {
+              beritaUtamaDetailList.push(foundInList);
+            } else {
+              try {
+                const detailRes = await api.get(`/berita/${idUtama}`);
+                const detailData = detailRes?.data?.data;
+                if (detailData) {
+                  beritaUtamaDetailList.push(detailData);
+                }
+              } catch (fetchError) {
+                console.error(
+                  `Gagal mengambil detail berita utama ${idUtama}:`,
+                  fetchError
+                );
+              }
+            }
+          }
+        }
+
+        setBeritaUtamaList(beritaUtamaDetailList);
+      } catch (error) {
+        console.error("Gagal fetch berita:", error);
+        setErrorBerita("Gagal memuat data berita");
+      } finally {
+        setLoadingBerita(false);
+      }
+    };
+
+    fetchBerita();
+  }, []);
 
   // Fetch agenda data from API
   useEffect(() => {
     const fetchAgenda = async () => {
       try {
         setLoadingAgenda(true);
-        const res = await fetch("http://localhost:8080/api/agenda");
-        const json = await res.json();
+        const res = await api.get("/agenda");
+        const json = res?.data;
 
         if (json.status && Array.isArray(json.data)) {
           const eventsMap: Record<number, CalendarEvent> = {};
+          const agendaList: ApiAgendaItem[] = json.data;
 
-          json.data.forEach((item: ApiAgendaItem) => {
+          // Simpan data agenda untuk digunakan di pengumuman
+          setAgendaData(agendaList);
+
+          agendaList.forEach((item: ApiAgendaItem) => {
             const start = new Date(item.start_date);
             const day = start.getDate();
 
@@ -198,7 +254,7 @@ export default function Agenda() {
   };
 
   const selectedEvent = selectedDate ? calendarEvents[selectedDate] : null;
-  const currentNews = newsItems[currentNewsIndex];
+  const currentNews = beritaUtamaList[currentNewsIndex];
 
   return (
     <div className="container-fluid py-5">
@@ -208,43 +264,59 @@ export default function Agenda() {
           <div className="col">
             <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
             <div className="card border-0 shadow news-card position-relative rounded-4 overflow-hidden">
-              <div className="news-image-container">
-                {currentNews.image ? (
-                  <img
-                    src={currentNews.image}
-                    className="img-fluid w-100 h-100 object-fit-cover"
-                    alt="News"
-                  />
-                ) : (
-                  <div
-                    className="d-flex justify-content-center align-items-center bg-primary text-white"
-                    style={{ height: "200px" }}
-                  >
-                    <ImageIcon size={60} />
-                  </div>
-                )}
-              </div>
-              <div className="card-body text-dark d-flex flex-column">
-                <p className="fw-bold text-blue mb-2">{currentNews.subtitle}</p>
-                <p className="small">{currentNews.desc}</p>
-                <div className="mt-auto pt-3 border-top">
-                  <small className="text-muted d-block">
-                    Sumber: {currentNews.source}
-                  </small>
-                  <small className="text-secondary">{currentNews.date}</small>
+              {loadingBerita ? (
+                <div className="text-center p-5">
+                  <p className="text-muted">Memuat berita utama...</p>
                 </div>
-              </div>
-              <div className="d-flex justify-content-center gap-2 pb-3">
-                {newsItems.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentNewsIndex(i)}
-                    className={`indicator ${
-                      i === currentNewsIndex ? "active" : ""
-                    }`}
-                  />
-                ))}
-              </div>
+              ) : errorBerita ? (
+                <div className="text-center p-5">
+                  <p className="text-danger">{errorBerita}</p>
+                </div>
+              ) : beritaUtamaList.length > 0 && currentNews ? (
+                <>
+                  <div className="news-image-container">
+                    {currentNews.feat_image ? (
+                      <img
+                        src={`${ROOT}/${currentNews.feat_image.replace(/^\/+/, "")}`}
+                        className="img-fluid w-100 h-100 object-fit-cover"
+                        alt={currentNews.judul}
+                      />
+                    ) : (
+                      <div
+                        className="d-flex justify-content-center align-items-center bg-primary text-white"
+                        style={{ height: "200px" }}
+                      >
+                        <Image size={60} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="card-body text-dark d-flex flex-column">
+                    <p className="fw-bold text-blue mb-2">BERITA UTAMA</p>
+                    <p className="small">{currentNews.judul}</p>
+                    <div className="mt-auto pt-3 border-top">
+                      <small className="text-muted d-block">
+                        Sumber: Dinas Komunikasi dan Informatika Kota Tangerang
+                      </small>
+                      <small className="text-secondary">{formatDate(currentNews.created_at)}</small>
+                    </div>
+                  </div>
+                  <div className="d-flex justify-content-center gap-2 pb-3">
+                    {beritaUtamaList.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentNewsIndex(i)}
+                        className={`indicator ${
+                          i === currentNewsIndex ? "active" : ""
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center p-5">
+                  <p className="text-muted">Tidak ada berita utama.</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -276,7 +348,7 @@ export default function Agenda() {
                     <img
                       src={
                         selectedEvent && selectedEvent.image
-                          ? `http://localhost:8080/uploads/agenda/${selectedEvent.image}`
+                          ? `${ROOT}/uploads/agenda/${selectedEvent.image}`
                           : "assets/agenda-default.jpg"
                       }
                       alt={selectedEvent?.title || "Belum Ada Agenda"}
@@ -375,17 +447,31 @@ export default function Agenda() {
               </div>
             ) : (
               <div className="card border-0 shadow rounded-4">
-                {announcementData.map((a) => (
-                  <div key={a.id} className="p-3 border-bottom hover-bg-light">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div className="d-flex align-items-center gap-2">
-                        <div className="dot bg-primary"></div>
-                        <h6 className="mb-0 fw-semibold">{a.title}</h6>
-                      </div>
-                      <span className="fw-bold text-blue small">{a.date}</span>
-                    </div>
+                {loadingAgenda ? (
+                  <div className="text-center p-4">
+                    <p className="text-muted">Memuat pengumuman...</p>
                   </div>
-                ))}
+                ) : errorAgenda ? (
+                  <div className="text-center p-4">
+                    <p className="text-danger">{errorAgenda}</p>
+                  </div>
+                ) : announcementData.length > 0 ? (
+                  announcementData.map((a) => (
+                    <div key={a.id} className="p-3 border-bottom hover-bg-light">
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div className="d-flex align-items-center gap-2">
+                          <div className="dot bg-primary"></div>
+                          <h6 className="mb-0 fw-semibold">{a.title}</h6>
+                        </div>
+                        <span className="fw-bold text-blue small">{a.date}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center p-4">
+                    <p className="text-muted">Tidak ada pengumuman.</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
