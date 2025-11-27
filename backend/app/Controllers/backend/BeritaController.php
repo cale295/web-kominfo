@@ -114,26 +114,45 @@ public function new()
     // ========================================================
     // Detail Berita (Show)
     // ========================================================
-public function show($id)
+// ========================================================
+    // Detail Berita (Show)
+    // ========================================================
+    // Ubah parameter dari $id menjadi $slug
+    public function show($slug = null)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_read']) {
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
         }
 
-        $berita = $this->beritaModel->find($id);
+        // ----------------------------------------------------
+        // PERUBAHAN LOGIKA PENCARIAN
+        // ----------------------------------------------------
+        // Cari berdasarkan kolom 'slug'
+        $berita = $this->beritaModel->where('slug', $slug)->first();
+
+        // (Opsional) Fallback: Jika slug tidak ketemu, coba cari pakai ID (siapa tau link lama masih pakai ID)
+        if (!$berita && is_numeric($slug)) {
+             $berita = $this->beritaModel->find($slug);
+        }
+        // ----------------------------------------------------
+
         if (!$berita) {
             return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
         }
 
+        // Ambil ID dari data berita yang ditemukan untuk query relasi lainnya
+        $id = $berita['id_berita']; 
+
+        // --- SISA KODE KE BAWAH TETAP SAMA ---
+        
         // Ambil kategori berita
         $kategori = $this->beritaModel->getKategoriByBerita($id);
         $kategoriNames = array_column($kategori, 'kategori');
 
-        // ✅ TAMBAHAN TAGS: Ambil tags berita
-        // Pastikan function getTagsByBerita sudah ada di Model (sesuai jawaban sebelumnya)
+        // Ambil tags
         $tags = $this->beritaModel->getTagsByBerita($id); 
-        $tagNames = array_column($tags, 'nama_tag'); // Asumsi kolom nama_tag
+        $tagNames = array_column($tags, 'nama_tag');
 
         // Ambil berita terkait
         $beritaTerkait = [];
@@ -144,7 +163,7 @@ public function show($id)
             $beritaTerkait[] = $this->beritaModel->find($berita['id_berita_terkait2']);
         }
 
-        // Decode additional images & Normalisasi
+        // Decode additional images
         $rawImages = !empty($berita['additional_images']) ? json_decode($berita['additional_images'], true) : [];
         $additionalImages = [];
         
@@ -160,7 +179,7 @@ public function show($id)
             'title' => 'Detail Berita',
             'berita' => $berita,
             'kategori' => $kategoriNames,
-            'tags' => $tagNames, // ✅ Kirim ke view
+            'tags' => $tagNames,
             'additionalImages' => $additionalImages,
             'beritaTerkait' => $beritaTerkait,
         ];

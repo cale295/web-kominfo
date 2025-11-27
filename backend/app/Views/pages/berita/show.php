@@ -193,7 +193,7 @@
                                                 <?= date('d M Y', strtotime($bt['created_at'])) ?>
                                             </small>
                                             <h6 class="card-title mb-0 fw-bold">
-                                                <a href="<?= site_url('berita/show/'.$bt['id_berita']) ?>" 
+                                                <a href="<?= site_url('berita/show/'.$bt['slug']) ?>" 
                                                    class="text-decoration-none text-dark stretched-link three-line-clamp">
                                                     <?= esc($bt['judul']) ?>
                                                 </a>

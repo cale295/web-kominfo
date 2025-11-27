@@ -10,27 +10,27 @@ use App\Models\BeritaTagModel;
 
 class ApiBeritaController extends ResourceController
 {
-    protected $modelName = BeritaModel::class; // model default bawaan CI
-    protected $format = 'json';
+    protected $modelName = BeritaModel::class;
+    protected $format    = 'json';
 
-    protected $utamaModel; // model kedua
+    protected $utamaModel;
     protected $katemodel;
     protected $tagmodel;
 
     public function __construct()
     {
-        $this->utamaModel = new BeritaUtamaModel(); // instance manual model kedua
-        $this->katemodel = new KategoriModel();
-        $this->tagmodel = new BeritaTagModel();
+        $this->utamaModel = new BeritaUtamaModel();
+        $this->katemodel  = new KategoriModel();
+        $this->tagmodel   = new BeritaTagModel();
     }
 
     // ==========================================================
-    // HELPER: Ambil Kategori (Manual Query Builder)
+    // HELPER: Ambil Kategori
     // ==========================================================
     private function getKategoriByBerita($id_berita)
     {
         return $this->model->db->table('t_berita_kategori')
-            ->select('m_kategori_berita.id_kategori, m_kategori_berita.kategori')
+            ->select('m_kategori_berita.id_kategori, m_kategori_berita.kategori, m_kategori_berita.slug')
             ->join('m_kategori_berita', 'm_kategori_berita.id_kategori = t_berita_kategori.id_kategori')
             ->where('t_berita_kategori.id_berita', $id_berita)
             ->get()
@@ -38,76 +38,26 @@ class ApiBeritaController extends ResourceController
     }
 
     // ==========================================================
-    // ✅ HELPER BARU: Ambil Tags (Manual Query Builder)
+    // HELPER: Ambil Tags
     // ==========================================================
     private function getTagsByBerita($id_berita)
     {
-        // Asumsi: Tabel Pivot = t_berita_tag, Tabel Master = m_berita_tag
-        // Sesuaikan nama kolom (id_tags / id_tag) dengan database Anda
         return $this->model->db->table('t_berita_tag')
-            ->select('m_berita_tag.id_tags, m_berita_tag.nama_tag') 
+            ->select('m_berita_tag.id_tags, m_berita_tag.nama_tag, m_berita_tag.slug')
             ->join('m_berita_tag', 'm_berita_tag.id_tags = t_berita_tag.id_tags')
             ->where('t_berita_tag.id_berita', $id_berita)
             ->get()
             ->getResultArray();
     }
 
-    // ================================
-    // TAMPILKAN SEMUA AGENDA (API)
-    // ================================
-    public function index()
-    {
-        $tagmodes = $this->tagmodel->orderBy('created_at', 'DESC')->findAll();
-
-        $kategories = $this->katemodel
-            ->where('trash', '0')
-            ->where('is_show_nav', '1')
-            ->orderBy('created_on', 'DESC')
-            ->findAll();
-
-        $beritautama = $this->utamaModel
-            ->where('status', '1')
-            ->orderBy('created_date', 'DESC')
-            ->findAll();
-
-        $beritas = $this->model
-            ->where('trash', '0')
-            ->where('status', '1')
-            ->orderBy('created_at', 'DESC')
-            ->findAll();
-
-        // === Tambahkan kategori ke setiap berita ===
-        foreach ($beritas as &$b) {
-            // Kategori
-            $kats = $this->getKategoriByBerita($b['id_berita']);
-            $b['kategori'] = array_column($kats, 'kategori');
-            $b['kategori_ids'] = array_column($kats, 'id_kategori');
-            
-            // ✅ Tags di Index (Opsional, jika ingin muncul di list)
-            $tags = $this->getTagsByBerita($b['id_berita']);
-            $b['tags'] = array_column($tags, 'nama_tag');
-        }
-
-        return $this->respond([
-            'status'  => true,
-            'message' => 'Data berita berhasil diambil.',
-            'data'    => [
-                'utama'    => $beritautama,
-                'berita'  => $beritas,
-                'kategori'=> $kategories,
-                'tag'     => $tagmodes
-            ]
-        ]);
-    }
-
     // ==========================================================
-    // ANTI SPAM HIT (IP + CACHE)
+    // ANTI SPAM HIT
     // ==========================================================
     private function canCountHit($id_berita)
     {
-        $ip = $this->request->getIPAddress();
+        $ip       = $this->request->getIPAddress();
         $cacheKey = "hit_lock_" . md5($ip) . "_" . $id_berita;
-        $cache = \Config\Services::cache();
+        $cache    = \Config\Services::cache();
 
         if ($cache->get($cacheKey)) {
             return false;
@@ -117,70 +67,143 @@ class ApiBeritaController extends ResourceController
         return true;
     }
 
-    // =================================================================
-    // TAMPILKAN DETAIL BERITA (SHOW)
-    // =================================================================
-    public function show($id = null)
+    // ================================
+    // TAMPILKAN SEMUA BERITA (INDEX)
+    // ================================
+    public function index()
     {
         try {
-            // 1. Cek berita regular
+            $tagmodes = $this->tagmodel->orderBy('created_at', 'DESC')->findAll();
+
+            $kategories = $this->katemodel
+                ->where('trash', '0')
+                ->where('is_show_nav', '1')
+                ->orderBy('created_on', 'DESC')
+                ->findAll();
+
+            $beritautama = $this->utamaModel
+                ->where('status', '1')
+                ->orderBy('created_date', 'DESC')
+                ->findAll();
+
+            $beritas = $this->model
+                ->where('trash', '0')
+                ->where('status', '1')
+                ->orderBy('created_at', 'DESC')
+                ->findAll();
+
+            // Fungsi Format Data
+            $formatData = function (&$listBerita) {
+                foreach ($listBerita as &$b) {
+                    // ❌ HAPUS base_url() AGAR TIDAK DOUBLE URL DI FRONTEND
+                    // Biarkan path apa adanya (misal: uploads/berita/foto.jpg)
+                    
+                    // Kategori
+                    $kats = $this->getKategoriByBerita($b['id_berita']);
+                    $b['kategori']       = array_column($kats, 'kategori');
+                    $b['kategori_ids']   = array_column($kats, 'id_kategori');
+                    $b['kategori_slugs'] = array_column($kats, 'slug');
+
+                    // Tags
+                    $tags = $this->getTagsByBerita($b['id_berita']);
+                    $b['tags']       = array_column($tags, 'nama_tag');
+                    $b['tags_slugs'] = array_column($tags, 'slug');
+                }
+            };
+
+            $formatData($beritautama);
+            $formatData($beritas);
+
+            return $this->respond([
+                'status'  => true,
+                'message' => 'Data berita berhasil diambil.',
+                'data'    => [
+                    'utama'    => $beritautama,
+                    'berita'   => $beritas,
+                    'kategori' => $kategories,
+                    'tag'      => $tagmodes
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->failServerError($e->getMessage());
+        }
+    }
+
+    // =================================================================
+    // TAMPILKAN DETAIL BERITA (BY SLUG)
+    // =================================================================
+    public function show($slug = null)
+    {
+        try {
+            if (empty($slug)) {
+                return $this->failNotFound('Slug berita tidak boleh kosong.');
+            }
+
+            // 1. Cari Berita Reguler
             $berita = $this->model
-                ->where('id_berita', $id)
+                ->where('slug', $slug)
                 ->where('trash', '0')
                 ->first();
 
-            // 2. Cek berita utama jika tidak ada
+            // Fallback ID
+            if (!$berita && is_numeric($slug)) {
+                $berita = $this->model
+                    ->where('id_berita', $slug)
+                    ->where('trash', '0')
+                    ->first();
+            }
+
+            // 2. Cari Berita Utama
             $isUtama = false;
             if (!$berita) {
                 $berita = $this->utamaModel
-                    ->where('id_berita', $id)
+                    ->where('slug', $slug)
                     ->where('trash', '0')
                     ->first();
+                
+                if (!$berita && is_numeric($slug)) {
+                    $berita = $this->utamaModel
+                        ->where('id_berita', $slug)
+                        ->where('trash', '0')
+                        ->first();
+                }
+
                 if ($berita) $isUtama = true;
             }
 
-            // 3. 404 Not Found
             if (!$berita) {
                 return $this->failNotFound('Berita tidak ditemukan.');
             }
 
-            // ======================================================
-            // 4. AMBIL KATEGORI BERITA
-            // ======================================================
+            $id = $berita['id_berita'];
+
+            // 4. Enrich Data
             $kategoriBerita = $this->getKategoriByBerita($id);
-            $berita['kategori'] = array_column($kategoriBerita, 'kategori');
-            $berita['kategori_ids'] = array_column($kategoriBerita, 'id_kategori');
+            $berita['kategori']         = array_column($kategoriBerita, 'kategori');
+            $berita['kategori_ids']     = array_column($kategoriBerita, 'id_kategori');
+            $berita['kategori_slugs']   = array_column($kategoriBerita, 'slug');
 
-            // ======================================================
-            // ✅ 4B. AMBIL TAGS BERITA (INI YANG DITAMBAHKAN)
-            // ======================================================
             $tagsBerita = $this->getTagsByBerita($id);
-            // Menampilkan array nama tags (contoh: ["Politik", "Ekonomi"])
-            $berita['tags'] = array_column($tagsBerita, 'nama_tag');
-            // Menampilkan detail tags (opsional, ada id dan nama)
-            $berita['tags_detail'] = $tagsBerita;
+            $berita['tags']             = array_column($tagsBerita, 'nama_tag');
+            $berita['tags_slugs']       = array_column($tagsBerita, 'slug');
+            $berita['tags_detail']      = $tagsBerita;
 
-            // ======================================================
-            // 5. UPDATE HIT + ANTI SPAM
-            // ======================================================
+            // Hit Counter
             if ($this->canCountHit($id)) {
                 if ($isUtama) {
-                    $this->utamaModel->set('hit', 'hit + 1', false)
-                        ->where('id_berita', $id)->update();
+                    $this->utamaModel->set('hit', 'hit + 1', false)->where('id_berita', $id)->update();
                 } else {
-                    $this->model->set('hit', 'hit + 1', false)
-                        ->where('id_berita', $id)->update();
+                    $this->model->set('hit', 'hit + 1', false)->where('id_berita', $id)->update();
                 }
                 $berita['hit'] = (int)$berita['hit'] + 1;
             }
 
-            // ======================================================
-            // 6. FORMAT DATA (Gambar & JSON)
-            // ======================================================
-            if (!empty($berita['feat_image'])) {
-                $berita['feat_image'] = base_url($berita['feat_image']);
-            }
+            // ❌ HAPUS base_url() PADA GAMBAR UTAMA
+            // Frontend Anda sudah memiliki logic untuk menambahkan ROOT URL
+            // if (!empty($berita['feat_image'])) { $berita['feat_image'] = base_url($berita['feat_image']); }
 
+            // Gallery
             $gallery = [];
             if (!empty($berita['additional_images'])) {
                 $decoded = json_decode($berita['additional_images'], true);
@@ -188,10 +211,9 @@ class ApiBeritaController extends ResourceController
                     foreach ($decoded as $item) {
                         $path = is_array($item) ? $item['path'] : $item;
                         $caption = is_array($item) ? ($item['caption'] ?? '') : '';
-                        
                         if (!empty($path)) {
                             $gallery[] = [
-                                'url'     => base_url($path),
+                                'url'     => $path, // ❌ Jangan pakai base_url() disini juga
                                 'caption' => $caption
                             ];
                         }
@@ -200,35 +222,35 @@ class ApiBeritaController extends ResourceController
             }
             $berita['additional_images'] = $gallery;
 
-            // ======================================================
-            // 7. AMBIL BERITA TERKAIT
-            // ======================================================
+            // Berita Terkait
             $beritaTerkait = [];
-            if (!empty($berita['id_berita_terkait'])) {
-                $related = $this->model->find($berita['id_berita_terkait']);
+            $getRelated = function($idTerkait) {
+                if (!$idTerkait) return null;
+                $related = $this->model->find($idTerkait);
                 if ($related) {
-                    $beritaTerkait[] = [
-                        'id_berita' => $related['id_berita'],
-                        'judul' => $related['judul'],
-                        'slug' => $related['slug'] ?? '',
-                        'feat_image' => !empty($related['feat_image']) ? base_url($related['feat_image']) : null
+                    return [
+                        'id_berita'  => $related['id_berita'],
+                        'judul'      => $related['judul'],
+                        'slug'       => $related['slug'],
+                        // ❌ HAPUS base_url() DI SINI
+                        'feat_image' => !empty($related['feat_image']) ? $related['feat_image'] : null,
+                        'created_at' => $related['created_at']
                     ];
                 }
+                return null;
+            };
+
+            if (!empty($berita['id_berita_terkait'])) {
+                $res = $getRelated($berita['id_berita_terkait']);
+                if ($res) $beritaTerkait[] = $res;
             }
             if (!empty($berita['id_berita_terkait2'])) {
-                $related2 = $this->model->find($berita['id_berita_terkait2']);
-                if ($related2) {
-                    $beritaTerkait[] = [
-                        'id_berita' => $related2['id_berita'],
-                        'judul' => $related2['judul'],
-                        'slug' => $related2['slug'] ?? '',
-                        'feat_image' => !empty($related2['feat_image']) ? base_url($related2['feat_image']) : null
-                    ];
-                }
+                $res = $getRelated($berita['id_berita_terkait2']);
+                if ($res) $beritaTerkait[] = $res;
             }
+            
             $berita['berita_terkait'] = $beritaTerkait;
 
-            // 8. Response
             return $this->respond([
                 'status'  => true,
                 'message' => 'Detail berita berhasil diambil.',
