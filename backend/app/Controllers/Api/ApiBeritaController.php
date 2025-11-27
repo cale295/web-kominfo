@@ -130,10 +130,52 @@ class ApiBeritaController extends ResourceController
             return $this->failServerError($e->getMessage());
         }
     }
+    // ==========================================================
+    // FILTER BERITA BY TAG SLUG
+    // ==========================================================
+public function getByTag($slug = null)
+    {
+        try {
+            if (empty($slug)) return $this->failNotFound('Slug kosong');
 
-    // =================================================================
-    // TAMPILKAN DETAIL BERITA (BY SLUG)
-    // =================================================================
+            // 1. Cari ID Tag
+            $tagData = $this->tagmodel->where('slug', $slug)->first();
+            if (!$tagData) return $this->failNotFound('Tag tidak ditemukan.');
+
+            // 2. Query Builder
+            $beritas = $this->model
+                ->select('t_berita.*')
+                ->join('t_berita_tag', 't_berita_tag.id_berita = t_berita.id_berita')
+                ->where('t_berita_tag.id_tags', $tagData['id_tags'])
+                ->orderBy('t_berita.created_at', 'DESC')
+                ->findAll();
+
+            // 3. Format Data (Looping untuk tambah kategori & tags lain)
+            if (!empty($beritas)) {
+                foreach ($beritas as &$b) {
+                    // Kategori
+                    $kats = $this->getKategoriByBerita($b['id_berita']);
+                    $b['kategori']       = array_column($kats, 'kategori');
+                    $b['kategori_ids']   = array_column($kats, 'id_kategori');
+                    $b['kategori_slugs'] = array_column($kats, 'slug');
+
+                    // Tags
+                    $tags = $this->getTagsByBerita($b['id_berita']);
+                    $b['tags']       = array_column($tags, 'nama_tag');
+                    $b['tags_slugs'] = array_column($tags, 'slug');
+                }
+            }
+
+            return $this->respond([
+                'status'  => true,
+                'message' => 'Berita berdasarkan tag: ' . $tagData['nama_tag'],
+                'data'    => $beritas
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->failServerError($e->getMessage());
+        }
+    }
     // =================================================================
     // TAMPILKAN DETAIL BERITA (BY SLUG)
     // =================================================================

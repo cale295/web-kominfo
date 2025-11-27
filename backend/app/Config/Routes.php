@@ -185,6 +185,7 @@ $routes->group('api', function ($routes) {
     //berita
     $routes->get('berita', 'Api\ApiBeritaController::index');
     $routes->get('berita/(:segment)', 'Api\ApiBeritaController::show/$1');
+    $routes->get('berita/tag/(:segment)', 'Api\ApiBeritaController::getByTag/$1');
 
     //Photo Album
     $routes->get('album', 'Api\ApiPhotoAlbumController::index');

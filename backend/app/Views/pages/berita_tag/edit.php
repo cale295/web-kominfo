@@ -17,7 +17,7 @@
         <input type="hidden" name="_method" value="PUT">
         <div class="mb-3">
             <label for="name" class="form-label">Nama Tag</label>
-            <input type="text" name="name" id="name" class="form-control" value="<?= esc($tag['name']) ?>" required>
+            <input type="text" name="name" id="name" class="form-control" value="<?= esc($tag['nama_tag']) ?>" required>
         </div>
         <button type="submit" class="btn btn-success">Update</button>
     </form>
