@@ -142,7 +142,7 @@ public function update($id)
     $data = [
         'id_profil'  => $id, // WAJIB! kalau tidak, save() bikin data baru
         'type'       => $post['type'] ?? $menu_profile['type'],
-        'title'      => $post['title'],
+        'title'      => $post['title'] ?? $menu_profile['title'],
         'slug'       => url_title($post['title'], '-', true),
         'sorting'    => $post['sorting'] ?? $menu_profile['sorting'],
         'is_active'  => $post['is_active'] ?? $menu_profile['is_active'],

@@ -36,15 +36,20 @@
     </select>
 </div>
 
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Sorting</label>
+                    <input type="text" name="sorting" class="form-control"
+                           value="<?= esc($menu_profile['sorting']) ?>" required>
+                </div>
 
-<div class="mb-3">
-        <label class="form-label fw-bold">Type</label>
-<select name="is_active" class="form-select" required>
-    <option value="1" <?= ($menu_profile['is_active'] == 1 ? 'selected' : '') ?>>Aktif</option>
-    <option value="0" <?= ($menu_profile['is_active'] == 0 ? 'selected' : '') ?>>Tidak Aktif</option>
-</select>
+            <div class="mb-3">
+                    <label class="form-label fw-bold">Aktif</label>
+            <select name="is_active" class="form-select" required>
+                <option value="1" <?= ($menu_profile['is_active'] == 1 ? 'selected' : '') ?>>Aktif</option>
+                <option value="0" <?= ($menu_profile['is_active'] == 0 ? 'selected' : '') ?>>Tidak Aktif</option>
+            </select>
 
-</div>
+            </div>
                 <!-- Current Image -->
                 <div class="mb-3">
                     <label class="form-label fw-bold">Gambar Saat Ini</label><br>

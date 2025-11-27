@@ -30,7 +30,9 @@ class ApiProfileController extends BaseController
     {
         // Ambil data, urutkan sesuai controller frontend (created_at DESC)
         // Opsional: Anda bisa menambahkan .where('is_active', 1) jika API hanya boleh melihat yang aktif
-        $data = $this->profileModel->orderBy('created_at', 'DESC')->findAll();
+        $data = $this->profileModel
+        ->where('is_active', 1)
+        ->orderBy('created_at', 'DESC')->findAll();
 
         if (empty($data)) {
             return $this->respond([

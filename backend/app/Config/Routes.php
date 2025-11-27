@@ -137,6 +137,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // =========================================================
 $routes->group('api', function ($routes) {
 
+    //profile
+    $routes->get('profile', 'Api\ApiProfileController::index');
+    $routes->get('profile/(:num)', 'Api\ApiProfileController::show/$1');
+
     //Pejabat
     $routes->get('pejabat', 'Api\ApiPejabatController::index');
     $routes->get('pejabat/(:num)', 'Api\ApiPejabatController::show/$1');
