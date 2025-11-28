@@ -61,7 +61,9 @@ $routes->resource('kontak_social', ['controller' => 'frontend\KontakSocialContro
 $routes->resource('footer_opd', ['controller' => 'frontend\FooterOpdController', 'except' => ['show']]);
 //footer social
 $routes->resource('footer_social', ['controller' => 'frontend\FooterSocialController', 'except' => ['show']]);
-
+// footer statistics
+$routes->resource('footer_statistics', ['controller' => 'frontend\FooterStatisticsController', 'except' => ['show']]);
+$routes->get('footer_statistics/test_sync', 'frontend\FooterStatisticsController::test_sync');
 
 
 
@@ -142,6 +144,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //footer_statistics
+    $routes->get('footer_statistics', 'Api\ApiFooterStatisticsController::index');
+    
 
     //footer_social
     $routes->get('footer_social', 'Api\ApiFooterSocialController::index');

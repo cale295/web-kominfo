@@ -47,6 +47,8 @@ class FooterStatisticsModel extends Model
 
     // Validation Rules
     protected $validationRules = [
+        'id_footer_statis' => 'permit_empty|numeric',
+
         'stat_type' => [
             'rules'  => 'required|max_length[50]|is_unique[m_footer_statistics.stat_type,id_footer_statis,{id_footer_statis}]',
             'label'  => 'Tipe Statistik'
@@ -54,10 +56,6 @@ class FooterStatisticsModel extends Model
         'stat_label' => [
             'rules'  => 'required|max_length[100]',
             'label'  => 'Label Tampilan'
-        ],
-        'stat_value' => [
-            'rules'  => 'required|numeric',
-            'label'  => 'Nilai'
         ],
         'stat_icon' => [
             'rules'  => 'permit_empty|max_length[50]',
@@ -87,4 +85,45 @@ class FooterStatisticsModel extends Model
             'numeric' => '{field} harus berupa angka.'
         ]
     ];
+
+        public function syncAutoStats()
+    {
+        $db = \Config\Database::connect();
+        
+        // 1. Hitung Total Visitors (Semua row di t_visitors)
+        $totalVisitors = $db->table('t_visitors')->countAllResults();
+
+        // 2. Hitung Today Visitors (Row dengan access_date hari ini)
+        $todayVisitors = $db->table('t_visitors')
+                            ->where('access_date', date('Y-m-d'))
+                            ->countAllResults();
+
+        // 3. Hitung Online Visitors (Row dengan last_activity 5 menit terakhir)
+        // Interval bisa diubah sesuai kebutuhan
+        $fiveMinutesAgo = date('Y-m-d H:i:s', strtotime('-5 minutes'));
+        $onlineVisitors = $db->table('t_visitors')
+                            ->where('last_activity >=', $fiveMinutesAgo)
+                            ->countAllResults();
+
+        // 4. Update ke tabel m_footer_statistics
+        // Hanya update jika auto_update = 1
+        
+        // Update Total
+        $this->where('stat_type', 'total_visitors')
+             ->where('auto_update', 1)
+             ->set(['stat_value' => $totalVisitors])
+             ->update();
+
+        // Update Today
+        $this->where('stat_type', 'today_visitors')
+             ->where('auto_update', 1)
+             ->set(['stat_value' => $todayVisitors])
+             ->update();
+             
+        // Update Online
+        $this->where('stat_type', 'online_visitors')
+             ->where('auto_update', 1)
+             ->set(['stat_value' => $onlineVisitors])
+             ->update();
+    }
 }

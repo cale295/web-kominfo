@@ -19,13 +19,14 @@ class Filters extends BaseFilters
         'toolbar'       => DebugToolbar::class,
         'honeypot'      => Honeypot::class,
         'roleauth'      => \App\Filters\RoleAuthFilter::class,
-        'auth' => \App\Filters\AuthFilter::class,
+        'auth'          => \App\Filters\AuthFilter::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
         'cors'          => \App\Filters\Cors::class, // pastikan file Cors.php ada di App\Filters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'visitor_filter'=> \App\Filters\VisitorFillter::class, // <--- 1. DAFTARKAN ALIAS DI SINI
     ];
 
     // kosongkan dulu supaya nggak bentrok
@@ -35,8 +36,14 @@ class Filters extends BaseFilters
     ];
 
     public array $globals = [
-        'before' => [],
-        'after'  => [],
+        'before' => [
+            'visitor_filter', // <--- 2. AKTIFKAN DI SINI (Supaya jalan otomatis saat web dibuka)
+            // 'csrf',
+        ],
+        'after'  => [
+            'toolbar', // Debug toolbar (biasanya default aktif di development)
+            // 'honeypot',
+        ],
     ];
 
     public array $methods = [];
@@ -48,4 +55,6 @@ class Filters extends BaseFilters
             'after'  => ['api/*'],
         ],
     ];
+
+    
 }
