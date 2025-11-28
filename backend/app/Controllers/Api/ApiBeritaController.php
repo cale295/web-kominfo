@@ -38,6 +38,62 @@ class ApiBeritaController extends ResourceController
     }
 
     // ==========================================================
+    // FILTER BERITA BY KATEGORI SLUG
+    // ==========================================================
+    public function getByKategori($slug = null)
+    {
+        try {
+            if (empty($slug)) return $this->failNotFound('Slug kategori kosong');
+
+            // 1. Cari ID Kategori berdasarkan Slug
+            // Kita cari di tabel m_kategori_berita
+            $kategoriData = $this->katemodel->where('slug', $slug)->first();
+
+            if (!$kategoriData) {
+                return $this->failNotFound('Kategori tidak ditemukan.');
+            }
+
+            // 2. Query Builder (JOIN ke t_berita_kategori)
+            $beritas = $this->model
+                ->select('t_berita.*')
+                // JOIN tabel pivot kategori
+                ->join('t_berita_kategori', 't_berita_kategori.id_berita = t_berita.id_berita')
+                // Filter berdasarkan ID Kategori yang ditemukan
+                ->where('t_berita_kategori.id_kategori', $kategoriData['id_kategori'])
+                // Filter Status Berita (Wajib Aktif)
+                ->where('t_berita.trash', '0')
+                ->where('t_berita.status', '1')
+                ->orderBy('t_berita.created_at', 'DESC')
+                ->findAll();
+
+            // 3. Format Data (Looping untuk melengkapi data)
+            // Bagian ini sama persis dengan index() dan getByTag()
+            if (!empty($beritas)) {
+                foreach ($beritas as &$b) {
+                    // Kategori
+                    $kats = $this->getKategoriByBerita($b['id_berita']);
+                    $b['kategori']       = array_column($kats, 'kategori');
+                    $b['kategori_ids']   = array_column($kats, 'id_kategori');
+                    $b['kategori_slugs'] = array_column($kats, 'slug');
+
+                    // Tags
+                    $tags = $this->getTagsByBerita($b['id_berita']);
+                    $b['tags']       = array_column($tags, 'nama_tag');
+                    $b['tags_slugs'] = array_column($tags, 'slug');
+                }
+            }
+
+            return $this->respond([
+                'status'  => true,
+                'message' => 'Berita berdasarkan kategori: ' . $kategoriData['kategori'], // Asumsi nama kolomnya 'kategori'
+                'data'    => $beritas
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->failServerError($e->getMessage());
+        }
+    }
+    // ==========================================================
     // HELPER: Ambil Tags
     // ==========================================================
     private function getTagsByBerita($id_berita)
