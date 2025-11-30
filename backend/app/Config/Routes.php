@@ -61,7 +61,12 @@ $routes->resource('kontak_social', ['controller' => 'frontend\KontakSocialContro
 $routes->resource('footer_opd', ['controller' => 'frontend\FooterOpdController', 'except' => ['show']]);
 //footer social
 $routes->resource('footer_social', ['controller' => 'frontend\FooterSocialController', 'except' => ['show']]);
-
+// footer statistics
+$routes->resource('footer_statistics', ['controller' => 'frontend\FooterStatisticsController', 'except' => ['show']]);
+//home service
+$routes->resource('home_service', ['controller' => 'frontend\HomeServiceController', 'except' => ['show']]);
+//home video 
+$routes->resource('home_video_layanan', ['controller' => 'frontend\HomeVideoLayananController', 'except' => ['show']]);
 
 
 
@@ -143,6 +148,18 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // =========================================================
 $routes->group('api', function ($routes) {
 
+    //home layanan video
+    $routes->get('home_video_layanan', 'Api\ApiHomeVideoLayananController::index');
+    $routes->get('home_video_layanan/(:num)', 'Api\ApiHomeVideoLayananController::show/$1');
+
+    //home service
+    $routes->get('home_service', 'Api\ApiHomeServiceController::index');
+    $routes->get('home_service/(:num)', 'Api\ApiHomeServiceController::show/$1');
+
+    //footer_statistics
+    $routes->get('footer_statistics', 'Api\ApiFooterStatisticsController::index');
+    
+
     //footer_social
     $routes->get('footer_social', 'Api\ApiFooterSocialController::index');
     $routes->get('footer_social/(:num)', 'Api\ApiFooterSocialController::show/$1');
@@ -186,6 +203,7 @@ $routes->group('api', function ($routes) {
     $routes->get('berita', 'Api\ApiBeritaController::index');
     $routes->get('berita/(:segment)', 'Api\ApiBeritaController::show/$1');
     $routes->get('berita/tag/(:segment)', 'Api\ApiBeritaController::getByTag/$1');
+    $routes->get('berita/kategori/(:segment)', 'Api\ApiBeritaController::getByKategori/$1');
 
     //Photo Album
     $routes->get('album', 'Api\ApiPhotoAlbumController::index');

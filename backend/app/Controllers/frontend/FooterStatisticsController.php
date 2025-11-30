@@ -39,6 +39,9 @@ class FooterStatisticsController extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat modul ini.');
         }
 
+        // Jalankan Update Otomatis setiap kali halaman index dibuka
+        $this->statsModel->syncAutoStats();
+
         $stats = $this->statsModel
             ->orderBy('sorting', 'ASC')
             ->findAll();
@@ -62,9 +65,6 @@ class FooterStatisticsController extends BaseController
         return view('pages/footer_statistics/create');
     }
 
-    // =================================================================
-    // CREATE
-    // =================================================================
     public function create()
     {
         $access = $this->getAccess(session()->get('role'));
@@ -80,7 +80,6 @@ class FooterStatisticsController extends BaseController
             'auto_update' => $this->request->getPost('auto_update') ?? 0,
             'sorting'     => $this->request->getPost('sorting') ?? 0,
             'is_active'   => $this->request->getPost('is_active') ?? 0,
-            'created_by'  => session()->get('id_user'),
         ];
 
         if (!$this->statsModel->save($data)) {
@@ -90,9 +89,6 @@ class FooterStatisticsController extends BaseController
         return redirect()->to('/footer_statistics')->with('success', 'Data Statistik berhasil ditambahkan.');
     }
 
-    // =================================================================
-    // EDIT
-    // =================================================================
     public function edit($id)
     {
         $access = $this->getAccess(session()->get('role'));
@@ -110,9 +106,6 @@ class FooterStatisticsController extends BaseController
         ]);
     }
 
-    // =================================================================
-    // UPDATE
-    // =================================================================
     public function update($id)
     {
         $access = $this->getAccess(session()->get('role'));
@@ -134,7 +127,7 @@ class FooterStatisticsController extends BaseController
             'auto_update'      => $this->request->getPost('auto_update') ?? 0,
             'sorting'          => $this->request->getPost('sorting') ?? 0,
             'is_active'        => $this->request->getPost('is_active') ?? 0,
-            'updated_by'       => session()->get('id_user'),
+            'updated_at'       => session()->get('id_user'),
         ];
 
         if (!$this->statsModel->save($data)) {
@@ -144,9 +137,6 @@ class FooterStatisticsController extends BaseController
         return redirect()->to('/footer_statistics')->with('success', 'Data Statistik berhasil diperbarui.');
     }
 
-    // =================================================================
-    // DELETE
-    // =================================================================
     public function delete($id)
     {
         $access = $this->getAccess(session()->get('role'));
