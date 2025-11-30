@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Youtube,
   Facebook,
@@ -11,7 +12,8 @@ import {
 import "./navbar.css";
 import api from "../../../services/api";
 
-interface Menu {
+// Interface untuk tipe menu yang berbeda
+interface MenuItem {
   id_menu: string | number;
   menu_name: string;
   menu_url: string | null;
@@ -19,37 +21,131 @@ interface Menu {
   order_number: string | number | null;
   parent_id: string | number | null;
   status: "active" | "inactive" | null;
-  sub_menu?: Menu[];
-  children?: Menu[];
+  sub_menu?: MenuItem[];
+  children?: MenuItem[];
 }
 
+interface CategoryItem {
+  id_kategori: string | number;
+  kategori: string;
+  slug: string;
+  id_parent: string | number | null;
+  is_show_nav: string;
+  sorting_nav: string | number;
+  children?: CategoryItem[];
+  status: string;
+}
+
+type MenuType = 'main' | 'berita';
+
 function Navbar() {
-  const [menus, setMenus] = useState<Menu[]>([]);
+  const location = useLocation();
+  const [menus, setMenus] = useState<(MenuItem | CategoryItem)[]>([]);
+  const [menuType, setMenuType] = useState<MenuType>('main');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        const response = await api.get<{
-          status: number;
-          message: string;
-          data: Menu[];
-        }>("/menu");
-        console.log("Data Menu dari API:", response.data.data);
+  // Deteksi route untuk menentukan menu type
+  const getMenuTypeFromPath = (pathname: string): MenuType => {
+    if (pathname.startsWith('/berita') || 
+        pathname.startsWith('/news') || 
+        pathname.startsWith('/artikel') ||
+        pathname.includes('kategori')) {
+      return 'berita';
+    }
+    return 'main';
+  };
 
-        const menusWithChildren = response.data.data.map((menu) => ({
+  // Fungsi untuk mengambil menu utama
+  const fetchMainMenus = async () => {
+    if (menuType === 'main' && menus.length > 0) return; // Skip jika sudah loaded
+    
+    setIsLoading(true);
+    try {
+      const response = await api.get<{
+        status: number;
+        message: string;
+        data: MenuItem[];
+      }>("/menu");
+
+      const menusWithChildren = response.data.data
+        .filter((menu) => menu.status === "active")
+        .map((menu) => ({
           ...menu,
-          children: menu.sub_menu,
+          children: menu.sub_menu?.filter((sub) => sub.status === "active") || [],
         }));
 
-        setMenus(menusWithChildren);
-      } catch (error) {
-        console.error("Gagal mengambil data menu:", error);
-      }
-    };
+      setMenus(menusWithChildren);
+      setMenuType('main');
+    } catch (error) {
+      console.error("Gagal mengambil data menu:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchMenus();
+  // Fungsi untuk mengambil menu berita/kategori
+  const fetchCategoryMenus = async () => {
+    if (menuType === 'berita' && menus.length > 0) return; // Skip jika sudah loaded
+    
+    setIsLoading(true);
+    try {
+      const res = await api.get("/berita");
+      const categories = res.data.data.kategori;
+
+      const filtered = categories
+        .filter((c: CategoryItem) => c.is_show_nav === "1" && c.status === "1")
+        .sort((a: CategoryItem, b: CategoryItem) => 
+          Number(a.sorting_nav) - Number(b.sorting_nav)
+        );
+
+      const categoryTree = filtered
+        .filter((c: CategoryItem) => c.id_parent === null || c.id_parent === "0")
+        .map((parent: CategoryItem) => ({
+          ...parent,
+          children: filtered.filter((child: CategoryItem) => 
+            child.id_parent === parent.id_kategori
+          )
+        }));
+
+      setMenus(categoryTree);
+      setMenuType('berita');
+    } catch (err) {
+      console.error("Gagal mengambil kategori:", err);
+      // Fallback ke menu utama jika gagal
+      fetchMainMenus();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Switch menu berdasarkan route
+  const switchMenuBasedOnRoute = () => {
+    const newMenuType = getMenuTypeFromPath(location.pathname);
+    
+    if (newMenuType !== menuType) {
+      if (newMenuType === 'main') {
+        fetchMainMenus();
+      } else {
+        fetchCategoryMenus();
+      }
+    }
+  };
+
+  // Effect untuk handle route changes
+  useEffect(() => {
+    switchMenuBasedOnRoute();
+  }, [location.pathname]);
+
+  // Effect initial load
+  useEffect(() => {
+    const initialMenuType = getMenuTypeFromPath(location.pathname);
+    if (initialMenuType === 'main') {
+      fetchMainMenus();
+    } else {
+      fetchCategoryMenus();
+    }
   }, []);
 
   // Toggle submenu di mobile
@@ -57,24 +153,22 @@ function Navbar() {
     setOpenSubmenu(openSubmenu === String(id) ? null : String(id));
   };
 
-  // Render menu — bisa untuk desktop atau mobile
-  const renderMenus = (menuList: Menu[], depth = 0, isMobile = false) => {
-    if (!Array.isArray(menuList)) return null;
+  // Render menu utama
+  const renderMainMenus = (menuList: MenuItem[], depth = 0, isMobile = false) => {
+    if (!Array.isArray(menuList) || menuList.length === 0) {
+      return <div className="text-white px-3 py-2">Menu tidak tersedia</div>;
+    }
 
-    const activeMenus = menuList.filter((menu) => menu.status === "active");
-
-    return activeMenus.map((menu) => {
+    return menuList.map((menu) => {
       const hasChildren = menu.children && menu.children.length > 0;
       const isSubOpen = openSubmenu === String(menu.id_menu);
 
       return (
         <div
           key={menu.id_menu}
-          className={`
-            position-relative d-inline-block w-100 ${
-              isMobile ? "py-2 border-bottom border-gray-200" : ""
-            }
-          `}
+          className={`navbar-menu-item position-relative ${
+            isMobile ? "w-100 py-2 border-bottom border-gray-200" : "d-inline-block"
+          }`}
         >
           {isMobile ? (
             // MOBILE VERSION
@@ -91,7 +185,7 @@ function Navbar() {
               >
                 <a
                   href={menu.menu_url || "#"}
-                  className="text-blue-900 d-block text-decoration-none"
+                  className="text-blue-900 d-block text-decoration-none fw-semibold"
                   onClick={(e) => {
                     if (hasChildren) e.preventDefault();
                   }}
@@ -108,7 +202,6 @@ function Navbar() {
                 )}
               </div>
 
-              {/* Submenu Mobile Dropdown */}
               {hasChildren && isSubOpen && (
                 <div className="ms-4 mt-2">
                   {menu.children!.map((child) => (
@@ -126,7 +219,7 @@ function Navbar() {
             </>
           ) : (
             // DESKTOP VERSION
-            <>
+            <div className="position-relative d-inline-block">
               <a
                 href={menu.menu_url || "#"}
                 className={`px-3 py-2 d-inline-block transition-colors duration-300 navbar-menu-link ${
@@ -136,32 +229,150 @@ function Navbar() {
                 }`}
               >
                 {menu.menu_name}
+                {hasChildren && <ChevronDown size={14} className="ms-1" />}
               </a>
 
-              {/* Submenu Desktop (hover) */}
               {hasChildren && depth === 0 && (
-                <div
-                  className={`
-                    position-absolute bg-white shadow-md rounded-md z-index-99 min-width-200px
-                    submenu-hidden submenu-transition top-100 start-0 mt-1
-                  `}
-                >
+                <div className="navbar-submenu position-absolute bg-white shadow-lg rounded-md z-index-99 min-width-200px top-100 start-0 mt-1">
                   {menu.children!.map((child) => (
                     <a
                       key={child.id_menu}
                       href={child.menu_url || "#"}
-                      className="d-block px-4 py-2 text-blue-900 hover-bg-blue-50 text-decoration-none"
+                      className="d-block px-4 py-3 text-blue-900 hover-bg-blue-50 text-decoration-none border-bottom border-gray-100 last-border-bottom-0"
                     >
                       {child.menu_name}
                     </a>
                   ))}
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       );
     });
+  };
+
+  // Render menu kategori berita
+  const renderCategoryMenus = (menuList: CategoryItem[], depth = 0, isMobile = false) => {
+    if (!Array.isArray(menuList) || menuList.length === 0) {
+      return <div className="text-white px-3 py-2">Kategori tidak tersedia</div>;
+    }
+
+    return menuList.map((menu) => {
+      const hasChildren = menu.children && menu.children.length > 0;
+      const isSubOpen = openSubmenu === String(menu.id_kategori);
+
+      return (
+        <div
+          key={menu.id_kategori}
+          className={`navbar-menu-item position-relative ${
+            isMobile ? "w-100 py-2 border-bottom border-gray-200" : "d-inline-block"
+          }`}
+        >
+          {isMobile ? (
+            // MOBILE VERSION
+            <>
+              <div
+                className="d-flex justify-content-between align-items-center px-3 py-2 cursor-pointer"
+                onClick={() => {
+                  if (hasChildren) {
+                    toggleSubmenu(menu.id_kategori);
+                  } else {
+                    setIsMenuOpen(false);
+                  }
+                }}
+              >
+                <a
+                  href={`/berita/kategori/${menu.slug}`}
+                  className="text-blue-900 d-block text-decoration-none fw-semibold"
+                  onClick={(e) => {
+                    if (hasChildren) e.preventDefault();
+                  }}
+                >
+                  {menu.kategori}
+                </a>
+                {hasChildren && (
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform ${
+                      isSubOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                )}
+              </div>
+
+              {hasChildren && isSubOpen && (
+                <div className="ms-4 mt-2">
+                  {menu.children!.map((child) => (
+                    <a
+                      key={child.id_kategori}
+                      href={`/berita/kategori/${child.slug}`}
+                      className="d-block px-3 py-2 text-blue-900 hover-bg-blue-50 rounded text-decoration-none"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {child.kategori}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            // DESKTOP VERSION
+            <div className="position-relative d-inline-block">
+              <a
+                href={`/berita/kategori/${menu.slug}`}
+                className={`px-3 py-2 d-inline-block transition-colors duration-300 navbar-menu-link ${
+                  depth === 0
+                    ? "text-white hover-text-decoration-underline"
+                    : "hover-bg-blue-100 text-blue-900"
+                }`}
+              >
+                {menu.kategori}
+                {hasChildren && <ChevronDown size={14} className="ms-1" />}
+              </a>
+
+              {hasChildren && depth === 0 && (
+                <div className="navbar-submenu position-absolute bg-white shadow-lg rounded-md z-index-99 min-width-200px top-100 start-0 mt-1">
+                  {menu.children!.map((child) => (
+                    <a
+                      key={child.id_kategori}
+                      href={`/berita/kategori/${child.slug}`}
+                      className="d-block px-4 py-3 text-blue-900 hover-bg-blue-50 text-decoration-none border-bottom border-gray-100 last-border-bottom-0"
+                    >
+                      {child.kategori}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
+
+  // Render menu berdasarkan tipe
+  const renderMenus = (isMobile = false) => {
+    if (isLoading) {
+      return (
+        <div className="text-center py-2">
+          <div className="spinner-border spinner-border-sm text-white" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (menuType === 'main') {
+      return renderMainMenus(menus as MenuItem[], 0, isMobile);
+    } else {
+      return renderCategoryMenus(menus as CategoryItem[], 0, isMobile);
+    }
+  };
+
+  // Dapatkan judul menu berdasarkan tipe
+  const getMenuTitle = () => {
+    return menuType === 'main' ? 'Menu Utama' : 'Kategori Berita';
   };
 
   return (
@@ -213,6 +424,14 @@ function Navbar() {
           <h1 className="font-bold text-lg leading-snug tracking-wide">
             DINAS KOMUNIKASI DAN INFORMATIKA <br /> KOTA TANGERANG
           </h1>
+          
+          {/* Menu Type Indicator */}
+          <div className="d-none d-md-block mt-2">
+            <span className="badge bg-light text-blue-800 fs-6">
+              {getMenuTitle()}
+            </span>
+          </div>
+
           <button
             className="d-md-none text-white hamburger-btn d-flex end-6 position-absolute"
             onClick={() => {
@@ -231,14 +450,19 @@ function Navbar() {
       {/* DESKTOP MENU */}
       <div className="w-100 navbar-wrapper d-none d-md-block">
         <div className="d-flex justify-content-center min-width-max px-3 px-md-5 py-3 font-semibold text-md text-center">
-          {renderMenus(menus, 0, false)}
+          {renderMenus(false)}
         </div>
       </div>
 
       {/* MOBILE MENU (Hamburger) */}
       {isMenuOpen && (
         <div className="d-md-none bg-white p-4 text-blue-900 position-relative z-index-100 shadow-lg">
-          {renderMenus(menus, 0, true)}
+          <div className="text-center mb-3">
+            <span className="badge bg-blue-800 text-white">
+              {getMenuTitle()}
+            </span>
+          </div>
+          {renderMenus(true)}
         </div>
       )}
     </nav>

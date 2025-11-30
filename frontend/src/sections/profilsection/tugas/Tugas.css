@@ -1,0 +1,81 @@
+/* Container utama */
+.tugas-container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Judul utama (Tugas & Fungsi) */
+.tugas-title,
+.fungsi-title {
+  text-align: center;
+  color: #2f4496;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+/* Subjudul */
+.tugas-subtitle,
+.fungsi-subtitle {
+  text-align: center;
+  color: #2f4496;
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+/* Box krem */
+.tugas-box{
+  background-color: #fff9e6;
+  border-radius: 20px;
+  padding: 30px 395px;
+  margin-bottom: 80px;
+}
+.fungsi-box {
+  background-color: #fff9e6;
+  border-radius: 20px;
+  padding: 30px 50px;
+  margin-bottom: 80px;
+}
+
+/* Text dalam box Tugas */
+.tugas-text {
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* List Fungsi */
+.fungsi-box ol {
+  padding-left: 20px;
+}
+
+.fungsi-box li {
+  font-size: 17px;
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+/* Responsive biar tetap enak di HP */
+@media (max-width: 640px) {
+  .tugas-title,
+  .fungsi-title {
+    font-size: 28px;
+  }
+
+  .tugas-subtitle,
+  .fungsi-subtitle {
+    font-size: 16px;
+  }
+
+  .tugas-box,
+  .fungsi-box {
+    padding: 20px;
+  }
+
+  .tugas-text,
+  .fungsi-box li {
+    font-size: 15px;
+  }
+}

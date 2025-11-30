@@ -63,7 +63,7 @@ export default function HubungiKami() {
   ];
 
   return (
-    <div className="py-12 py-md-16">
+    <div className="py-12 py-md-16" id='kontak'>
       <div className="container px-4">
         <h1 className="fs-1 fs-md-1 fw-bold text-blue text-center mb-10 mb-md-12">
           Hubungi Kami

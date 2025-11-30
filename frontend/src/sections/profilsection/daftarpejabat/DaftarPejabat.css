@@ -1,0 +1,46 @@
+.pejabat-container {
+    margin: 0 auto;
+    padding: 60px 90px;
+    font-family: "Inter", system-ui, sans-serif;
+    text-align: center;
+}
+
+/* Judul utama */
+.pejabat-title {
+    color: #2f4496;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+/* Subjudul */
+.pejabat-subtitle {
+    color: #2f4496;
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+
+/* Gambar daftar pejabat */
+.pejabat-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .pejabat-title {
+        font-size: 28px;
+    }
+
+    .pejabat-subtitle {
+        font-size: 16px;
+    }
+
+    .pejabat-box {
+        padding: 20px;
+    }
+}
