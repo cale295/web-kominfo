@@ -16,10 +16,7 @@ class ApiPhotoGalleryController extends ResourceController
      */
     public function index()
     {
-        $galleries = $this->model
-            ->where('trash', '0')
-            ->orderBy('created_at', 'DESC')
-            ->findAll();
+        $galleries = $this->model->orderBy('created_at', 'DESC')->findAll();
 
         return $this->respond([
             'status'  => true,
@@ -35,10 +32,7 @@ class ApiPhotoGalleryController extends ResourceController
     public function byAlbum($album_id = null)
     {
         $photos = $this->model
-            ->where('album_id', $album_id)
-            ->where('trash', '0')
-            ->orderBy('created_at', 'DESC')
-            ->findAll();
+            ->where('album_id', $album_id)->orderBy('created_at', 'DESC')->findAll();
 
         if (!$photos) {
             return $this->failNotFound('Foto untuk album ini tidak ditemukan.');
@@ -59,7 +53,6 @@ class ApiPhotoGalleryController extends ResourceController
     {
         $photo = $this->model
             ->where('id_gallery', $id)
-            ->where('trash', '0')
             ->first();
 
         if (!$photo) {
