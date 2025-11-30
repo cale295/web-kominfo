@@ -409,7 +409,7 @@ function Navbar() {
               style={{ width: "6rem" }}
             />
 
-            <h1 className="font-bold text-lg leading-snug tracking-wide text-center">
+            <h1 className="font-bold text-lg leading-snug tracking-wide text-center text-white">
               DINAS KOMUNIKASI DAN INFORMATIKA <br /> KOTA TANGERANG
             </h1>
           </a>

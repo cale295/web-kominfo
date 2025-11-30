@@ -18,6 +18,7 @@ import Tugas from "../sections/profilsection/tugas/Tugas";
 import DaftarPejabat from "../sections/profilsection/daftarpejabat/DaftarPejabat";
 import Program from "../sections/programsection/Program";
 import ModalProfil from "../sections/profilsection/modalprofil/ModalProfil";
+import Gallery from "../sections/gallerysection/Gallery";
 
 const HomePage: React.FC = () => {
   return (
@@ -72,6 +73,14 @@ const ProgramPage: React.FC = () => {
   )
 }
 
+const GalleryPage: React.FC = () => {
+  return(
+    <>
+      <Gallery />
+    </>
+  )
+}
+
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
@@ -84,6 +93,7 @@ const AppRouter: React.FC = () => {
         <Route path="*" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/program" element={<ProgramPage />} />
+        <Route path="/gallery" element={<GalleryPage />} />
       </Routes>
       <AccessibilityPanel />
     </BrowserRouter>

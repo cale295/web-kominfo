@@ -25,7 +25,6 @@ interface Tag {
   id_tags: string;
   nama_tag: string;
   slug: string;
-  is_delete: string;
 }
 
 interface Kategori {
@@ -160,9 +159,9 @@ const Berita: React.FC = () => {
 
       // Setup Tag & Populer
       if (data.tag) {
-        const filteredTags = data.tag.filter((t: Tag) => t.is_delete === "0");
-        setTagPopuler(filteredTags);
-      }
+  setTagPopuler(data.tag);
+}
+
 
       const populer = [...beritaData]
         .sort((a, b) => Number(b.hit) - Number(a.hit))
