@@ -65,4 +65,5 @@ class ApiPhotoGalleryController extends ResourceController
             'data'    => $photo
         ]);
     }
+    
 }

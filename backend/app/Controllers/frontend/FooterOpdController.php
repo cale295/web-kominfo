@@ -70,6 +70,14 @@ class FooterOpdController extends BaseController
         if (!$access || !$access['can_create']) {
             return redirect()->to('/footer_opd')->with('error', 'Kamu tidak punya izin menambah data.');
         }
+        // --- LOGIKA BARU: Cek apakah data sudah ada ---
+        // Menghitung jumlah data di tabel footer_opd
+        $existingData = $this->footerOpdModel->countAllResults();
+
+        // Jika jumlah data sudah lebih dari 0 (artinya sudah ada 1), tolak proses create
+        if ($existingData > 0) {
+            return redirect()->to('/footer_opd')->with('error', 'Data Footer OPD sudah ada. Hanya diperbolehkan 1 data. Silakan edit data yang sudah ada.');
+        }
 
         // Ambil Data Input
         $data = [
