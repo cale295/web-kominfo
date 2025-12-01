@@ -71,7 +71,8 @@ $routes->resource('home_video_layanan', ['controller' => 'frontend\HomeVideoLaya
 $routes->resource('profil_tentang', ['controller' => 'frontend\ProfilTentangController', 'except' => ['show']]);    
 // Tugas Fungsi
 $routes->resource('tugas_fungsi', ['controller' => 'frontend\TugasFungsiController', 'except' => ['show']]);
-
+// Struktur Organisasi
+$routes->resource('struktur_organisasi', ['controller' => 'frontend\StrukturOrganisasiController', 'except' => ['show']]);
 
 
 // berita kategori
@@ -151,6 +152,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //Struktur Organisasi
+    $routes->get('struktur_organisasi', 'Api\ApiStrukturOrganisasiController::index');
+    $routes->get('struktur_organisasi/(:num)', 'Api\ApiStrukturOrganisasiController::show/$1');
 
     //profil tentang
     $routes->get('profil_tentang', 'Api\ApiProfilTentangController::index');

@@ -61,17 +61,35 @@ class HomeVideoLayananController extends BaseController
         return view('pages/home_video_layanan/create');
     }
 
-    public function create()
+public function create()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_create']) return redirect()->to('/home_video_layanan');
+
+        // Ambil nilai is_featured dari input
+        $isFeatured = $this->request->getPost('is_featured') ?? 0;
+
+        // --- LOGIKA PENGECEKAN (VALIDASI) ---
+        // Jika user mencoba menginput video sebagai Featured (1)
+        if ($isFeatured == 1) {
+            // Cek di database apakah sudah ada video yang featured?
+            $existingFeatured = $this->homeVideoModel->where('is_featured', 1)->first();
+
+            // Jika SUDAH ADA, tolak prosesnya
+            if ($existingFeatured) {
+                return redirect()->back()
+                    ->withInput() // Kembalikan inputan user agar tidak mengetik ulang
+                    ->with('error', 'Gagal: Video Utama (Featured) sudah ada. Silakan non-aktifkan video utama yang lama terlebih dahulu.');
+            }
+        }
+        // --- SELESAI LOGIKA PENGECEKAN ---
 
         $data = [
             'youtube_url' => $this->request->getPost('youtube_url'),
             'embed_code'  => $this->request->getPost('embed_code'),
             'title'       => $this->request->getPost('title'),
             'description' => $this->request->getPost('description'),
-            'is_featured' => $this->request->getPost('is_featured') ?? 0,
+            'is_featured' => $isFeatured,
             'sorting'     => $this->request->getPost('sorting') ?? 0,
             'is_active'   => $this->request->getPost('is_active') ?? 0,
         ];
@@ -90,7 +108,6 @@ class HomeVideoLayananController extends BaseController
 
         return redirect()->to('/home_video_layanan')->with('success', 'Video berhasil ditambahkan.');
     }
-
     public function edit($id)
     {
         $access = $this->getAccess(session()->get('role'));
@@ -106,7 +123,7 @@ class HomeVideoLayananController extends BaseController
         return view('pages/home_video_layanan/edit', ['video' => $video]);
     }
 
-    public function update($id)
+public function update($id)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_update']) return redirect()->to('/home_video_layanan');
@@ -114,13 +131,35 @@ class HomeVideoLayananController extends BaseController
         $oldData = $this->homeVideoModel->find($id);
         if (!$oldData) return redirect()->to('/home_video_layanan')->with('error', 'Data tidak ditemukan.');
 
+        // Ambil nilai is_featured dari input
+        $isFeatured = $this->request->getPost('is_featured') ?? 0;
+
+        // --- LOGIKA PENGECEKAN (VALIDASI UPDATE) ---
+        // Jika user mencoba menyetel video ini sebagai Featured (1)
+        if ($isFeatured == 1) {
+            // Cek apakah ada video LAIN yang sudah featured?
+            // Kita gunakan 'where id != $id' agar tidak mendeteksi dirinya sendiri
+            $existingFeatured = $this->homeVideoModel
+                                     ->where('is_featured', 1)
+                                     ->where('id_video_layanan !=', $id) // PENTING: Kecualikan video yang sedang diedit ini
+                                     ->first();
+
+            // Jika ada video LAIN yang featured, tolak update
+            if ($existingFeatured) {
+                return redirect()->back()
+                    ->withInput() // Kembalikan inputan user
+                    ->with('error', 'Gagal: Video Utama (Featured) sudah ada pada video lain ("' . $existingFeatured['title'] . '"). Silakan non-aktifkan video tersebut terlebih dahulu.');
+            }
+        }
+        // --- SELESAI LOGIKA PENGECEKAN ---
+
         $data = [
             'id_video_layanan' => $id,
             'youtube_url'      => $this->request->getPost('youtube_url'),
             'embed_code'       => $this->request->getPost('embed_code'),
             'title'            => $this->request->getPost('title'),
             'description'      => $this->request->getPost('description'),
-            'is_featured'      => $this->request->getPost('is_featured') ?? 0,
+            'is_featured'      => $isFeatured,
             'sorting'          => $this->request->getPost('sorting') ?? 0,
             'is_active'        => $this->request->getPost('is_active') ?? 0,
         ];
@@ -145,7 +184,6 @@ class HomeVideoLayananController extends BaseController
 
         return redirect()->to('/home_video_layanan')->with('success', 'Video berhasil diperbarui.');
     }
-
     public function delete($id)
     {
         $access = $this->getAccess(session()->get('role'));
