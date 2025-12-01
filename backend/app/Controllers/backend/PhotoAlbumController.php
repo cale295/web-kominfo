@@ -100,10 +100,6 @@ class PhotoAlbumController extends BaseController
         }
 
         $album = $this->albumModel->find($id);
-        // 8. Tambahkan pengecekan trash
-        if (!$album || $album['trash'] == '1') {
-            return redirect()->to('/album')->with('error', 'Album tidak ditemukan.');
-        }
 
         return view('pages/album/edit', [
             'title' => 'Edit Album',
