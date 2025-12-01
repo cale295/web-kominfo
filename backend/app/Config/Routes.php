@@ -67,6 +67,9 @@ $routes->resource('footer_statistics', ['controller' => 'frontend\FooterStatisti
 $routes->resource('home_service', ['controller' => 'frontend\HomeServiceController', 'except' => ['show']]);
 //home video 
 $routes->resource('home_video_layanan', ['controller' => 'frontend\HomeVideoLayananController', 'except' => ['show']]);
+// profil tentang
+$routes->resource('profil_tentang', ['controller' => 'frontend\ProfilTentangController', 'except' => ['show']]);    
+
 
 
 
