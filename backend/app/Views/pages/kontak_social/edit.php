@@ -1,6 +1,8 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
+
 <?php
 // Daftar Icon Social Media yang umum digunakan
 $socialIcons = [
@@ -38,16 +40,7 @@ $socialIcons = [
         </div>
         <div class="card-body">
 
-            <!-- Tampilkan Error Validasi -->
-            <?php if (session()->has('errors')): ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error): ?>
-                            <li><?= esc($error) ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif ?>
+
 
             <!-- Route Update menggunakan ID -->
             <form action="<?= base_url('kontak_social/' . $kontak['id_kontak_social']) ?>" method="POST">

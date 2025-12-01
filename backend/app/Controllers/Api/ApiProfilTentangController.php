@@ -12,42 +12,29 @@ class ApiProfilTentangController extends ResourceController
 
     /**
      * Index: Ambil semua data profil yang aktif
-     * Bisa difilter by section: /api/profil_tentang?section=visi_misi
      */
     public function index()
     {
-        try {
-            
-            $builder = $this->model->where('is_active', 1);
+        // Mengambil semua data yang aktif
+        $data = $this->model
+            ->where('is_active', 1)
+            ->orderBy('section', 'ASC') // Urutkan berdasarkan section agar rapi
+            ->orderBy('sorting', 'ASC')
+            ->findAll();
 
-            if (!empty($section)) {
-                $builder->where('section', $section);
-            }
-
-            $data = $builder
-                ->orderBy('sorting', 'ASC')
-                ->orderBy('id_tentang', 'ASC')
-                ->findAll();
-
-            if (empty($data)) {
-                return $this->respond([
-                    'status'  => true,
-                    'message' => 'Data profil kosong.',
-                    'data'    => []
-                ]);
-            }
-
-            // Path gambar dikirim raw (tanpa base_url) sesuai standar project ini
-            
+        if ($data) {
             return $this->respond([
-                'status'  => true,
+                'status'  => 200,
                 'message' => 'Data profil berhasil diambil.',
                 'count'   => count($data),
                 'data'    => $data
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->failServerError($e->getMessage());
+            ], 200);
+        } else {
+            return $this->respond([
+                'status'  => 404,
+                'message' => 'Data profil kosong.',
+                'data'    => []
+            ], 404);
         }
     }
 
@@ -56,21 +43,16 @@ class ApiProfilTentangController extends ResourceController
      */
     public function show($id = null)
     {
-        try {
-            if (!$id) return $this->failNotFound('ID tidak boleh kosong.');
+        $data = $this->model->find($id);
 
-            $data = $this->model->find($id);
-
-            if (!$data) return $this->failNotFound('Data tidak ditemukan.');
-
+        if ($data) {
             return $this->respond([
-                'status'  => true,
+                'status'  => 200,
                 'message' => 'Detail profil berhasil diambil.',
                 'data'    => $data
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->failServerError($e->getMessage());
+            ], 200);
+        } else {
+            return $this->failNotFound('Data profil dengan ID ' . $id . ' tidak ditemukan.');
         }
     }
     
@@ -80,23 +62,28 @@ class ApiProfilTentangController extends ResourceController
      */
     public function getBySection($sectionName = null)
     {
-        try {
-            if (!$sectionName) return $this->failNotFound('Nama section kosong.');
+        if (!$sectionName) {
+            return $this->failNotFound('Nama section kosong.');
+        }
 
-            $data = $this->model
-                ->where('section', $sectionName)
-                ->where('is_active', 1)
-                ->orderBy('sorting', 'ASC')
-                ->findAll();
+        $data = $this->model
+            ->where('section', $sectionName)
+            ->where('is_active', 1)
+            ->orderBy('sorting', 'ASC')
+            ->findAll();
 
-            if (empty($data)) return $this->respond(['status' => true, 'data' => []]);
-
+        if ($data) {
             return $this->respond([
-                'status' => true,
-                'data'   => $data
-            ]);
-        } catch (\Exception $e) {
-            return $this->failServerError($e->getMessage());
+                'status'  => 200,
+                'message' => 'Data section ' . $sectionName . ' berhasil diambil.',
+                'data'    => $data
+            ], 200);
+        } else {
+            return $this->respond([
+                'status'  => 404,
+                'message' => 'Data section ' . $sectionName . ' tidak ditemukan.',
+                'data'    => []
+            ], 404);
         }
     }
 }

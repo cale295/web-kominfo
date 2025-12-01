@@ -1,6 +1,8 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
+
 <?php
 // Daftar Icon Social Media
 $socialIcons = [
@@ -38,15 +40,7 @@ $socialIcons = [
         </div>
         <div class="card-body">
             
-            <?php if (session()->has('errors')): ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error): ?>
-                            <li><?= esc($error) ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif ?>
+
 
             <form action="<?= base_url('kontak_social') ?>" method="POST">
                 <?= csrf_field() ?>

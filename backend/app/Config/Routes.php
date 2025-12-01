@@ -69,7 +69,8 @@ $routes->resource('home_service', ['controller' => 'frontend\HomeServiceControll
 $routes->resource('home_video_layanan', ['controller' => 'frontend\HomeVideoLayananController', 'except' => ['show']]);
 // profil tentang
 $routes->resource('profil_tentang', ['controller' => 'frontend\ProfilTentangController', 'except' => ['show']]);    
-
+// Tugas Fungsi
+$routes->resource('tugas_fungsi', ['controller' => 'frontend\TugasFungsiController', 'except' => ['show']]);
 
 
 
@@ -150,6 +151,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //profil tentang
+    $routes->get('profil_tentang', 'Api\ApiProfilTentangController::index');
+    $routes->get('profil_tentang/(:num)', 'Api\ApiProfilTentangController::show/$1');
 
     //home layanan video
     $routes->get('home_video_layanan', 'Api\ApiHomeVideoLayananController::index');

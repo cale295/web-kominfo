@@ -29,16 +29,6 @@ $icons = [
     <div class="card shadow mb-4">
         <div class="card-body">
             
-            <!-- Tampilkan Error Validasi -->
-            <?php if (session()->has('errors')): ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error): ?>
-                            <li><?= esc($error) ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
 
             <form action="<?= base_url('footer_statistics') ?>" method="post">
                 <?= csrf_field() ?>

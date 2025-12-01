@@ -29,16 +29,7 @@ $icons = [
     <div class="card shadow mb-4">
         <div class="card-body">
             
-            <?php if (session()->has('errors')): ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('errors') as $error): ?>
-                            <li><?= esc($error) ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-
+ 
             <!-- Perhatikan URL update menggunakan ID -->
             <form action="<?= base_url('footer_statistics/' . $statistic['id_footer_statis']) ?>" method="post">
                 <?= csrf_field() ?>

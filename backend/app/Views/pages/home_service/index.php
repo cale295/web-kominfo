@@ -1,6 +1,8 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
+
 <div class="container-fluid px-4">
     <!-- Page Header -->
     <div class="d-flex align-items-center justify-content-between my-4">
@@ -14,16 +16,6 @@
         </ol>
     </div>
 
-    <!-- Alert Messages -->
-    <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-check-circle me-2 fs-5"></i>
-                <div><?= session()->getFlashdata('success') ?></div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
 
     <?php if (session()->getFlashdata('error')): ?>
         <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">

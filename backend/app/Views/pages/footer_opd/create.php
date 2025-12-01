@@ -1,6 +1,8 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
+
 <div class="container-fluid px-4">
     <h1 class="mt-4">Tambah Footer OPD</h1>
     <ol class="breadcrumb mb-4">
@@ -8,17 +10,6 @@
         <li class="breadcrumb-item"><a href="/footer_opd">Footer OPD</a></li>
         <li class="breadcrumb-item active">Tambah Baru</li>
     </ol>
-
-    <?php if (session()->has('errors')) : ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <ul class="mb-0">
-                <?php foreach (session('errors') as $error) : ?>
-                    <li><?= esc($error) ?></li>
-                <?php endforeach ?>
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif ?>
 
     <div class="card mb-4 shadow-sm">
         <div class="card-header">

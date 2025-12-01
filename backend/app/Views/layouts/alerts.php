@@ -1,281 +1,478 @@
-<!-- app/Views/layouts/alerts.php -->
-
 <style>
-    /* Animations */
-    @keyframes slideDown {
-        from {
-            transform: translateY(-100%) scale(0.9);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
+    /* 1. RESET & BASE STYLE */
+    .neo-alert-wrapper {
+        font-family: 'Courier New', Courier, monospace; /* Font teknis */
+        box-sizing: border-box;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-    }
-
-    @keyframes gentle-shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-
-    @keyframes scaleIn {
-        from { transform: scale(0); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
-
-    /* Alert Container */
-    .custom-alert-overlay {
+    /* 2. OVERLAY (Latar Belakang) */
+    .neo-alert-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(3px);
+        background-color: rgba(255, 255, 255, 0.1); /* Transparan */
+        /* Pola titik-titik (Dotted Pattern) agar unik */
+        background-image: radial-gradient(#000 1px, transparent 1px);
+        background-size: 4px 4px;
         z-index: 9999;
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: fadeIn 0.3s ease;
+        /* Animasi muncul kasar (tidak fade in halus) */
+        animation: snapShow 0.1s steps(1); 
     }
 
-    /* Alert Box */
-    .custom-alert-box {
-        background: white;
-        border-radius: 16px;
-        padding: 32px;
-        max-width: 480px;
-        width: 90%;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* 3. ALERT BOX (Kotak Utama) */
+    .neo-alert-box {
+        background: #fff;
+        width: 400px;
+        max-width: 90%;
+        border: 3px solid #000; /* Garis tebal */
+        box-shadow: 8px 8px 0px #000; /* Bayangan keras tanpa blur */
         position: relative;
+        display: flex;
+        flex-direction: column;
     }
 
-    .custom-alert-box.error {
-        border-top: 4px solid #dc3545;
-        animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                   gentle-shake 0.4s ease 0.3s;
-    }
-
-    .custom-alert-box.success {
-        border-top: 4px solid #28a745;
-    }
-
-    /* Alert Content */
-    .custom-alert-content {
-        text-align: center;
-    }
-
-    .custom-alert-icon {
-        font-size: 64px;
-        margin-bottom: 16px;
-        display: inline-block;
-        animation: scaleIn 0.4s ease 0.2s both;
-    }
-
-    .custom-alert-title {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: #2c3e50;
-    }
-
-    .custom-alert-box.error .custom-alert-title {
-        color: #dc3545;
-    }
-
-    .custom-alert-box.success .custom-alert-title {
-        color: #28a745;
-    }
-
-    .custom-alert-message {
-        font-size: 16px;
-        margin-bottom: 24px;
-        line-height: 1.6;
-        color: #495057;
-    }
-
-    /* Error List Styling */
-    .custom-alert-message ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        text-align: left;
-    }
-
-    .custom-alert-message ul li {
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        background: #fff5f5;
-        border-left: 3px solid #dc3545;
-        border-radius: 4px;
-        font-size: 14px;
-    }
-
-    .custom-alert-message ul li:last-child {
-        margin-bottom: 0;
-    }
-
-    /* Button */
-    .custom-alert-close {
-        background: #6c757d;
-        border: none;
-        color: white;
-        padding: 12px 32px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
+    /* 4. HEADER (Judul) */
+    .neo-alert-header {
+        border-bottom: 3px solid #000;
+        padding: 10px 16px;
+        font-weight: 900;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 18px;
     }
 
-    .custom-alert-close:hover {
-        background: #5a6268;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    /* Warna Header Berdasarkan Tipe */
+    .neo-alert-box.error .neo-alert-header {
+        background-color: #FF6B6B; /* Merah Pastel */
+        color: #000;
     }
 
-    .custom-alert-close:active {
-        transform: translateY(0);
+    .neo-alert-box.success .neo-alert-header {
+        background-color: #4ECDC4; /* Tosca Retro */
+        color: #000;
     }
 
-    .custom-alert-box.error .custom-alert-close {
-        background: #dc3545;
+    /* Tombol X kecil di header */
+    .neo-close-icon {
+        cursor: pointer;
+        padding: 0 5px;
+        font-size: 20px;
+        line-height: 1;
+    }
+    .neo-close-icon:hover { background: #000; color: #fff; }
+
+    /* 5. CONTENT (Isi Pesan) */
+    .neo-alert-content {
+        padding: 24px;
+        color: #000;
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 600;
     }
 
-    .custom-alert-box.error .custom-alert-close:hover {
-        background: #c82333;
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    /* List error jika banyak */
+    .neo-alert-content ul {
+        margin: 10px 0 0 0;
+        padding-left: 20px;
+        list-style-type: square;
     }
 
-    .custom-alert-box.success .custom-alert-close {
-        background: #28a745;
+    /* 6. FOOTER (Tombol Bawah) */
+    .neo-alert-footer {
+        padding: 0 24px 24px 24px;
+        text-align: right;
     }
 
-    .custom-alert-box.success .custom-alert-close:hover {
-        background: #218838;
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    .neo-btn {
+        background: #000;
+        color: #fff;
+        border: 2px solid #000;
+        padding: 10px 24px;
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 4px 4px 0px #888; /* Bayangan tombol abu */
+        transition: none; /* Matikan transisi halus */
     }
 
-    /* Responsive */
-    @media (max-width: 576px) {
-        .custom-alert-box {
-            padding: 24px;
-        }
+    /* Efek tekan tombol kasar */
+    .neo-btn:hover {
+        background: #fff;
+        color: #000;
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0px #000;
+    }
+    .neo-btn:active {
+        transform: translate(4px, 4px);
+        box-shadow: none;
+    }
 
-        .custom-alert-icon {
-            font-size: 48px;
-        }
-
-        .custom-alert-title {
-            font-size: 20px;
-        }
-
-        .custom-alert-message {
-            font-size: 14px;
-        }
+    /* ANIMATIONS */
+    @keyframes snapShow {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
     }
 </style>
 
-<!-- Error Alert (Flash Data) -->
-<?php if (session()->getFlashdata('error')): ?>
-    <div class="custom-alert-overlay" id="errorAlert">
-        <div class="custom-alert-box error">
-            <div class="custom-alert-content">
-                <div class="custom-alert-icon">⛔</div>
-                <div class="custom-alert-title">Terjadi Kesalahan!</div>
-                <div class="custom-alert-message">
-                    <?= esc(session()->getFlashdata('error')) ?>
-                </div>
-                <button class="custom-alert-close" onclick="closeAlert('errorAlert')">Tutup</button>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
+<div class="neo-alert-wrapper">
 
-<!-- Success Alert (Flash Data) -->
-<?php if (session()->getFlashdata('success')): ?>
-    <div class="custom-alert-overlay" id="successAlert">
-        <div class="custom-alert-box success">
-            <div class="custom-alert-content">
-                <div class="custom-alert-icon">✅</div>
-                <div class="custom-alert-title">Berhasil!</div>
-                <div class="custom-alert-message">
-                    <?= esc(session()->getFlashdata('success')) ?>
+    <?php if (session()->getFlashdata('error') || !empty($error) || session()->get('errors')): ?>
+        <div class="neo-alert-overlay" id="alertError">
+            <div class="neo-alert-box error">
+                <div class="neo-alert-header">
+                    <span>⚠️ SYSTEM_ERROR</span>
+                    <span class="neo-close-icon" onclick="closeNeoAlert('alertError')">&times;</span>
                 </div>
-                <button class="custom-alert-close" onclick="closeAlert('successAlert')">Tutup</button>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
+                
+                <div class="neo-alert-content">
+                    <?php if (session()->getFlashdata('error')): ?>
+                        <p><?= session()->getFlashdata('error') ?></p>
+                    <?php endif; ?>
 
-<!-- Direct Error Alert -->
-<?php if (!empty($error)): ?>
-    <div class="custom-alert-overlay" id="directError">
-        <div class="custom-alert-box error">
-            <div class="custom-alert-content">
-                <div class="custom-alert-icon">⛔</div>
-                <div class="custom-alert-title">Terjadi Kesalahan!</div>
-                <div class="custom-alert-message">
-                    <?= esc($error) ?>
-                </div>
-                <button class="custom-alert-close" onclick="closeAlert('directError')">Tutup</button>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
+                    <?php if (!empty($error)): ?>
+                        <p><?= $error ?></p>
+                    <?php endif; ?>
 
-<!-- Validation Errors Alert -->
-<?php if (session()->get('errors')): ?>
-    <div class="custom-alert-overlay" id="validationErrors">
-        <div class="custom-alert-box error">
-            <div class="custom-alert-content">
-                <div class="custom-alert-icon">⚠️</div>
-                <div class="custom-alert-title">Validasi Gagal!</div>
-                <div class="custom-alert-message">
-                    <ul>
-                        <?php foreach (session()->get('errors') as $error): ?>
-                            <li><?= esc($error) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <?php if (session()->get('errors')): ?>
+                        <span>List Kesalahan:</span>
+                        <ul>
+                            <?php foreach (session()->get('errors') as $err): ?>
+                                <li><?= esc($err) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
                 </div>
-                <button class="custom-alert-close" onclick="closeAlert('validationErrors')">Tutup</button>
+
+                <div class="neo-alert-footer">
+                    <button class="neo-btn" onclick="closeNeoAlert('alertError')">Tutup</button>
+                </div>
             </div>
         </div>
-    </div>
-<?php endif; ?>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="neo-alert-overlay" id="alertSuccess">
+            <div class="neo-alert-box success">
+                <div class="neo-alert-header">
+                    <span>✅ SUCCESS</span>
+                    <span class="neo-close-icon" onclick="closeNeoAlert('alertSuccess')">&times;</span>
+                </div>
+                
+                <div class="neo-alert-content">
+                    <?= session()->getFlashdata('success') ?>
+                </div>
+
+                <div class="neo-alert-footer">
+                    <button class="neo-btn" onclick="closeNeoAlert('alertSuccess')">Lanjut</button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+</div>
 
 <script>
-    function closeAlert(alertId) {
-        const alertElement = document.getElementById(alertId);
-        if (alertElement) {
-            alertElement.style.animation = 'fadeOut 0.3s ease';
+    function closeNeoAlert(elementId) {
+        const el = document.getElementById(elementId);
+        if (el) {
+            // Langsung hapus tanpa animasi fade out (sesuai request: tidak smooth/lebay)
+            el.style.display = 'none'; 
+            el.remove();
+        }
+    }
+
+    // Opsional: Auto close setelah 5 detik
+    // Hapus bagian ini jika ingin user menutup manual
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            const overlays = document.querySelectorAll('.neo-alert-overlay');
+            overlays.forEach(overlay => overlay.remove());
+        }, 5000);
+    });
+</script><style>
+    /* 1. RESET & BASE STYLE */
+    .neo-alert-wrapper {
+        font-family: 'Courier New', Courier, monospace;
+        box-sizing: border-box;
+    }
+
+    /* 2. OVERLAY (Latar Belakang) */
+    .neo-alert-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: overlayFadeIn 0.3s ease-out;
+    }
+
+    /* 3. ALERT BOX (Kotak Utama) */
+    .neo-alert-box {
+        background: #fff;
+        width: 420px;
+        max-width: 90%;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: boxSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Decorative gradient line */
+    .neo-alert-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #FFD93D);
+        animation: gradientShift 3s ease infinite;
+    }
+
+    /* 4. HEADER (Judul) */
+    .neo-alert-header {
+        padding: 20px 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        position: relative;
+        margin-top: 4px;
+    }
+
+    /* Warna Header Berdasarkan Tipe */
+    .neo-alert-box.error .neo-alert-header {
+        background: linear-gradient(135deg, #FFE5E5 0%, #FFF0F0 100%);
+        color: #D32F2F;
+    }
+
+    .neo-alert-box.success .neo-alert-header {
+        background: linear-gradient(135deg, #E8F5F4 0%, #F0FFFE 100%);
+        color: #00897B;
+    }
+
+    /* Tombol X kecil di header */
+    .neo-close-icon {
+        cursor: pointer;
+        padding: 4px 8px;
+        font-size: 22px;
+        line-height: 1;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        opacity: 0.6;
+    }
+    .neo-close-icon:hover { 
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.1);
+        transform: rotate(90deg);
+    }
+
+    /* 5. CONTENT (Isi Pesan) */
+    .neo-alert-content {
+        padding: 24px 24px 28px;
+        color: #2C3E50;
+        font-size: 15px;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+
+    /* List error jika banyak */
+    .neo-alert-content ul {
+        margin: 12px 0 0 0;
+        padding-left: 20px;
+        list-style-type: none;
+    }
+
+    .neo-alert-content ul li {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 8px;
+    }
+
+    .neo-alert-content ul li::before {
+        content: '▸';
+        position: absolute;
+        left: 0;
+        color: #FF6B6B;
+        font-weight: bold;
+    }
+
+    /* 6. FOOTER (Tombol Bawah) */
+    .neo-alert-footer {
+        padding: 0 24px 24px 24px;
+        text-align: right;
+    }
+
+    .neo-btn {
+        background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+        color: #fff;
+        border: none;
+        padding: 12px 32px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .neo-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .neo-btn:hover::before {
+        left: 100%;
+    }
+
+    /* Efek hover tombol */
+    .neo-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .neo-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    /* ANIMATIONS */
+    @keyframes overlayFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes boxSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    @keyframes overlayFadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+</style>
+
+<div class="neo-alert-wrapper">
+
+    <?php if (session()->getFlashdata('error') || !empty($error) || session()->get('errors')): ?>
+        <div class="neo-alert-overlay" id="alertError">
+            <div class="neo-alert-box error">
+                <div class="neo-alert-header">
+                    <span>⚠️ SYSTEM_ERROR</span>
+                    <span class="neo-close-icon" onclick="closeNeoAlert('alertError')">&times;</span>
+                </div>
+                
+                <div class="neo-alert-content">
+                    <?php if (session()->getFlashdata('error')): ?>
+                        <p><?= session()->getFlashdata('error') ?></p>
+                    <?php endif; ?>
+
+                    <?php if (!empty($error)): ?>
+                        <p><?= $error ?></p>
+                    <?php endif; ?>
+
+                    <?php if (session()->get('errors')): ?>
+                        <span>List Kesalahan:</span>
+                        <ul>
+                            <?php foreach (session()->get('errors') as $err): ?>
+                                <li><?= esc($err) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+
+                <div class="neo-alert-footer">
+                    <button class="neo-btn" onclick="closeNeoAlert('alertError')">Tutup</button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="neo-alert-overlay" id="alertSuccess">
+            <div class="neo-alert-box success">
+                <div class="neo-alert-header">
+                    <span>✅ SUCCESS</span>
+                    <span class="neo-close-icon" onclick="closeNeoAlert('alertSuccess')">&times;</span>
+                </div>
+                
+                <div class="neo-alert-content">
+                    <?= session()->getFlashdata('success') ?>
+                </div>
+
+                <div class="neo-alert-footer">
+                    <button class="neo-btn" onclick="closeNeoAlert('alertSuccess')">Lanjut</button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+</div>
+
+<script>
+    function closeNeoAlert(elementId) {
+        const el = document.getElementById(elementId);
+        if (el) {
+            // Animasi smooth fade out
+            el.style.animation = 'overlayFadeOut 0.3s ease-out';
             setTimeout(() => {
-                alertElement.remove();
+                el.remove();
             }, 300);
         }
     }
 
-    // Auto close alerts after 5 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.custom-alert-overlay');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                closeAlert(alert.id);
-            }, 5000);
-        });
+    // Auto close setelah 6 detik dengan animasi
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            const overlays = document.querySelectorAll('.neo-alert-overlay');
+            overlays.forEach(overlay => {
+                overlay.style.animation = 'overlayFadeOut 0.3s ease-out';
+                setTimeout(() => overlay.remove(), 300);
+            });
+        }, 6000);
     });
 </script>
