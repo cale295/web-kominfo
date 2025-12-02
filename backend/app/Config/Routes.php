@@ -77,6 +77,8 @@ $routes->resource('struktur_organisasi', ['controller' => 'frontend\StrukturOrga
 $routes->resource('pejabat_struktural', ['controller' => 'frontend\PejabatStrukturalController', 'except' => ['show']]);
 // Informasi Perencanaan
 $routes->resource('informasi_perencanaan', ['controller' => 'frontend\InformasiPerencanaanController', 'except' => ['show']]);
+// Laporan Keuangan
+$routes->resource('laporan_keuangan', ['controller' => 'frontend\LaporanKeuanganController', 'except' => ['show']]);
 
 
 
@@ -159,6 +161,11 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //Laporan Keuangan
+    $routes->get('laporan_keuangan', 'Api\ApiLaporanKeuanganController::index');
+    $routes->get('laporan_keuangan/(:num)', 'Api\ApiLaporanKeuanganController::show/$1');
+
 
     //Informasi Perencanaan
     $routes->get('informasi_perencanaan', 'Api\ApiInformasiPerencanaanController::index');
