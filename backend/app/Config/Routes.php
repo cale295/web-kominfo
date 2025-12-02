@@ -73,6 +73,8 @@ $routes->resource('profil_tentang', ['controller' => 'frontend\ProfilTentangCont
 $routes->resource('tugas_fungsi', ['controller' => 'frontend\TugasFungsiController', 'except' => ['show']]);
 // Struktur Organisasi
 $routes->resource('struktur_organisasi', ['controller' => 'frontend\StrukturOrganisasiController', 'except' => ['show']]);
+// Pejabat Struktural
+$routes->resource('pejabat_struktural', ['controller' => 'frontend\PejabatStrukturalController', 'except' => ['show']]);
 
 
 // berita kategori
@@ -152,6 +154,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //Pejabat Struktural
+    $routes->get('pejabat_struktural', 'Api\ApiPejabatStrukturalController::index');
+    $routes->get('pejabat_struktural/(:num)', 'Api\ApiPejabatStrukturalController::show/$1');
 
     //Struktur Organisasi
     $routes->get('struktur_organisasi', 'Api\ApiStrukturOrganisasiController::index');
