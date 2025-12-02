@@ -45,7 +45,7 @@
                             <th width="5%" class="text-center">No</th>
                             <th width="25%">Judul Info</th>
                             <th width="10%" class="text-center">Icon</th>
-                            <th width="15%">Tipe & Kontak</th>
+                            <th width="15%">Kontak</th>
                             <th width="10%" class="text-center">Urutan</th>
                             <th width="10%" class="text-center">Status</th>
                             <th width="15%" class="text-center">Aksi</th>
@@ -74,17 +74,11 @@
                                         <small class="text-muted d-block mt-1" style="font-size: 0.7rem;"><?= esc($row['icon_class']) ?></small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-info text-dark mb-1"><i class="fas fa-tag me-1"></i><?= esc($row['tipe']) ?></span>
                                         <div class="small">
                                             <?php if ($row['link_url']) : ?>
                                                 <a href="<?= esc($row['link_url']) ?>" target="_blank" class="text-decoration-none text-truncate d-block" style="max-width: 150px;">
                                                     <i class="fas fa-link text-muted me-1"></i> Link
                                                 </a>
-                                            <?php endif; ?>
-                                            <?php if ($row['nomor_telepon']) : ?>
-                                                <div class="text-truncate" style="max-width: 150px;">
-                                                    <i class="fas fa-phone text-muted me-1"></i> <?= esc($row['nomor_telepon']) ?>
-                                                </div>
                                             <?php endif; ?>
                                         </div>
                                     </td>

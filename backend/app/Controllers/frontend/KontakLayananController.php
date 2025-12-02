@@ -77,7 +77,6 @@ class KontakLayananController extends BaseController
             'icon_class'    => $this->request->getPost('icon_class'),
             'icon_bg_color' => $this->request->getPost('icon_bg_color'),
             'link_url'      => $this->request->getPost('link_url'),
-            'nomor_telepon' => $this->request->getPost('nomor_telepon'),
             'urutan'        => $this->request->getPost('urutan'),
             'status'        => $this->request->getPost('status'),
         ];
@@ -140,7 +139,6 @@ class KontakLayananController extends BaseController
             'icon_class'        => $this->request->getPost('icon_class'),
             'icon_bg_color'     => $this->request->getPost('icon_bg_color'),
             'link_url'          => $this->request->getPost('link_url'),
-            'nomor_telepon'     => $this->request->getPost('nomor_telepon'),
             'urutan'            => $this->request->getPost('urutan'),
             'status'            => $this->request->getPost('status'),
         ];

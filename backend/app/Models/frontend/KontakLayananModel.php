@@ -20,7 +20,6 @@ class KontakLayananModel extends Model
         'icon_class', 
         'icon_bg_color', 
         'link_url', 
-        'nomor_telepon',  
         'urutan', 
         'status'
     ];
@@ -52,11 +51,6 @@ class KontakLayananModel extends Model
             'label' => 'Warna Background Icon',
             'rules' => 'required|max_length[20]'
         ],
-        'nomor_telepon' => [
-            'label' => 'Nomor Telepon',
-            // Tidak menggunakan 'numeric' agar mendukung karakter seperti + atau -
-            'rules' => 'required|max_length[50]' 
-        ],
         'urutan' => [
             'label' => 'Urutan',
             'rules' => 'permit_empty|integer'
@@ -76,10 +70,6 @@ class KontakLayananModel extends Model
         'link_url' => [
             'required'   => 'Link URL wajib diisi.',
             'max_length' => 'Link URL tidak boleh lebih dari 255 karakter.'
-        ],
-        'nomor_telepon' => [
-            'required'   => 'Nomor telepon wajib diisi.',
-            'max_length' => 'Nomor telepon tidak boleh lebih dari 50 karakter.'
         ],
         'subjudul' => [
             'required'   => 'Sub judul wajib diisi.',

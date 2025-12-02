@@ -94,11 +94,6 @@
                         <input type="url" class="form-control" id="link_url" name="link_url" value="<?= old('link_url') ?>" placeholder="https://...">
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="nomor_telepon" class="form-label fw-bold">Nomor Telepon</label>
-                        <input type="text" class="form-control" id="nomor_telepon" name="nomor_telepon" value="<?= old('nomor_telepon') ?>" placeholder="0812...">
-                    </div>
-
                     <div class="col-12"><hr class="my-2"></div>
 
                     <div class="col-md-6">
