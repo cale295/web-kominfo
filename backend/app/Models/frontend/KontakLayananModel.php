@@ -20,8 +20,7 @@ class KontakLayananModel extends Model
         'icon_class', 
         'icon_bg_color', 
         'link_url', 
-        'nomor_telepon', 
-        'tipe', 
+        'nomor_telepon',  
         'urutan', 
         'status'
     ];
@@ -58,11 +57,6 @@ class KontakLayananModel extends Model
             // Tidak menggunakan 'numeric' agar mendukung karakter seperti + atau -
             'rules' => 'required|max_length[50]' 
         ],
-        'tipe' => [
-            'label' => 'Tipe Layanan',
-            // Validasi input harus salah satu dari opsi ENUM
-            'rules' => 'required|in_list[download,whatsapp,layanan,sp4n,darurat]'
-        ],
         'urutan' => [
             'label' => 'Urutan',
             'rules' => 'permit_empty|integer'
@@ -78,9 +72,6 @@ class KontakLayananModel extends Model
         'judul' => [
             'required'   => 'Judul layanan wajib diisi.',
             'max_length' => 'Judul tidak boleh lebih dari 150 karakter.'
-        ],
-        'tipe' => [
-            'in_list' => 'Tipe yang dipilih tidak valid.'
         ],
         'link_url' => [
             'required'   => 'Link URL wajib diisi.',

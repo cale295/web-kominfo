@@ -155,7 +155,7 @@ $routes->group('api', function ($routes) {
 
     //Struktur Organisasi
     $routes->get('struktur_organisasi', 'Api\ApiStrukturOrganisasiController::index');
-    $routes->get('struktur_organisasi/(:num)', 'Api\ApiStrukturOrganisasiController::show/$1');
+    $routes->get('struktur_organisasi/(:segment)', 'Api\ApiStrukturOrganisasiController::show/$1');
 
     //profil tentang
     $routes->get('profil_tentang', 'Api\ApiProfilTentangController::index');

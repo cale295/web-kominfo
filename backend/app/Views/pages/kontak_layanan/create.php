@@ -90,18 +90,6 @@
                     <div class="col-12"><hr class="my-2"></div>
 
                     <div class="col-md-4">
-                        <label for="tipe" class="form-label fw-bold">Tipe Layanan <span class="text-danger">*</span></label>
-                        <select class="form-select" id="tipe" name="tipe" required>
-                            <option value="" disabled selected>-- Pilih Tipe --</option>
-                            <option value="download" <?= old('tipe') == 'download' ? 'selected' : '' ?>>Download</option>
-                            <option value="whatsapp" <?= old('tipe') == 'whatsapp' ? 'selected' : '' ?>>WhatsApp</option>
-                            <option value="layanan" <?= old('tipe') == 'layanan' ? 'selected' : '' ?>>Layanan Link</option>
-                            <option value="sp4n" <?= old('tipe') == 'sp4n' ? 'selected' : '' ?>>SP4N Lapor</option>
-                            <option value="darurat" <?= old('tipe') == 'darurat' ? 'selected' : '' ?>>Darurat</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
                         <label for="link_url" class="form-label fw-bold">Link URL</label>
                         <input type="url" class="form-control" id="link_url" name="link_url" value="<?= old('link_url') ?>" placeholder="https://...">
                     </div>
