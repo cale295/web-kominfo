@@ -68,7 +68,14 @@ public function create()
 
         // Ambil nilai is_featured dari input
         $isFeatured = $this->request->getPost('is_featured') ?? 0;
+        $countvideo = $this->homeVideoModel->countAllResults();
 
+
+         if ($countvideo >= 4) {
+            return redirect()->back()
+                ->withInput() // Kembalikan inputan user agar tidak mengetik ulang
+                ->with('error', 'Maksimal 3 video. silahkan hapus atau edit video yang sudah ada.');
+        }
         // --- LOGIKA PENGECEKAN (VALIDASI) ---
         // Jika user mencoba menginput video sebagai Featured (1)
         if ($isFeatured == 1) {
@@ -82,6 +89,9 @@ public function create()
                     ->with('error', 'Gagal: Video Utama (Featured) sudah ada. Silakan non-aktifkan video utama yang lama terlebih dahulu.');
             }
         }
+
+
+       
         // --- SELESAI LOGIKA PENGECEKAN ---
 
         $data = [
@@ -144,6 +154,7 @@ public function update($id)
                                      ->where('id_video_layanan !=', $id) // PENTING: Kecualikan video yang sedang diedit ini
                                      ->first();
 
+                                        
             // Jika ada video LAIN yang featured, tolak update
             if ($existingFeatured) {
                 return redirect()->back()

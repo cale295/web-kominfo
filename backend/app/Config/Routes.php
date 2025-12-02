@@ -83,6 +83,9 @@ $routes->resource('laporan_keuangan', ['controller' => 'frontend\LaporanKeuangan
 $routes->resource('daftar_informasi_publik', ['controller' => 'frontend\DaftarInformasiPublikController', 'except' => ['show']]);
 // Laporan Kinerja
 $routes->resource('laporan_kinerja', ['controller' => 'frontend\LaporanKinerjaController', 'except' => ['show']]);
+// Permohonan Informasi
+$routes->resource('permohonan_informasi', ['controller' => 'frontend\PermohonanInformasiController', 'except' => ['show']]);
+ 
 
 
 
@@ -165,6 +168,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //Permohonan Informasi
+    $routes->get('permohonan_informasi', 'Api\ApiPermohonanInformasiController::index');
+    $routes->get('permohonan_informasi/(:num)', 'Api\ApiPermohonanInformasiController::show/$1');
 
     //Daftar Laporan Kinerja
     $routes->get('laporan_kinerja', 'Api\ApiLaporanKinerjaController::index');

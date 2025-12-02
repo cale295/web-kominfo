@@ -19,7 +19,6 @@ class FooterStatisticsModel extends Model
         'stat_type',    // Unik, misal: visitors_today
         'stat_label',   // Label Frontend: Pengunjung Hari Ini
         'stat_value',   // Nilai: 1024
-        'stat_icon',    // Icon class: fas fa-users
         'is_active',
         'auto_update',  // 1 = Hitung otomatis sistem, 0 = Input manual
         'sorting',
@@ -56,10 +55,6 @@ class FooterStatisticsModel extends Model
         'stat_label' => [
             'rules'  => 'required|max_length[100]',
             'label'  => 'Label Tampilan'
-        ],
-        'stat_icon' => [
-            'rules'  => 'permit_empty|max_length[50]',
-            'label'  => 'Icon'
         ],
         'sorting' => [
             'rules'  => 'permit_empty|numeric',

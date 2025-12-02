@@ -71,6 +71,11 @@ class KontakSocialController extends BaseController
             return redirect()->to('/kontak_social')->with('error', 'Kamu tidak punya izin menambah data.');
         }
 
+        $count = $this->kontakSocialModel->countAllResults();
+        if ($count >= 4) {
+            return redirect()->back()->withInput()->with('error', 'Maksimal 4 data');
+        }
+
         // Ambil data dari form
         $data = [
             'platform'   => $this->request->getPost('platform'),

@@ -24,7 +24,6 @@
                     <thead>
                         <tr>
                             <th width="5%">No</th>
-                            <th>Icon</th>
                             <th>Label</th>
                             <th>Value</th>
                             <th>Type</th>
@@ -38,10 +37,6 @@
                             <?php foreach ($statistics as $key => $row): ?>
                                 <tr>
                                     <td><?= $key + 1 ?></td>
-                                    <td class="text-center">
-                                        <i class="<?= $row['stat_icon'] ?> fa-lg"></i>
-                                        <br><small class="text-muted"><?= $row['stat_icon'] ?></small>
-                                    </td>
                                     <td><?= esc($row['stat_label']) ?></td>
                                     <td><?= esc($row['stat_value']) ?></td>
                                     <td><span class="badge bg-info text-dark"><?= esc($row['stat_type']) ?></span></td>

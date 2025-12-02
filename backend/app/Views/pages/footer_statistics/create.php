@@ -4,18 +4,7 @@
 
 <?php
 // Daftar Icon FontAwesome Populer untuk opsi dropdown
-$icons = [
-    'fas fa-users' => 'Users / Orang',
-    'fas fa-project-diagram' => 'Project / Diagram',
-    'fas fa-award' => 'Award / Penghargaan',
-    'fas fa-smile' => 'Smile / Klien Puas',
-    'fas fa-coffee' => 'Coffee / Projek Selesai',
-    'fas fa-check-circle' => 'Check Circle',
-    'fas fa-chart-line' => 'Chart / Grafik',
-    'fas fa-building' => 'Building / Gedung',
-    'fas fa-briefcase' => 'Briefcase / Pekerjaan',
-    'fas fa-code' => 'Code / Coding',
-];
+
 ?>
 
 <div class="container-fluid">
@@ -58,23 +47,7 @@ $icons = [
                         </select>
                     </div>
 
-                    <!-- Stat Icon (Dropdown) -->
-                    <div class="col-md-6 mb-3">
-                        <label for="stat_icon" class="form-label">Icon <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-icons"></i></span>
-                            <select class="form-select form-control" id="stat_icon" name="stat_icon" required>
-                                <option value="" disabled selected>-- Pilih Icon --</option>
-                                <?php foreach ($icons as $class => $name): ?>
-                                    <option value="<?= $class ?>" <?= old('stat_icon') == $class ? 'selected' : '' ?>>
-                                        <?= $name ?> (<?= $class ?>)
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <small class="text-muted">Pilih icon yang sesuai untuk ditampilkan di footer.</small>
-                    </div>
-                </div>
+
 
                 <div class="row">
                     <!-- Sorting -->
