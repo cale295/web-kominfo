@@ -18,13 +18,8 @@ class KontakModel extends Model
         'nama_instansi',
         'alamat_lengkap',
         'telepon',
-        'email',
         'fax',
-        'website',
-        'latitude',
-        'longitude',
         'map_link',
-        'footer_text',
         'status'
     ];
 
@@ -52,34 +47,13 @@ class KontakModel extends Model
             // Tidak pakai numeric agar bisa input karakter: (021) 123-4567 atau +62
             'rules' => 'required|max_length[50]' 
         ],
-        'email' => [
-            'label' => 'Email',
-            'rules' => 'required|valid_email|max_length[100]'
-        ],
         'fax' => [
             'label' => 'Fax',
             'rules' => 'permit_empty|max_length[50]'
         ],
-        'website' => [
-            'label' => 'Website',
-            'rules' => 'permit_empty|valid_url|max_length[255]'
-        ],
-        'latitude' => [
-            'label' => 'Latitude',
-            // Decimal memastikan input berupa angka desimal koordinat
-            'rules' => 'permit_empty|decimal|max_length[50]' 
-        ],
-        'longitude' => [
-            'label' => 'Longitude',
-            'rules' => 'permit_empty|decimal|max_length[50]'
-        ],
         'map_link' => [
             'label' => 'Link Google Maps',
             'rules' => 'permit_empty|valid_url' // URL Maps biasanya panjang, jadi hati-hati jika pakai max_length
-        ],
-        'footer_text' => [
-            'label' => 'Teks Footer',
-            'rules' => 'permit_empty|max_length[255]'
         ],
         'status' => [
             'label' => 'Status',
@@ -103,19 +77,8 @@ class KontakModel extends Model
             'required'   => 'Nomor telepon wajib diisi.',
             'max_length' => 'Nomor telepon terlalu panjang.'
         ],
-        'email' => [
-            'required'    => 'Email wajib diisi.',
-            'valid_email' => 'Format email tidak valid (contoh: admin@instansi.com).',
-            'max_length'  => 'Email terlalu panjang.'
-        ],
-        'website' => [
-            'valid_url' => 'Format URL website tidak valid (harus diawali http:// atau https://).'
-        ],
-        'latitude' => [
-            'decimal' => 'Latitude harus berupa angka desimal.'
-        ],
-        'longitude' => [
-            'decimal' => 'Longitude harus berupa angka desimal.'
+        'fax' => [
+            'max_length' => 'Nomor fax terlalu panjang.'
         ],
         'map_link' => [
             'valid_url' => 'Link Google Maps tidak valid (harus diawali http:// atau https://).'

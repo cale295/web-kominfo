@@ -46,9 +46,6 @@
             <th style="width: 50px;">No</th>
             <th>Nama Instansi</th>
             <th>Alamat</th>
-            <th>Telepon</th>
-            <th>Email</th>
-            <th>Website</th>
             <th style="width: 220px;">Peta</th> <!-- Lebar kolom peta diset agar rapi -->
             <th>Status</th>
             <?php if ($can_update || $can_delete): ?>
@@ -64,9 +61,6 @@
                 <td><?= $no++ ?></td>
                 <td><?= esc($row['nama_instansi']) ?></td>
                 <td><?= esc($row['alamat_lengkap']) ?></td>
-                <td><?= esc($row['telepon']) ?></td>
-                <td><?= esc($row['email']) ?></td>
-                <td><?= esc($row['website']) ?></td>
 
                 <!-- MAP COLUMN (IFRAME ONLY) -->
                 <td>

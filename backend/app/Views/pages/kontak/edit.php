@@ -31,10 +31,6 @@
                         <label>Nama Instansi</label>
                         <input type="text" class="form-control" name="nama_instansi" value="<?= old('nama_instansi', $kontak['nama_instansi']) ?>" required>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Email</label>
-                        <input type="email" class="form-control" name="email" value="<?= old('email', $kontak['email']) ?>">
-                    </div>
                 </div>
 
                 <div class="form-group">
@@ -55,27 +51,9 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label>Website</label>
-                        <input type="url" class="form-control" name="website" placeholder="https://" value="<?= old('website', $kontak['website']) ?>">
-                    </div>
-                    <div class="form-group col-md-6">
                         <label>Link Google Maps</label>
                         <input type="text" class="form-control" name="map_link" value="<?= old('map_link', $kontak['map_link']) ?>">
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Latitude</label>
-                    <input type="text" class="form-control" name="latitude" value="<?= old('latitude', $kontak['latitude']) ?>">
-                </div>
-
-                <div class="form-group">
-                    <label>Longitude</label>
-                    <input type="text" class="form-control" name="longitude" value="<?= old('longitude', $kontak['longitude']) ?>">
-                </div>
-                <div class="form-group">
-                    <label>Footer Text</label>
-                    <textarea class="form-control" name="footer_text" rows="2"><?= old('footer_text', $kontak['footer_text']) ?></textarea>
                 </div>
 
 <div class="form-group">

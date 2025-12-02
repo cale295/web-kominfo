@@ -84,11 +84,7 @@ class KontakController extends BaseController
             'alamat_lengkap' => $this->request->getPost('alamat_lengkap'),
             'telepon' => $this->request->getPost('telepon'),
             'fax' => $this->request->getPost('fax'),
-            'email' => $this->request->getPost('email'),
-            'website' => $this->request->getPost('website'),
-            'latitude' => $this->request->getPost('latitude'),
             'map_link' => $this->request->getPost('map_link'),
-            'footer_text' => $this->request->getPost('footer_text'),
             'status' => $this->request->getPost('status'),
         ];
         if (!$this->kontakModel->insert($data)) {
@@ -138,11 +134,7 @@ class KontakController extends BaseController
             'alamat_lengkap' => $this->request->getPost('alamat_lengkap'),
             'telepon'        => $this->request->getPost('telepon'),
             'fax'            => $this->request->getPost('fax'),
-            'email'          => $this->request->getPost('email'),
-            'website'        => $this->request->getPost('website'),
-            'latitude'       => $this->request->getPost('latitude'),
             'map_link'       => $this->request->getPost('map_link'),
-            'footer_text'    => $this->request->getPost('footer_text'),
             'status'         => $this->request->getPost('status'),
         ];
 
