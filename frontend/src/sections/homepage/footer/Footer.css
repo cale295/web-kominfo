@@ -57,8 +57,25 @@
   color: #60a5fa;
 }
 
-.visitor-info {
+.visitor-stats-wrapper {
   margin-top: 1rem;
+}
+
+.visitor-stat {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: #d7d6d6;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .footer-bottom {
