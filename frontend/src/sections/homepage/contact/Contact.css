@@ -1,3 +1,5 @@
+/* Tambahkan ke file contact.css */
+
 /* Custom Colors (Tailwind-like) */
 .text-blue-800 {
   color: #1e3a8a !important;
@@ -34,10 +36,9 @@
 .bg-hover-gray-100:hover {
   background-color: #f3f4f6 !important;
 }
-.group-hover-text-blue-600 {
-  /* Tidak bisa pakai group di Bootstrap, jadi kita ganti manual */
-}
-a .text-blue-800:hover {
+
+/* Untuk hover text pada link kontak */
+a:hover .text-blue-800 {
   color: #2563eb !important;
 }
 
@@ -75,13 +76,16 @@ a .text-blue-800:hover {
   font-size: 0.875rem !important;
 }
 .fs-7 {
-  font-size: 2rem !important;
+  font-size: 1.5rem !important; /* Diubah dari 2rem menjadi 1.5rem */
 }
 .text-sm {
   font-size: 0.875rem !important;
 }
 .fw-bold {
   font-weight: 800 !important;
+}
+.fw-semibold {
+  font-weight: 600 !important;
 }
 
 /* Spacing */
@@ -109,11 +113,23 @@ a .text-blue-800:hover {
 .lh-base {
   line-height: 1.5 !important;
 }
+.py-12 {
+  padding-top: 3rem !important;
+  padding-bottom: 3rem !important;
+}
 
 /* Responsive gutter override */
+.g-10 {
+  margin-left: -1.25rem !important;
+  margin-right: -1.25rem !important;
+}
 .g-10 > * {
   padding-left: 1.25rem !important;
   padding-right: 1.25rem !important;
+}
+.g-md-8 {
+  margin-left: -1rem !important;
+  margin-right: -1rem !important;
 }
 .g-md-8 > * {
   padding-left: 1rem !important;
@@ -123,4 +139,59 @@ a .text-blue-800:hover {
 /* Transitions */
 .transition-colors {
   transition: color 0.3s ease;
+}
+
+/* Contact container */
+.contact-container {
+  min-height: 300px;
+}
+
+/* Icon wrapper */
+.rounded-circle {
+  border-radius: 50% !important;
+}
+
+/* Flex utilities */
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
+.flex-grow-1 {
+  flex-grow: 1 !important;
+}
+
+/* For inline display of icons */
+.d-inline {
+  display: inline !important;
+}
+
+/* Border top for social media section */
+.border-top {
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Shadow for map */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+/* Tambahkan di contact.css atau di file utama */
+
+/* Font Awesome sizing */
+.fa-lg {
+  font-size: 1.33333em !important;
+  line-height: 0.75em !important;
+  vertical-align: -.0667em !important;
+}
+
+/* Pastikan Font Awesome icons memiliki width/height yang konsisten */
+.fas, .fab {
+  width: 1.25em !important;
+  height: 1.25em !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Optional: tambahkan ini jika ingin lebih smooth */
+i {
+  transition: all 0.3s ease !important;
 }
