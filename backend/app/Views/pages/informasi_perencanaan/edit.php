@@ -24,17 +24,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
-                        <select name="kategori" class="form-select" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <?php 
-                            $options = ['Renstra', 'Renja', 'IKU', 'Perjanjian Kinerja', 'Lainnya'];
-                            foreach($options as $opt): ?>
-                                <option value="<?= $opt ?>" <?= (old('kategori', $doc['kategori']) == $opt) ? 'selected' : '' ?>>
-                                    <?= $opt ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                        <input type="text" name="kategori" class="form-control" value="<?= old('kategori', $doc['kategori']) ?>" required>                    </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Tahun <span class="text-danger">*</span></label>

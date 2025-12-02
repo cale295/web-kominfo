@@ -23,14 +23,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
-                        <select name="kategori" class="form-select" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <option value="Renstra" <?= old('kategori') == 'Renstra' ? 'selected' : '' ?>>Renstra</option>
-                            <option value="Renja" <?= old('kategori') == 'Renja' ? 'selected' : '' ?>>Renja</option>
-                            <option value="IKU" <?= old('kategori') == 'IKU' ? 'selected' : '' ?>>IKU</option>
-                            <option value="Perjanjian Kinerja" <?= old('kategori') == 'Perjanjian Kinerja' ? 'selected' : '' ?>>Perjanjian Kinerja</option>
-                            <option value="Lainnya" <?= old('kategori') == 'Lainnya' ? 'selected' : '' ?>>Lainnya</option>
-                        </select>
+                        <input type="text" name="kategori" class="form-control" value="<?= old('kategori') ?>" placeholder="Contoh: Rencana Strategis" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
