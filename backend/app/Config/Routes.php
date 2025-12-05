@@ -85,7 +85,10 @@ $routes->resource('daftar_informasi_publik', ['controller' => 'frontend\DaftarIn
 $routes->resource('laporan_kinerja', ['controller' => 'frontend\LaporanKinerjaController', 'except' => ['show']]);
 // Permohonan Informasi
 $routes->resource('permohonan_informasi', ['controller' => 'frontend\PermohonanInformasiController', 'except' => ['show']]);
- 
+// Ip Penyedia
+$routes->resource('ip_penyedia', ['controller' => 'frontend\IpPenyediaController', 'except' => ['show']]);
+// Ip Swakelola
+$routes->resource('ip_swakelola', ['controller' => 'frontend\IpSwakelolaController', 'except' => ['show']]);
 
 
 
@@ -169,6 +172,14 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // =========================================================
 $routes->group('api', function ($routes) {
 
+    // Ip Swakelola
+    $routes->get('ip_swakelola', 'Api\ApiIpSwakelolaController::index');
+    $routes->get('ip_swakelola/(:num)', 'Api\ApiIpSwakelolaController::show/$1');
+
+    // Ip Penyedia
+    $routes->get('ip_penyedia', 'Api\ApiIpPenyediaController::index');
+    $routes->get('ip_penyedia/(:num)', 'Api\ApiIpPenyediaController::show/$1');
+
     //Permohonan Informasi
     $routes->get('permohonan_informasi', 'Api\ApiPermohonanInformasiController::index');
     $routes->get('permohonan_informasi/(:num)', 'Api\ApiPermohonanInformasiController::show/$1');
@@ -178,8 +189,8 @@ $routes->group('api', function ($routes) {
     $routes->get('laporan_kinerja/(:num)', 'Api\ApiLaporanKinerjaController::show/$1');
 
     //Daftar Informasi Publik
-    $routes->get('daftar_informasi_publik', 'Api\ApiInformasiPublikController::index');
-    $routes->get('daftar_informasi_publik/(:num)', 'Api\ApiInformasiPublikController::show/$1');
+    $routes->get('daftar_informasi_publik', 'Api\ApidaftarInformasiPublikController::index');
+    $routes->get('daftar_informasi_publik/(:num)', 'Api\ApidaftarInformasiPublikController::show/$1');
 
     //Laporan Keuangan
     $routes->get('laporan_keuangan', 'Api\ApiLaporanKeuanganController::index');
