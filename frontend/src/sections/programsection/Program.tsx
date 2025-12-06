@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import './Program.css';
+import "./Program.css";
 import api from "../../services/api";
 
 interface ProgramList {
@@ -65,65 +65,78 @@ const Program: React.FC = () => {
 
   return (
     <div className="program-container">
-  <h2 className="program-title">PROGRAM SKPD TAHUN 2025</h2>
+      <h2 className="program-title">PROGRAM SKPD TAHUN 2025</h2>
 
-  <div className="table-toolbar">
-    <div>
-      Show
-      <select>
-        <option>10</option>
-        <option>25</option>
-        <option>50</option>
-      </select>
-      entries
+      <div className="table-toolbar">
+        <div>
+          Show
+          <select>
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select>
+          entries
+        </div>
+
+        <div className="search-box">
+          Search: <input type="text" placeholder="Cari program..." />
+        </div>
+      </div>
+
+      <div className="table-responsive">
+        <table className="program-table">
+          <thead>
+            <tr>
+              <th>Nama Program</th>
+              <th>Nama Kegiatan</th>
+              <th>Nilai Anggaran (Rupiah)</th>
+              <th>Tahun</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {program.map((item) => (
+              <tr key={item.id_program}>
+                <td>{item.nama_program}</td>
+                <td>{item.nama_kegiatan}</td>
+                <td className="text-right">
+                  {Number(item.nilai_anggaran).toLocaleString("id-ID")}
+                </td>
+                <td style={{ textAlign: "center" }}>{item.tahun}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="table-footer">
+        <div>Showing 1 to 10 of {program.length} entries</div>
+
+        <ul className="pagination">
+          <li>
+            <button>Previous</button>
+          </li>
+          <li className="active">
+            <button>1</button>
+          </li>
+          <li>
+            <button>2</button>
+          </li>
+          <li>
+            <button>3</button>
+          </li>
+          <li>
+            <button>4</button>
+          </li>
+          <li>
+            <button>5</button>
+          </li>
+          <li>
+            <button>Next</button>
+          </li>
+        </ul>
+      </div>
     </div>
-
-    <div className="search-box">
-      Search: <input type="text" placeholder="Cari program..." />
-    </div>
-  </div>
-
-  <div className="table-responsive">
-    <table className="program-table">
-      <thead>
-        <tr>
-          <th>Nama Program</th>
-          <th>Nama Kegiatan</th>
-          <th>Nilai Anggaran (Rupiah)</th>
-          <th>Tahun</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {program.map((item) => (
-          <tr key={item.id_program}>
-            <td>{item.nama_program}</td>
-            <td>{item.nama_kegiatan}</td>
-            <td className="text-right">
-              {Number(item.nilai_anggaran).toLocaleString("id-ID")}
-            </td>
-            <td style={{ textAlign: "center" }}>{item.tahun}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-
-  <div className="table-footer">
-    <div>Showing 1 to 10 of {program.length} entries</div>
-
-    <ul className="pagination">
-      <li><button>Previous</button></li>
-      <li className="active"><button>1</button></li>
-      <li><button>2</button></li>
-      <li><button>3</button></li>
-      <li><button>4</button></li>
-      <li><button>5</button></li>
-      <li><button>Next</button></li>
-    </ul>
-  </div>
-</div>
-
   );
 };
 

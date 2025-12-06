@@ -61,7 +61,6 @@
   text-decoration: none;
 }
 
-
 .carousel-indicators {
   bottom: 10px;
   margin-bottom: 0;
@@ -73,12 +72,11 @@
   margin: 0 4px;
   background-color: rgba(255, 255, 255, 0.5);
   border: none;
-  border-radius: 50% !important; /* paksa bulat */
+  border-radius: 50% !important;
 }
 
-
 .carousel-indicators button.active {
-  width: 12px; /* sama dengan height */
+  width: 12px;
   height: 12px;
   background-color: #ffffff;
 }
@@ -195,12 +193,12 @@
   margin: 10px;
 }
 
-.berita-terkini-card-body{
+.berita-terkini-card-body {
   display: flex;
   gap: 1rem;
 }
 
-.berita-terkini-card-item{
+.berita-terkini-card-item {
   display: flex;
   flex-direction: column;
 }
@@ -213,6 +211,7 @@
   width: 300px;
   height: 160px;
   object-fit: cover;
+  border-radius: 8px;
 }
 
 .berita-terkini-title {
@@ -288,38 +287,252 @@
 }
 
 /* ============================
-   Responsive Adjustments
+   Responsive Adjustments - TABLET (768px - 991px)
    ============================ */
 @media (max-width: 991px) {
+  .berita-container {
+    padding: 0rem 2rem;
+  }
+
+  /* Carousel */
   .carousel-image {
-    height: 300px;
+    height: 350px;
   }
 
   .caption-title {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
   }
 
+  .caption-date {
+    font-size: 0.85rem;
+  }
+
+  /* Berita Terkini */
   .berita-terkini-img {
-    width: 100px;
-    height: 75px;
+    width: 200px;
+    height: 120px;
+  }
+
+  .berita-terkini-title {
+    font-size: 1.2rem;
+  }
+
+  .berita-terkini-intro {
+    font-size: 0.9rem;
+  }
+
+  /* Berita Populer */
+  .berita-populer-card {
+    height: auto;
+    margin-bottom: 2rem;
+  }
+
+  .berita-number {
+    font-size: 1.2rem;
+  }
+
+  .berita-title {
+    font-size: 0.95rem;
+  }
+
+  /* Tag Populer */
+  .tag-number {
+    font-size: 1.2rem;
+  }
+
+  .tag-name {
+    font-size: 1.2rem;
   }
 }
 
-@media (max-width: 576px) {
+/* ============================
+   Responsive Adjustments - MOBILE (max 767px)
+   ============================ */
+@media (max-width: 767px) {
+  .berita-container {
+    padding: 0rem 1rem;
+  }
+
+  /* Section Title */
+  .section-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .icon-triangle {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Carousel */
   .carousel-image {
     height: 250px;
   }
 
-  .caption-title {
-    font-size: 1rem;
+  .carousel-caption-custom {
+    padding: 0.75rem 1rem 1rem;
   }
 
-  .carousel-caption-custom {
-    padding: 1.5rem 1rem 1rem;
+  .caption-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .caption-date {
+    font-size: 0.75rem;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 32px;
+    height: 32px;
+  }
+
+  .carousel-control-prev {
+    left: 10px;
+  }
+
+  .carousel-control-next {
+    right: 10px;
+  }
+
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .carousel-indicators [data-bs-target] {
+    width: 8px;
+    height: 8px;
+    margin: 0 3px;
+  }
+
+  .carousel-indicators button.active {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Berita Terkini Card */
+  .berita-terkini-card {
+    margin: 8px 0;
+  }
+
+  .berita-terkini-card-body {
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   .berita-terkini-img {
-    width: 80px;
-    height: 60px;
+    width: 100%;
+    height: 180px;
+  }
+
+  .berita-terkini-title {
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .berita-terkini-intro {
+    font-size: 0.85rem;
+    -webkit-line-clamp: 3;
+  }
+
+  .berita-terkini-date {
+    font-size: 0.7rem;
+  }
+
+  /* Berita Populer */
+  .berita-populer-card {
+    height: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  .berita-populer-item {
+    padding: 10px 0;
+  }
+
+  .berita-populer-link {
+    gap: 10px;
+  }
+
+  .berita-number {
+    font-size: 1rem;
+  }
+
+  .berita-title {
+    font-size: 0.9rem;
+  }
+
+  .berita-date {
+    font-size: 0.7rem;
+  }
+
+  .btn-link-more {
+    font-size: 0.8rem;
+  }
+
+  /* Tag Populer */
+  .tag-populer-item {
+    padding: 6px 0;
+  }
+
+  .tag-populer-link {
+    gap: 6px;
+    font-size: 0.8rem;
+  }
+
+  .tag-number {
+    font-size: 1rem;
+  }
+
+  .tag-name {
+    font-size: 1rem;
+  }
+
+  /* Filter Alert */
+  .alert {
+    font-size: 0.85rem;
+  }
+
+  .alert button {
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================
+   Responsive Adjustments - SMALL MOBILE (max 480px)
+   ============================ */
+@media (max-width: 480px) {
+  .berita-container {
+    padding: 0rem 0.75rem;
+  }
+
+  .carousel-image {
+    height: 200px;
+  }
+
+  .caption-title {
+    font-size: 0.95rem;
+  }
+
+  .caption-date {
+    font-size: 0.7rem;
+  }
+
+  .berita-terkini-img {
+    height: 160px;
+  }
+
+  .berita-terkini-title {
+    font-size: 0.95rem;
+  }
+
+  .berita-terkini-intro {
+    font-size: 0.8rem;
+  }
+
+  .section-title {
+    font-size: 0.95rem;
   }
 }

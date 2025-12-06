@@ -22,13 +22,13 @@ const Gallery: React.FC = () => {
   const [selectedAlbum, setSelectedAlbum] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
-  const ROOT_ALBUM = "http://localhost:8080/uploads/album_covers";
-  const ROOT_GALLERY = "http://localhost:8080/uploads/gallery";
+  const BASE_URL = import.meta.env.VITE_API_URL;
+  const ROOT_ALBUM = `${BASE_URL}/uploads/album_covers`;
+  const ROOT_GALLERY = `${BASE_URL}/uploads/gallery`;
 
   const fetchData = async () => {
     try {
       setLoading(true);
-
       const [albumRes, photoRes] = await Promise.all([
         api.get("/album"),
         api.get("/gallery"),
@@ -37,7 +37,6 @@ const Gallery: React.FC = () => {
       if (albumRes.data.status) {
         const albumsData = albumRes.data.data;
         setAlbums(albumsData);
-        
         if (albumsData.length > 0 && !selectedAlbum) {
           setSelectedAlbum(albumsData[0].id_album);
         }
@@ -67,11 +66,21 @@ const Gallery: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-5">Memuat gallery...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Memuat galeri foto...</p>
+      </div>
+    );
   }
 
   if (albums.length === 0) {
-    return <div className="text-center py-5">Tidak ada album tersedia</div>;
+    return (
+      <div className="empty-state">
+        <h3>Tidak Ada Album</h3>
+        <p>Belum ada album foto yang tersedia saat ini.</p>
+      </div>
+    );
   }
 
   const selectedAlbumData = getSelectedAlbum();
@@ -79,12 +88,13 @@ const Gallery: React.FC = () => {
 
   return (
     <div className="gallery-container">
-      <h2 className="gallery-title">Galeri Foto</h2>
+      <div className="gallery-header">
+        <h1 className="gallery-title">Galeri Foto</h1>
+        <p className="gallery-subtitle">Dokumentasi kegiatan pemerintahan</p>
+      </div>
 
-      {/* FILTER ALBUM - DESIGN YANG LEBIH BAGUS */}
-      <div className="album-filter-section">
-        <div className="filter-header">
-          <span className="filter-icon">📁</span>
+      <div className="album-selector">
+        <div className="selector-header">
           <h3>Pilih Album</h3>
         </div>
         <select
@@ -92,62 +102,65 @@ const Gallery: React.FC = () => {
           onChange={(e) => setSelectedAlbum(e.target.value)}
           className="album-select"
         >
-          {albums.map((album) => {
-            const photoCount = photos.filter(p => p.id_album === album.id_album).length;
-            return (
-              <option key={album.id_album} value={album.id_album}>
-                {album.album_name} ({photoCount} foto)
-              </option>
-            );
-          })}
+          {albums.map((album) => (
+            <option key={album.id_album} value={album.id_album}>
+              {album.album_name} ({photos.filter(p => p.id_album === album.id_album).length} foto)
+            </option>
+          ))}
         </select>
       </div>
 
-      {/* ALBUM YANG DIPILIH */}
       {selectedAlbumData && (
-        <div className="selected-album-container">
-          {/* HEADER ALBUM - SAMA DENGAN SEBELUMNYA */}
-          <div className="album-header">
+        <div className="album-content">
+          <div className="album-info">
             <div className="album-cover-container">
               <img
                 src={`${ROOT_ALBUM}/${selectedAlbumData.cover_image}`}
-                className="album-cover"
                 alt={selectedAlbumData.album_name}
+                className="album-cover"
+                loading="lazy"
               />
             </div>
-            <div className="album-info">
-              <h3 className="album-name">{selectedAlbumData.album_name}</h3>
+            <div className="album-details">
+              <h2>{selectedAlbumData.album_name}</h2>
               <p className="album-description">{selectedAlbumData.description}</p>
-              <div className="album-stats">
-                <span className="photo-count-badge">
-                  {filteredPhotos.length} Foto
+              <div className="album-meta">
+                <span className="photo-count">
+                  {filteredPhotos.length} foto dalam album ini
                 </span>
               </div>
             </div>
           </div>
 
-          {/* GRID FOTO - SAMA DENGAN SEBELUMNYA */}
-          {filteredPhotos.length > 0 ? (
-            <div className="photo-grid">
-              {filteredPhotos.map((photo) => (
-                <div key={photo.id_photo} className="photo-item">
-                  <div className="photo-image-container">
-                    <img
-                      src={`${ROOT_GALLERY}/${photo.file_path}`}
-                      alt={photo.photo_title}
-                      className="photo-image"
-                    />
+          <div className="photos-section">
+            <div className="section-header">
+              <h3>Dokumentasi</h3>
+            </div>
+
+            {filteredPhotos.length > 0 ? (
+              <div className="photo-grid">
+                {filteredPhotos.map((photo) => (
+                  <div key={photo.id_photo} className="photo-card">
+                    <div className="photo-image-container">
+                      <img
+                        src={`${ROOT_GALLERY}/${photo.file_path}`}
+                        alt={photo.photo_title}
+                        className="photo-image"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="photo-info">
+                      <p className="photo-title">{photo.photo_title}</p>
+                    </div>
                   </div>
-                  <p className="photo-title">{photo.photo_title}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <div className="empty-icon">📷</div>
-              <p className="empty-text">Belum ada foto di album ini</p>
-            </div>
-          )}
+                ))}
+              </div>
+            ) : (
+              <div className="no-photos">
+                <p>Belum ada foto di album ini</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

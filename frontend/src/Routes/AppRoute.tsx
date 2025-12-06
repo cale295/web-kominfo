@@ -19,6 +19,11 @@ import DaftarPejabat from "../sections/profilsection/daftarpejabat/DaftarPejabat
 import Program from "../sections/programsection/Program";
 import ModalProfil from "../sections/profilsection/modalprofil/ModalProfil";
 import Gallery from "../sections/gallerysection/Gallery";
+import Perencanaan from "../sections/informasipubliksection/perencanaan/Perencanaan";
+import Keuangan from "../sections/informasipubliksection/laporankeuangan/LaporanKeuangan";
+import Kinerja from "../sections/informasipubliksection/laporankinerja/LaporanKinerja";
+import SBU from "../sections/profilsection/sbu/SBU";
+import BannerPopupComponent from "../components/bannerpopup/BannerPopup";
 
 const HomePage: React.FC = () => {
   return (
@@ -30,7 +35,6 @@ const HomePage: React.FC = () => {
       <Media />
       <HubungiKami />
       <Modal />
-      <Footer />
     </>
   );
 };
@@ -40,7 +44,6 @@ const BeritaPage: React.FC = () => {
     <>
       <ModalBerita/>
       <Berita />
-      <Footer />
     </>
   );
 };
@@ -49,7 +52,6 @@ const BeritaDetailPage: React.FC = () => {
   return (
     <>
       <BeritaDetail />
-      <Footer />
     </>
   );
 };
@@ -61,6 +63,7 @@ const ProfilePage: React.FC = () => {
       <Tentang />
       <Tugas />
       <DaftarPejabat />
+      <SBU />
     </div>
   )
 }
@@ -85,6 +88,8 @@ const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Navbar />
+
+      <BannerPopupComponent />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/berita" element={<BeritaPage />} />
@@ -94,7 +99,11 @@ const AppRouter: React.FC = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/program" element={<ProgramPage />} />
         <Route path="/gallery" element={<GalleryPage />} />
+        <Route path="/perencanaan" element={<Perencanaan />} />
+        <Route path="/laporan_keuangan" element={<Keuangan />} />
+        <Route path="/laporan_kinerja" element={<Kinerja />} />
       </Routes>
+      <Footer />
       <AccessibilityPanel />
     </BrowserRouter>
   );

@@ -38,6 +38,30 @@ const Footer: React.FC = () => {
   const [kanalError, setKanalError] = useState<string | null>(null);
 
   // Fetch OPD Info
+  const BASE_URL = import.meta.env.VITE_API_URL;
+
+  // Fungsi untuk mengubah relative path menjadi absolute URL
+  const getFullLogoUrl = (relativePath: string) => {
+    if (!relativePath) return null;
+
+    // Jika sudah absolute URL, kembalikan langsung
+    if (
+      relativePath.startsWith("http://") ||
+      relativePath.startsWith("https://")
+    ) {
+      return relativePath;
+    }
+
+    // Jika dimulai dengan slash, tambahkan base URL
+    if (relativePath.startsWith("/")) {
+      return `${BASE_URL}${relativePath}`;
+    }
+
+    // Jika tanpa slash, tambahkan dengan slash
+    return `${BASE_URL}/${relativePath}`;
+  };
+
+  // Update bagian fetch data:
   useEffect(() => {
     const fetchOpdInfo = async () => {
       try {
@@ -45,9 +69,19 @@ const Footer: React.FC = () => {
         setOpdError(null);
 
         const response = await api.get("/footer_opd");
+        console.log("OPD API Response:", response.data);
 
         if (response.data.status && response.data.data.length > 0) {
-          setOpdInfo(response.data.data[0]);
+          const opdData = response.data.data[0];
+
+          // Transform logo URL ke absolute
+          const transformedData = {
+            ...opdData,
+            logo_cominfo: getFullLogoUrl(opdData.logo_cominfo),
+          };
+
+          console.log("Transformed logo URL:", transformedData.logo_cominfo);
+          setOpdInfo(transformedData);
         } else {
           setOpdInfo(null);
         }
@@ -93,7 +127,7 @@ const Footer: React.FC = () => {
       setKanalLoading(true);
       setKanalError(null);
 
-      const response = await api.get("/footer_social"); // Adjust endpoint as needed
+      const response = await api.get("/footer_social");
 
       console.log("API Response kanal:", response.data);
 
@@ -102,7 +136,7 @@ const Footer: React.FC = () => {
         const activeKanal = response.data.data
           .filter((item: kanal) => item.is_active === 1)
           .sort((a: kanal, b: kanal) => a.sorting - b.sorting);
-        
+
         setKanalData(activeKanal);
       } else {
         setKanalData([]);
@@ -125,25 +159,34 @@ const Footer: React.FC = () => {
     if (platformIcon) {
       return <i className={`${platformIcon} me-2`}></i>;
     }
-    
+
     // Default mapping based on platform name
     const platform = platformName.toLowerCase();
-    if (platform.includes('instagram')) return <i className="fab fa-instagram me-2"></i>;
-    if (platform.includes('live') || platform.includes('stream')) return <i className="fas fa-video me-2"></i>;
-    if (platform.includes('ppid') || platform.includes('informasi')) return <i className="fas fa-info-circle me-2"></i>;
-    if (platform.includes('smart')) return <i className="fas fa-brain me-2"></i>;
-    if (platform.includes('data')) return <i className="fas fa-database me-2"></i>;
-    if (platform.includes('lapor')) return <i className="fas fa-comment-alt me-2"></i>;
-    if (platform.includes('youtube')) return <i className="fab fa-youtube me-2"></i>;
-    if (platform.includes('facebook')) return <i className="fab fa-facebook me-2"></i>;
-    if (platform.includes('twitter')) return <i className="fab fa-twitter me-2"></i>;
-    
+    if (platform.includes("instagram"))
+      return <i className="fab fa-instagram me-2"></i>;
+    if (platform.includes("live") || platform.includes("stream"))
+      return <i className="fas fa-video me-2"></i>;
+    if (platform.includes("ppid") || platform.includes("informasi"))
+      return <i className="fas fa-info-circle me-2"></i>;
+    if (platform.includes("smart"))
+      return <i className="fas fa-brain me-2"></i>;
+    if (platform.includes("data"))
+      return <i className="fas fa-database me-2"></i>;
+    if (platform.includes("lapor"))
+      return <i className="fas fa-comment-alt me-2"></i>;
+    if (platform.includes("youtube"))
+      return <i className="fab fa-youtube me-2"></i>;
+    if (platform.includes("facebook"))
+      return <i className="fab fa-facebook me-2"></i>;
+    if (platform.includes("twitter"))
+      return <i className="fab fa-twitter me-2"></i>;
+
     return <i className="fas fa-link me-2"></i>;
   };
 
   // Format platform name for display
   const formatPlatformName = (platformName: string) => {
-    return platformName.startsWith('@') ? platformName : `@${platformName}`;
+    return platformName.startsWith("@") ? platformName : `@${platformName}`;
   };
 
   if (error && visitorCounts.length === 0) {
