@@ -89,9 +89,12 @@ $routes->resource('permohonan_informasi', ['controller' => 'frontend\PermohonanI
 $routes->resource('ip_penyedia', ['controller' => 'frontend\IpPenyediaController', 'except' => ['show']]);
 // Ip Swakelola
 $routes->resource('ip_swakelola', ['controller' => 'frontend\IpSwakelolaController', 'except' => ['show']]);
-
-
-
+// Ppid Permohonan
+$routes->resource('ppid_permohonan', ['controller' => 'frontend\PpidPermohonanController', 'except' => ['show']]);
+// Agenda Pelatihan
+$routes->resource('agenda_pelatihan', ['controller' => 'frontend\AgendaPelatihanController', 'except' => ['show']]);
+// Ip Kerja Sama Daerah
+$routes->resource('ip_kerjasama_daerah', ['controller' => 'frontend\IpKerjasamaDaerahController', 'except' => ['show']]);
 
 
 // berita kategori
@@ -171,6 +174,18 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    // Ip Kerja Sama Daerah
+    $routes->get('ip_kerjasama_daerah', 'Api\ApiIpKerjasamaDaerahController::index');
+    $routes->get('ip_kerjasama_daerah/(:num)', 'Api\ApiIpKerjasamaDaerahController::show/$1');
+
+    // Agenda Pelatihan
+    $routes->get('agenda_pelatihan', 'Api\ApiAgendaPelatihanController::index');
+    $routes->get('agenda_pelatihan/(:num)', 'Api\ApiAgendaPelatihanController::show/$1');
+
+    // Ppid Permohonan
+    $routes->get('ppid_permohonan', 'Api\ApiPpidPermohonanController::index');
+    $routes->post('ppid_permohonan', 'Api\ApiPpidPermohonanController::create');
 
     // Ip Swakelola
     $routes->get('ip_swakelola', 'Api\ApiIpSwakelolaController::index');
