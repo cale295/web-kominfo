@@ -58,6 +58,10 @@ class KontakSocialController extends BaseController
         if (!$access['can_create']) {
             return redirect()->to('/kontak_social')->with('error', 'Kamu tidak punya izin menambah data.');
         }
+        $countdata = $this->kontakSocialModel->countAllResults();
+        if ($countdata > 3) {
+            return redirect()->to('/kontak_social')->with('error', 'Maksimal Data Kontak Social 4.');
+        }
         return view('pages/kontak_social/create');
     }
 
@@ -70,12 +74,6 @@ class KontakSocialController extends BaseController
         if (!$access['can_create']) {
             return redirect()->to('/kontak_social')->with('error', 'Kamu tidak punya izin menambah data.');
         }
-
-        $count = $this->kontakSocialModel->countAllResults();
-        if ($count >= 4) {
-            return redirect()->back()->withInput()->with('error', 'Maksimal 4 data');
-        }
-
         // Ambil data dari form
         $data = [
             'platform'   => $this->request->getPost('platform'),

@@ -58,6 +58,10 @@ class HomeVideoLayananController extends BaseController
         if (!$access || !$access['can_create']) {
             return redirect()->to('/home_video_layanan')->with('error', 'Akses ditolak.');
         }
+        $countdata = $this->homeVideoModel->countAllResults();
+        if ($countdata > 3) {
+            return redirect()->to('/home_video_layanan')->with('error', 'Maksimal Data Video Layanan 4.');
+        }
         return view('pages/home_video_layanan/create');
     }
 
@@ -68,14 +72,7 @@ public function create()
 
         // Ambil nilai is_featured dari input
         $isFeatured = $this->request->getPost('is_featured') ?? 0;
-        $countvideo = $this->homeVideoModel->countAllResults();
 
-
-         if ($countvideo >= 4) {
-            return redirect()->back()
-                ->withInput() // Kembalikan inputan user agar tidak mengetik ulang
-                ->with('error', 'Maksimal 3 video. silahkan hapus atau edit video yang sudah ada.');
-        }
         // --- LOGIKA PENGECEKAN (VALIDASI) ---
         // Jika user mencoba menginput video sebagai Featured (1)
         if ($isFeatured == 1) {

@@ -10,6 +10,7 @@ class PhotoGalleryModel extends Model
     protected $primaryKey = 'id_photo';
     protected $allowedFields = [
         'photo_title',
+        'deskripsi',
         'file_path',
         'id_album',
     ];
@@ -19,6 +20,19 @@ class PhotoGalleryModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
+    protected $validationRules = [
+        'photo_title' => 'required',
+        'deskripsi' => 'required',
+    ];
+
+    protected $validationMessages = [
+        'photo_title' => [
+            'required' => 'Judul foto harus diisi.',
+        ],
+        'deskripsi' => [
+            'required' => 'Deskripsi foto harus diisi.',
+        ]
+        ];
     // Ambil semua data foto berdasarkan album
     public function getByAlbum($id_album)
     {
