@@ -18,3 +18,36 @@
         padding-bottom: 2.5rem;
     }
 }
+
+/* Sembunyikan bar Google Translate di atas */
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+/* Sembunyikan tooltip */
+.goog-tooltip {
+  display: none !important;
+}
+
+.goog-tooltip:hover {
+  display: none !important;
+}
+
+/* Sembunyikan highlight aneh */
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Hilangkan logo Google kecil */
+.goog-logo-link {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  font-size: 0 !important;
+}

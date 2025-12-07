@@ -124,6 +124,45 @@ function Navbar() {
     fetchMainMenus();
     fetchCategoryMenus();
   }, []);
+  // Tambahkan script ini di component Navbar.tsx setelah useEffect
+
+  useEffect(() => {
+    // Function untuk set posisi submenu
+    const handleSubmenuPosition = () => {
+      const menuItems = document.querySelectorAll(".navbar-menu-item");
+
+      menuItems.forEach((item) => {
+        const submenu = item.querySelector(".submenu-hidden");
+        if (!submenu) return;
+
+        const link = item.querySelector(".navbar-menu-link");
+        if (!link) return;
+
+        // Event listener untuk hover
+        item.addEventListener("mouseenter", () => {
+          const rect = link.getBoundingClientRect();
+          const submenuEl = submenu as HTMLElement;
+
+          // Set posisi submenu berdasarkan posisi link
+          submenuEl.style.position = "fixed";
+          submenuEl.style.top = `${rect.bottom + 5}px`;
+          submenuEl.style.left = `${rect.left}px`;
+        });
+      });
+    };
+
+    // Jalankan setelah render
+    handleSubmenuPosition();
+
+    // Re-calculate saat resize
+    window.addEventListener("resize", handleSubmenuPosition);
+    window.addEventListener("scroll", handleSubmenuPosition);
+
+    return () => {
+      window.removeEventListener("resize", handleSubmenuPosition);
+      window.removeEventListener("scroll", handleSubmenuPosition);
+    };
+  }, [mainMenus, categoryMenus, currentMenuType]);
 
   // Toggle submenu di mobile
   const toggleSubmenu = (id: string | number) => {

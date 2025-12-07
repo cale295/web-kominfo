@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  Triangle,
-  Calendar,
-  Bell,
-  Image,
-} from "lucide-react";
-import './Agenda.css'
+import { Triangle, Calendar, Bell, Image } from "lucide-react";
+import "./Agenda.css";
 import api from "../../../services/api";
 
 interface AnnouncementItem {
@@ -63,12 +58,13 @@ export default function Agenda() {
     today.getDate()
   );
   const [calendarEvents, setCalendarEvents] = useState<
-    Record<number, CalendarEvent>
+    Record<number, CalendarEvent[]>
   >({});
+
   const [loadingAgenda, setLoadingAgenda] = useState<boolean>(true);
   const [errorAgenda, setErrorAgenda] = useState<string | null>(null);
   const [agendaData, setAgendaData] = useState<ApiAgendaItem[]>([]);
-  
+
   // State untuk Berita Utama
   const [beritaUtamaList, setBeritaUtamaList] = useState<BeritaItem[]>([]);
   const [loadingBerita, setLoadingBerita] = useState<boolean>(true);
@@ -99,11 +95,13 @@ export default function Agenda() {
 
   // Generate data pengumuman dari agenda
   const announcementData: AnnouncementItem[] = agendaData
-    .filter(agenda => agenda.status === "active" || agenda.status === "published")
+    .filter(
+      (agenda) => agenda.status === "active" || agenda.status === "published"
+    )
     .map((agenda, index) => ({
       id: index + 1,
       title: agenda.activity_name,
-      date: formatAnnouncementDate(agenda.start_date)
+      date: formatAnnouncementDate(agenda.start_date),
     }))
     .slice(0, 7); // Ambil maksimal 7 pengumuman
 
@@ -114,12 +112,12 @@ export default function Agenda() {
         setLoadingBerita(true);
         const res = await api.get("/berita");
         const data = res?.data?.data;
-        
+
         if (!data) {
           setErrorBerita("Data berita tidak ditemukan");
           return;
         }
-        
+
         const utamaArray: BeritaUtamaItem[] = data.utama || [];
         const beritaUtamaDetailList: BeritaItem[] = [];
 
@@ -171,7 +169,7 @@ export default function Agenda() {
         const json = res?.data;
 
         if (json.status && Array.isArray(json.data)) {
-          const eventsMap: Record<number, CalendarEvent> = {};
+          const eventsMap: Record<number, CalendarEvent[]> = {};
           const agendaList: ApiAgendaItem[] = json.data;
 
           // Simpan data agenda untuk digunakan di pengumuman
@@ -185,7 +183,11 @@ export default function Agenda() {
               start.getMonth() + 1 === currentMonth &&
               start.getFullYear() === currentYear
             ) {
-              eventsMap[day] = {
+              if (!eventsMap[day]) {
+                eventsMap[day] = [];
+              }
+
+              eventsMap[day].push({
                 date: day,
                 title: item.activity_name,
                 time: start.toLocaleTimeString("id-ID", {
@@ -193,7 +195,7 @@ export default function Agenda() {
                   minute: "2-digit",
                 }),
                 image: item.image,
-              };
+              });
             }
           });
 
@@ -253,7 +255,9 @@ export default function Agenda() {
     } else setCurrentMonth(currentMonth + 1);
   };
 
-  const selectedEvent = selectedDate ? calendarEvents[selectedDate] : null;
+  const selectedEvents = selectedDate ? calendarEvents[selectedDate] ?? [] : [];
+  const firstEvent = selectedEvents[0];
+
   const currentNews = beritaUtamaList[currentNewsIndex];
 
   return (
@@ -277,7 +281,10 @@ export default function Agenda() {
                   <div className="news-image-container">
                     {currentNews.feat_image ? (
                       <img
-                        src={`${ROOT}/${currentNews.feat_image.replace(/^\/+/, "")}`}
+                        src={`${ROOT}/${currentNews.feat_image.replace(
+                          /^\/+/,
+                          ""
+                        )}`}
                         className="img-fluid w-100 h-100 object-fit-cover"
                         alt={currentNews.judul}
                       />
@@ -297,7 +304,9 @@ export default function Agenda() {
                       <small className="text-muted d-block">
                         Sumber: Dinas Komunikasi dan Informatika Kota Tangerang
                       </small>
-                      <small className="text-secondary">{formatDate(currentNews.created_at)}</small>
+                      <small className="text-secondary">
+                        {formatDate(currentNews.created_at)}
+                      </small>
                     </div>
                   </div>
                   <div className="d-flex justify-content-center gap-2 pb-3">
@@ -347,11 +356,11 @@ export default function Agenda() {
                   <div className="col-md-5 d-flex ">
                     <img
                       src={
-                        selectedEvent && selectedEvent.image
-                          ? `${ROOT}/uploads/agenda/${selectedEvent.image}`
+                        firstEvent?.image
+                          ? `${ROOT}/uploads/agenda/${firstEvent.image}`
                           : "assets/agenda-default.jpg"
                       }
-                      alt={selectedEvent?.title || "Belum Ada Agenda"}
+                      alt={firstEvent?.title || "Belum Ada Agenda"}
                       className="img-fluid h-100 object-fit-cover rounded-start-4"
                     />
                   </div>
@@ -425,14 +434,21 @@ export default function Agenda() {
                               Agenda Tanggal {selectedDate}
                             </h6>
                           </div>
-                          {selectedEvent ? (
-                            <div className="d-flex justify-content-between align-items-center">
-                              <p className="fw-semibold mb-1 small">
-                                {selectedEvent.title}
-                              </p>
-                              <p className="fw-bold text-blue mb-0">
-                                {selectedEvent.time}
-                              </p>
+                          {selectedEvents && selectedEvents.length > 0 ? (
+                            <div className="d-flex flex-column gap-2">
+                              {selectedEvents.map((event, index) => (
+                                <div
+                                  key={index}
+                                  className="d-flex justify-content-between align-items-center border-bottom pb-1"
+                                >
+                                  <p className="fw-semibold mb-0 small">
+                                    {event.title}
+                                  </p>
+                                  <p className="fw-bold text-blue mb-0 small">
+                                    {event.time}
+                                  </p>
+                                </div>
+                              ))}
                             </div>
                           ) : (
                             <p className="text-muted small mb-0">
@@ -457,13 +473,18 @@ export default function Agenda() {
                   </div>
                 ) : announcementData.length > 0 ? (
                   announcementData.map((a) => (
-                    <div key={a.id} className="p-3 border-bottom hover-bg-light">
+                    <div
+                      key={a.id}
+                      className="p-3 border-bottom hover-bg-light"
+                    >
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex align-items-center gap-2">
                           <div className="dot bg-primary"></div>
                           <h6 className="mb-0 fw-semibold">{a.title}</h6>
                         </div>
-                        <span className="fw-bold text-blue small">{a.date}</span>
+                        <span className="fw-bold text-blue small">
+                          {a.date}
+                        </span>
                       </div>
                     </div>
                   ))

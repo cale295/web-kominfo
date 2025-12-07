@@ -1,41 +1,59 @@
-import React, { useState } from 'react';
-import './Tentang.css';
+import React, { useEffect, useState } from "react";
+import "./Tentang.css";
+import api from "../../../services/api";
 
-interface AccordionItem {
-  id: string;
+interface ListData {
+  id_tentang: string;
   title: string;
   content: string;
+  sorting: string;
+  is_active: string;
 }
 
 const Tentang: React.FC = () => {
-  const [openItem, setOpenItem] = useState<string>('profil');
+  const [listData, setListData] = useState<ListData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [openItem, setOpenItem] = useState<string | null>(null);
 
-  const accordionData: AccordionItem[] = [
-    {
-      id: 'profil',
-      title: 'Profil',
-      content: `Dinas Komunikasi dan Informatika Kota Tangerang terbentuk berdasarkan Peraturan Daerah Nomor 9 Tahun 2019 Tentang Perubahan atas Peraturan Daerah Nomor 8 Tahun 2016 tentang Pembentukan dan Susunan Perangkat Daerah. Dalam regulasi tersebut Dinas Komunikasi dan Informatika Kota Tangerang termasuk dalam klasifikasi Dinas tipe A. Dalam melaksanakan tugasnya, Dinas Komunikasi dan Informatika Kota Tangerang menyelenggarakan fungsi dan wewenang yaitu pengelolaan informasi dan komunikasi publik Pemerintah daerah, pengelolaan e-Government di lingkup Pemerintah Kota Tangerang, penyelenggaraan statistik sektoral di lingkup Pemerintah Kota Tangerang, dan pelaksanaan tugas yang diberikan oleh walikota terkait dengan tugas dan fungsinya. Pegawai Dinas Komunikasi dan Informatika Kota Tangerang per Januari 2020 berjumlah 50 orang Pegawai Negeri Sipil (PNS).`
-    },
-    {
-      id: 'ruang-lingkup',
-      title: 'Ruang Lingkup Kegiatan',
-      content: 'Konten untuk Ruang Lingkup Kegiatan akan ditampilkan di sini.'
-    },
-    {
-      id: 'susunan-organisasi',
-      title: 'Susunan Organisasi',
-      content: 'Konten untuk Susunan Organisasi akan ditampilkan di sini.'
-    },
-    {
-      id: 'visi-misi',
-      title: 'Visi dan Misi',
-      content: 'Konten untuk Visi dan Misi akan ditampilkan di sini.'
+  const fetchTentang = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await api.get("/profil_tentang");
+
+      if (response.data.status && Array.isArray(response.data.data)) {
+        // filter yang aktif + sorting
+        const cleanData = response.data.data
+          .filter((item: ListData) => item.is_active === "1")
+          .sort(
+            (a: ListData, b: ListData) =>
+              Number(a.sorting) - Number(b.sorting)
+          );
+
+        setListData(cleanData);
+      } else {
+        setListData([]);
+      }
+    } catch (err) {
+      console.error("Error fetching Tentang", err);
+      setError("Gagal memuat data Tentang. Silahkan coba lagi.");
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchTentang();
+  }, []);
 
   const toggleAccordion = (id: string) => {
-    setOpenItem(openItem === id ? '' : id);
+    setOpenItem((prev) => (prev === id ? null : id));
   };
+
+  if (loading) return <p className="text-center mt-5">Loading...</p>;
+  if (error) return <p className="text-center text-danger mt-5">{error}</p>;
 
   return (
     <div className="tentang-container">
@@ -48,31 +66,42 @@ const Tentang: React.FC = () => {
         <div className="row">
           <div className="col-lg-6 mb-4">
             <div className="accordion-custom">
-              {accordionData.map((item) => (
-                <div key={item.id} className="accordion-item-custom">
+              {listData.map((item) => (
+                <div key={item.id_tentang} className="accordion-item-custom">
                   <div
-                    className={`accordion-header-custom ${openItem === item.id ? 'active' : ''}`}
-                    onClick={() => toggleAccordion(item.id)}
+                    className={`accordion-header-custom ${
+                      openItem === item.id_tentang ? "active" : ""
+                    }`}
+                    onClick={() => toggleAccordion(item.id_tentang)}
                   >
                     <h3 className="accordion-title">{item.title}</h3>
                   </div>
-                  <div className={`accordion-body-custom ${openItem === item.id ? 'open' : ''}`}>
+
+                  <div
+                    className={`accordion-body-custom ${
+                      openItem === item.id_tentang ? "open" : ""
+                    }`}
+                  >
                     <div className="accordion-content">
-                      {item.content.split('\n').map((paragraph, index) => (
+                      {item.content.split("\n").map((paragraph, index) => (
                         <p key={index}>{paragraph}</p>
                       ))}
                     </div>
                   </div>
                 </div>
               ))}
+
+              {listData.length === 0 && (
+                <p className="text-center">Data belum tersedia</p>
+              )}
             </div>
           </div>
 
           <div className="col-lg-6">
             <div className="logo-container">
-              <img 
-                src="./assets/logo.png" 
-                alt="Logo Dinas Kominfo Kota Tangerang" 
+              <img
+                src="/assets/logo.png"
+                alt="Logo Dinas Kominfo Kota Tangerang"
                 className="logo-image"
               />
             </div>
