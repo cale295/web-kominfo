@@ -1,5 +1,25 @@
 <?= $this->extend('layouts/main') ?>
 
+<?= $this->section('styles') ?>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    /* Sedikit styling agar editor terlihat menyatu dengan Bootstrap */
+    #editor-container {
+        height: 300px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    .ql-toolbar {
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+    }
+    .ql-container {
+        border-bottom-left-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+    }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 <div class="container-fluid px-4">
     <h1 class="mt-4">Tambah Struktur Organisasi</h1>
@@ -16,11 +36,10 @@
             <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-plus-circle me-1"></i> Form Input</h6>
         </div>
         <div class="card-body">
-            <form action="/struktur_organisasi" method="post">
+            <form action="/struktur_organisasi" method="post" id="formStruktur">
                 <?= csrf_field() ?>
 
                 <div class="row">
-                    <!-- Kolom Kiri -->
                     <div class="col-md-8">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Nama Unit/Jabatan <span class="text-danger">*</span></label>
@@ -55,17 +74,14 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Deskripsi Singkat</label>
-                            <textarea class="form-control" name="deskripsi" rows="3"><?= old('deskripsi') ?></textarea>
+                            
+                            <div id="editor-container"></div>
+                            
+                            <input type="hidden" name="deskripsi" id="deskripsi_input" value="<?= htmlspecialchars(old('deskripsi') ?? '') ?>">
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Konten HTML (Opsional)</label>
-                            <!-- Class editor untuk Summernote/CKEditor -->
-                            <textarea class="form-control editor" name="konten_html" rows="5"><?= old('konten_html') ?></textarea>
                         </div>
-                    </div>
 
-                    <!-- Kolom Kanan -->
                     <div class="col-md-4">
                         <div class="card bg-light border-0">
                             <div class="card-body">
@@ -95,4 +111,47 @@
         </div>
     </div>
 </div>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Inisialisasi Quill
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Tulis deskripsi tugas pokok dan fungsi di sini...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],        // toggled buttons
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['link', 'clean']                       // remove formatting button
+                ]
+            }
+        });
+
+        // 2. Load Old Data (Jika validasi gagal dan halaman reload)
+        var oldContent = document.getElementById('deskripsi_input').value;
+        if (oldContent) {
+            // Gunakan clipboard.dangerouslyPasteHTML agar tag HTML terbaca
+            quill.clipboard.dangerouslyPasteHTML(oldContent);
+        }
+
+        // 3. Tangkap event Submit Form
+        var form = document.getElementById('formStruktur');
+        form.onsubmit = function() {
+            // Pindahkan HTML dari editor Quill ke dalam input hidden sebelum submit
+            var deskripsiContent = document.querySelector('input[name=deskripsi]');
+            
+            // Cek apakah editor kosong (hanya berisi tag p kosong)
+            if (quill.root.innerHTML === '<p><br></p>') {
+                 deskripsiContent.value = ''; 
+            } else {
+                 deskripsiContent.value = quill.root.innerHTML;
+            }
+        };
+    });
+</script>
 <?= $this->endSection() ?>
