@@ -13,6 +13,11 @@
         </div>
 
         <div class="mb-3">
+            <label for="deskripsi" class="form-label">Deskripsi Foto</label>
+            <textarea name="deskripsi" id="deskripsi" class="form-control" rows="3" required></textarea>
+        </div>
+
+        <div class="mb-3">
             <label for="id_album" class="form-label">Album</label>
             <select name="id_album" id="id_album" class="form-select" required>
                 <option value="">-- Pilih Album --</option>

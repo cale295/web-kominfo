@@ -78,6 +78,7 @@ class PhotoGalleryController extends BaseController
 
         $data = [
             'photo_title' => $this->request->getPost('photo_title'),
+            'deskripsi'   => $this->request->getPost('deskripsi'),
             'id_album'    => $this->request->getPost('id_album') ?: null,
             'file_path'   => $newName,
         ];
@@ -135,6 +136,7 @@ class PhotoGalleryController extends BaseController
 
         $data = [
             'photo_title' => $this->request->getPost('photo_title'),
+            'deskripsi'   => $this->request->getPost('deskripsi'),
             'id_album'    => $this->request->getPost('id_album') ?: null,
             'file_path'   => $newName,
         ];

@@ -20,6 +20,7 @@
             <tr class="text-center">
                 <th>#</th>
                 <th>Judul Foto</th>
+                <th>Deskripsi</th>
                 <th>Album</th>
                 <th>File</th>
                 <th>Tanggal Upload</th>
@@ -32,6 +33,7 @@
                     <tr>
                         <td class="text-center"><?= $i + 1 ?></td>
                         <td><?= esc($row['photo_title']) ?></td>
+                        <td><?= esc($row['deskripsi']) ?></td>
                         <td><?= esc($row['album_name'] ?? '-') ?></td>
                         <td class="text-center">
                             <?php if (!empty($row['file_path'])): ?>

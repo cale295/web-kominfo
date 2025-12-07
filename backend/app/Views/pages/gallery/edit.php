@@ -4,12 +4,18 @@
 <div class="container py-4">
     <h3>✏️ Edit Foto</h3>
 
-    <form action="<?= site_url('gallery/update/' . $photo['id_photo']) ?>" method="post" enctype="multipart/form-data">
+    <form action="<?= site_url('gallery/' . $photo['id_photo']) ?>" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="PUT">
         <?= csrf_field() ?>
 
         <div class="mb-3">
             <label for="photo_title" class="form-label">Judul Foto</label>
             <input type="text" name="photo_title" id="photo_title" value="<?= esc($photo['photo_title']) ?>" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="deskripsi" class="form-label">Deskripsi Foto</label>
+            <textarea name="deskripsi" id="deskripsi" class="form-control" rows="3" required><?= esc($photo['deskripsi']) ?></textarea>
         </div>
 
         <div class="mb-3">

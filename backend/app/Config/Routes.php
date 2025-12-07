@@ -175,6 +175,11 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // =========================================================
 $routes->group('api', function ($routes) {
 
+    //tugas fungsi
+    $routes->get('tugasfungsi', 'Api\ApiTugasFungsiController::index');
+    $routes->get('tugasfungsi/(:num)', 'Api\ApiTugasFungsiController::show/$1');
+
+
     // Ip Kerja Sama Daerah
     $routes->get('ip_kerjasama_daerah', 'Api\ApiIpKerjasamaDaerahController::index');
     $routes->get('ip_kerjasama_daerah/(:num)', 'Api\ApiIpKerjasamaDaerahController::show/$1');
