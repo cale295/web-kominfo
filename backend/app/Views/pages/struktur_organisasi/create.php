@@ -2,21 +2,26 @@
 
 <?= $this->section('styles') ?>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <style>
-    /* Sedikit styling agar editor terlihat menyatu dengan Bootstrap */
-    #editor-container {
-        height: 300px;
-        font-family: inherit;
-        font-size: 1rem;
+    /* Styling Editor */
+    #editor-container { height: 300px; font-family: inherit; font-size: 1rem; }
+    .ql-toolbar { border-top-left-radius: 0.375rem; border-top-right-radius: 0.375rem; }
+    .ql-container { border-bottom-left-radius: 0.375rem; border-bottom-right-radius: 0.375rem; }
+    
+    /* Tweaking Select2 */
+    .select2-container .select2-selection--single {
+        height: 38px !important; 
+        display: flex;
+        align-items: center;
     }
-    .ql-toolbar {
-        border-top-left-radius: 0.375rem;
-        border-top-right-radius: 0.375rem;
-    }
-    .ql-container {
-        border-bottom-left-radius: 0.375rem;
-        border-bottom-right-radius: 0.375rem;
-    }
+    
+    /* Styling Pilihan Dropdown */
+    .level-0 { font-weight: 700; color: #2c3e50; } /* Induk Utama (Tebal) */
+    .level-1 { font-weight: 500; color: #444; }    /* Anak Pertama */
+    .level-2 { color: #666; font-size: 0.95em; }    /* Cucu */
+    .level-deep { color: #888; font-size: 0.9em; font-style: italic; }
 </style>
 <?= $this->endSection() ?>
 
@@ -46,41 +51,28 @@
                             <input type="text" class="form-control" name="nama" placeholder="Contoh: Bidang Informasi dan Komunikasi Publik" value="<?= old('nama') ?>" required>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
-                                <input class="form-control" list="kategoriList" name="kategori" placeholder="Pilih atau ketik..." value="<?= old('kategori') ?>" required>
-                                <datalist id="kategoriList">
-                                    <option value="sekretariat">Sekretariat</option>
-                                    <option value="bidang">Bidang</option>
-                                    <option value="seksi">Seksi</option>
-                                    <option value="upt">UPT</option>
-                                    <option value="kelompok_jabatan">Kelompok Jabatan</option>
-                                </datalist>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Induk (Parent)</label>
-                                <select class="form-select" name="parent_id">
-                                    <option value="">- Tidak Ada (Root) -</option>
-                                    <?php foreach ($parents as $p): ?>
-                                        <option value="<?= $p['id_struktur'] ?>" <?= old('parent_id') == $p['id_struktur'] ? 'selected' : '' ?>>
-                                            <?= $p['nama'] ?> (<?= ucfirst($p['kategori']) ?>)
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <div class="form-text">Pilih jika unit ini berada di bawah unit lain.</div>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Induk (Parent)</label>
+                            
+                            <select class="form-select select2" name="parent_id" id="parent_id">
+                                <option value="" data-depth="0">- Tidak Ada (Root) -</option>
+                                <?php foreach ($parents as $p): ?>
+                                    <option value="<?= $p['id_struktur'] ?>" 
+                                            data-depth="<?= $p['depth'] ?>" 
+                                            <?= old('parent_id') == $p['id_struktur'] ? 'selected' : '' ?>>
+                                        <?= $p['nama'] ?> </option>
+                                <?php endforeach; ?>
+                            </select>
+                            
+                            <div class="form-text">Pilih induk jika unit ini adalah bawahan.</div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Deskripsi Singkat</label>
-                            
                             <div id="editor-container"></div>
-                            
                             <input type="hidden" name="deskripsi" id="deskripsi_input" value="<?= htmlspecialchars(old('deskripsi') ?? '') ?>">
                         </div>
-
-                        </div>
+                    </div>
 
                     <div class="col-md-4">
                         <div class="card bg-light border-0">
@@ -88,7 +80,7 @@
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Urutan Tampilan</label>
                                     <input type="number" class="form-control" name="sorting" value="<?= old('sorting', 0) ?>">
-                                    <div class="form-text">Semakin kecil angkanya, semakin di atas.</div>
+                                    <div class="form-text">Semakin kecil angka, semakin prioritas.</div>
                                 </div>
 
                                 <div class="mb-3 pt-2">
@@ -114,44 +106,87 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>
+    $(document).ready(function() {
+        // --- LOGIKA SELECT2 YANG DIPERCANTIK ---
+        
+        // Fungsi untuk mengatur tampilan per baris option
+        function formatStruktur(state) {
+            if (!state.id) { return state.text; } // Untuk placeholder
+            
+            // Ambil data depth dari atribut HTML
+            var depth = $(state.element).data('depth'); 
+            var paddingLeft = depth * 20; // 20px per level
+            var icon = '';
+            var cssClass = '';
+
+            // Tentukan Icon & Style berdasarkan Level kedalaman
+            if (depth == 0) {
+                icon = '<i class="fas fa-building text-primary me-2"></i>'; // Icon Gedung utk Induk
+                cssClass = 'level-0';
+            } else if (depth == 1) {
+                icon = '<i class="fas fa-folder-open text-warning me-2"></i>'; // Icon Folder utk Sub
+                cssClass = 'level-1';
+            } else {
+                icon = '<i class="fas fa-turn-up fa-rotate-90 text-secondary me-2"></i>'; // Icon Panah L utk Cucu
+                cssClass = depth == 2 ? 'level-2' : 'level-deep';
+            }
+
+            // Gabungkan Padding (CSS) + Icon + Teks
+            var $state = $(
+                '<span style="padding-left:' + paddingLeft + 'px" class="' + cssClass + '">' + 
+                    icon + state.text + 
+                '</span>'
+            );
+            return $state;
+        }
+
+        // Fungsi untuk tampilan saat item SUDAH DIPILIH (Selection Box)
+        function formatSelection(state) {
+            if (!state.id) { return state.text; }
+            // Saat dipilih, kita tidak butuh padding/indentasi berlebih, cukup icon saja
+            // Ambil depth untuk cek icon apa yg cocok
+            var depth = $(state.element).data('depth');
+            var icon = (depth == 0) ? '<i class="fas fa-building text-primary me-1"></i>' : '';
+            
+            return $('<span>' + icon + state.text + '</span>');
+        }
+
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Cari Unit Induk...',
+            allowClear: true,
+            templateResult: formatStruktur,    // Tampilan saat dropdown dibuka
+            templateSelection: formatSelection // Tampilan setelah dipilih
+        });
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Inisialisasi Quill
+        // --- LOGIKA QUILL (TETAP SAMA) ---
         var quill = new Quill('#editor-container', {
             theme: 'snow',
-            placeholder: 'Tulis deskripsi tugas pokok dan fungsi di sini...',
+            placeholder: 'Tulis deskripsi tugas pokok dan fungsi...',
             modules: {
                 toolbar: [
-                    ['bold', 'italic', 'underline'],        // toggled buttons
+                    ['bold', 'italic', 'underline'],
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                     [{ 'header': [1, 2, 3, false] }],
-                    ['link', 'clean']                       // remove formatting button
+                    ['link', 'clean']
                 ]
             }
         });
 
-        // 2. Load Old Data (Jika validasi gagal dan halaman reload)
         var oldContent = document.getElementById('deskripsi_input').value;
-        if (oldContent) {
-            // Gunakan clipboard.dangerouslyPasteHTML agar tag HTML terbaca
-            quill.clipboard.dangerouslyPasteHTML(oldContent);
-        }
+        if (oldContent) { quill.clipboard.dangerouslyPasteHTML(oldContent); }
 
-        // 3. Tangkap event Submit Form
-        var form = document.getElementById('formStruktur');
-        form.onsubmit = function() {
-            // Pindahkan HTML dari editor Quill ke dalam input hidden sebelum submit
-            var deskripsiContent = document.querySelector('input[name=deskripsi]');
-            
-            // Cek apakah editor kosong (hanya berisi tag p kosong)
-            if (quill.root.innerHTML === '<p><br></p>') {
-                 deskripsiContent.value = ''; 
-            } else {
-                 deskripsiContent.value = quill.root.innerHTML;
-            }
+        document.getElementById('formStruktur').onsubmit = function() {
+            var input = document.querySelector('input[name=deskripsi]');
+            input.value = (quill.root.innerHTML === '<p><br></p>') ? '' : quill.root.innerHTML;
         };
     });
 </script>
-<?= $this->endSection() ?> 
+<?= $this->endSection() ?>

@@ -76,7 +76,6 @@ if (!empty($struktur)) {
                         <tr>
                             <th class="text-center py-3" width="5%">No</th>
                             <th class="py-3" width="30%">Nama Unit (Hierarki)</th>
-                            <th class="py-3" width="15%">Kategori</th>
                             <th class="text-center py-3" width="10%">Status</th>
                             <th class="text-center py-3" width="10%">Urutan</th>
                             <th class="text-center py-3" width="15%">Aksi</th>
@@ -116,11 +115,7 @@ if (!empty($struktur)) {
                                             <div class="small text-muted fst-italic mt-1">Slug: <?= esc($item['slug']) ?></div>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
-                                        <span class="badge bg-info bg-opacity-10 text-info border border-info px-2">
-                                            <?= esc(strtoupper($item['kategori'])) ?>
-                                        </span>
-                                    </td>
+
                                     <td class="text-center">
                                         <?php if ($item['is_active'] == 1) : ?>
                                             <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-2">Aktif</span>

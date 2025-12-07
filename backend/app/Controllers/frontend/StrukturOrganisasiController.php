@@ -18,6 +18,29 @@ class StrukturOrganisasiController extends BaseController
         $this->accessRightsModel = new AccessRightsModel();
     }
 
+    // --- TAMBAHAN BARU ---
+    // Fungsi rekursif untuk menyusun hierarki tree
+    private function getHierarchicalOptions($data, $parentId = null, $depth = 0)
+    {
+        $result = [];
+        foreach ($data as $item) {
+            // Cek apakah parent_id item ini sama dengan parentId yang dicari
+            // Kita gunakan loose comparison (==) agar null dan 0 bisa terhandle jika perlu, 
+            // tapi karena di database kamu set null, pastikan logikanya cocok.
+            if ($item['parent_id'] == $parentId) {
+                $item['depth'] = $depth; // Tambahkan info kedalaman
+                $result[] = $item;
+
+                // Cari anak dari item ini (Recursion)
+                $children = $this->getHierarchicalOptions($data, $item['id_struktur'], $depth + 1);
+                
+                // Gabungkan hasil
+                $result = array_merge($result, $children);
+            }
+        }
+        return $result;
+    }
+
     private function getAccess($role)
     {
         $access = $this->accessRightsModel->where('role', $role)->where('module_name', $this->module)->first();
@@ -52,15 +75,19 @@ class StrukturOrganisasiController extends BaseController
         ]);
     }
 
-    public function new()
+public function new()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_create']) {
             return redirect()->to('/struktur_organisasi')->with('error', 'Akses ditolak.');
         }
 
-        // Ambil semua data untuk dropdown parent
-        $parents = $this->strukturModel->orderBy('nama', 'ASC')->findAll();
+        // 1. Ambil data mentah (urutkan berdasarkan sorting agar urutannya pas)
+        $rawStruktur = $this->strukturModel->orderBy('sorting', 'ASC')->orderBy('nama', 'ASC')->findAll();
+
+        // 2. Proses menjadi hierarki
+        // Parameter kedua 'null' karena root parent_id di database kamu null
+        $parents = $this->getHierarchicalOptions($rawStruktur, null, 0);
 
         return view('pages/struktur_organisasi/create', ['parents' => $parents]);
     }
@@ -74,11 +101,9 @@ class StrukturOrganisasiController extends BaseController
         
         $data = [
             'nama'        => $this->request->getPost('nama'),
-            'kategori'    => $this->request->getPost('kategori'),
             'parent_id'   => !empty($parentId) ? $parentId : null,
             'slug'        => url_title($this->request->getPost('nama'), '-', true),
             'deskripsi'   => $this->request->getPost('deskripsi'),
-            'konten_html' => $this->request->getPost('konten_html'),
             'sorting'     => $this->request->getPost('sorting') ?? 0,
             'is_active'   => $this->request->getPost('is_active') ?? 0,
         ];
@@ -90,7 +115,7 @@ class StrukturOrganisasiController extends BaseController
         return redirect()->to('/struktur_organisasi')->with('success', 'Data struktur berhasil ditambahkan.');
     }
 
-    public function edit($id)
+public function edit($id)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_update']) {
@@ -102,18 +127,22 @@ class StrukturOrganisasiController extends BaseController
             return redirect()->to('/struktur_organisasi')->with('error', 'Data tidak ditemukan.');
         }
 
-        // Ambil semua data untuk dropdown parent (kecuali diri sendiri)
-        $parents = $this->strukturModel
-            ->where('id_struktur !=', $id)
-            ->orderBy('nama', 'ASC')
-            ->findAll();
+        // 1. Ambil semua data (JANGAN difilter 'where id != id' disini, nanti hierarki anaknya putus)
+        $rawStruktur = $this->strukturModel->orderBy('sorting', 'ASC')->orderBy('nama', 'ASC')->findAll();
+
+        // 2. Susun Hierarki
+        $hierarchicalData = $this->getHierarchicalOptions($rawStruktur, null, 0);
+
+        // 3. Filter: Hapus diri sendiri dari daftar opsi parent (opsional: hapus juga turunannya agar tidak loop)
+        $parents = array_filter($hierarchicalData, function($item) use ($id) {
+            return $item['id_struktur'] != $id;
+        });
 
         return view('pages/struktur_organisasi/edit', [
             'struktur' => $struktur,
             'parents'  => $parents
         ]);
     }
-
     public function update($id)
     {
         $access = $this->getAccess(session()->get('role'));
@@ -127,11 +156,9 @@ class StrukturOrganisasiController extends BaseController
         $data = [
             'id_struktur' => $id,
             'nama'        => $this->request->getPost('nama'),
-            'kategori'    => $this->request->getPost('kategori'),
             'parent_id'   => !empty($parentId) ? $parentId : null,
             'slug'        => url_title($this->request->getPost('nama'), '-', true),
             'deskripsi'   => $this->request->getPost('deskripsi'),
-            'konten_html' => $this->request->getPost('konten_html'),
             'sorting'     => $this->request->getPost('sorting') ?? 0,
             'is_active'   => $this->request->getPost('is_active') ?? 0,
         ];

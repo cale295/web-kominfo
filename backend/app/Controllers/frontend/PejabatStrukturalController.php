@@ -2,20 +2,20 @@
 
 namespace App\Controllers\frontend;
 
-use App\Controllers\BaseController;
+use App\Models\frontend\PejabatStrukturalModel;
 use App\Models\AccessRightsModel;
-// Pastikan kamu sudah membuat Model ini
-use App\Models\frontend\StrukturOrganisasiModel; 
+use App\Controllers\BaseController;
 
-class StrukturOrganisasiController extends BaseController
+class PejabatStrukturalController extends BaseController
 {
-    protected $strukturModel;
+    protected $pejabatModel;
     protected $accessRightsModel;
-    protected $module = 'struktur_organisasi'; // Sesuaikan nama modul di tabel hak akses
+    protected $module = 'pejabat_struktural'; // Sesuaikan dengan nama modul di database hak akses
+    protected $uploadPath = FCPATH . 'uploads/pejabat_struktural/';
 
     public function __construct()
     {
-        $this->strukturModel = new StrukturOrganisasiModel();
+        $this->pejabatModel = new PejabatStrukturalModel();
         $this->accessRightsModel = new AccessRightsModel();
     }
 
@@ -40,159 +40,149 @@ class StrukturOrganisasiController extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat data ini.');
         }
 
-        // Kita bisa sort berdasarkan 'sorting' ASC agar urutan sesuai input user
         $data = [
-            'struktur_organisasi' => $this->strukturModel->orderBy('sorting', 'ASC')->findAll(),
+            'pejabat_struktural' => $this->pejabatModel->orderBy('created_at', 'DESC')->findAll(),
             'can_create' => $access['can_create'],
             'can_update' => $access['can_update'],
             'can_delete' => $access['can_delete'],
         ];
 
-        return view('pages/struktur_organisasi/index', $data);
+        return view('pages/pejabat_struktural/index', $data);
     }
 
     public function new()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access['can_create']) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Akses ditolak.');
+            return redirect()->to('/pejabat_struktural')->with('error', 'Akses ditolak.');
         }
-
-        // PENTING: Kirim data 'parents' untuk dropdown select option
-        $data = [
-            'parents' => $this->strukturModel->orderBy('nama', 'ASC')->findAll()
-        ];
-
-        return view('pages/struktur_organisasi/create', $data);
+        return view('pages/pejabat_struktural/create');
     }
 
     public function create()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access['can_create']) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Akses ditolak.');
+            return redirect()->to('/pejabat_struktural')->with('error', 'Akses ditolak.');
         }
 
-        // 1. Validasi Input
+        // Validasi Upload Gambar Wajib di Create
         if (!$this->validate([
-            'nama'     => 'required|min_length[3]',
-            'kategori' => 'required',
-            'sorting'  => 'integer'
+            'image' => [
+                'label' => 'Gambar Struktur',
+                'rules' => 'uploaded[image]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]|max_size[image,5120]'
+            ]
         ])) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // 2. LOGIC KHUSUS: Handle Parent ID (String kosong "" jadi NULL)
-        $parentIdInput = $this->request->getPost('parent_id');
-        $parentId = empty($parentIdInput) ? null : $parentIdInput;
-
-        // 3. Persiapkan Data
         $data = [
-            'nama'        => $this->request->getPost('nama'),
-            'kategori'    => $this->request->getPost('kategori'),
-            'parent_id'   => $parentId, // Ini variable yang sudah di-cek null
-            'deskripsi'   => $this->request->getPost('deskripsi'), // Isi dari Quill JS
-            'sorting'     => $this->request->getPost('sorting'),
-            // Checkbox: jika dicentang kirim '1', jika tidak kirim '0'
-            'is_active'   => $this->request->getPost('is_active') ? 1 : 0, 
+            'title'       => $this->request->getPost('title'),
+            'subtitle'    => $this->request->getPost('subtitle'),
+            'description' => $this->request->getPost('description'),
+            'is_active'   => $this->request->getPost('is_active'),
         ];
 
-        // 4. Simpan
-        if (!$this->strukturModel->save($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->strukturModel->errors());
+        // Handle File Upload
+        $img = $this->request->getFile('image');
+        if ($img->isValid() && !$img->hasMoved()) {
+            $newName = $img->getRandomName();
+            // Pastikan folder ada
+            if (!is_dir($this->uploadPath)) {
+                mkdir($this->uploadPath, 0777, true);
+            }
+            $img->move($this->uploadPath, $newName);
+            $data['image_url'] = $newName;
         }
 
-        return redirect()->to('/struktur_organisasi')->with('success', 'Data struktur organisasi berhasil ditambahkan.');
+        if (!$this->pejabatModel->save($data)) {
+            return redirect()->back()->withInput()->with('errors', $this->pejabatModel->errors());
+        }
+
+        return redirect()->to('/pejabat_struktural')->with('success', 'Data pejabat struktural berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access['can_update']) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Akses ditolak.');
+            return redirect()->to('/pejabat_struktural')->with('error', 'Akses ditolak.');
         }
 
-        $struktur = $this->strukturModel->find($id);
-        if (!$struktur) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Data tidak ditemukan.');
+        $pejabat = $this->pejabatModel->find($id);
+        if (!$pejabat) {
+            return redirect()->to('/pejabat_struktural')->with('error', 'Data tidak ditemukan.');
         }
 
-        // PENTING: Kirim data 'parents' tapi KECUALIKAN dirinya sendiri
-        // (Agar tidak terjadi error hierarki: bapak adalah anak dari dirinya sendiri)
-        $parents = $this->strukturModel->where('id_struktur !=', $id)->orderBy('nama', 'ASC')->findAll();
-
-        $data = [
-            'struktur' => $struktur,
-            'parents'  => $parents
-        ];
-
-        return view('pages/struktur_organisasi/edit', $data);
+        return view('pages/pejabat_struktural/edit', ['pejabat' => $pejabat]);
     }
 
     public function update($id)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access['can_update']) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Akses ditolak.');
+            return redirect()->to('/pejabat_struktural')->with('error', 'Akses ditolak.');
         }
 
-        $struktur = $this->strukturModel->find($id);
-        if (!$struktur) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Data tidak ditemukan.');
-        }
-
-        // Validasi
-        if (!$this->validate([
-            'nama'     => 'required|min_length[3]',
-            'kategori' => 'required',
-            'sorting'  => 'integer'
-        ])) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        // Handle Parent ID Null
-        $parentIdInput = $this->request->getPost('parent_id');
-        $parentId = empty($parentIdInput) ? null : $parentIdInput;
-
-        // Cegah user memilih dirinya sendiri sebagai parent (Circular Logic)
-        if ($parentId == $id) {
-            return redirect()->back()->withInput()->with('error', 'Unit tidak bisa menjadi atasan bagi dirinya sendiri.');
+        $pejabat = $this->pejabatModel->find($id);
+        if (!$pejabat) {
+            return redirect()->to('/pejabat_struktural')->with('error', 'Data tidak ditemukan.');
         }
 
         $data = [
-            'id_struktur' => $id, // Primary Key wajib ada untuk update
-            'nama'        => $this->request->getPost('nama'),
-            'kategori'    => $this->request->getPost('kategori'),
-            'parent_id'   => $parentId,
-            'deskripsi'   => $this->request->getPost('deskripsi'),
-            'sorting'     => $this->request->getPost('sorting'),
-            'is_active'   => $this->request->getPost('is_active') ? 1 : 0,
+            'id_pejabat_s' => $id,
+            'title'        => $this->request->getPost('title'),
+            'subtitle'     => $this->request->getPost('subtitle'),
+            'description'  => $this->request->getPost('description'),
+            'is_active'    => $this->request->getPost('is_active'),
         ];
 
-        if (!$this->strukturModel->save($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->strukturModel->errors());
+        // Handle Image Upload (Optional on Update)
+        $img = $this->request->getFile('image');
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            
+            // Validasi file baru
+            if (!$this->validate(['image' => 'is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]|max_size[image,5120]'])) {
+                return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            }
+
+            // Hapus gambar lama
+            if (!empty($pejabat['image_url']) && file_exists($this->uploadPath . $pejabat['image_url'])) {
+                unlink($this->uploadPath . $pejabat['image_url']);
+            }
+
+            $newName = $img->getRandomName();
+            $img->move($this->uploadPath, $newName);
+            $data['image_url'] = $newName;
         }
 
-        return redirect()->to('/struktur_organisasi')->with('success', 'Data berhasil diperbarui.');
+        if (!$this->pejabatModel->save($data)) {
+            return redirect()->back()->withInput()->with('errors', $this->pejabatModel->errors());
+        }
+
+        return redirect()->to('/pejabat_struktural')->with('success', 'Data berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access['can_delete']) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Akses ditolak.');
+            return redirect()->to('/pejabat_struktural')->with('error', 'Akses ditolak.');
         }
 
-        // Opsional: Cek apakah data ini punya Child (Anak)
-        // Jika punya anak, sebaiknya dilarang hapus agar data anak tidak jadi "yatim piatu"
-        $hasChild = $this->strukturModel->where('parent_id', $id)->first();
-        if ($hasChild) {
-            return redirect()->to('/struktur_organisasi')->with('error', 'Gagal hapus! Unit ini memiliki bawahan. Hapus atau pindahkan bawahannya terlebih dahulu.');
+        $pejabat = $this->pejabatModel->find($id);
+        if (!$pejabat) {
+            return redirect()->to('/pejabat_struktural')->with('error', 'Data tidak ditemukan.');
         }
 
-        $this->strukturModel->delete($id);
+        // Hapus file fisik
+        if (!empty($pejabat['image_url']) && file_exists($this->uploadPath . $pejabat['image_url'])) {
+            unlink($this->uploadPath . $pejabat['image_url']);
+        }
 
-        return redirect()->to('/struktur_organisasi')->with('success', 'Data berhasil dihapus.');
+        $this->pejabatModel->delete($id);
+
+        return redirect()->to('/pejabat_struktural')->with('success', 'Data berhasil dihapus.');
     }
-    
+  
 }

@@ -15,11 +15,9 @@ class StrukturOrganisasiModel extends Model
 
     protected $allowedFields    = [
         'parent_id',
-        'kategori',
         'nama',
         'slug',
         'deskripsi',
-        'konten_html',
         'sorting',
         'is_active',
         'created_at',
@@ -37,10 +35,6 @@ class StrukturOrganisasiModel extends Model
         'nama' => [
             'rules'  => 'required|max_length[255]',
             'label'  => 'Nama Unit/Jabatan'
-        ],
-        'kategori' => [
-            'rules'  => 'required|max_length[100]',
-            'label'  => 'Kategori'
         ],
         'sorting' => [
             'rules'  => 'permit_empty|numeric',
