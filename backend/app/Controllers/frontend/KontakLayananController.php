@@ -57,6 +57,10 @@ class KontakLayananController extends BaseController
         if (!$access || !$access['can_create']) {
             return redirect()->to('/kontak_layanan')->with('error', 'Kamu tidak punya izin menambah kontak.');
         }
+        $countdata = $this->kontakLayananModel->countAllResults();
+        if ($countdata > 5) {
+            return redirect()->to('/kontak_layanan')->with('error', 'Maksimal Data Kontak Layanan 5.');
+        }
         return view('pages/kontak_layanan/create');
     }
 

@@ -69,6 +69,10 @@ class KontakController extends BaseController
         if (!$access || !$access['can_create']) {
             return redirect()->to('/kontak')->with('error', 'Kamu tidak punya izin menambah kontak.');
         }
+        $countdata = $this->kontakModel->countAllResults();
+        if ($countdata > 0) {
+            return redirect()->to('/kontak')->with('error', 'Maksimal Data Kontak 1.');
+        }
         return view('pages/kontak/create');
 
     }
