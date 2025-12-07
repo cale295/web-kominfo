@@ -24,6 +24,9 @@ import Keuangan from "../sections/informasipubliksection/laporankeuangan/Laporan
 import Kinerja from "../sections/informasipubliksection/laporankinerja/LaporanKinerja";
 import SBU from "../sections/profilsection/sbu/SBU";
 import BannerPopupComponent from "../components/bannerpopup/BannerPopup";
+import DaftarInformasiPublik from "../sections/informasipubliksection/daftarinformasipublik/Daftar_Informasi_publik";
+import PermohonanInformasi from "../sections/informasipubliksection/permohonaninformasi/PermohonanInformasi";
+import PengadaanBarangJasa from "../sections/informasipubliksection/pengadaanbarangjasa/PengadaanBarangJasa";
 
 const HomePage: React.FC = () => {
   return (
@@ -100,8 +103,11 @@ const AppRouter: React.FC = () => {
         <Route path="/program" element={<ProgramPage />} />
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/perencanaan" element={<Perencanaan />} />
+        <Route path="/pengadaan_barang_jasa" element={<PengadaanBarangJasa />} />
         <Route path="/laporan_keuangan" element={<Keuangan />} />
         <Route path="/laporan_kinerja" element={<Kinerja />} />
+        <Route path="/daftar_informasi_publik" element={<DaftarInformasiPublik />} />
+        <Route path="/permohonan_informasi" element={<PermohonanInformasi />} />
       </Routes>
       <Footer />
       <AccessibilityPanel />

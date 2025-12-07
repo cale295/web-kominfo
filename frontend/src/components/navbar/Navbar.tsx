@@ -70,12 +70,15 @@ function Navbar() {
 
       console.log("Data Menu dari API:", response.data.data);
 
-      const menusWithChildren = response.data.data.map((menu) => ({
-        ...menu,
-        children: menu.sub_menu,
-      }));
+      // Filter hanya menu dengan status 'active' dan map children
+      const activeMenus = response.data.data
+        .filter((menu) => menu.status === "active")
+        .map((menu) => ({
+          ...menu,
+          children: menu.sub_menu?.filter((sub) => sub.status === "active") || [],
+        }));
 
-      setMainMenus(menusWithChildren);
+      setMainMenus(activeMenus);
     } catch (error) {
       console.error("Gagal mengambil data menu:", error);
     }
