@@ -16,7 +16,7 @@ class ApiAgendaController extends ResourceController
 public function index()
 {
     $agendas = $this->model
-        ->where('status', 'active')
+        ->where('status', '1')
         ->orderBy('start_date', 'DESC')
         ->findAll();
 

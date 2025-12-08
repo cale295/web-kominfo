@@ -22,7 +22,7 @@ class ApiKontakController extends ResourceController
         
         // Mengambil data dengan urutan terbaru seperti di controller frontend
         $data = $model
-        ->where('status', 'aktif')
+        ->where('status', '1')
         ->orderBy('created_at', 'DESC')->findAll();
 
         if ($data) {
