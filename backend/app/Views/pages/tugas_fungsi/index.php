@@ -110,7 +110,9 @@
                                             </span>
                                         <?php endif; ?>
                                     </td>
-
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_tugas'], $item['is_active'], 'tugas_fungsi/toggle-status') ?>
+                                    </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
                                             <?php if ($can_update): ?>

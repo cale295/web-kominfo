@@ -83,7 +83,7 @@ class TugasFungsiController extends BaseController
 
             // Data Update (Termasuk Audit Trail)
             $updateData = [
-                'status'            => $newStatus,
+                'is_active'            => $newStatus,
                 'updated_at'        => date('Y-m-d H:i:s'),
                 'updated_by_id'     => session()->get('id_user'),
                 'updated_by_name'   => session()->get('username'),
