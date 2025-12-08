@@ -298,7 +298,6 @@ export default function Agenda() {
                     )}
                   </div>
                   <div className="card-body text-dark d-flex flex-column">
-                    <p className="fw-bold text-blue mb-2">BERITA UTAMA</p>
                     <p className="small">{currentNews.judul}</p>
                     <div className="mt-auto pt-3 border-top">
                       <small className="text-muted d-block">

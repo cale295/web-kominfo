@@ -1,72 +1,62 @@
 import React, { useState, useEffect } from "react";
 import "./tugas.css";
 import api from "../../../services/api";
+import DOMPurify from "dompurify";
 
 interface ListData {
   id_tugas: string;
   type: string;
   description: string;
-  order_number: string;
   is_active: string;
 }
 
 const Tugas: React.FC = () => {
   const [tugasData, setTugasData] = useState<ListData[]>([]);
   const [fungsiData, setFungsiData] = useState<ListData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
 
-      const response = await api.get("/tugasfungsi");
-      console.log("API response:", response.data);
+        const response = await api.get("/tugasfungsi");
 
-      const rawData = Array.isArray(response.data)
-        ? response.data
-        : response.data.data;
+        const rawData: ListData[] = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
 
-      const tugas = rawData
-        .filter(
-          (item: ListData) =>
+        if (rawData.length === 0) {
+          throw new Error("Data kosong atau format salah");
+        }
+
+        const tugas = rawData.filter(
+          (item) =>
             item.type?.toLowerCase().trim() === "tugas" &&
-            item.is_active == "1"
-        )
-        .sort(
-          (a: ListData, b: ListData) =>
-            parseInt(a.order_number) - parseInt(b.order_number)
+            item.is_active === "1"
         );
 
-      const fungsi = rawData
-        .filter(
-          (item: ListData) =>
+        const fungsi = rawData.filter(
+          (item) =>
             item.type?.toLowerCase().trim() === "fungsi" &&
-            item.is_active == "1"
-        )
-        .sort(
-          (a: ListData, b: ListData) =>
-            parseInt(a.order_number) - parseInt(b.order_number)
+            item.is_active === "1"
         );
 
-      console.log("Tugas:", tugas);
-      console.log("Fungsi:", fungsi);
+        setTugasData(tugas);
+        setFungsiData(fungsi);
+        setError(null);
+      } catch (err) {
+        setError("Gagal memuat data. Silakan coba lagi.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setTugasData(tugas);
-      setFungsiData(fungsi);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-      setError("Gagal memuat data. Silakan coba lagi.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-}, []);
-
+    fetchData();
+  }, []);
 
   if (loading) {
     return (
@@ -88,6 +78,7 @@ const Tugas: React.FC = () => {
     <div className="tugas-container">
       <h1 className="tugas-title">Tugas</h1>
       <p className="tugas-subtitle">Dinas Kominfo Kota Tangerang</p>
+
       <div className="tugas-box">
         {tugasData.length > 0 ? (
           tugasData.map((item) => (
@@ -98,40 +89,34 @@ const Tugas: React.FC = () => {
         ) : (
           <p className="tugas-text">
             Menyelenggarakan urusan pemerintahan bidang komunikasi dan
-            informatika, urusan pemerintahan bidang statistik dan urusan
-            pemerintahan bidang persandian.
+            informatika, statistik, dan persandian.
           </p>
         )}
       </div>
 
       <h1 className="fungsi-title">Fungsi</h1>
       <p className="fungsi-subtitle">Dinas Kominfo Kota Tangerang</p>
+
       <div className="fungsi-box">
-        <ol>
-          {fungsiData.length > 0 ? (
-            fungsiData.map((item) => (
-              <li key={item.id_tugas}>{item.description}</li>
-            ))
-          ) : (
-            <>
-              <li>
-                Perumusan kebijakan teknis pelaksanaan urusan di bidang komunikasi dan informatika
-              </li>
-              <li>
-                Perumusan kebijakan teknis pelaksanaan urusan di bidang persandian
-              </li>
-              <li>
-                Perumusan kebijakan teknis pelaksanaan urusan di bidang statistik
-              </li>
-              <li>
-                Pemberian dukungan atas penyelenggaraan urusan pemerintahan daerah di bidang komunikasi dan informatika
-              </li>
-              <li>
-                Pemberian dukungan atas penyelenggaraan urusan pemerintahan daerah di bidang persandian
-              </li>
-            </>
-          )}
-        </ol>
+        {fungsiData.length > 0 ? (
+          fungsiData.map((item) => (
+            <div
+              key={item.id_tugas}
+              className="fungsi-html"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(item.description),
+              }}
+            />
+          ))
+        ) : (
+          <ol>
+            <li>Perumusan kebijakan teknis bidang komunikasi dan informatika</li>
+            <li>Perumusan kebijakan teknis bidang persandian</li>
+            <li>Perumusan kebijakan teknis bidang statistik</li>
+            <li>Dukungan penyelenggaraan urusan komunikasi dan informatika</li>
+            <li>Dukungan penyelenggaraan urusan persandian</li>
+          </ol>
+        )}
       </div>
     </div>
   );
