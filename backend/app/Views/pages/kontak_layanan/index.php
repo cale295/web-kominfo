@@ -1,103 +1,116 @@
 <?= $this->extend('layouts/main') ?>
+
 <?= $this->section('content') ?>
 <?= $this->include('layouts/alerts') ?>
+
 <div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <div class="d-flex align-items-center justify-content-between my-4">
         <div>
-            <h1 class="h3 mb-0 text-gray-800">Kontak Layanan</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Kontak Layanan</li>
-                </ol>
-            </nav>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">Kontak Layanan</h1>
+            <p class="text-muted small mb-0">Kelola daftar layanan, icon, dan tautan kontak terkait.</p>
         </div>
-        <?php if ($can_create): ?>
-            <a href="/kontak_layanan/new" class="btn btn-primary shadow-sm">
-                <i class="fas fa-plus fa-sm text-white-50 me-1"></i> Tambah Baru
-            </a>
-        <?php endif; ?>
+        <ol class="breadcrumb mb-0 bg-transparent p-0">
+            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item active">Kontak Layanan</li>
+        </ol>
     </div>
 
-    <?php if (session()->getFlashdata('success')) : ?>
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <i class="fas fa-check-circle me-2"></i> <?= session()->getFlashdata('success') ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="card shadow border-0 rounded-3 mb-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-headset me-2"></i>Daftar Data Layanan
+            </h6>
+            <?php if ($can_create): ?>
+                <a href="/kontak_layanan/new" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale">
+                    <i class="fas fa-plus me-1"></i> Tambah Baru
+                </a>
+            <?php endif; ?>
         </div>
-    <?php endif; ?>
 
-    <?php if (session()->getFlashdata('error')) : ?>
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i> <?= session()->getFlashdata('error') ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-white py-3">
-            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-table me-1"></i> Daftar Data Layanan</h6>
-        </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle" width="100%" cellspacing="0">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
                         <tr>
-                            <th width="5%" class="text-center">No</th>
-                            <th width="25%">Judul Info</th>
-                            <th width="10%" class="text-center">Icon</th>
-                            <th width="15%">Kontak</th>
-                            <th width="10%" class="text-center">Urutan</th>
-                            <th width="10%" class="text-center">Status</th>
-                            <th width="15%" class="text-center">Aksi</th>
+                            <th class="text-center py-3" width="5%">No</th>
+                            <th class="py-3" width="25%">Judul Info</th>
+                            <th class="text-center py-3" width="10%">Icon</th>
+                            <th class="py-3" width="20%">Tautan / Link</th>
+                            <th class="text-center py-3" width="10%">Urutan</th>
+                            <th class="text-center py-3" width="10%">Status</th>
+                            <th class="text-center py-3" width="10%">Toggle</th>
+                            <th class="text-center py-3" width="10%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($kontaklayanan)) : ?>
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">
-                                    <i class="fas fa-folder-open fa-2x mb-2"></i><br>Belum ada data tersedia.
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted opacity-50 mb-2">
+                                        <i class="fas fa-folder-open fa-3x"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-secondary">Belum ada data layanan</h6>
+                                    <p class="small text-muted mb-0">Silakan tambahkan data baru.</p>
                                 </td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ($kontaklayanan as $i => $row) : ?>
                                 <tr>
-                                    <td class="text-center"><?= $i + 1 ?></td>
+                                    <td class="text-center fw-bold text-secondary"><?= $i + 1 ?></td>
+                                    
                                     <td>
-                                        <div class="fw-bold text-dark"><?= esc($row['judul']) ?></div>
-                                        <small class="text-muted"><?= esc($row['subjudul']) ?></small>
+                                        <div class="fw-bold text-dark mb-1"><?= esc($row['judul']) ?></div>
+                                        <div class="small text-muted"><?= esc($row['subjudul']) ?></div>
                                     </td>
+
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center mx-auto text-white shadow-sm" 
-                                             style="width: 40px; height: 40px; border-radius: 50%; background-color: <?= esc($row['icon_bg_color']) ?>;">
-                                            <i class="<?= esc($row['icon_class']) ?>"></i>
-                                        </div>
-                                        <small class="text-muted d-block mt-1" style="font-size: 0.7rem;"><?= esc($row['icon_class']) ?></small>
-                                    </td>
-                                    <td>
-                                        <div class="small">
-                                            <?php if ($row['link_url']) : ?>
-                                                <a href="<?= esc($row['link_url']) ?>" target="_blank" class="text-decoration-none text-truncate d-block" style="max-width: 150px;">
-                                                    <i class="fas fa-link text-muted me-1"></i> Link
-                                                </a>
-                                            <?php endif; ?>
+                                        <div class="d-flex flex-column align-items-center justify-content-center">
+                                            <div class="d-flex justify-content-center align-items-center text-white shadow-sm rounded-circle mb-1" 
+                                                 style="width: 40px; height: 40px; background-color: <?= esc($row['icon_bg_color']) ?>;">
+                                                <i class="<?= esc($row['icon_class']) ?>"></i>
+                                            </div>
+                                            <span class="badge bg-light text-muted border" style="font-size: 0.6rem; font-family: monospace;">
+                                                <?= esc($row['icon_class']) ?>
+                                            </span>
                                         </div>
                                     </td>
-                                    <td class="text-center"><?= esc($row['urutan']) ?></td>
-                                    <td class="text-center">
-                                        <?php if ($row['status'] == '1') : ?>
-                                            <span class="badge rounded-pill bg-success">Aktif</span>
-                                        <?php else : ?>
-                                            <span class="badge rounded-pill bg-secondary">Nonaktif</span>
+
+                                    <td>
+                                        <?php if ($row['link_url']) : ?>
+                                            <a href="<?= esc($row['link_url']) ?>" target="_blank" class="btn btn-sm btn-light border text-primary w-100 text-truncate" title="<?= esc($row['link_url']) ?>">
+                                                <i class="fas fa-external-link-alt me-1 small"></i> Buka Link
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted small fst-italic">-</span>
                                         <?php endif; ?>
                                     </td>
+
                                     <td class="text-center">
-                                    <?= btn_toggle($row['id_kontak_layanan'], $row['status'], 'kontak_layanan/toggle-status') ?>
+                                        <span class="badge bg-light text-dark border"><?= esc($row['urutan']) ?></span>
                                     </td>
+
                                     <td class="text-center">
-                                        <div class="btn-group" role="group">
+                                        <?php if ($row['status'] == '1') : ?>
+                                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-2">Aktif</span>
+                                        <?php else : ?>
+                                            <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Nonaktif</span>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex justify-content-center align-items-center h-100">
+                                            <?= btn_toggle($row['id_kontak_layanan'], $row['status'], 'kontak_layanan/toggle-status') ?>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-center align-items-center h-100">
                                             <?php if ($can_update) : ?>
-                                                <a href="/kontak_layanan/<?= $row['id_kontak_layanan'] ?>/edit" class="btn btn-warning btn-sm text-white" title="Edit">
-                                                    <i class="fas fa-edit"></i>
+                                                <a href="/kontak_layanan/<?= $row['id_kontak_layanan'] ?>/edit" 
+                                                   class="btn btn-outline-warning btn-sm rounded-circle shadow-sm" 
+                                                   data-bs-toggle="tooltip" 
+                                                   title="Edit">
+                                                    <i class="fas fa-pencil-alt"></i>
                                                 </a>
                                             <?php endif; ?>
                                             
@@ -105,8 +118,11 @@
                                                 <form action="/kontak_layanan/<?= $row['id_kontak_layanan'] ?>" method="post" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                                     <?= csrf_field() ?>
                                                     <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
-                                                        <i class="fas fa-trash"></i>
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-danger btn-sm rounded-circle shadow-sm" 
+                                                            data-bs-toggle="tooltip" 
+                                                            title="Hapus">
+                                                        <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
                                             <?php endif; ?>
@@ -121,4 +137,18 @@
         </div>
     </div>
 </div>
+
+<style>
+    .hover-scale { transition: transform 0.2s; }
+    .hover-scale:hover { transform: scale(1.05); }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
 <?= $this->endSection() ?>

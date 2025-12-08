@@ -72,10 +72,7 @@
                     </div>
                 </div>
 
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" <?= old('is_active', $pejabat['is_active']) == 1 ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="is_active">Aktifkan Pejabat ini?</label>
-                </div>
+        
 
                 <div class="d-flex justify-content-end gap-2">
                     <a href="<?= base_url('pejabat') ?>" class="btn btn-secondary">Batal</a>

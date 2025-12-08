@@ -3,140 +3,247 @@
 <?= $this->section('content') ?>
 <?= $this->include('layouts/alerts') ?>
 
-<div class="container-fluid px-4">
-    <!-- Page Header -->
-    <div class="d-flex align-items-center justify-content-between my-4">
-        <div>
-            <h1 class="h3 mb-0 text-gray-800 fw-bold">Manajemen Footer OPD</h1>
-            <p class="text-muted small mb-0">Kelola informasi identitas, kontak, dan aset visual footer website.</p>
+<style>
+    :root {
+        --primary-soft: #eef2ff;
+        --primary-text: #4f46e5;
+        --success-soft: #ecfdf5;
+        --success-text: #059669;
+        --danger-soft: #fef2f2;
+        --danger-text: #dc2626;
+        --warning-soft: #fffbeb;
+        --warning-text: #d97706;
+    }
+
+    /* Gradient Title */
+    .text-gradient {
+        background: linear-gradient(45deg, #4e73df, #224abe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Modern Card */
+    .card-modern {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
+    }
+
+    /* Action Buttons Soft */
+    .btn-soft-primary { background-color: var(--primary-soft); color: var(--primary-text); border: none; }
+    .btn-soft-primary:hover { background-color: #4f46e5; color: white; }
+    
+    .btn-soft-danger { background-color: var(--danger-soft); color: var(--danger-text); border: none; }
+    .btn-soft-danger:hover { background-color: #dc2626; color: white; }
+
+    /* Image Hover Effect */
+    .img-hover-zoom {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .img-hover-zoom:hover {
+        transform: scale(1.5);
+        z-index: 10;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        cursor: zoom-in;
+    }
+
+    /* Table Styling */
+    .table thead th {
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        border-bottom: 2px solid #f3f4f6;
+    }
+    .table tbody tr td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f9fafb;
+    }
+    
+    .icon-box {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+</style>
+
+<div class="container-fluid px-4 pb-5">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between my-4 py-2">
+        <div class="mb-3 mb-md-0">
+            <h1 class="h3 fw-bolder mb-1 text-gradient">Manajemen Footer OPD</h1>
+            <p class="text-muted small mb-0">
+                <i class="fas fa-info-circle me-1 text-primary"></i> 
+                Pusat kendali informasi identitas, kontak, dan aset visual footer website.
+            </p>
         </div>
-        <ol class="breadcrumb mb-0 bg-transparent p-0">
-            <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Dashboard</a></li>
-            <li class="breadcrumb-item active">Footer OPD</li>
-        </ol>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm mb-0 border">
+                <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none fw-bold text-primary small"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item active small" aria-current="page">Footer OPD</li>
+            </ol>
+        </nav>
     </div>
 
-    <!-- Alert Messages -->
     <?php if (session()->getFlashdata('error')): ?>
-        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <div class="alert alert-danger border-0 shadow-sm border-start border-4 border-danger rounded-3 fade show mb-4" role="alert">
             <div class="d-flex align-items-center">
-                <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
-                <div><?= session()->getFlashdata('error') ?></div>
+                <div class="icon-box bg-white text-danger me-3 shadow-sm" style="width: 32px; height: 32px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Terjadi Kesalahan!</h6>
+                    <small><?= session()->getFlashdata('error') ?></small>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
-    <!-- Main Card -->
-    <div class="card shadow border-0 rounded-3 mb-4">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-table me-2"></i>Daftar Data</h6>
+    <div class="card card-modern">
+        <div class="card-header bg-white py-4 border-0 d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold text-dark mb-0">Daftar Informasi</h5>
+                <span class="text-muted small">Kelola data footer yang tampil di halaman depan</span>
+            </div>
+            
             <?php if ($can_create): ?>
-                <a href="/footer_opd/new" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
+                <a href="/footer_opd/new" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Data Baru
                 </a>
             <?php endif; ?>
         </div>
+
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="datatablesSimple">
-                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                    <thead class="bg-light">
                         <tr>
-                            <th class="text-center py-3" width="5%">No</th>
-                            <th class="py-3" width="30%">Identitas Website</th>
-                            <th class="py-3" width="20%">Kontak & Alamat</th>
-                            <th class="text-center py-3" width="15%">Aset Visual</th>
-                            <th class="text-center py-3" width="10%">Status</th>
-                            <th class="text-center py-3" width="15%">Aksi</th>
+                            <th class="text-center py-3 text-uppercase font-monospace" width="5%">#</th>
+                            <th class="py-3 text-uppercase" width="25%">Identitas Website</th>
+                            <th class="py-3 text-uppercase" width="25%">Kontak & Alamat</th>
+                            <th class="text-center py-3 text-uppercase" width="15%">Aset Visual</th>
+                            <th class="text-center py-3 text-uppercase" width="15%">Status</th>
+                            <th class="text-center py-3 text-uppercase" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($footer_opd)) : ?>
                             <tr>
                                 <td colspan="6" class="text-center py-5">
-                                    <div class="text-muted opacity-50 mb-2">
-                                        <i class="fas fa-folder-open fa-3x"></i>
+                                    <div class="py-4">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486777.png" alt="Empty" width="80" class="opacity-25 mb-3">
+                                        <h6 class="fw-bold text-secondary">Belum ada data tersedia</h6>
+                                        <p class="small text-muted mb-0">Silakan tambahkan data baru untuk memulai pengaturan footer.</p>
                                     </div>
-                                    <h6 class="fw-bold text-secondary">Belum ada data tersedia</h6>
-                                    <p class="small text-muted mb-0">Silakan tambahkan data baru untuk memulai.</p>
                                 </td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ($footer_opd as $index => $item) : ?>
                                 <tr>
-                                    <td class="text-center fw-bold text-secondary"><?= $index + 1 ?></td>
+                                    <td class="text-center fw-bold text-muted"><?= $index + 1 ?></td>
+                                    
                                     <td>
-                                        <div class="fw-bold text-dark mb-1 fs-6"><?= esc($item['website_name']) ?></div>
-                                        <div class="small text-muted fst-italic border-start border-3 border-primary ps-2">
-                                            <?= esc($item['official_title']) ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex flex-column gap-1 small">
-                                            <span class="text-truncate" title="<?= esc($item['address']) ?>">
-                                                <i class="fas fa-map-marker-alt me-2 text-danger w-15px text-center"></i>
-                                                <?= strlen($item['address']) > 40 ? substr($item['address'], 0, 40) . '...' : esc($item['address']) ?>
-                                            </span>
-                                            <?php if($item['email']): ?>
-                                                <span><i class="fas fa-envelope me-2 text-warning w-15px text-center"></i> <?= esc($item['email']) ?></span>
-                                            <?php endif; ?>
-                                            <?php if($item['phone']): ?>
-                                                <span><i class="fas fa-phone me-2 text-success w-15px text-center"></i> <?= esc($item['phone']) ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <?php if (!empty($item['logo_cominfo']) && file_exists($item['logo_cominfo'])): ?>
-                                                <div class="p-1 border rounded bg-light" data-bs-toggle="tooltip" title="Logo Kominfo">
-                                                    <img src="<?= base_url($item['logo_cominfo']) ?>" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3 border" style="width: 45px; height: 45px; min-width: 45px;">
+                                                <i class="fas fa-globe text-primary fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark"><?= esc($item['website_name']) ?></div>
+                                                <div class="small text-muted text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                                    <?= esc($item['official_title']) ?>
                                                 </div>
-                                            <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </td>
 
-                                            <?php if (!empty($item['election_badge']) && file_exists($item['election_badge'])): ?>
-                                                <div class="p-1 border rounded bg-light" data-bs-toggle="tooltip" title="Badge Pemilu">
-                                                    <img src="<?= base_url($item['election_badge']) ?>" alt="Badge" style="height: 35px; width: auto; object-fit: contain;">
+                                    <td>
+                                        <div class="d-flex flex-column gap-2 small">
+                                            <div class="d-flex align-items-start text-muted">
+                                                <span class="icon-box bg-light text-danger shadow-sm me-2 flex-shrink-0" style="width:24px; height:24px; font-size:10px;">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                </span>
+                                                <span class="lh-sm"><?= esc($item['address']) ?></span>
+                                            </div>
+                                            <?php if($item['email']): ?>
+                                                <div class="d-flex align-items-center text-muted">
+                                                    <span class="icon-box bg-light text-warning shadow-sm me-2 flex-shrink-0" style="width:24px; height:24px; font-size:10px;">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </span>
+                                                    <span><?= esc($item['email']) ?></span>
                                                 </div>
-                                            <?php endif; ?>
-                                            
-                                            <?php if (empty($item['logo_cominfo']) && empty($item['election_badge'])): ?>
-                                                <span class="badge bg-light text-muted border">No Image</span>
                                             <?php endif; ?>
                                         </div>
                                     </td>
+
                                     <td class="text-center">
-                                        <?php if ($item['is_active'] == 1) : ?>
-                                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-3">
-                                                <i class="fas fa-check-circle me-1"></i> Aktif
-                                            </span>
-                                        <?php else : ?>
-                                            <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-3">
-                                                <i class="fas fa-ban me-1"></i> Non-Aktif
-                                            </span>
-                                        <?php endif; ?>
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
+                                            <?php 
+                                            $hasImage = false;
+                                            $renderImg = function($path, $title) {
+                                                if (!empty($path) && file_exists($path)) {
+                                                    return '<div class="position-relative" data-bs-toggle="tooltip" title="'.$title.'">
+                                                                <img src="'.base_url($path).'" 
+                                                                     class="img-thumbnail rounded-3 shadow-sm img-hover-zoom bg-white" 
+                                                                     style="height: 40px; width: 40px; object-fit: contain; padding: 2px;">
+                                                            </div>';
+                                                }
+                                                return '';
+                                            };
+                                            
+                                            echo $renderImg($item['logo_cominfo'], 'Logo Kominfo');
+                                            if (!empty($item['logo_cominfo']) && file_exists($item['logo_cominfo'])) $hasImage = true;
+
+                                            echo $renderImg($item['election_badge'], 'Badge Pemilu');
+                                            if (!empty($item['election_badge']) && file_exists($item['election_badge'])) $hasImage = true;
+                                            ?>
+                                            <?php if (!$hasImage): ?>
+                                                <span class="badge bg-light text-secondary border rounded-pill px-3">Kosong</span>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
+
                                     <td class="text-center">
-                                    <?= btn_toggle($item['id_opd_info'], $item['is_active'], 'footer_opd/toggle-status') ?>
+                                        <div class="d-flex flex-column align-items-center justify-content-center">
+                                            <div class="mb-1">
+                                                <?= btn_toggle($item['id_opd_info'], $item['is_active'], 'footer_opd/toggle-status') ?>
+                                            </div>
+                                           
+                                        </div>
                                     </td>
-                                    <td>
+
+                                    <td class="text-center">
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>
-                                                <a href="/footer_opd/<?= $item['id_opd_info'] ?>/edit" class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Edit Data">
-                                                    <i class="fas fa-edit"></i>
+                                                <a href="/footer_opd/<?= $item['id_opd_info'] ?>/edit" 
+                                                   class="btn btn-soft-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
+                                                   style="width: 32px; height: 32px;"
+                                                   data-bs-toggle="tooltip" title="Edit Data">
+                                                    <i class="fas fa-pen fa-xs"></i>
                                                 </a>
                                             <?php endif; ?>
 
                                             <?php if ($can_delete): ?>
-                                                <form action="/footer_opd/<?= $item['id_opd_info'] ?>" method="post" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini? Data yang dihapus tidak dapat dikembalikan.');">
+                                                <form action="/footer_opd/<?= $item['id_opd_info'] ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
                                                     <?= csrf_field() ?>
                                                     <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Hapus Permanen">
-                                                        <i class="fas fa-trash-alt"></i>
+                                                    <button type="submit" 
+                                                            class="btn btn-soft-danger btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
+                                                            style="width: 32px; height: 32px;"
+                                                            data-bs-toggle="tooltip" title="Hapus Permanen">
+                                                        <i class="fas fa-trash-alt fa-xs"></i>
                                                     </button>
                                                 </form>
                                             <?php endif; ?>
                                         </div>
                                     </td>
+
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -144,28 +251,23 @@
                 </table>
             </div>
         </div>
-        <div class="card-footer bg-white py-3 border-top-0">
-            <div class="small text-muted d-flex align-items-center">
-                <i class="fas fa-info-circle me-2"></i>
-                <span>Menampilkan seluruh data informasi footer yang terdaftar di sistem.</span>
+        
+        <div class="card-footer bg-white border-top-0 py-3">
+            <div class="d-flex align-items-center text-muted small">
+                <i class="fas fa-shield-alt me-2 text-primary"></i>
+                <span>Pastikan data berstatus <strong>"AKTIF"</strong> agar muncul di halaman depan website.</span>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .hover-scale { transition: transform 0.2s; }
-    .hover-scale:hover { transform: scale(1.05); }
-    .w-15px { width: 15px; display: inline-block; }
-</style>
-
 <script>
-    // Initialize Bootstrap Tooltips
     document.addEventListener('DOMContentLoaded', function () {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     });
 </script>
+
 <?= $this->endSection() ?>

@@ -53,13 +53,7 @@
                         <div class="card bg-light border-0">
                             <div class="card-body">
 
-                                <div class="mb-3 pt-2">
-                                    <div class="form-check form-switch">
-                                        <input type="hidden" name="is_active" value="0">
-                                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <?= old('is_active', $item['is_active']) == 1 ? 'checked' : '' ?>>
-                                        <label class="form-check-label fw-bold" for="is_active">Status Aktif</label>
-                                    </div>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>

@@ -115,13 +115,7 @@
                         <label for="urutan" class="form-label fw-bold">Urutan Tampil</label>
                         <input type="number" class="form-control" id="urutan" name="urutan" value="<?= old('urutan', $kontak['urutan']) ?>">
                     </div>
-                    <div class="col-md-6">
-                        <label for="status" class="form-label fw-bold">Status</label>
-                        <select class="form-select" id="status" name="status">
-                            <option value="aktif" <?= old('status', $kontak['status']) == 'aktif' ? 'selected' : '' ?>>Aktif</option>
-                            <option value="nonaktif" <?= old('status', $kontak['status']) == 'nonaktif' ? 'selected' : '' ?>>Nonaktif</option>
-                        </select>
-                    </div>
+                    
                 </div>
 
                 <div class="d-flex justify-content-end mt-4 gap-2">
