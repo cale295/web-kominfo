@@ -95,7 +95,7 @@
                                         </a>
                                     </td>
                                     <td class="text-center">
-                                        <?php if ($item['is_active'] == 1) : ?>
+                                        <?php if ($item['is_active'] == '1') : ?>
                                             <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-2">Aktif</span>
                                         <?php else : ?>
                                             <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Non-Aktif</span>
@@ -103,6 +103,9 @@
                                     </td>
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark border"><?= esc($item['sorting']) ?></span>
+                                    </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_video_layanan'], $item['is_active'], 'home_video_layanan/toggle-status') ?>
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center">

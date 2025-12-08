@@ -59,6 +59,9 @@
 
         <td><?= esc($p['created_at']) ?></td>
 
+        <td class="text-center">
+                <?= btn_toggle($p['id_profil'], $p['is_active'], 'menu_profile/toggle-status') ?>
+            </td>
         <td>
             <?php if ($can_update): ?>
                 <a href="<?= base_url('menu_profile/'.$p['id_profil'].'/edit') ?>" 

@@ -41,7 +41,7 @@ class StrukturOrganisasiModel extends Model
             'label'  => 'Urutan'
         ],
         'parent_id' => [
-            'rules'  => 'required|numeric',
+            'rules'  => 'permit_empty|numeric',
             'label'  => 'Induk'
         ]
     ];

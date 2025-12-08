@@ -546,11 +546,10 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <span class="status-badge <?= $agenda['status'] === 'active' ? 'status-active' : 'status-inactive' ?>">
-                                        <?= $agenda['status'] === 'active' ? 'Active' : 'Inactive' ?>
-                                    </span>
-                                </td>
+                                
+                                <td class="text-center">
+    <?= btn_toggle($agenda['id_agenda'], $agenda['status'], 'agenda/toggle-status') ?>
+</td>
                                 <td>
                                     <div class="btn-action-group">
                                         <a href="<?= site_url('agenda/' . $agenda['id_agenda'].'/edit') ?>" 

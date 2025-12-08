@@ -115,6 +115,9 @@
                                             </span>
                                         <?php endif; ?>
                                     </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_opd_info'], $item['is_active'], 'footer_opd/toggle-status') ?>
+                                    </td>
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>

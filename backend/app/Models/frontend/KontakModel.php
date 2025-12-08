@@ -55,10 +55,7 @@ class KontakModel extends Model
             'label' => 'Link Google Maps',
             'rules' => 'required|valid_url' // URL Maps biasanya panjang, jadi hati-hati jika pakai max_length
         ],
-        'status' => [
-            'label' => 'Status',
-            'rules' => 'required|in_list[aktif,nonaktif]'
-        ],
+
     ];
 
     // -------------------------------------------------------------------------

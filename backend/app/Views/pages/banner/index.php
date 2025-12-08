@@ -309,42 +309,75 @@
         }
     }
 
+    /* --- PERBAIKAN TOMBOL STATUS --- */
+    .status-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Jarak antara switch dan teks */
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+    .status-btn:hover {
+        opacity: 0.8;
+    }
+
+    .status-btn .switch {
+        position: relative;
+        width: 42px;
+        height: 22px;
+        background-color: var(--gray-300); /* Warna default (mati) */
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .status-btn .switch::after {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background-color: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* State Aktif */
+    .status-btn .switch.active {
+        background-color: var(--success); /* Warna saat aktif (Hijau) */
+    }
+
+    .status-btn .switch.active::after {
+        left: 22px; /* Geser lingkaran ke kanan */
+    }
+
+    .status-btn .switch-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        min-width: 65px; /* Lebar fixed agar teks tidak goyang */
+        text-align: left;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
-        .gov-header {
-            padding: 20px;
-        }
-        
-        .gov-header h1 {
-            font-size: 1.375rem;
-        }
-
-        .gov-table thead th,
-        .gov-table tbody td {
-            padding: 10px 12px;
-            font-size: 0.8125rem;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .action-buttons .btn {
-            width: 100%;
-        }
-
-        .banner-image {
-            width: 80px;
-            height: 50px;
-        }
+        .gov-header { padding: 20px; }
+        .gov-header h1 { font-size: 1.375rem; }
+        .gov-table thead th, .gov-table tbody td { padding: 10px 12px; font-size: 0.8125rem; }
+        .action-buttons { flex-direction: column; gap: 8px; }
+        .action-buttons .btn { width: 100%; }
+        .banner-image { width: 80px; height: 50px; }
     }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 
-<!-- Page Header -->
 <div class="gov-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
@@ -363,7 +396,6 @@
 
 <?= $this->include('layouts/alerts') ?>
 
-<!-- Table Card -->
 <?php if (!empty($banners) && is_array($banners)): ?>
     <div class="card table-card">
         <div class="card-body p-0">
@@ -381,6 +413,7 @@
                             <th class="text-center" style="width: 80px;">Sorting</th>
                             <th style="min-width: 140px;">Dibuat Oleh</th>
                             <th style="min-width: 140px;">Diperbarui</th>
+                            <th class="text-center" style="min-width: 140px;">Toggle Status</th>
                             <th class="text-center" style="width: 140px;">Aksi</th>
                         </tr>
                     </thead>
@@ -395,11 +428,11 @@
                                 </td>
                                 <td class="text-center">
                                     <?php if ($b['status'] === '1'): ?>
-                                        <span class="badge bg-success">
+                                        <span class="badge bg-success status-badge-<?= $b['id_banner'] ?>">
                                             <i class="bi bi-check-circle"></i> Publish
                                         </span>
                                     <?php else: ?>
-                                        <span class="badge bg-secondary">
+                                        <span class="badge bg-secondary status-badge-<?= $b['id_banner'] ?>">
                                             <i class="bi bi-x-circle"></i> Unpublish
                                         </span>
                                     <?php endif; ?>
@@ -472,6 +505,15 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
+                                    <button type="button" class="status-btn" 
+                                            data-id="<?= $b['id_banner'] ?>">
+                                        <div class="switch <?= ($b['status'] == '1' ? 'active' : '') ?>"></div>
+                                        <span class="switch-label">
+                                            <?= ($b['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?>
+                                        </span>
+                                    </button>
+                                </td>
+                                <td class="text-center">
                                     <div class="d-flex flex-column gap-1">
                                         <a href="<?= site_url('banner/' . $b['id_banner'] . '/edit') ?>" 
                                            class="btn btn-warning btn-sm" 
@@ -508,7 +550,6 @@
     </div>
 <?php endif; ?>
 
-<!-- Image Modal -->
 <div id="imageModal" class="image-modal" onclick="closeImageModal()">
     <div class="image-modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeImageModal()" title="Tutup">&times;</span>
@@ -516,7 +557,10 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
+// Logic Modal Gambar
 function openImageModal(imageSrc, imageName) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
@@ -533,11 +577,66 @@ function closeImageModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Close modal with ESC key
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         closeImageModal();
     }
+});
+
+// Logic Toggle Status
+$(document).on('click', '.status-btn', function () {
+    let btn = $(this);
+    let id = btn.data('id');
+    let switchEl = btn.find('.switch');
+    let labelEl = btn.find('.switch-label');
+    
+    // Simpan token CSRF
+    let csrfName = '<?= csrf_token() ?>';
+    let csrfHash = '<?= csrf_hash() ?>';
+
+    // Disable sementara
+    btn.css('opacity', '0.6').prop('disabled', true);
+
+    $.ajax({
+        url: "<?= site_url('banner/toggle-status') ?>",
+        type: "POST",
+        data: { 
+            id: id,
+            [csrfName]: csrfHash // Kirim CSRF Token
+        },
+        dataType: "json",
+        success: function(res) {
+            btn.css('opacity', '1').prop('disabled', false);
+
+            if (res.status === 'success') {
+                // Update CSRF Hash untuk request berikutnya (Penting di CI4)
+                if (res.token) {
+                    csrfHash = res.token;
+                    $('input[name="' + csrfName + '"]').val(csrfHash);
+                }
+
+                // Update Tampilan Tombol
+                if (res.newStatus == 1) {
+                    switchEl.addClass('active');
+                    labelEl.text('Aktif');
+                    // Opsional: Update badge status di kolom 'Status' jika ada
+                    $('.status-badge-' + id).removeClass('bg-secondary').addClass('bg-success').html('<i class="bi bi-check-circle"></i> Publish');
+                } else {
+                    switchEl.removeClass('active');
+                    labelEl.text('Non-Aktif');
+                    // Opsional: Update badge status di kolom 'Status' jika ada
+                    $('.status-badge-' + id).removeClass('bg-success').addClass('bg-secondary').html('<i class="bi bi-x-circle"></i> Unpublish');
+                }
+            } else {
+                alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
+            }
+        },
+        error: function(xhr, status, error) {
+            btn.css('opacity', '1').prop('disabled', false);
+            console.error(error);
+            alert('Gagal menghubungi server.');
+        }
+    });
 });
 </script>
 

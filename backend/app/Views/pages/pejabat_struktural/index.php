@@ -67,6 +67,9 @@
                                         <?php endif; ?>
                                     </td>
                                     
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_pejabat_s'], $item['is_active'], 'pejabat_struktural/toggle-status') ?>
+                                    </td>
                                     <?php if ($can_update || $can_delete): ?>
                                     <td>
                                         <div class="d-flex gap-2">

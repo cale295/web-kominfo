@@ -58,6 +58,9 @@
                                     <td class="fw-semibold"><?= esc($row['created_on']) ?></td>
                                     <td class="fw-semibold"><?= esc($row['modified_on']) ?></td>
                                     <td class="text-center">
+                                    <?= btn_toggle($row['id_kategori'], $row['status'], 'kategori/toggle-status') ?>
+                                    </td>
+                                    <td class="text-center">
                                         <a href="<?= site_url('kategori/' . $row['id_kategori'] . '/edit') ?>" 
                                            class="btn btn-sm btn-warning me-1" 
                                            title="Edit">

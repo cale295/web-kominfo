@@ -126,6 +126,9 @@ if (!empty($struktur)) {
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark border"><?= esc($item['sorting']) ?></span>
                                     </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_struktur'], $item['is_active'], 'struktur_organisasi/toggle-status') ?>
+                                    </td>
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>

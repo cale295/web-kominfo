@@ -61,13 +61,15 @@
                                     </td>
                                     <td><?= esc($item['urutan']) ?></td>
                                     <td>
-                                        <?php if ($item['status'] == 'aktif'): ?>
+                                        <?php if ($item['status'] == '1'): ?>
                                             <span class="badge bg-success">Aktif</span>
                                         <?php else: ?>
                                             <span class="badge bg-secondary">Nonaktif</span>
                                         <?php endif; ?>
                                     </td>
-                                    
+                                        <td class="text-center">
+                                    <?= btn_toggle($item['id_kontak_social'], $item['status'], 'kontak_social/toggle-status') ?>
+                                    </td>
                                     <?php if ($can_update || $can_delete): ?>
                                     <td>
                                         <div class="d-flex gap-2">

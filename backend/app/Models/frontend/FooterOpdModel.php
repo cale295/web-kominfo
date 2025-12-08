@@ -78,10 +78,6 @@ class FooterOpdModel extends Model
             'rules'  => 'required|max_length[255]',
             'label'  => 'Badge Pemilu'
         ],
-        'is_active' => [
-            'rules'  => 'required|in_list[0,1]',
-            'label'  => 'Status Aktif'
-        ],
     ];
 
     // Custom Pesan Error (Bahasa Indonesia)

@@ -55,10 +55,6 @@ class KontakLayananModel extends Model
             'label' => 'Urutan',
             'rules' => 'required|integer'
         ],
-        'status' => [
-            'label' => 'Status',
-            'rules' => 'required|in_list[aktif,nonaktif]'
-        ],
     ];
 
     // Pesan Error Custom (Opsional, agar lebih ramah pengguna)

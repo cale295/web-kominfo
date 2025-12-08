@@ -97,6 +97,9 @@
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark border"><?= esc($item['sorting']) ?></span>
                                     </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_tentang'], $item['is_active'], 'profil_tentang/toggle-status') ?>
+                                    </td>
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>

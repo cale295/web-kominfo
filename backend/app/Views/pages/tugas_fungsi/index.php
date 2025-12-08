@@ -73,6 +73,9 @@
                                             <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Non-Aktif</span>
                                         <?php endif; ?>
                                     </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_tugas'], $item['is_active'], 'tugas_fungsi/toggle-status') ?>
+                                    </td>
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>
                                                 <a href="/tugas_fungsi/<?= $item['id_tugas'] ?>/edit" class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Edit">

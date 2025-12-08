@@ -84,11 +84,14 @@
                                     </td>
                                     <td class="text-center"><?= esc($row['urutan']) ?></td>
                                     <td class="text-center">
-                                        <?php if ($row['status'] == 'aktif') : ?>
+                                        <?php if ($row['status'] == '1') : ?>
                                             <span class="badge rounded-pill bg-success">Aktif</span>
                                         <?php else : ?>
                                             <span class="badge rounded-pill bg-secondary">Nonaktif</span>
                                         <?php endif; ?>
+                                    </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($row['id_kontak_layanan'], $row['status'], 'kontak_layanan/toggle-status') ?>
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">

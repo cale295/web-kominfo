@@ -1,6 +1,10 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
-<?= $this->include('layouts/alerts') ?><div class="container-fluid px-4">
+<?= $this->include('layouts/alerts') ?>
+<div style="display:none;">
+    <?= csrf_field() ?>
+</div>
+<div class="container-fluid px-4">
     <h1 class="mt-4">Program & Anggaran</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
@@ -76,6 +80,9 @@
                                         <?php else : ?>
                                             <span class="badge bg-danger">Non-Aktif</span>
                                         <?php endif; ?>
+                                    </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_program'], $item['is_active'], 'program/toggle-status') ?>
                                     </td>
                                     <!-- Tambahkan style width minimal agar tombol tidak turun baris -->
                                     <td class="text-center text-nowrap" style="width: 15%;">

@@ -241,6 +241,33 @@
         color: var(--gray-300);
         margin-bottom: 16px;
     }
+    /* Style Toggle Switch */
+.status-btn {
+    background: none; border: none; padding: 0;
+    display: flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity 0.3s;
+}
+.status-btn:hover { opacity: 0.8; }
+.status-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+.status-btn .switch {
+    position: relative; width: 42px; height: 22px;
+    background-color: #cbd5e1; /* Warna mati (Gray-300) */
+    border-radius: 20px; transition: all 0.3s ease;
+}
+.status-btn .switch::after {
+    content: ''; position: absolute; width: 18px; height: 18px;
+    background-color: white; border-radius: 50%;
+    top: 2px; left: 2px; transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.status-btn .switch.active { background-color: #059669; /* Warna hidup (Success) */ }
+.status-btn .switch.active::after { left: 22px; }
+
+.status-btn .switch-label {
+    font-size: 0.8rem; font-weight: 600; color: #334155;
+    min-width: 65px; text-align: left;
+}
 </style>
 <?= $this->endSection() ?>
 
@@ -293,6 +320,7 @@
                         <th>Diupdate Oleh</th>
                         <th class="text-center">Update Terakhir</th>
                         <th>dilihat</th>
+                        <th>Status</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -473,7 +501,15 @@
                                 </td>
 
                                 <td><?= esc($row['hit'] ?? '-') ?></td>
-
+<td class="text-center">
+    <button type="button" class="status-btn" 
+            data-id="<?= $item['id_banner'] ?>" 
+            data-url="<?= site_url('banner/toggle-status') ?>"> <div class="switch <?= ($item['status'] == '1' ? 'active' : '') ?>"></div>
+        <span class="switch-label">
+            <?= ($item['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?>
+        </span>
+    </button>
+</td>
                                 <!-- Aksi -->
                                 <td class="text-center" style="white-space: nowrap;">
                                     <div class="d-flex flex-column gap-1">
@@ -512,5 +548,57 @@
         </div>
     </div>
 </div>
+<script>
+$(document).on('click', '.status-btn', function () {
+    let btn = $(this);
+    let id = btn.data('id');
+    let url = btn.data('url'); 
+    let switchEl = btn.find('.switch');
+    let labelEl = btn.find('.switch-label');
+    
+    // Ambil Token CSRF dari input hidden yang biasanya ada di layout/form delete
+    let csrfName = '<?= csrf_token() ?>';
+    let csrfHash = $('input[name="'+csrfName+'"]').val(); 
+
+    // Efek loading
+    btn.prop('disabled', true);
+    btn.css('opacity', '0.5');
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: { id: id, [csrfName]: csrfHash },
+        dataType: "json",
+        success: function(res) {
+            btn.prop('disabled', false);
+            btn.css('opacity', '1');
+            
+            if (res.status === 'success') {
+                // 1. Update Tampilan
+                if (res.newStatus == 1) {
+                    switchEl.addClass('active');
+                    labelEl.text('Aktif');
+                } else {
+                    switchEl.removeClass('active');
+                    labelEl.text('Non-Aktif');
+                }
+                
+                // 2. Update Token CSRF (PENTING untuk request selanjutnya)
+                $('input[name="'+csrfName+'"]').val(res.token);
+            } else {
+                alert('Gagal: ' + res.message);
+                // Jika token mismatch, update token dari respon error jika ada
+                if(res.token) $('input[name="'+csrfName+'"]').val(res.token);
+            }
+        },
+        error: function(xhr, status, error) {
+            btn.prop('disabled', false);
+            btn.css('opacity', '1');
+            console.error(error);
+            alert('Terjadi kesalahan koneksi ke server.');
+        }
+    });
+});
+</script>
 
 <?= $this->endSection() ?>

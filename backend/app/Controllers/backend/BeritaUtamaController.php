@@ -47,6 +47,62 @@ class BeritaUtamaController extends BaseController
         return view('pages/berita_utama/index', $data);
     }
 
+    public function toggleStatus()
+    {
+        // 1. Cek Request AJAX
+        if (!$this->request->isAJAX()) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        // 2. CEK HAK AKSES
+        // Pastikan Controller punya property $this->accessRightsModel & fungsi getAccess()
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+
+        if (!$access || !$access['can_update']) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Anda tidak memiliki izin untuk mengubah data ini.',
+                'token' => csrf_hash()
+            ]);
+        }
+
+        // 3. LOAD MODEL & AMBIL DATA
+        // ==================================================
+        $model = new \App\Models\BeritaUtamaModel(); // <--- GANTI INI SESUAI MODUL
+        // ==================================================
+
+        $id = $this->request->getPost('id');
+        $data = $model->find($id);
+
+        if ($data) {
+            // Logic Toggle (1 -> 0, 0 -> 1)
+            $newStatus = ($data['status'] == '1') ? '0' : '1';
+
+            // Data Update (Termasuk Audit Trail)
+            $updateData = [
+                'status'            => $newStatus,
+                'updated_at'        => date('Y-m-d H:i:s'),
+                'updated_by_id'     => session()->get('id_user'),
+                'updated_by_name'   => session()->get('username'),
+            ];
+
+            if ($model->update($id, $updateData)) {
+                return $this->response->setJSON([
+                    'status'    => 'success',
+                    'message'   => 'Status berhasil diperbarui',
+                    'newStatus' => $newStatus,
+                    'token'     => csrf_hash() // Kirim token baru
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Gagal update status atau data tidak ditemukan',
+            'token'   => csrf_hash()
+        ]);
+    }
     // ============================
     // Form tambah berita utama
     // ============================

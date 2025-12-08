@@ -38,14 +38,68 @@ class BannerController extends BaseController
 
         $data = [
             'title' => 'Manajemen Banner',
-            'banners' => $this->bannerModel->getAllActive(),
-            'can_create' => $access['can_create'],
+            'banners' => $this->bannerModel->orderBy('created_at', 'DESC')->findAll(),            'can_create' => $access['can_create'],
             'can_update' => $access['can_update'],
             'can_delete' => $access['can_delete'],
         ];
 
         return view('pages/banner/index', $data);
     }
+
+public function toggleStatus()
+    {
+        // 1. Cek Request AJAX
+        if (!$this->request->isAJAX()) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        // 2. CEK HAK AKSES (PENTING! Tambahan Keamanan)
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+
+        if (!$access || !$access['can_update']) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Anda tidak memiliki izin untuk mengubah status banner.',
+                'token' => csrf_hash()
+            ]);
+        }
+
+        // 3. Ambil ID
+        $id = $this->request->getPost('id');
+        
+        // 4. Cari data (Gunakan $this->bannerModel yang sudah di-init di construct)
+        $banner = $this->bannerModel->find($id);
+
+        if ($banner) {
+            $currentStatus = $banner['status']; 
+            $newStatus = ($currentStatus == '1') ? '0' : '1';
+
+            // 5. Update data LENGKAP (Termasuk siapa yang update)
+            $updateData = [
+                'status'            => $newStatus,
+                'updated_at'        => date('Y-m-d H:i:s'), // Update waktu
+                'updated_by_id'     => session()->get('id_user'), // Update user ID
+                'updated_by_name'   => session()->get('username'), // Update nama user
+            ];
+
+            if ($this->bannerModel->update($id, $updateData)) {
+                return $this->response->setJSON([
+                    'status'    => 'success',
+                    'message'   => 'Status berhasil diperbarui',
+                    'newStatus' => $newStatus,
+                    'token'     => csrf_hash() 
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Gagal update atau data tidak ditemukan',
+            'token'   => csrf_hash()
+        ]);
+    }
+
 
 
 

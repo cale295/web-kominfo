@@ -78,6 +78,9 @@
                                             <span class="badge bg-danger">Non-Aktif</span>
                                         <?php endif; ?>
                                     </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($item['id_pejabat'], $item['is_active'], 'pejabat/toggle-status') ?>
+                                    </td>
                                     <td>
                                         <div class="d-flex gap-2">
                                             <?php if (isset($can_update) && $can_update) : ?>

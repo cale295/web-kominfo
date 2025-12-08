@@ -48,6 +48,9 @@
                                             <span class="badge bg-secondary">Inactive</span>
                                         <?php endif; ?>
                                     </td>
+                                    <td class="text-center">
+                                    <?= btn_toggle($row['id_footer_statis'], $row['is_active'], 'footer_statistics/toggle-status') ?>
+                                    </td>
                                     <td>
                                         <?php if ($can_update): ?>
                                             <a href="<?= base_url('footer_statistics/' . $row['id_footer_statis'] . '/edit') ?>" class="btn btn-warning btn-sm">

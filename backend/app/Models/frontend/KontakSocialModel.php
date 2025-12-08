@@ -57,10 +57,6 @@ class KontakSocialModel extends Model
             'label' => 'Urutan',
             'rules' => 'required|integer'
         ],
-        'status' => [
-            'label' => 'Status',
-            'rules' => 'required|in_list[aktif,nonaktif]'
-        ],
     ];
 
     protected $validationMessages = [

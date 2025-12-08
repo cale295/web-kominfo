@@ -287,6 +287,9 @@
                                 <td class="text-center" style="white-space: nowrap;">
                                     <?= date('d M Y H:i', strtotime($b['created_date'])) ?>
                                 </td>
+                                     <td class="text-center">
+                                    <?= btn_toggle($b['id_berita_utama'], $b['status'], 'berita-utama/toggle-status') ?>
+                                    </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_update) && $can_update): ?>

@@ -18,36 +18,46 @@ $routes->get('/dashboard', 'backend\DashboardController::index');
 
 //Pejabat
 $routes->resource('pejabat', ['controller' => 'frontend\PejabatController', 'except' => ['show']]);
+$routes->post('pejabat/toggle-status', 'frontend\PejabatController::toggleStatus');
 
 // Berita Kategori Tema
 $routes->resource('tema', ['controller' => 'backend\TemaKategoriController', 'except' => ['show']]);
+$routes->post('tema/toggle-status', 'backend\TemaKategoriController::toggleStatus');
 
 // Resource Web (non-API)
 $routes->resource('manage_user', ['controller' => 'backend\UserController']);
 
+
 // Kategori Berita
 $routes->resource('kategori_berita', ['controller' => 'backend\KategoriBeritaController']);
+$routes->post('kategori_berita/toggle-status', 'backend\KategoriBeritaController::toggleStatus');
 
 // Kontak
 $routes->resource('kontak', ['controller' => 'frontend\KontakController', 'except' => ['show']]);
+$routes->post('kontak/toggle-status', 'frontend\KontakController::toggleStatus');
 
 //program
 $routes->resource('program', ['controller' => 'frontend\ProgramController', 'except' => ['show']]);
+$routes->post('program/toggle-status', 'frontend\ProgramController::toggleStatus');
 
 //profile
 $routes->resource('menu_profile', ['controller' => 'frontend\ProfileController', 'except' => ['show']]);
+$routes->post('menu_profile/toggle-status', 'frontend\ProfileController::toggleStatus');
 
 // Agenda
 $routes->resource('agenda', ['controller' => 'backend\AgendaController','except' => ['show']]);
+$routes->post('agenda/toggle-status', 'backend\AgendaController::toggleStatus');
 
 // Profile
 $routes->resource('profile', ['controller' => 'backend\ProfileController', 'except' => ['show']]);
+$routes->post('profile/toggle-status', 'backend\ProfileController::toggleStatus');
 
 // Kategori
 $routes->resource('kategori', ['controller' => 'backend\KategoriController', 'except' => ['show']]);
 $routes->get('kategori/trash', 'backend\KategoriController::trash');
 $routes->get('kategori/(:num)/restore', 'backend\KategoriController::restore/$1');
 $routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::destroyPermanent/$1');
+$routes->post('kategori/toggle-status', 'backend\KategoriController::toggleStatus');
 
 
 //////////////////////////////////////
@@ -55,56 +65,80 @@ $routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::d
 //////////////////////////////////////
 //kontak layanan
 $routes->resource('kontak_layanan', ['controller' => 'frontend\KontakLayananController', 'except' => ['show']]);
+$routes->post('kontak_layanan/toggle-status', 'frontend\KontakLayananController::toggleStatus');
 //kontak Social
 $routes->resource('kontak_social', ['controller' => 'frontend\KontakSocialController', 'except' => ['show']]);
+$routes->post('kontak_social/toggle-status', 'frontend\KontakSocialController::toggleStatus');
 //footer opd
 $routes->resource('footer_opd', ['controller' => 'frontend\FooterOpdController', 'except' => ['show']]);
+$routes->post('footer_opd/toggle-status', 'frontend\FooterOpdController::toggleStatus');
 //footer social
 $routes->resource('footer_social', ['controller' => 'frontend\FooterSocialController', 'except' => ['show']]);
+$routes->post('footer_social/toggle-status', 'frontend\FooterSocialController::toggleStatus');
 // footer statistics
 $routes->resource('footer_statistics', ['controller' => 'frontend\FooterStatisticsController', 'except' => ['show']]);
+$routes->post('footer_statistics/toggle-status', 'frontend\FooterStatisticsController::toggleStatus');
 //home service
 $routes->resource('home_service', ['controller' => 'frontend\HomeServiceController', 'except' => ['show']]);
+$routes->post('home_service/toggle-status', 'frontend\HomeServiceController::toggleStatus');
 //home video 
 $routes->resource('home_video_layanan', ['controller' => 'frontend\HomeVideoLayananController', 'except' => ['show']]);
+$routes->post('home_video_layanan/toggle-status', 'frontend\HomeVideoLayananController::toggleStatus');
 // profil tentang
-$routes->resource('profil_tentang', ['controller' => 'frontend\ProfilTentangController', 'except' => ['show']]);    
+$routes->resource('profil_tentang', ['controller' => 'frontend\ProfilTentangController', 'except' => ['show']]); 
+$routes->post('profil_tentang/toggle-status', 'frontend\ProfilTentangController::toggleStatus');   
 // Tugas Fungsi
 $routes->resource('tugas_fungsi', ['controller' => 'frontend\TugasFungsiController', 'except' => ['show']]);
+$routes->post('tugas_fungsi/toggle-status', 'frontend\TugasFungsiController::toggleStatus');
 // Struktur Organisasi
 $routes->resource('struktur_organisasi', ['controller' => 'frontend\StrukturOrganisasiController', 'except' => ['show']]);
+$routes->post('struktur_organisasi/toggle-status', 'frontend\StrukturOrganisasiController::toggleStatus');
 // Pejabat Struktural
 $routes->resource('pejabat_struktural', ['controller' => 'frontend\PejabatStrukturalController', 'except' => ['show']]);
+$routes->post('pejabat_struktural/toggle-status', 'frontend\PejabatStrukturalController::toggleStatus');
 // Informasi Perencanaan
 $routes->resource('informasi_perencanaan', ['controller' => 'frontend\InformasiPerencanaanController', 'except' => ['show']]);
+$routes->post('informasi_perencanaan/toggle-status', 'frontend\InformasiPerencanaanController::toggleStatus');
 // Laporan Keuangan
 $routes->resource('laporan_keuangan', ['controller' => 'frontend\LaporanKeuanganController', 'except' => ['show']]);
+$routes->post('laporan_keuangan/toggle-status', 'frontend\LaporanKeuanganController::toggleStatus');
 // Daftar Informaisi Publik
 $routes->resource('daftar_informasi_publik', ['controller' => 'frontend\DaftarInformasiPublikController', 'except' => ['show']]);
+$routes->post('daftar_informasi_publik/toggle-status', 'frontend\DaftarInformasiPublikController::toggleStatus');
 // Laporan Kinerja
 $routes->resource('laporan_kinerja', ['controller' => 'frontend\LaporanKinerjaController', 'except' => ['show']]);
+$routes->post('laporan_kinerja/toggle-status', 'frontend\LaporanKinerjaController::toggleStatus');
 // Permohonan Informasi
 $routes->resource('permohonan_informasi', ['controller' => 'frontend\PermohonanInformasiController', 'except' => ['show']]);
+$routes->post('permohonan_informasi/toggle-status', 'frontend\PermohonanInformasiController::toggleStatus');
 // Ip Penyedia
 $routes->resource('ip_penyedia', ['controller' => 'frontend\IpPenyediaController', 'except' => ['show']]);
+$routes->post('ip_penyedia/toggle-status', 'frontend\IpPenyediaController::toggleStatus');
 // Ip Swakelola
 $routes->resource('ip_swakelola', ['controller' => 'frontend\IpSwakelolaController', 'except' => ['show']]);
+$routes->post('ip_swakelola/toggle-status', 'frontend\IpSwakelolaController::toggleStatus');
 // Ppid Permohonan
 $routes->resource('ppid_permohonan', ['controller' => 'frontend\PpidPermohonanController', 'except' => ['show']]);
+$routes->post('ppid_permohonan/toggle-status', 'frontend\PpidPermohonanController::toggleStatus');
 // Agenda Pelatihan
 $routes->resource('agenda_pelatihan', ['controller' => 'frontend\AgendaPelatihanController', 'except' => ['show']]);
+$routes->post('agenda_pelatihan/toggle-status', 'frontend\AgendaPelatihanController::toggleStatus');
 // Ip Kerja Sama Daerah
 $routes->resource('ip_kerjasama_daerah', ['controller' => 'frontend\IpKerjasamaDaerahController', 'except' => ['show']]);
+$routes->post('ip_kerjasama_daerah/toggle-status', 'frontend\IpKerjasamaDaerahController::toggleStatus');
 
 
 // berita kategori
 $routes->resource('berita_tag', ['controller' => 'backend\BeritaTagController', 'except' => ['show']]);
+$routes->post('berita_tag/toggle-status', 'backend\BeritaTagController::toggleStatus');
 
 // Dokumen Kategori
 $routes->resource('dokument_kategori', ['controller' => 'backend\DokumenKategoriController', 'except' => ['show']]);
+$routes->post('dokument_kategori/toggle-status', 'backend\DokumenKategoriController::toggleStatus');
 
 // Dokumen
 $routes->resource('dokument', ['controller' => 'backend\DokumenController', 'except' => ['show']]);
+$routes->post('dokument/toggle-status', 'backend\DokumenController::toggleStatus');
 
 // ========================================================
 // BERITA ROUTES
@@ -121,10 +155,12 @@ $routes->post('berita/(:num)/destroyPermanent', 'backend\BeritaController::destr
 $routes->get('berita/trash', 'backend\BeritaController::trash');
 $routes->post('berita/(:num)/restore', 'backend\BeritaController::restore/$1');
 $routes->get('/berita/(:num)/log/', 'backend\BeritaController::log/$1');
+$routes->post('berita/toggle-status', 'backend\BeritaController::toggleStatus');
 
 
 //berita Utama
 $routes->resource('berita-utama', ['controller' => 'backend\BeritaUtamaController', 'except' => ['show']]);
+$routes->post('berita-utama/toggle-status', 'backend\BeritaUtamaController::toggleStatus');
 
 
 //album
@@ -132,24 +168,16 @@ $routes->resource('album', [
     'controller' => 'backend\PhotoAlbumController',
     'except' => ['show']
 ]);
-$routes->get('album/trash', 'backend\PhotoAlbumController::trash');
-$routes->get('album/restore/(:num)', 'backend\PhotoAlbumController::restore/$1');
-$routes->get('album/destroy/(:num)', 'backend\PhotoAlbumController::destroyPermanent/$1');
+$routes->post('album/toggle-status', 'backend\PhotoAlbumController::toggleStatus');
 
 // Gallery 
 $routes->resource('gallery', ['controller' => 'backend\PhotoGalleryController', 'except' => ['show']]);
-
-// Trash dan restore
-$routes->get('gallery/trash', 'backend\PhotoGalleryController::trash');
-$routes->get('gallery/restore/(:num)', 'backend\PhotoGalleryController::restore/$1');
-$routes->get('gallery/destroy/(:num)', 'backend\PhotoGalleryController::destroyPermanent/$1');
-
-
-
+$routes->post('gallery/toggle-status', 'backend\PhotoGalleryController::toggleStatus');
 
 // Banner logo
 $routes->resource('banner', ['controller' => 'backend\BannerController', 'except' => ['show']]);
 $routes->get('banner/view/(:num)', 'backend\BannerController::view/$1');
+$routes->post('banner/toggle-status', 'backend\BannerController::toggleStatus');
 $routes->get('banner/click/(:num)', 'backend\BannerController::click/$1');
 
 
