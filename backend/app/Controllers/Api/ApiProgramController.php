@@ -19,7 +19,7 @@ class ApiProgramController extends ResourceController
     {
         // Ambil data yang aktif saja
         $data = $this->model
-            ->where('is_active', 1) 
+            ->where('is_active', '1') 
             ->orderBy('sorting', 'ASC')       // Urutkan berdasarkan nomor urut (jika ada)
             ->orderBy('created_at', 'DESC')   // Lalu yang terbaru
             ->findAll();

@@ -17,7 +17,7 @@ class ApiProfilTentangController extends ResourceController
     {
         // Mengambil semua data yang aktif
         $data = $this->model
-            ->where('is_active', 1)
+            ->where('is_active', '1')
             ->orderBy('section', 'ASC') // Urutkan berdasarkan section agar rapi
             ->orderBy('sorting', 'ASC')
             ->findAll();

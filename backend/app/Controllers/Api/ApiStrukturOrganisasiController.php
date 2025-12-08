@@ -17,7 +17,7 @@ class ApiStrukturOrganisasiController extends ResourceController
     public function index()
     {
         $data = $this->model
-            ->where('is_active', 1)
+            ->where('is_active', '1')
             ->orderBy('parent_id', 'ASC') // Parent dulu (NULL)
             ->orderBy('sorting', 'ASC')
             ->findAll();

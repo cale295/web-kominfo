@@ -17,7 +17,7 @@ class ApiTugasFungsiController extends ResourceController
     {
         // Mengambil semua data yang aktif
         $data = $this->model
-            ->where('is_active', 1)
+            ->where('is_active', '1')
             ->orderBy('type', 'ASC')
             ->orderBy('order_number', 'ASC')
             ->findAll();

@@ -20,7 +20,7 @@ class ApiFooterOpdController extends ResourceController
         try {
             // Ambil data yang aktif saja untuk ditampilkan di Frontend
             $data = $this->model
-                ->where('is_active', 1)
+                ->where('is_active', '1')
                 ->orderBy('created_at', 'DESC')
                 ->findAll();
 

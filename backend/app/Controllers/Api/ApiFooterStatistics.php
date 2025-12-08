@@ -22,7 +22,7 @@ class ApiFooterStatistics extends ResourceController
             // 2. Ambil data statistik
             // Kondisi: Hanya yang AKTIF dan urutkan berdasarkan SORTING
             $data = $this->model
-                ->where('is_active', 1)
+                ->where('is_active', '1')
                 ->orderBy('sorting', 'ASC')
                 ->findAll();
 

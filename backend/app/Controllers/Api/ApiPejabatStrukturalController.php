@@ -19,7 +19,7 @@ class ApiPejabatStrukturalController extends ResourceController
         // Ambil data yang statusnya aktif (1)
         // Urutkan berdasarkan ID ASC (atau sesuaikan kebutuhan)
         $data = $this->model
-            ->where('is_active', 1)
+            ->where('is_active', '1')
             ->orderBy('id_pejabat_s', 'ASC')
             ->findAll();
 

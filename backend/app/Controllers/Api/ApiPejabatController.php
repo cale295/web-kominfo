@@ -16,7 +16,7 @@ class ApiPejabatController extends ResourceController
 
         // 2. Mulai Query Builder
         // Kita gunakan logika where is_active = 1 agar yang non-aktif tidak muncul di public API
-        $builder = $this->model->where('is_active', 1);
+        $builder = $this->model->where('is_active', '1');
 
 
 
