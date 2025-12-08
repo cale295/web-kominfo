@@ -40,7 +40,6 @@ class TugasFungsiController extends BaseController
         // Urutkan berdasarkan Tipe lalu Order Number
         $data = $this->tugasModel
             ->orderBy('type', 'ASC')
-            ->orderBy('order_number', 'ASC')
             ->findAll();
 
         return view('pages/tugas_fungsi/index', [
