@@ -1,7 +1,7 @@
 /* Custom styles for TangerangNewsApp */
 
 .news-card {
-  height: 500px;
+  height: 400px;
   display: flex;
   flex-direction: column;
 }
@@ -9,6 +9,7 @@
 .news-image-container {
   height: 230px;
   overflow: hidden;
+  border-radius: 15px;
 }
 
 .indicator {
@@ -107,7 +108,7 @@
 }
 
 .calender-container {
-  height: 500px;
+  height: 400px;
   background-color: #EDF2FF;
 }
 .text-blue{

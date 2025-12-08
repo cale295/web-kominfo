@@ -267,7 +267,7 @@ export default function Agenda() {
           {/* News Section */}
           <div className="col">
             <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
-            <div className="card border-0 shadow news-card position-relative rounded-4 overflow-hidden">
+            <div className=" news-card position-relative overflow-hidden">
               {loadingBerita ? (
                 <div className="text-center p-5">
                   <p className="text-muted">Memuat berita utama...</p>
@@ -297,13 +297,9 @@ export default function Agenda() {
                       </div>
                     )}
                   </div>
-                  <div className="card-body text-dark d-flex flex-column">
-                    <p className="fw-bold text-blue mb-2">BERITA UTAMA</p>
-                    <p className="small">{currentNews.judul}</p>
-                    <div className="mt-auto pt-3 border-top">
-                      <small className="text-muted d-block">
-                        Sumber: Dinas Komunikasi dan Informatika Kota Tangerang
-                      </small>
+                  <div className="card-body text-dark d-flex flex-column pt-3">
+                    <h2 className="">{currentNews.judul}</h2>
+                    <div className="pt-3">
                       <small className="text-secondary">
                         {formatDate(currentNews.created_at)}
                       </small>
