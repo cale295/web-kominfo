@@ -1,660 +1,437 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <?php
-$session = session();
-$role = $session->get('role'); 
-$fullName = $session->get('full_name');
-
-// Konfigurasi menu dengan permission (sesuaikan dengan role dari database)
-$menuItems = [
-[
-    'title' => 'Dashboard',
-    'icon' => 'bi-house-door-fill',
-    'url' => '/dashboard',
-    'roles' => ['superadmin', 'admin', 'editor']
-],
-[
-    'title' => 'Tampil Home',
-    'icon' => 'bi-display',
-    'roles' => ['superadmin', 'admin'],
-    'submenu'=> [
-        ['title' => 'Banner', 'url' => '/banner', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Service', 'url' => '/home_service', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Daftar Agenda', 'url' => '/agenda', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Pejabat Publik', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Video Layanan', 'url' => '/home_video_layanan', 'roles' => ['superadmin', 'admin']]
-
-    ]
-],
-    
-[
-    'title' => 'Manajemen Berita',
-    'icon' => 'bi-newspaper',
-    'roles' => ['superadmin', 'admin', 'editor'],
-    'submenu' => [
-        ['title' => 'Daftar Berita', 'url' => '/berita', 'roles' => ['superadmin', 'admin', 'editor']],
-        ['title' => 'Kategori Berita', 'url' => '/kategori', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Tag Berita', 'url' => '/berita_tag', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Berita Utama', 'url' => '/berita-utama', 'roles' => ['superadmin', 'admin', 'editor']]
-    ]
-],
-[
-    'title' => 'Tampil Profil',
-    'icon' => 'bi-building',
-    'roles' => ['superadmin', 'admin'],
-    'submenu'=> [
-        ['title' => 'Profil Tentang', 'url' => '/profil_tentang', 'roles'=> ['superadmin', 'admin']],
-        ['title' => 'Tugas & Fungsi', 'url' => '/tugas_fungsi', 'roles'=> ['superadmin', 'admin']],
-        //['title' => 'Pejabat Struktural', 'url' => '/pejabat_struktural', 'roles'=> ['superadmin', 'admin']],
-        ['title' => 'Struktur Organisasi', 'url' => '/struktur_organisasi', 'roles' => ['superadmin', 'admin']]
-    ]
-],
-[
-    'title' => 'Tampil Informasi Publik',
-    'icon' => 'bi-building',
-    'roles' => ['superadmin', 'admin'],
-    'submenu'=> [
-        ['title' => 'Perencanaan', 'url' => '/informasi_perencanaan', 'roles'=> ['superadmin', 'admin']],
-        //['title' => 'Pengadaan Barang & Jasa', 'url' => '/barang_jasa', 'roles'=> ['superadmin', 'admin']],
-        ['title' => 'Laporan Keuangan', 'url' => '/laporan_keuangan', 'roles'=> ['superadmin', 'admin']],
-        ['title' => 'Laporan Kinerja', 'url' => '/laporan_kinerja', 'roles'=> ['superadmin', 'admin']],
-        //['title' => 'Pendidikan dan Pelatihan', 'url' => '/barang_jasa', 'roles'=> ['superadmin', 'admin']],
-        ['title' => 'Permohonan Informasi', 'url' => '/permohonan_informasi', 'roles'=> ['superadmin', 'admin']],
-        ['title' => 'Daftar Informasi Publik', 'url' => '/daftar_informasi_publik', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Kerjasama Daerah', 'url' => '/ip_kerjasama_daerah', 'roles'=> ['superadmin', 'admin']]
-    ]
-],
-[
-    'title' => 'Tampil Kontak',
-    'icon' => 'bi-telephone-fill',
-    'roles' => ['superadmin', 'admin'],
-    'submenu'=> [
-        ['title' => 'Kontak', 'url' => '/kontak', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Kontak Layanan', 'url' => '/kontak_layanan', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Sosial Media', 'url' => '/kontak_social', 'roles' => ['superadmin', 'admin']]
-    ]
-],
-
-[
-    'title' => 'Galeri',
-    'icon' => 'bi-image-fill',
-    'roles' => ['superadmin', 'admin'],
-    'submenu' => [
-        ['title' => 'Album Foto', 'url' => '/album', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Upload Foto', 'url' => '/galeri/upload', 'roles' => ['superadmin', 'admin']]
-    ]
- ],
-// [
-//     'title' => 'Dokumen',
-//     'icon' => 'bi-file-earmark-pdf-fill',
-//     'roles' => ['superadmin', 'admin'],
-//     'submenu' => [   
-//         ['title' => 'Daftar Dokumen', 'url' => '/dokument', 'roles' => ['superadmin', 'admin']],
-//         ['title' => 'Kategori Dokumen', 'url' => '/dokument_kategori', 'roles' => ['superadmin', 'admin']],
-//         ['title' => 'Upload Dokumen', 'url' => '/dokumen/upload', 'roles' => ['superadmin', 'admin']]
-//     ]
-// ],
-[
-    'title' => 'Tampil Footer',
-    'icon' => 'bi-layout-text-window-reverse',   
-    'roles' => ['superadmin', 'admin'],
-    'submenu'=> [
-        ['title' => 'Footer', 'url' => '/footer_opd', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Sosial Media', 'url' => '/footer_social', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Statistik', 'url' => '/footer_statistics', 'roles' => ['superadmin', 'admin']]
-    ]
-],
-[
-    'title' => 'Pengaturan Menu',
-    'icon' => 'bi-list-ul',
-    'url' => '/menu',
-    'roles' => ['superadmin']
-],
-[
-    'title' => 'Pengguna & Akses',
-    'icon' => 'bi-shield-lock-fill',
-    'roles' => ['superadmin'],
-    'submenu' => [
-        ['title' => 'Manajemen User', 'url' => '/manage_user', 'roles' => ['superadmin']],
-        ['title' => 'Hak Akses', 'url' => '/access_rights', 'roles' => ['superadmin']]
-    ]
-],
-// [
-//     'title' => 'Pengaturan',
-//     'icon' => 'bi-gear-fill',
-//     'url' => '/settings',
-//     'roles' => ['superadmin', 'admin']
-// ],
-[
-    'title' => 'Profil',
-    'icon' => 'bi-person-circle',
-    'url' => '/profile',
-    'roles' => ['superadmin', 'admin', 'editor']
-]
-
-   
-];
-
-// Get current URI for active menu
+$session  = session();
+$role     = $session->get('role') ?? 'superadmin'; // Default fallback
+$fullName = $session->get('full_name') ?? 'Guest User';
+$avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($fullName) . "&background=3b82f6&color=ffffff&bold=true&format=svg";
 $uri = service('uri');
-$currentPath = '/' . $uri->getPath();
+$segments = $uri->getSegments();
+$currentPath = '/' . (isset($segments[0]) ? $segments[0] : 'dashboard');
+if(count($segments) > 1) {
+
+    $currentPath = '/' . implode('/', $segments);
+}
+$menuItems = [
+    [
+        'type' => 'item', 
+        'title' => 'Dashboard', 
+        'icon' => 'bi-grid-1x2-fill', 
+        'url' => '/dashboard', 
+        'roles' => ['superadmin', 'admin', 'editor'],
+        'color' => '#4e73df', 
+        'bg' => 'rgba(78, 115, 223, 0.1)' 
+    ],
+    ['type' => 'header', 'title' => 'BANNER & LAYANAN'],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Tampil Home', 
+        'icon' => 'bi-laptop', 
+        'roles' => ['superadmin', 'admin'],
+        'color' => '#6610f2', 
+        'bg' => 'rgba(102, 16, 242, 0.1)',
+        'submenu' => [
+            ['title' => 'Banner Slider', 'url' => '/banner', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Layanan', 'url' => '/home_service', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Video Layanan', 'url' => '/home_video_layanan', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Agenda', 'url' => '/agenda', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Pejabat Publik', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin']],
+        ]
+    ],
+    ['type' => 'header', 'title' => 'BERITA'],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Manajemen Berita', 
+        'icon' => 'bi-newspaper', 
+        'roles' => ['superadmin', 'admin', 'editor'],
+        'color' => '#e74a3b', 
+        'bg' => 'rgba(231, 74, 59, 0.1)',
+        'submenu' => [
+            ['title' => 'Berita', 'url' => '/berita', 'roles' => ['superadmin', 'admin', 'editor']],
+            ['title' => 'Berita Utama', 'url' => '/berita-utama', 'roles' => ['superadmin', 'admin', 'editor']],
+            ['title' => 'Kategori', 'url' => '/kategori', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Tag', 'url' => '/berita_tag', 'roles' => ['superadmin', 'admin']],
+        ]
+    ],
+    ['type' => 'header', 'title' => 'HALAMAN PUBLIK'],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Profil Instansi', 
+        'icon' => 'bi-building', 
+        'roles' => ['superadmin', 'admin'],
+        'color' => '#36b9cc', 
+        'bg' => 'rgba(54, 185, 204, 0.1)',
+        'submenu' => [
+            ['title' => 'Profil Tentang', 'url' => '/profil_tentang', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Tugas & Fungsi', 'url' => '/tugas_fungsi', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Struktur Pejabat', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Struktur Organisasi', 'url' => '/struktur_organisasi', 'roles' => ['superadmin', 'admin']],
+        
+        ]
+    ],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Informasi Publik', 
+        'icon' => 'bi-info-circle', 
+        'roles' => ['superadmin', 'admin'],
+        'color' => '#1cc88a', 
+        'bg' => 'rgba(28, 200, 138, 0.1)',
+        'submenu' => [
+            ['title' => 'Daftar Informasi', 'url' => '/daftar_informasi_publik', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Permohonan Informasi', 'url' => '/permohonan_informasi', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Laporan Keuangan', 'url' => '/laporan_keuangan', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Laporan Kinerja', 'url' => '/laporan_kinerja', 'roles' => ['superadmin', 'admin']],
+        ]
+    ],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Galeri & Media', 
+        'icon' => 'bi-images', 
+        'roles' => ['superadmin', 'admin'],
+        'color' => '#f6c23e', // Kuning
+        'bg' => 'rgba(246, 194, 62, 0.1)',
+        'submenu' => [
+            ['title' => 'Album Foto', 'url' => '/album', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['superadmin', 'admin']],
+           
+        ]
+    ],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Kontak', 
+        'icon' => 'bi-telephone', 
+        'roles' => ['superadmin', 'admin'],
+        'color' => '#fd7e14', 
+        'bg' => 'rgba(253, 126, 20, 0.1)',
+        'submenu' => [
+            ['title' => 'Info Kontak', 'url' => '/kontak', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Layanan Kontak', 'url' => '/kontak_layanan', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Sosial Media', 'url' => '/kontak_social', 'roles' => ['superadmin', 'admin']],
+        ]
+    ],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Footer', 
+        'icon' => 'bi-layout-text-window', 
+        'roles' => ['superadmin', 'admin'],
+        'color' => '#20c997', 
+        'bg' => 'rgba(32, 201, 151, 0.1)',
+        'submenu' => [
+            ['title' => 'Pengaturan Footer', 'url' => '/footer_opd', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Footer Sosial Media', 'url' => '/footer_social', 'roles' => ['superadmin', 'admin']],
+        ]
+    ],
+    ['type' => 'header', 'title' => 'SYSTEM SETTINGS'],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Users & Akses', 
+        'icon' => 'bi-gear', 
+        'roles' => ['superadmin'],
+        'color' => '#858796', 
+        'bg' => 'rgba(133, 135, 150, 0.1)',
+        'submenu' => [
+            ['title' => 'Manajemen User', 'url' => '/manage_user', 'roles' => ['superadmin']],
+            ['title' => 'Hak Akses', 'url' => '/access_rights', 'roles' => ['superadmin']],
+            ['title' => 'Pengaturan Menu', 'url' => '/menu', 'roles' => ['superadmin']],
+        ]
+    ],
+    [
+        'type' => 'item', 
+        'title' => 'Profil Saya', 
+        'icon' => 'bi-person-circle', 
+        'url' => '/profile', 
+        'roles' => ['superadmin', 'admin', 'editor'],
+        'color' => '#4e73df', 
+        'bg' => 'rgba(78, 115, 223, 0.1)'
+    ]
+];
 ?>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     :root {
-        --primary: #1e40af;
-        --primary-dark: #1e3a8a;
-        --primary-light: #3b82f6;
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-300: #cbd5e1;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --gray-600: #475569;
-        --gray-700: #334155;
-        --gray-800: #1e293b;
-        --gray-900: #0f172a;
+        --sb-width: 280px;
+        --sb-bg: #ffffff;
+        --sb-text: #64748b;
+        --sb-text-active: #1e293b;
+        --sb-header: #a0aec0;
+        --primary: #3b82f6;
+        --hover-bg: #f8fafc;
+        --active-bg: #eff6ff;
+        --border: #e2e8f0;
+        --danger: #ef4444;
     }
 
-    .sidebar {
-        width: 280px;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* Layout Sidebar */
+    #sidebar {
+        width: var(--sb-width);
         height: 100vh;
-        background: white;
-        border-right: 1px solid var(--gray-200);
         position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        top: 0; left: 0;
+        background: var(--sb-bg);
+        border-right: 1px solid var(--border);
+        z-index: 1040;
+        display: flex; flex-direction: column;
+        font-family: 'Inter', sans-serif;
         transition: transform 0.3s ease;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.02);
     }
 
-    /* Header Sidebar */
-    .sidebar-header {
-        padding: 20px;
-        border-bottom: 1px solid var(--gray-200);
-        background-color: var(--gray-50);
+    /* Brand Header */
+    .sidebar-brand {
+        height: 70px;
+        display: flex; align-items: center;
+        padding: 0 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: #ffffff;
+    }
+    .sidebar-brand i { font-size: 1.5rem; color: var(--primary); margin-right: 10px; }
+    .sidebar-brand span { font-weight: 700; font-size: 1.1rem; color: #1e293b; letter-spacing: -0.5px; }
+
+    /* User Profile Card */
+    .sidebar-user-card {
+        padding: 1rem; margin: 1rem 0.75rem;
+        background: #f8fafc; 
+        border: 1px solid #f1f5f9;
+        border-radius: 12px;
+        display: flex; align-items: center;
+    }
+    .user-avatar { width: 42px; height: 42px; border-radius: 10px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .user-details { margin-left: 12px; overflow: hidden; flex: 1; }
+    .user-name { font-weight: 600; color: #334155; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+
+    /* Menu Wrapper (Scrollable) */
+    .sidebar-menu-wrapper { flex: 1; overflow-y: auto; padding: 0 0 1rem 0; }
+    .sidebar-menu-wrapper::-webkit-scrollbar { width: 5px; }
+    .sidebar-menu-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .menu-list { list-style: none; }
+
+    /* Section Header */
+    .menu-header {
+        font-size: 0.7rem; font-weight: 700; color: var(--sb-header);
+        text-transform: uppercase; margin: 1.25rem 0 0.5rem 1.5rem; letter-spacing: 0.5px;
     }
 
-    .sidebar-header h5 {
-        color: var(--gray-900);
-        font-weight: 600;
-        font-size: 1.125rem;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
+    /* Main Links */
+    .sidebar-link {
+        display: flex; align-items: center;
+        padding: 0.6rem 0.75rem;
+        color: var(--sb-text); text-decoration: none;
+        font-weight: 500; font-size: 0.875rem;
+        transition: all 0.2s ease;
+        margin: 0 0.75rem 0.25rem 0.75rem;
+        border-radius: 10px; cursor: pointer;
     }
 
-    .sidebar-header h5 i {
-        color: var(--primary);
-        margin-right: 10px;
-        font-size: 1.25rem;
-    }
-
-    .sidebar-header small {
-        color: var(--gray-600);
-        font-size: 0.8125rem;
-    }
-
-    /* User Info Box */
-    .user-info-box {
-        background: var(--gray-50);
-        padding: 16px;
-        margin: 16px 16px 12px;
+    /* --- ICON WRAPPER (Colored Box) --- */
+    .icon-wrapper {
+        width: 34px; height: 34px;
+        min-width: 34px;
+        display: flex; align-items: center; justify-content: center;
         border-radius: 8px;
-        border: 1px solid var(--gray-200);
-    }
-
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        border: 2px solid var(--primary);
-    }
-
-    .user-name {
-        color: var(--gray-900);
-        font-weight: 600;
-        font-size: 0.9375rem;
-        margin-bottom: 4px;
-        line-height: 1.3;
-    }
-
-    .user-role {
-        color: var(--primary);
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 2px 8px;
-        background: var(--gray-100);
-        border-radius: 4px;
-        display: inline-block;
-        border: 1px solid var(--gray-200);
-    }
-
-    /* Scrollable Content */
-    .sidebar-scrollable-content {
-        flex: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-        max-height: calc(100vh - 240px);
-        padding: 8px 0 20px;
-    }
-
-    .sidebar-scrollable-content::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .sidebar-scrollable-content::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .sidebar-scrollable-content::-webkit-scrollbar-thumb {
-        background: var(--gray-300);
-        border-radius: 3px;
-    }
-
-    .sidebar-scrollable-content::-webkit-scrollbar-thumb:hover {
-        background: var(--gray-400);
-    }
-
-    /* Navigation */
-    .sidebar .nav {
-        padding: 0;
-    }
-
-    .sidebar .nav-link {
-        color: var(--gray-700);
-        padding: 10px 16px;
-        border-radius: 8px;
-        margin: 2px 16px;
-        transition: all 0.2s;
-        white-space: nowrap;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        font-weight: 500;
-        font-size: 0.875rem;
-        position: relative;
-    }
-
-    .sidebar .nav-link:hover {
-        background: var(--gray-100);
-        color: var(--gray-900);
-    }
-
-    .sidebar .nav-link.active {
-        background: var(--primary);
-        color: white;
-        font-weight: 600;
-    }
-
-    .sidebar .nav-link.active i {
-        color: white;
-    }
-
-    .sidebar .nav-link i {
         margin-right: 12px;
-        font-size: 1.125rem;
-        width: 20px;
-        text-align: center;
-        color: var(--gray-600);
-        transition: color 0.2s;
+        transition: all 0.2s ease;
+        font-size: 1.1rem;
     }
 
-    .sidebar .nav-link:hover i {
-        color: var(--primary);
-    }
+    /* Hover State */
+    .sidebar-link:hover { background: var(--hover-bg); color: var(--sb-text-active); }
+    .sidebar-link:hover .icon-wrapper { transform: scale(1.05); }
 
-    /* Collapse Icon */
-    .collapse-icon {
-        margin-left: auto;
-        transition: transform 0.2s ease;
-        color: var(--gray-500);
-        font-size: 0.875rem;
+    /* Active State */
+    .sidebar-link.active, .has-submenu.open > .sidebar-link {
+        background: var(--active-bg);
+        color: var(--sb-text-active);
+        font-weight: 600;
     }
-
-    .nav-link:not(.collapsed) .collapse-icon {
-        transform: rotate(180deg);
-    }
+    
+    /* Arrow Rotate */
+    .arrow { margin-left: auto; font-size: 0.75rem; transition: transform 0.3s ease; color: #94a3b8; }
+    .has-submenu.open > .sidebar-link .arrow { transform: rotate(180deg); color: var(--sb-text-active); }
 
     /* Submenu */
-    .submenu {
-        padding-left: 0;
-        margin-top: 2px;
-        margin-bottom: 4px;
+    .submenu { display: none; list-style: none; padding: 0.25rem 0; animation: slideDown 0.2s ease forwards; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+    .has-submenu.open .submenu { display: block; }
+
+    .submenu-item {
+        display: flex; align-items: center;
+        padding: 0.6rem 1rem 0.6rem 3.8rem; /* Indentation relative to icon */
+        text-decoration: none; color: var(--sb-text);
+        font-size: 0.85rem; font-weight: 500;
+        margin: 0 0.75rem 0.15rem 0.75rem;
+        border-radius: 8px; position: relative;
     }
 
-    .submenu .nav-link {
-        font-size: 0.8125rem;
-        padding: 8px 16px 8px 52px;
-        margin: 2px 16px;
-        position: relative;
-        color: var(--gray-600);
+    /* Submenu Line Indicator */
+    .submenu-item::before {
+        content: ''; position: absolute; left: 2.25rem; top: 50%;
+        transform: translateY(-50%); width: 5px; height: 5px;
+        background: #cbd5e1; border-radius: 50%; transition: all 0.2s;
     }
 
-    .submenu .nav-link::before {
-        content: '';
-        position: absolute;
-        left: 32px;
-        top: 50%;
-        width: 4px;
-        height: 4px;
-        background: var(--gray-400);
-        border-radius: 50%;
-        transform: translateY(-50%);
-        transition: all 0.2s;
-    }
+    .submenu-item:hover { color: var(--sb-text-active); background: var(--hover-bg); }
+    .submenu-item:hover::before { background: var(--primary); transform: translateY(-50%) scale(1.2); }
 
-    .submenu .nav-link:hover {
-        color: var(--gray-900);
-    }
+    .submenu-item.active { color: var(--primary); background: white; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+    .submenu-item.active::before { background: var(--primary); width: 7px; height: 7px; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 
-    .submenu .nav-link:hover::before {
-        background: var(--primary);
-        transform: translateY(-50%) scale(1.5);
-    }
-
-    .submenu .nav-link.active {
-        background: var(--gray-100);
-        color: var(--primary);
+    /* Footer */
+    .sidebar-footer { padding: 1rem; border-top: 1px solid var(--border); background: #ffffff; }
+    .logout-btn { 
+        background: #fff5f5; color: var(--danger); 
+        border: 1px solid #ffecec; justify-content: center; 
         font-weight: 600;
     }
+    .logout-btn:hover { background: #fee2e2; border-color: #fecaca; }
+    .logout-btn i { margin-right: 8px; }
 
-    .submenu .nav-link.active::before {
-        background: var(--primary);
-        transform: translateY(-50%) scale(1.5);
-    }
-
-    /* Logout Button */
-    .logout-btn {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: white;
-        padding: 16px;
-        border-top: 1px solid var(--gray-200);
-    }
-
-    .logout-btn .nav-link {
-        background: white;
-        border: 1px solid var(--gray-300);
-        color: var(--gray-700);
-        font-weight: 500;
-        justify-content: center;
-        margin: 0;
-        transition: all 0.2s;
-    }
-
-    .logout-btn .nav-link:hover {
-        background: #fef2f2;
-        border-color: #fecaca;
-        color: #dc2626;
-    }
-
-    .logout-btn .nav-link i {
-        color: var(--gray-600);
-        margin-right: 8px;
-    }
-
-    .logout-btn .nav-link:hover i {
-        color: #dc2626;
-    }
-
-    /* Mobile Top Bar */
-    .sidebar-toggle-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 64px;
-        background: white;
-        border-bottom: 1px solid var(--gray-200);
-        z-index: 1050;
-        padding: 12px 16px;
-        display: none;
-    }
-
-    .sidebar-toggle-container .d-flex {
-        height: 100%;
-    }
-
-    .sidebar-toggle-container .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        border: 2px solid var(--primary);
-    }
-
-    .sidebar-toggle-container .user-name {
-        color: var(--gray-900);
-        font-weight: 600;
-        font-size: 0.9375rem;
-        margin-bottom: 2px;
-    }
-
-    .sidebar-toggle-container .user-role {
-        color: var(--primary);
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 2px 8px;
-        background: var(--gray-100);
-        border-radius: 4px;
-        display: inline-block;
-        border: 1px solid var(--gray-200);
-    }
-
-    /* Hamburger Toggle Button */
-    #sidebarToggle {
-        background: white;
-        border: 1px solid var(--gray-300);
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        flex-shrink: 0;
-        margin-left: auto;
-    }
-
-    #sidebarToggle:hover {
-        background: var(--gray-50);
-        border-color: var(--gray-400);
-    }
-
-    #sidebarToggle i {
-        font-size: 1.25rem;
-        color: var(--gray-700);
-    }
-
-    /* Overlay untuk mobile */
+    /* Mobile Overlay */
     .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4); z-index: 1030; backdrop-filter: blur(2px);
     }
 
-    .sidebar-overlay.show {
-        display: block;
-        opacity: 1;
-    }
-
-    /* Mobile Responsive */
+    /* Responsive */
     @media (max-width: 768px) {
-        .sidebar-toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .sidebar {
-            transform: translateX(-100%);
-            top: 64px;
-            height: calc(100vh - 64px);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar.show {
-            transform: translateX(0);
-        }
-
-        body {
-            padding-top: 64px;
-        }
+        #sidebar { transform: translateX(-100%); }
+        #sidebar.mobile-open { transform: translateX(0); }
+        .sidebar-overlay.show { display: block; }
     }
 </style>
 
-<!-- Mobile Top Bar -->
-<div class="sidebar-toggle-container d-md-none">
-    <div class="d-flex align-items-center flex-grow-1">
-        <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fff&bold=true&format=svg" 
-             alt="Avatar" class="user-avatar me-3">
-        <div class="flex-grow-1">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<nav id="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-shield-lock-fill"></i>
+        <span>Admin Panel</span>
+    </div>
+
+    <div class="sidebar-user-card">
+        <img src="<?= $avatarUrl ?>" alt="User" class="user-avatar">
+        <div class="user-details">
             <div class="user-name"><?= esc($fullName) ?></div>
-            <span class="user-role"><?= esc(strtoupper($role)) ?></span>
-        </div>
-    </div>
-    <button class="btn btn-primary" id="sidebarToggle">
-        <i class="bi bi-list"></i>
-    </button>
-</div>
-
-<!-- Overlay untuk mobile -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-<div class="sidebar" id="sidebar">
-    <!-- Header -->
-    <div class="sidebar-header">
-        <h5>
-            <i class="bi bi-shield-lock"></i>
-            Admin Panel
-        </h5>
-        <small>Sistem Informasi Pemerintah</small>
-    </div>
-
-    <!-- User Info -->
-    <div class="user-info-box d-md-block d-none">
-        <div class="d-flex align-items-center">
-            <img src="https://ui-avatars.com/api/?name=<?= urlencode($fullName) ?>&background=1e40af&color=fff&bold=true&format=svg" 
-                 alt="Avatar" class="user-avatar me-3">
-            <div class="flex-grow-1">
-                <div class="user-name"><?= esc($fullName) ?></div>
-                <span class="user-role"><?= esc(strtoupper($role)) ?></span>
-            </div>
+            <div class="user-role"><?= esc($role) ?></div>
         </div>
     </div>
 
-    <!-- Scrollable Menu -->
-    <div class="sidebar-scrollable-content">
-        <ul class="nav flex-column">
-            <?php 
-            $menuIndex = 0;
-            foreach ($menuItems as $item): 
-                // Cek akses role
-                if (!in_array($role, $item['roles'])) continue;
-            ?>
-                <li class="nav-item">
-                    <?php if (isset($item['submenu']) && !empty($item['submenu'])): ?>
-                        <!-- Menu dengan Submenu -->
-                        <?php $collapseId = 'collapse-' . $menuIndex; ?>
-                        <a class="nav-link collapsed" data-bs-toggle="collapse" href="#<?= $collapseId ?>" role="button" aria-expanded="false">
-                            <i class="<?= $item['icon'] ?>"></i>
+    <div class="sidebar-menu-wrapper">
+        <ul class="menu-list">
+            <?php foreach ($menuItems as $item): ?>
+                <?php 
+                // Filter Permission
+                if (isset($item['roles']) && !in_array($role, $item['roles'])) continue;
+                
+                // Set default colors jika tidak didefinisikan di array
+                $iconColor = $item['color'] ?? '#64748b';
+                $iconBg    = $item['bg'] ?? 'rgba(100, 116, 139, 0.1)';
+                ?>
+
+                <?php if ($item['type'] === 'header'): ?>
+                    <li class="menu-header"><?= $item['title'] ?></li>
+                
+                <?php elseif ($item['type'] === 'dropdown'): ?>
+                    <?php 
+                        // Cek apakah submenu aktif
+                        $isSubActive = false;
+                        foreach($item['submenu'] as $sub) {
+                            if(strpos($currentPath, $sub['url']) === 0) { // match partial url
+                                $isSubActive = true; 
+                                break; 
+                            }
+                        }
+                    ?>
+                    <li class="has-submenu <?= $isSubActive ? 'open' : '' ?>">
+                        <a href="javascript:void(0)" class="sidebar-link" onclick="toggleMenu(this)">
+                            <div class="icon-wrapper" style="color: <?= $iconColor ?>; background-color: <?= $iconBg ?>;">
+                                <i class="<?= $item['icon'] ?>"></i>
+                            </div>
+                            
                             <span><?= $item['title'] ?></span>
-                            <i class="bi bi-chevron-down collapse-icon"></i>
+                            <i class="bi bi-chevron-down arrow"></i>
                         </a>
-                        <div class="collapse" id="<?= $collapseId ?>">
-                            <ul class="nav flex-column submenu">
-                                <?php foreach ($item['submenu'] as $subItem): ?>
-                                    <?php if (!in_array($role, $subItem['roles'])) continue; ?>
-                                    <li class="nav-item">
-                                        <?php 
-                                        $isActive = ($currentPath === $subItem['url']) ? 'active' : '';
-                                        ?>
-                                        <a class="nav-link <?= $isActive ?>" href="<?= $subItem['url'] ?>">
+                        <ul class="submenu">
+                            <?php foreach ($item['submenu'] as $subItem): ?>
+                                <?php if (in_array($role, $subItem['roles'])): ?>
+                                    <li>
+                                        <a href="<?= $subItem['url'] ?>" class="submenu-item <?= ($currentPath === $subItem['url']) ? 'active' : '' ?>">
                                             <?= $subItem['title'] ?>
                                         </a>
                                     </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php else: ?>
-                        <!-- Menu tanpa Submenu -->
-                        <?php 
-                        $isActive = ($currentPath === $item['url']) ? 'active' : '';
-                        ?>
-                        <a class="nav-link <?= $isActive ?>" href="<?= $item['url'] ?>">
-                            <i class="<?= $item['icon'] ?>"></i>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </ul>
+                    </li>
+
+                <?php elseif ($item['type'] === 'item'): ?>
+                    <li>
+                        <a href="<?= $item['url'] ?>" class="sidebar-link <?= ($currentPath === $item['url']) ? 'active' : '' ?>">
+                            <div class="icon-wrapper" style="color: <?= $iconColor ?>; background-color: <?= $iconBg ?>;">
+                                <i class="<?= $item['icon'] ?>"></i>
+                            </div>
                             <span><?= $item['title'] ?></span>
                         </a>
-                    <?php endif; ?>
-                </li>
-            <?php 
-                $menuIndex++;
-            endforeach; 
-            ?>
+                    </li>
+                <?php endif; ?>
+
+            <?php endforeach; ?>
         </ul>
     </div>
-    
-    <!-- Logout Button -->
-    <div class="logout-btn">
-        <a href="/logout" class="nav-link">
+
+    <div class="sidebar-footer">
+        <a href="/logout" class="sidebar-link logout-btn">
             <i class="bi bi-box-arrow-right"></i>
-            <span>Keluar</span>
+            <span>Keluar Sistem</span>
         </a>
     </div>
-</div>
+</nav>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    // Toggle sidebar
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.toggle('show');
-            overlay.classList.toggle('show');
-        });
-    }
-
-    // Close sidebar when clicking overlay
-    if (overlay) {
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        });
-    }
-
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
+/**
+ * Fungsi Accordion Menu
+ * Klik menu, tutup menu lain, toggle panah
+ */
+function toggleMenu(element) {
+    const parentListItem = element.closest('li.has-submenu');
+    
+    if (parentListItem) {
+        // Opsional: Tutup menu lain yang sedang terbuka agar sidebar rapi
+        const allMenus = document.querySelectorAll('li.has-submenu');
+        allMenus.forEach(menu => {
+            if (menu !== parentListItem && menu.classList.contains('open')) {
+                menu.classList.remove('open');
             }
-        }
-    });
+        });
+        
+        // Toggle class 'open' pada elemen yang diklik
+        parentListItem.classList.toggle('open');
+    }
+}
 
-    // Prevent sidebar clicks from closing it
-    sidebar.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
+/**
+ * Helper untuk Mobile Toggle
+ * Panggil fungsi ini dari tombol hamburger di header utama Anda.
+ * Contoh: <button onclick="openSidebar()">Menu</button>
+ */
+function openSidebar() {
+    document.getElementById('sidebar').classList.add('mobile-open');
+    document.getElementById('sidebarOverlay').classList.add('show');
+}
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+// Auto Scroll ke menu aktif saat load
+document.addEventListener("DOMContentLoaded", function() {
+    const activeItem = document.querySelector('.submenu-item.active') || document.querySelector('.sidebar-link.active');
+    if (activeItem) {
+        activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 });
 </script>

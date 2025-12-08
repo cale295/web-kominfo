@@ -17,7 +17,7 @@ class ApiHomeVideoLayananController extends ResourceController
     {
         try {
             $data = $this->model
-                ->where('is_active', 1)
+                ->where('is_active', '1')
                 ->orderBy('is_featured', 'DESC') // Tampilkan yang featured/utama duluan
                 ->orderBy('sorting', 'ASC')
                 ->findAll();
