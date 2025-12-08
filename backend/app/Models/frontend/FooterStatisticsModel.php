@@ -46,7 +46,7 @@ class FooterStatisticsModel extends Model
 
     // Validation Rules
     protected $validationRules = [
-        'id_footer_statis' => 'permit_empty|numeric',
+        'id_footer_statis' => 'required|numeric',
 
         'stat_type' => [
             'rules'  => 'required|max_length[50]|is_unique[m_footer_statistics.stat_type,id_footer_statis,{id_footer_statis}]',
@@ -57,15 +57,15 @@ class FooterStatisticsModel extends Model
             'label'  => 'Label Tampilan'
         ],
         'sorting' => [
-            'rules'  => 'permit_empty|numeric',
+            'rules'  => 'required|numeric',
             'label'  => 'Urutan'
         ],
         'is_active' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ],
         'auto_update' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Auto Update'
         ],
     ];

@@ -33,7 +33,7 @@ class PermohonanInformasiModel extends Model
         ],
         'tahun' => [
             'label' => 'Tahun',
-            'rules' => 'permit_empty|numeric|max_length[50]'
+            'rules' => 'required|numeric|max_length[50]'
         ],
         // Validasi file upload dihandle di controller
     ];

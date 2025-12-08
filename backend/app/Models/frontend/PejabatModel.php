@@ -32,7 +32,7 @@ class PejabatModel extends Model
     // -------------------------------------------------------------------------
     protected $validationRules      = [
         'id_pejabat' => [
-            'rules' => 'permit_empty|numeric'
+            'rules' => 'required|numeric'
         ],
         'nama' => [
             'label' => 'Nama Lengkap',
@@ -41,7 +41,7 @@ class PejabatModel extends Model
         'nip' => [
             'label' => 'NIP',
             // Rule: Boleh kosong, jika isi harus angka, min 5 digit, dan harus unik (kecuali record ini sendiri saat edit)
-            'rules' => 'permit_empty|numeric|min_length[5]|is_unique[t_pejabat.nip,id_pejabat,{id_pejabat}]',
+            'rules' => 'required|numeric|min_length[5]|is_unique[t_pejabat.nip,id_pejabat,{id_pejabat}]',
         ],
         'jabatan' => [
             'label' => 'Jabatan',
@@ -49,15 +49,15 @@ class PejabatModel extends Model
         ],
         'tempat_tanggal_lahir' => [
             'label' => 'Tempat & Tanggal Lahir',
-            'rules' => 'permit_empty|max_length[255]',
+            'rules' => 'required|max_length[255]',
         ],
         'alamat_kantor' => [
             'label' => 'Alamat Kantor',
-            'rules' => 'permit_empty|string',
+            'rules' => 'required|string',
         ],
         'urutan' => [
             'label' => 'Urutan',
-            'rules' => 'permit_empty|numeric',
+            'rules' => 'required|numeric',
         ]
     ];
 

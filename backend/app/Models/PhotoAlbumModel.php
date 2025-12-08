@@ -28,7 +28,7 @@ class PhotoAlbumModel extends Model
 
     protected $validationRules = [
         'album_name' => 'required|min_length[3]|max_length[255]',
-        'description' => 'permit_empty|max_length[500]',
+        'description' => 'required|max_length[500]',
     ];
 
     protected $validationMessages = [

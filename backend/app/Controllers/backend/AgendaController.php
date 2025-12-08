@@ -82,7 +82,7 @@ class AgendaController extends BaseController
             // PERBAIKAN: Aturan 'is_image[image]' dihapus untuk mengatasi masalah PNG.
             // Kita hanya bergantung pada 'ext_in' untuk memeriksa ekstensi.
             // =======================================================================
-            'image' => 'permit_empty|ext_in[image,jpg,jpeg,png]' 
+            'image' => 'required|ext_in[image,jpg,jpeg,png]' 
         ]);
 
         if (!$validation) {
@@ -149,7 +149,7 @@ class AgendaController extends BaseController
             'activity_name' => 'required|min_length[3]',
             'start_date'    => 'required|valid_date',
             'end_date'      => 'required|valid_date',
-            'image'         => 'permit_empty|ext_in[image,jpg,jpeg,png]' // 'is_image' juga dihapus
+            'image'         => 'required|ext_in[image,jpg,jpeg,png]' // 'is_image' juga dihapus
         ];
 
         if (!$this->validate($rules)) {

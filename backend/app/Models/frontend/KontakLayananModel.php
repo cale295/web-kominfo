@@ -53,11 +53,11 @@ class KontakLayananModel extends Model
         ],
         'urutan' => [
             'label' => 'Urutan',
-            'rules' => 'permit_empty|integer'
+            'rules' => 'required|integer'
         ],
         'status' => [
             'label' => 'Status',
-            'rules' => 'permit_empty|in_list[aktif,nonaktif]'
+            'rules' => 'required|in_list[aktif,nonaktif]'
         ],
     ];
 

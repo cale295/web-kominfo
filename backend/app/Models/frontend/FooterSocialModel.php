@@ -62,11 +62,11 @@ class FooterSocialModel extends Model
             'label'  => 'URL Akun'
         ],
         'sorting' => [
-            'rules'  => 'permit_empty|numeric',
+            'rules'  => 'required|numeric',
             'label'  => 'Urutan'
         ],
         'is_active' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ],
     ];

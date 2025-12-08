@@ -236,19 +236,19 @@ public function new()
                 ]
             ],
             'sumber' => [
-                'rules'  => 'permit_empty|max_length[255]',
+                'rules'  => 'required|max_length[255]',
                 'errors' => [
                     'max_length' => 'Sumber maksimal 255 karakter.'
                 ]
             ],
 // Tambahkan ini di dalam array $rules
             'additional_images' => [
-                // 'permit_empty' adalah kuncinya agar tidak wajib diisi
-                'rules'  => 'permit_empty', 
+                // 'required' adalah kuncinya agar tidak wajib diisi
+                'rules'  => 'required', 
             ],
             // Jika ingin memvalidasi file hanya jika user mengupload (opsional tapi divalidasi):
             'additional_images.*' => [
-                'rules'  => 'permit_empty|max_size[additional_images,2048]|is_image[additional_images]|mime_in[additional_images,image/jpg,image/jpeg,image/png]',
+                'rules'  => 'required|max_size[additional_images,2048]|is_image[additional_images]|mime_in[additional_images,image/jpg,image/jpeg,image/png]',
                 'errors' => [
                     'max_size' => 'Ukuran foto tambahan maksimal 2MB.',
                     'is_image' => 'File tambahan harus berupa gambar.',
@@ -538,7 +538,7 @@ public function edit($id)
         // Validasi Cover Image (Optional saat update)
         if (!session()->has('temp_cover_image')) {
             $rules['feat_image'] = [
-                'rules'  => 'permit_empty|max_size[feat_image,2048]|is_image[feat_image]|mime_in[feat_image,image/jpg,image/jpeg,image/png]',
+                'rules'  => 'required|max_size[feat_image,2048]|is_image[feat_image]|mime_in[feat_image,image/jpg,image/jpeg,image/png]',
                 'errors' => [
                     'max_size' => 'Ukuran foto maksimal 2MB.',
                     'is_image' => 'File yang diupload bukan gambar.',
