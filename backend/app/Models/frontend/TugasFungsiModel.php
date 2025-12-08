@@ -16,7 +16,6 @@ class TugasFungsiModel extends Model
     protected $allowedFields    = [
         'type',          // Enum: tugas, fungsi
         'description',   // Text konten
-        'order_number',  // Sorting
         'is_active',
         'created_at',
         'updated_at'
@@ -37,10 +36,6 @@ class TugasFungsiModel extends Model
         'description' => [
             'rules'  => 'required',
             'label'  => 'Deskripsi'
-        ],
-        'order_number' => [
-            'rules'  => 'permit_empty|numeric',
-            'label'  => 'Urutan'
         ],
         'is_active' => [
             'rules'  => 'permit_empty|in_list[0,1]',

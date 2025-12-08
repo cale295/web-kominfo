@@ -68,7 +68,6 @@ class TugasFungsiController extends BaseController
         $data = [
             'type'         => $this->request->getPost('type'),
             'description'  => $this->request->getPost('description'),
-            'order_number' => $this->request->getPost('order_number') ?? 0,
             'is_active'    => $this->request->getPost('is_active') ?? 0,
         ];
 
@@ -106,7 +105,6 @@ class TugasFungsiController extends BaseController
             'id_tugas'     => $id,
             'type'         => $this->request->getPost('type'),
             'description'  => $this->request->getPost('description'),
-            'order_number' => $this->request->getPost('order_number') ?? 0,
             'is_active'    => $this->request->getPost('is_active') ?? 0,
         ];
 

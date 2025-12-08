@@ -36,7 +36,6 @@
                             <th class="text-center py-3" width="10%">Tipe</th>
                             <th class="py-3" width="50%">Deskripsi</th>
                             <th class="text-center py-3" width="10%">Status</th>
-                            <th class="text-center py-3" width="10%">Urutan</th>
                             <th class="text-center py-3" width="15%">Aksi</th>
                         </tr>
                     </thead>
@@ -74,10 +73,6 @@
                                             <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Non-Aktif</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-light text-dark border"><?= esc($item['order_number']) ?></span>
-                                    </td>
-                                    <td>
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>
                                                 <a href="/tugas_fungsi/<?= $item['id_tugas'] ?>/edit" class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Edit">

@@ -52,10 +52,6 @@
                     <div class="col-md-4">
                         <div class="card bg-light border-0">
                             <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Urutan Tampilan</label>
-                                    <input type="number" class="form-control" name="order_number" value="<?= old('order_number', $item['order_number']) ?>">
-                                </div>
 
                                 <div class="mb-3 pt-2">
                                     <div class="form-check form-switch">
