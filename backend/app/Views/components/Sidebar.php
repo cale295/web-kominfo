@@ -18,7 +18,10 @@ $menuItems = [
     'submenu'=> [
         ['title' => 'Banner', 'url' => '/banner', 'roles' => ['superadmin', 'admin']],
         ['title' => 'Service', 'url' => '/home_service', 'roles' => ['superadmin', 'admin']],
+        ['title' => 'Daftar Agenda', 'url' => '/agenda', 'roles' => ['superadmin', 'admin']],
+        ['title' => 'Pejabat Publik', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin']],
         ['title' => 'Video Layanan', 'url' => '/home_video_layanan', 'roles' => ['superadmin', 'admin']]
+
     ]
 ],
     
@@ -36,21 +39,27 @@ $menuItems = [
 [
     'title' => 'Tampil Profil',
     'icon' => 'bi-building',
-    'url' => '/profile_menu',
     'roles' => ['superadmin', 'admin'],
     'submenu'=> [
-        ['title' => 'Pejabat Publik', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin']]
+        ['title' => 'Profil Tentang', 'url' => '/profil_tentang', 'roles'=> ['superadmin', 'admin']],
+        ['title' => 'Tugas & Fungsi', 'url' => '/tugas_fungsi', 'roles'=> ['superadmin', 'admin']],
+        //['title' => 'Pejabat Struktural', 'url' => '/pejabat_struktural', 'roles'=> ['superadmin', 'admin']],
+        ['title' => 'Struktur Organisasi', 'url' => '/struktur_organisasi', 'roles' => ['superadmin', 'admin']]
     ]
 ],
-
 [
-    'title' => 'Agenda Kegiatan',
-    'icon' => 'bi-calendar-event-fill',
+    'title' => 'Tampil Informasi Publik',
+    'icon' => 'bi-building',
     'roles' => ['superadmin', 'admin'],
-    'submenu' => [
-        ['title' => 'Daftar Agenda', 'url' => '/agenda', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Tambah Agenda', 'url' => '/agenda/create', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Kalender', 'url' => '/agenda/calendar', 'roles' => ['superadmin', 'admin']]
+    'submenu'=> [
+        ['title' => 'Perencanaan', 'url' => '/informasi_perencanaan', 'roles'=> ['superadmin', 'admin']],
+        //['title' => 'Pengadaan Barang & Jasa', 'url' => '/barang_jasa', 'roles'=> ['superadmin', 'admin']],
+        ['title' => 'Laporan Keuangan', 'url' => '/laporan_keuangan', 'roles'=> ['superadmin', 'admin']],
+        ['title' => 'Laporan Kinerja', 'url' => '/laporan_kinerja', 'roles'=> ['superadmin', 'admin']],
+        //['title' => 'Pendidikan dan Pelatihan', 'url' => '/barang_jasa', 'roles'=> ['superadmin', 'admin']],
+        ['title' => 'Permohonan Informasi', 'url' => '/permohonan_informasi', 'roles'=> ['superadmin', 'admin']],
+        ['title' => 'Daftar Informasi Publik', 'url' => '/daftar_informasi_publik', 'roles' => ['superadmin', 'admin']],
+        ['title' => 'Kerjasama Daerah', 'url' => '/ip_kerjasama_daerah', 'roles'=> ['superadmin', 'admin']]
     ]
 ],
 [
@@ -63,6 +72,7 @@ $menuItems = [
         ['title' => 'Sosial Media', 'url' => '/kontak_social', 'roles' => ['superadmin', 'admin']]
     ]
 ],
+
 [
     'title' => 'Galeri',
     'icon' => 'bi-image-fill',
@@ -72,17 +82,17 @@ $menuItems = [
         ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['superadmin', 'admin']],
         ['title' => 'Upload Foto', 'url' => '/galeri/upload', 'roles' => ['superadmin', 'admin']]
     ]
-],
-[
-    'title' => 'Dokumen',
-    'icon' => 'bi-file-earmark-pdf-fill',
-    'roles' => ['superadmin', 'admin'],
-    'submenu' => [
-        ['title' => 'Daftar Dokumen', 'url' => '/dokument', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Kategori Dokumen', 'url' => '/dokument_kategori', 'roles' => ['superadmin', 'admin']],
-        ['title' => 'Upload Dokumen', 'url' => '/dokumen/upload', 'roles' => ['superadmin', 'admin']]
-    ]
-],
+ ],
+// [
+//     'title' => 'Dokumen',
+//     'icon' => 'bi-file-earmark-pdf-fill',
+//     'roles' => ['superadmin', 'admin'],
+//     'submenu' => [   
+//         ['title' => 'Daftar Dokumen', 'url' => '/dokument', 'roles' => ['superadmin', 'admin']],
+//         ['title' => 'Kategori Dokumen', 'url' => '/dokument_kategori', 'roles' => ['superadmin', 'admin']],
+//         ['title' => 'Upload Dokumen', 'url' => '/dokumen/upload', 'roles' => ['superadmin', 'admin']]
+//     ]
+// ],
 [
     'title' => 'Tampil Footer',
     'icon' => 'bi-layout-text-window-reverse',   
@@ -108,18 +118,19 @@ $menuItems = [
         ['title' => 'Hak Akses', 'url' => '/access_rights', 'roles' => ['superadmin']]
     ]
 ],
-[
-    'title' => 'Pengaturan',
-    'icon' => 'bi-gear-fill',
-    'url' => '/settings',
-    'roles' => ['superadmin', 'admin']
-],
+// [
+//     'title' => 'Pengaturan',
+//     'icon' => 'bi-gear-fill',
+//     'url' => '/settings',
+//     'roles' => ['superadmin', 'admin']
+// ],
 [
     'title' => 'Profil',
     'icon' => 'bi-person-circle',
     'url' => '/profile',
     'roles' => ['superadmin', 'admin', 'editor']
 ]
+
    
 ];
 
