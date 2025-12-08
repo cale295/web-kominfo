@@ -49,19 +49,19 @@ class HomeServiceModel extends Model
             'label'  => 'Nama Layanan'
         ],
         'icon_image' => [
-            'rules'  => 'permit_empty|max_length[255]',
+            'rules'  => 'required|max_length[255]',
             'label'  => 'Icon Layanan'
         ],
         'link' => [
-            'rules'  => 'permit_empty|max_length[255]|valid_url',
+            'rules'  => 'required|max_length[255]|valid_url',
             'label'  => 'URL Tujuan'
         ],
         'sorting' => [
-            'rules'  => 'permit_empty|numeric',
+            'rules'  => 'required|numeric',
             'label'  => 'Urutan'
         ],
         'is_active' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ],
     ];

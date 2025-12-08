@@ -55,7 +55,7 @@ class KontakSocialModel extends Model
         ],
         'urutan' => [
             'label' => 'Urutan',
-            'rules' => 'permit_empty|integer'
+            'rules' => 'required|integer'
         ],
         'status' => [
             'label' => 'Status',

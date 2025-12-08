@@ -41,19 +41,19 @@ class ProfilTentangModel extends Model
             'label'  => 'Judul'
         ],
         'content' => [
-            'rules'  => 'permit_empty',
+            'rules'  => 'required',
             'label'  => 'Konten'
         ],
         'image_url' => [
-            'rules'  => 'permit_empty|max_length[255]',
+            'rules'  => 'required|max_length[255]',
             'label'  => 'Gambar'
         ],
         'sorting' => [
-            'rules'  => 'permit_empty|numeric',
+            'rules'  => 'required|numeric',
             'label'  => 'Urutan'
         ],
         'is_active' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ]
     ];

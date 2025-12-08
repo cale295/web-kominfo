@@ -34,7 +34,7 @@ class PejabatStrukturalModel extends Model
         ],
         'subtitle' => [
             'label' => 'Sub Judul',
-            'rules' => 'permit_empty|max_length[255]'
+            'rules' => 'required|max_length[255]'
         ],
         'is_active' => [
             'label' => 'Status',
@@ -44,7 +44,7 @@ class PejabatStrukturalModel extends Model
         // Namun kita definisikan aturan dasar di sini
         'image' => [
             'label' => 'Gambar Struktur',
-            'rules' => 'permit_empty|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]|max_size[image,5120]' // Max 5MB
+            'rules' => 'required|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]|max_size[image,5120]' // Max 5MB
         ]
     ];
 

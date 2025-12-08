@@ -41,7 +41,7 @@ class ProgramModel extends Model
         ],
         'nilai_anggaran' => [
             'label' => 'Nilai Anggaran',
-            'rules' => 'permit_empty|numeric', // Boleh kosong, jika isi harus angka
+            'rules' => 'required|numeric', // Boleh kosong, jika isi harus angka
         ],
         'tahun' => [
             'label' => 'Tahun',
@@ -49,7 +49,7 @@ class ProgramModel extends Model
         ],
         'sorting' => [
             'label' => 'Urutan',
-            'rules' => 'permit_empty|numeric',
+            'rules' => 'required|numeric',
         ],
     ];
 

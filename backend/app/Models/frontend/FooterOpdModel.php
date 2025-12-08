@@ -63,23 +63,23 @@ class FooterOpdModel extends Model
             'label'  => 'Alamat'
         ],
         'email' => [
-            'rules'  => 'permit_empty|valid_email|max_length[100]',
+            'rules'  => 'required|valid_email|max_length[100]',
             'label'  => 'Email'
         ],
         'phone' => [
-            'rules'  => 'permit_empty|max_length[50]|numeric', // Sesuaikan jika boleh ada tanda + atau -
+            'rules'  => 'required|max_length[50]|numeric', // Sesuaikan jika boleh ada tanda + atau -
             'label'  => 'Nomor Telepon'
         ],
         'logo_cominfo' => [
-            'rules'  => 'permit_empty|max_length[255]',
+            'rules'  => 'required|max_length[255]',
             'label'  => 'Logo Kominfo'
         ],
         'election_badge' => [
-            'rules'  => 'permit_empty|max_length[255]',
+            'rules'  => 'required|max_length[255]',
             'label'  => 'Badge Pemilu'
         ],
         'is_active' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ],
     ];

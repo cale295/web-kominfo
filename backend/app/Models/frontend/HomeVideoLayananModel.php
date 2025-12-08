@@ -43,19 +43,19 @@ class HomeVideoLayananModel extends Model
             'label'  => 'Link YouTube'
         ],
         'thumb_image' => [
-            'rules'  => 'permit_empty|max_length[255]',
+            'rules'  => 'required|max_length[255]',
             'label'  => 'Thumbnail Video'
         ],
         'is_featured' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Video Utama'
         ],
         'sorting' => [
-            'rules'  => 'permit_empty|numeric',
+            'rules'  => 'required|numeric',
             'label'  => 'Urutan'
         ],
         'is_active' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ]
     ];

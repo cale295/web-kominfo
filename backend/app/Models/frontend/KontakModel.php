@@ -49,11 +49,11 @@ class KontakModel extends Model
         ],
         'fax' => [
             'label' => 'Fax',
-            'rules' => 'permit_empty|max_length[50]'
+            'rules' => 'required|max_length[50]'
         ],
         'map_link' => [
             'label' => 'Link Google Maps',
-            'rules' => 'permit_empty|valid_url' // URL Maps biasanya panjang, jadi hati-hati jika pakai max_length
+            'rules' => 'required|valid_url' // URL Maps biasanya panjang, jadi hati-hati jika pakai max_length
         ],
         'status' => [
             'label' => 'Status',

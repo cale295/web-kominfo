@@ -98,7 +98,7 @@ class UserModel extends Model
     {
         $id = $data['id'][0] ?? null;
         if ($id) {
-            $this->validationRules['password'] = 'permit_empty|min_length[8]|max_length[255]|regex_match[/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+/]';
+            $this->validationRules['password'] = 'required|min_length[8]|max_length[255]|regex_match[/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+/]';
         }
         return $data;
     }

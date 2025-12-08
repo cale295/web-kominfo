@@ -46,12 +46,12 @@ class ProfileModel extends Model
 
         'content' => [
             'label' => 'Konten',
-            'rules' => 'permit_empty'
+            'rules' => 'required'
         ],
 
         'sorting' => [
             'label' => 'Sorting',
-            'rules' => 'permit_empty|integer'
+            'rules' => 'required|integer'
         ],
 
         'is_active' => [
@@ -62,7 +62,7 @@ class ProfileModel extends Model
         'image' => [
             'label' => 'Gambar',
             'rules' =>
-                'permit_empty|' .
+                'required|' .
                 'is_image[image]|' .
                 'mime_in[image,image/png,image/jpg,image/jpeg]|' .
                 'max_size[image,2048]'

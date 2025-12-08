@@ -38,7 +38,7 @@ class TugasFungsiModel extends Model
             'label'  => 'Deskripsi'
         ],
         'is_active' => [
-            'rules'  => 'permit_empty|in_list[0,1]',
+            'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ]
     ];

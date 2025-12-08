@@ -62,9 +62,9 @@ public function getKategoriAktif()
     protected $validationRules = [
         'kategori' => 'required|min_length[3]|max_length[100]',
         'slug'     => 'required|alpha_dash|is_unique[m_kategori_berita.slug,id_kategori,{id}]',
-        'trash'    => 'permit_empty|in_list[0,1]',
-        'is_show_nav' => 'permit_empty|in_list[0,1]',
-        'sorting_nav' => 'permit_empty|numeric'
+        'trash'    => 'required|in_list[0,1]',
+        'is_show_nav' => 'required|in_list[0,1]',
+        'sorting_nav' => 'required|numeric'
     ];
 
     protected $validationMessages = [

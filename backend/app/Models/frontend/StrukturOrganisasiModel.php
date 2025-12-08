@@ -37,11 +37,11 @@ class StrukturOrganisasiModel extends Model
             'label'  => 'Nama Unit/Jabatan'
         ],
         'sorting' => [
-            'rules'  => 'permit_empty|numeric',
+            'rules'  => 'required|numeric',
             'label'  => 'Urutan'
         ],
         'parent_id' => [
-            'rules'  => 'permit_empty|numeric',
+            'rules'  => 'required|numeric',
             'label'  => 'Induk'
         ]
     ];
