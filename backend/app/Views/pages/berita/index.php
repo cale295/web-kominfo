@@ -503,10 +503,10 @@
                                 <td><?= esc($row['hit'] ?? '-') ?></td>
 <td class="text-center">
     <button type="button" class="status-btn" 
-            data-id="<?= $item['id_banner'] ?>" 
-            data-url="<?= site_url('banner/toggle-status') ?>"> <div class="switch <?= ($item['status'] == '1' ? 'active' : '') ?>"></div>
+            data-id="<?= $row['id_berita'] ?>" 
+            data-url="<?= site_url('berita/toggle-status') ?>"> <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
         <span class="switch-label">
-            <?= ($item['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?>
+            <?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?>
         </span>
     </button>
 </td>
