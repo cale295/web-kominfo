@@ -44,10 +44,6 @@ class ProfilTentangModel extends Model
             'rules'  => 'required',
             'label'  => 'Konten'
         ],
-        'image_url' => [
-            'rules'  => 'required|max_length[255]',
-            'label'  => 'Gambar'
-        ],
         'sorting' => [
             'rules'  => 'required|numeric',
             'label'  => 'Urutan'
