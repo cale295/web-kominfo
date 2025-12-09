@@ -38,14 +38,13 @@
                             <th class="py-3" width="20%">Tautan / Link</th>
                             <th class="text-center py-3" width="10%">Urutan</th>
                             <th class="text-center py-3" width="10%">Status</th>
-                            <th class="text-center py-3" width="10%">Toggle</th>
-                            <th class="text-center py-3" width="10%">Aksi</th>
+                            <th class="text-center py-3" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($kontaklayanan)) : ?>
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="7" class="text-center py-5">
                                     <div class="text-muted opacity-50 mb-2">
                                         <i class="fas fa-folder-open fa-3x"></i>
                                     </div>
@@ -90,14 +89,6 @@
                                     </td>
 
                                     <td class="text-center">
-                                        <?php if ($row['status'] == '1') : ?>
-                                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-2">Aktif</span>
-                                        <?php else : ?>
-                                            <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Nonaktif</span>
-                                        <?php endif; ?>
-                                    </td>
-
-                                    <td>
                                         <div class="d-flex justify-content-center align-items-center h-100">
                                             <?= btn_toggle($row['id_kontak_layanan'], $row['status'], 'kontak_layanan/toggle-status') ?>
                                         </div>
@@ -144,11 +135,59 @@
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Tooltip Init
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
+        });
+
+        // 2. Logic Toggle Switch AJAX
+        const toggles = document.querySelectorAll('.form-check-input[type="checkbox"]');
+        const base_url = "<?= base_url() ?>"; // Base URL
+
+        toggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const id = this.dataset.id;
+                const url = this.dataset.url;
+                
+                // PENTING: Sesuaikan nilai status yang dikirim ke controller
+                // Jika database pakai enum('1','0') atau int(1), gunakan baris ini:
+                const isChecked = this.checked ? 1 : 0; 
+                
+                // Jika database pakai enum('aktif','nonaktif'), gunakan ini:
+                // const isChecked = this.checked ? 'aktif' : 'nonaktif'; 
+
+                const csrfName = '<?= csrf_token() ?>';
+                const csrfHash = '<?= csrf_hash() ?>';
+
+                let formData = new FormData();
+                formData.append('id', id);
+                formData.append('status', isChecked);
+                formData.append(csrfName, csrfHash);
+
+                fetch(base_url + '/' + url, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Update Berhasil');
+                    } else {
+                        alert('Gagal: ' + (data.message || 'Error'));
+                        this.checked = !this.checked; // Kembalikan posisi jika gagal
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Gagal koneksi server');
+                    this.checked = !this.checked;
+                });
+            });
+        });
     });
 </script>
+
 <?= $this->endSection() ?>

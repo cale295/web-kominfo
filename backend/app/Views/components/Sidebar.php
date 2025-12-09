@@ -76,10 +76,15 @@ $menuItems = [
         'color' => '#1cc88a', 
         'bg' => 'rgba(28, 200, 138, 0.1)',
         'submenu' => [
-            ['title' => 'Daftar Informasi', 'url' => '/daftar_informasi_publik', 'roles' => ['superadmin', 'admin']],
-            ['title' => 'Permohonan Informasi', 'url' => '/permohonan_informasi', 'roles' => ['superadmin', 'admin']],
+            
+            ['title' => 'Perencanaan', 'url' => '/informasi_perencanaan', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Pengadaan Barang dan Jasa', 'url' => '/', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Laporan Keuangan', 'url' => '/laporan_keuangan', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Laporan Kinerja', 'url' => '/laporan_kinerja', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Pendidikan dan Pelatihan', 'url' => '/agenda_pelatihan', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Permohonan Informasi', 'url' => '/permohonan_informasi', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Daftar Informasi', 'url' => '/daftar_informasi_publik', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Kerja Sama Daerah', 'url' => '/ip_kerjasama_daerah', 'roles' => ['superadmin', 'admin']]
         ]
     ],
     [
