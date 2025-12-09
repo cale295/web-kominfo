@@ -37,6 +37,7 @@ class Filters extends BaseFilters
 
     public array $globals = [
         'before' => [
+            'cors',
             'visitor_filter', // <--- 2. AKTIFKAN DI SINI (Supaya jalan otomatis saat web dibuka)
             // 'csrf',
         ],

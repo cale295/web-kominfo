@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// ... Import yang sudah ada ...
 import HeroSection from "../sections/homepage/hero/Hero";
 import ServiceGrid from "../sections/homepage/services/Services";
 import Agenda from "../sections/homepage/agenda/Agenda";
@@ -28,6 +30,9 @@ import DaftarInformasiPublik from "../sections/informasipubliksection/daftarinfo
 import PermohonanInformasi from "../sections/informasipubliksection/permohonaninformasi/PermohonanInformasi";
 import PengadaanBarangJasa from "../sections/informasipubliksection/pengadaanbarangjasa/PengadaanBarangJasa";
 import AjukanPermohonan from "../sections/ppidsection/ajukanpermohonan/AjukanPermohonan";
+
+// 1. IMPORT COMPONENT CEK STATUS (Sesuaikan path foldernya)
+import CheckStatus from "../sections/ppidsection/lacakpermohonan/LacakPermohonan";
 
 const HomePage: React.FC = () => {
   return (
@@ -88,6 +93,20 @@ const GalleryPage: React.FC = () => {
   )
 }
 
+// 2. BUAT PAGE WRAPPER (Agar tampilan rapi ada background & padding)
+const CekStatusPage: React.FC = () => {
+  return (
+    <div style={{ 
+      backgroundColor: "#f8f9fa", 
+      paddingTop: "40px", 
+      paddingBottom: "60px", 
+      minHeight: "60vh" 
+    }}>
+      <CheckStatus />
+    </div>
+  )
+}
+
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
@@ -109,7 +128,11 @@ const AppRouter: React.FC = () => {
         <Route path="/laporan_kinerja" element={<Kinerja />} />
         <Route path="/daftar_informasi_publik" element={<DaftarInformasiPublik />} />
         <Route path="/permohonan_informasi" element={<PermohonanInformasi />} />
-        <Route path="/ajukan_permohonan" element={<AjukanPermohonan />} />"
+        <Route path="/ajukan_permohonan" element={<AjukanPermohonan />} />
+        
+        {/* 3. TAMBAHKAN ROUTE DI SINI */}
+        <Route path="/cek_status_permohonan" element={<CekStatusPage />} />
+
       </Routes>
       <Footer />
       <AccessibilityPanel />
