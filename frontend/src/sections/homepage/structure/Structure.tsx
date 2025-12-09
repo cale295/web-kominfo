@@ -86,7 +86,7 @@ export default function Structure() {
   }
 
   return (
-    <div className="h-screen bg-blue-light">
+    <div className="container-fluid bg-blue-light">
       <div className="text-center mb-3 mb-md-4">
         <h1 className="text-blue-dark fw-bold fs-3 fs-md-1 pt-5">
           Daftar Pejabat Struktural
