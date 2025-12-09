@@ -104,15 +104,21 @@ public function toggleStatus()
 
 
     // TAMBAH
-    public function new()
+public function new()
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_create']) {
             return redirect()->to('/banner')->with('error', 'Kamu tidak punya izin menambah banner.');
         }
 
+        // --- BAGIAN YANG DITAMBAHKAN ---
+        // Menangkap parameter ?kategori=X dari URL
+        $kategori = $this->request->getGet('kategori'); 
+        // -------------------------------
+
         $data = [
-            'title' => 'Tambah Banner'
+            'title' => 'Tambah Banner',
+            'selected_kategori' => $kategori // Kirim variabel ini ke View
         ];
         return view('pages/banner/create', $data);
     }
