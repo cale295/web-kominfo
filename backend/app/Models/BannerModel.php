@@ -34,7 +34,7 @@ class BannerModel extends Model
     'title'         => 'required|min_length[3]|max_length[255]',
     'status'        => 'required|in_list[0,1]',
     'media_type'    => 'required|in_list[image,video]',
-    'url'           => 'required|valid_url',
+    'url'           => 'required',
     'keterangan'    => 'required|min_length[3]|string|max_length[255]',
     'url_yt'        => 'required|valid_url',
     'sorting'       => 'required|integer',
