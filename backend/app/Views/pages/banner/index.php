@@ -48,6 +48,55 @@
         margin-right: 10px;
     }
 
+    /* --- GAYA FILTER NAVIGATION --- */
+    .filter-nav {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--gray-100);
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        background: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-btn:hover {
+        background: var(--gray-200);
+        color: var(--gray-900);
+    }
+
+    .filter-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
+    }
+    
+    .filter-count {
+        background: rgba(255,255,255,0.2);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+    }
+    .filter-btn:not(.active) .filter-count {
+        background: var(--gray-300);
+        color: white;
+    }
+
+    /* Action Buttons */
     .action-buttons .btn {
         border-radius: 8px;
         font-weight: 500;
@@ -59,6 +108,7 @@
     .action-buttons .btn-primary {
         background: var(--primary);
         border: none;
+        color: white;
     }
 
     .action-buttons .btn-primary:hover {
@@ -309,14 +359,14 @@
         }
     }
 
-    /* --- PERBAIKAN TOMBOL STATUS --- */
+    /* --- SWITCH TOGGLE STATUS --- */
     .status-btn {
         background: none;
         border: none;
         padding: 0;
         display: flex;
         align-items: center;
-        gap: 8px; /* Jarak antara switch dan teks */
+        gap: 8px;
         cursor: pointer;
         transition: opacity 0.3s;
     }
@@ -329,7 +379,7 @@
         position: relative;
         width: 42px;
         height: 22px;
-        background-color: var(--gray-300); /* Warna default (mati) */
+        background-color: var(--gray-300);
         border-radius: 20px;
         transition: all 0.3s ease;
     }
@@ -347,20 +397,19 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
-    /* State Aktif */
     .status-btn .switch.active {
-        background-color: var(--success); /* Warna saat aktif (Hijau) */
+        background-color: var(--success);
     }
 
     .status-btn .switch.active::after {
-        left: 22px; /* Geser lingkaran ke kanan */
+        left: 22px;
     }
 
     .status-btn .switch-label {
         font-size: 0.8rem;
         font-weight: 600;
         color: var(--gray-700);
-        min-width: 65px; /* Lebar fixed agar teks tidak goyang */
+        min-width: 65px;
         text-align: left;
     }
 
@@ -368,6 +417,8 @@
     @media (max-width: 768px) {
         .gov-header { padding: 20px; }
         .gov-header h1 { font-size: 1.375rem; }
+        .filter-nav { gap: 8px; overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; }
+        .filter-btn { white-space: nowrap; }
         .gov-table thead th, .gov-table tbody td { padding: 10px 12px; font-size: 0.8125rem; }
         .action-buttons { flex-direction: column; gap: 8px; }
         .action-buttons .btn { width: 100%; }
@@ -387,10 +438,25 @@
             </h1>
         </div>
         <div class="action-buttons d-flex gap-2">
-            <a href="<?= site_url('banner/new') ?>" class="btn btn-primary">
+            <a href="<?= site_url('banner/new') ?>" id="btnAddBanner" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Tambah Banner
             </a>
         </div>
+    </div>
+
+    <div class="filter-nav">
+        <button class="filter-btn active" onclick="filterTable('all', this)">
+            <i class="bi bi-grid"></i> Semua
+        </button>
+        <button class="filter-btn" onclick="filterTable('1', this)">
+            <i class="bi bi-house"></i> Banner Utama
+        </button>
+        <button class="filter-btn" onclick="filterTable('2', this)">
+            <i class="bi bi-window"></i> Banner Popup
+        </button>
+        <button class="filter-btn" onclick="filterTable('3', this)">
+            <i class="bi bi-newspaper"></i> Banner Berita
+        </button>
     </div>
 </div>
 
@@ -400,12 +466,11 @@
     <div class="card table-card">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table gov-table mb-0">
+                <table class="table gov-table mb-0" id="bannerTable">
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 50px;">#</th>
                             <th style="min-width: 180px;">Judul</th>
-                            <th class="text-center" style="width: 100px;">Status</th>
                             <th class="text-center" style="width: 130px;">Kategori</th>
                             <th class="text-center" style="width: 100px;">Media</th>
                             <th class="text-center" style="width: 130px;">Gambar</th>
@@ -419,23 +484,12 @@
                     </thead>
                     <tbody>
                         <?php $no = 1; foreach ($banners as $b): ?>
-                            <tr>
+                            <tr class="banner-row" data-category="<?= $b['category_banner'] ?>">
                                 <td class="text-center">
                                     <strong><?= $no++ ?></strong>
                                 </td>
                                 <td>
                                     <div class="banner-title"><?= esc($b['title']) ?></div>
-                                </td>
-                                <td class="text-center">
-                                    <?php if ($b['status'] === '1'): ?>
-                                        <span class="badge bg-success status-badge-<?= $b['id_banner'] ?>">
-                                            <i class="bi bi-check-circle"></i> Publish
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="badge bg-secondary status-badge-<?= $b['id_banner'] ?>">
-                                            <i class="bi bi-x-circle"></i> Unpublish
-                                        </span>
-                                    <?php endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <?php
@@ -534,6 +588,12 @@
                                 </td>
                             </tr>
                         <?php endforeach; ?>
+                        <tr id="noRowsMessage" style="display: none;">
+                            <td colspan="12" class="text-center py-5 text-muted">
+                                <i class="bi bi-filter-circle" style="font-size: 2rem;"></i>
+                                <p class="mt-2">Tidak ada banner di kategori ini.</p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -560,6 +620,46 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+// --- MODIFIKASI 2: LOGIC FILTER TABLE ---
+function filterTable(category, btnElement) {
+    // 1. Update status tombol aktif
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+
+    // 2. Filter Baris Tabel
+    const rows = document.querySelectorAll('.banner-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const rowCat = row.getAttribute('data-category');
+        if (category === 'all' || rowCat === category) {
+            row.style.display = ''; // Tampilkan
+            visibleCount++;
+        } else {
+            row.style.display = 'none'; // Sembunyikan
+        }
+    });
+
+    // 3. Tampilkan pesan jika kosong
+    const noMsg = document.getElementById('noRowsMessage');
+    if (visibleCount === 0) {
+        noMsg.style.display = '';
+    } else {
+        noMsg.style.display = 'none';
+    }
+
+    // 4. Update Link Tombol Tambah Banner (BAGIAN PENTING)
+    const btnAdd = document.getElementById('btnAddBanner');
+    const baseUrl = "<?= site_url('banner/new') ?>";
+
+    if (category !== 'all') {
+        btnAdd.href = baseUrl + "?kategori=" + category;
+    } else {
+        btnAdd.href = baseUrl;
+    }
+}
+
 // Logic Modal Gambar
 function openImageModal(imageSrc, imageName) {
     const modal = document.getElementById('imageModal');
@@ -590,11 +690,9 @@ $(document).on('click', '.status-btn', function () {
     let switchEl = btn.find('.switch');
     let labelEl = btn.find('.switch-label');
     
-    // Simpan token CSRF
     let csrfName = '<?= csrf_token() ?>';
     let csrfHash = '<?= csrf_hash() ?>';
 
-    // Disable sementara
     btn.css('opacity', '0.6').prop('disabled', true);
 
     $.ajax({
@@ -602,29 +700,25 @@ $(document).on('click', '.status-btn', function () {
         type: "POST",
         data: { 
             id: id,
-            [csrfName]: csrfHash // Kirim CSRF Token
+            [csrfName]: csrfHash 
         },
         dataType: "json",
         success: function(res) {
             btn.css('opacity', '1').prop('disabled', false);
 
             if (res.status === 'success') {
-                // Update CSRF Hash untuk request berikutnya (Penting di CI4)
                 if (res.token) {
                     csrfHash = res.token;
                     $('input[name="' + csrfName + '"]').val(csrfHash);
                 }
 
-                // Update Tampilan Tombol
                 if (res.newStatus == 1) {
                     switchEl.addClass('active');
                     labelEl.text('Aktif');
-                    // Opsional: Update badge status di kolom 'Status' jika ada
                     $('.status-badge-' + id).removeClass('bg-secondary').addClass('bg-success').html('<i class="bi bi-check-circle"></i> Publish');
                 } else {
                     switchEl.removeClass('active');
                     labelEl.text('Non-Aktif');
-                    // Opsional: Update badge status di kolom 'Status' jika ada
                     $('.status-badge-' + id).removeClass('bg-success').addClass('bg-secondary').html('<i class="bi bi-x-circle"></i> Unpublish');
                 }
             } else {
