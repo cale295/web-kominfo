@@ -41,7 +41,6 @@ const parseAdditionalImages = (imagesData: any): AdditionalImage[] => {
   }
 };
 
-
 // Komponen Carousel
 interface CarouselProps {
   images: AdditionalImage[];
@@ -64,7 +63,6 @@ const Carousel: React.FC<CarouselProps> = ({ images, getImageUrl }) => {
     setCurrentIndex(index);
   };
 
-  // Auto-advance setiap 5 detik (hanya berjalan ketika tidak dihover)
   useEffect(() => {
     if (images.length <= 1) return;
 
@@ -89,19 +87,17 @@ const Carousel: React.FC<CarouselProps> = ({ images, getImageUrl }) => {
       role="region"
       aria-label="Galeri foto berita"
     >
-      {/* Image */}
       <div className="carousel-slide text-center">
         <img
-  src={currentImage.url}
-  className="img-fluid rounded shadow-sm d-block mx-auto"
-  alt={currentImage.caption || `Foto ${currentIndex + 1}`}
-  style={{ maxHeight: "500px", objectFit: "contain" }}
-  onError={(e) => {
-    console.error("Carousel image failed to load:", currentImage.url);
-    e.currentTarget.style.display = "none";
-  }}
-/>
-
+          src={currentImage.url}
+          className="img-fluid rounded shadow-sm d-block mx-auto"
+          alt={currentImage.caption || `Foto ${currentIndex + 1}`}
+          style={{ maxHeight: "500px", objectFit: "contain" }}
+          onError={(e) => {
+            console.error("Carousel image failed to load:", currentImage.url);
+            e.currentTarget.style.display = "none";
+          }}
+        />
         {currentImage.caption && (
           <div className="carousel-caption mt-2 fst-italic text-muted small">
             {currentImage.caption}
@@ -109,7 +105,6 @@ const Carousel: React.FC<CarouselProps> = ({ images, getImageUrl }) => {
         )}
       </div>
 
-      {/* Navigation Buttons */}
       {images.length > 1 && (
         <>
           <button
@@ -127,7 +122,6 @@ const Carousel: React.FC<CarouselProps> = ({ images, getImageUrl }) => {
             ›
           </button>
 
-          {/* Dots */}
           <div className="carousel-indicators d-flex justify-content-center mt-3">
             {images.map((_, idx) => (
               <button
@@ -152,7 +146,7 @@ interface BeritaDetail {
   content: string;
   content2?: string;
   feat_image: string;
-  additional_images?: any; // Changed to any to handle both string and array
+  additional_images?: any;
   created_at: string;
   updated_at: string;
   hit: string;
@@ -213,19 +207,65 @@ const BeritaDetail: React.FC = () => {
   const getImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return null;
     
-    // Clean path dari leading slash
     const cleanPath = imagePath.replace(/^\/+/, "");
     
-    // Cek apakah path sudah lengkap dengan ROOT
     if (cleanPath.startsWith('http')) {
       return cleanPath;
     }
     
-    // Gabungkan ROOT dengan path
     const fullUrl = `${ROOT}/${cleanPath}`;
     console.log("Image URL:", fullUrl);
     return fullUrl;
   };
+
+  // Event listener untuk copy protection
+  useEffect(() => {
+    const handleCopy = (e: ClipboardEvent) => {
+      // Cegah default copy behavior
+      e.preventDefault();
+      
+      // Ambil teks yang dipilih
+      const selection = window.getSelection();
+      const selectedText = selection?.toString() || "";
+      
+      if (selectedText && berita) {
+        // Buat custom text dengan watermark/kredit
+        const customText = `${selectedText}\n\n---\nSumber: ${berita.judul}\nDikutip dari: ${window.location.href}\n© ${new Date().getFullYear()} - Hak Cipta Dilindungi`;
+        
+        // Override clipboard dengan text custom
+        e.clipboardData?.setData("text/plain", customText);
+        
+        // Optional: Tampilkan notifikasi
+        console.log("Teks disalin dengan kredit sumber");
+      }
+    };
+
+    // Tambahkan event listener
+    document.addEventListener("copy", handleCopy);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("copy", handleCopy);
+    };
+  }, [berita]);
+
+  // Optional: Disable context menu (klik kanan)
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      // Hanya disable pada area artikel
+      const target = e.target as HTMLElement;
+      if (target.closest('.berita-article')) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchBeritaDetail = async () => {
@@ -235,7 +275,6 @@ const BeritaDetail: React.FC = () => {
       setError("");
 
       try {
-        // Fetch detail berita dan berita terkait dalam satu waktu
         const [resDetail, resAll] = await Promise.all([
           api.get(`/berita/${id}`),
           api.get("/berita")
@@ -251,7 +290,6 @@ const BeritaDetail: React.FC = () => {
           console.log("Additional Images Raw:", data.additional_images);
           console.log("Parsed Additional Images:", parseAdditionalImages(data.additional_images));
 
-          // Filter berita terkait
           const allBerita = resAll?.data?.data?.berita || [];
           const terkait = allBerita
             .filter((item: BeritaTerkait) => item.id_berita !== id)
@@ -295,7 +333,6 @@ const BeritaDetail: React.FC = () => {
   };
 
   const handleBeritaTerkaitClick = (slug: string) => {
-    // Scroll ke atas dan navigate
     window.scrollTo({ top: 0, behavior: 'smooth' });
     navigate(`/berita/${slug}`);
   };
@@ -333,9 +370,7 @@ const BeritaDetail: React.FC = () => {
   return (
     <div className="container-fluid berita-detail-container my-5">
       <div className="row">
-        {/* Main Content */}
         <div className="col-lg-8">
-          {/* Back Button */}
           <button
             className="btn btn-link back-button mb-3"
             onClick={() => navigate("/berita")}
@@ -344,7 +379,6 @@ const BeritaDetail: React.FC = () => {
             Kembali ke Berita
           </button>
 
-          {/* Article Header */}
           <article className="berita-article">
             <h1 className="article-title">{berita.judul}</h1>
 
@@ -368,9 +402,7 @@ const BeritaDetail: React.FC = () => {
               </button>
             </div>
 
-            {/* Featured Image + Carousel for Additional Images */}
             <div className="article-image-section mt-4">
-              {/* Main Featured Image */}
               {berita.feat_image && (
                 <div className="main-image-wrapper mb-4">
                   <img
@@ -390,7 +422,6 @@ const BeritaDetail: React.FC = () => {
                 </div>
               )}
 
-              {/* Additional Images Carousel */}
               {additionalImgs.length > 0 && (
                 <div className="additional-images-carousel mt-4">
                   <h5 className="mb-3">Galeri Foto</h5>
@@ -399,18 +430,15 @@ const BeritaDetail: React.FC = () => {
               )}
             </div>
 
-            {/* Intro */}
             <div className="article-intro">
               <strong>{berita.intro}</strong>
             </div>
 
-            {/* Content */}
             <div
               className="article-content"
               dangerouslySetInnerHTML={{ __html: berita.content }}
             />
 
-            {/* Content 2 */}
             {berita.content2 && (
               <div
                 className="article-content"
@@ -418,7 +446,6 @@ const BeritaDetail: React.FC = () => {
               />
             )}
 
-            {/* Source & Video */}
             <div className="article-footer-info">
               {berita.sumber && (
                 <p className="article-source">
@@ -435,7 +462,6 @@ const BeritaDetail: React.FC = () => {
               )}
             </div>
 
-            {/* Kategori */}
             {berita.kategori && berita.kategori.length > 0 && (
               <div className="article-tags mt-4">
                 <strong>Kategori:</strong>
@@ -449,7 +475,6 @@ const BeritaDetail: React.FC = () => {
           </article>
         </div>
 
-        {/* Sidebar */}
         <div className="col-lg-4">
           <div className="sidebar-sticky">
             <h5 className="sidebar-title">Berita Terkait</h5>

@@ -43,7 +43,6 @@ export default function HubungiKami() {
 
       if (response.data.status === 200 && response.data.data && response.data.data.length > 0) {
         const activeItems = response.data.data
-          .filter((item: ContactItem) => item.status.toLowerCase() === 'aktif')
           .sort((a: ContactItem, b: ContactItem) => 
             Number(a.urutan) - Number(b.urutan)
           );

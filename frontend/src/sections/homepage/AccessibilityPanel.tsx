@@ -115,7 +115,7 @@ const AccessibilityPanel: React.FC = () => {
             width: '280px',
             maxHeight: '90vh',
             overflowY: 'auto',
-            zIndex: 999,
+            zIndex: 9999,
             border: '1px solid #ccc',
             backgroundColor: '#fff',
           }}
