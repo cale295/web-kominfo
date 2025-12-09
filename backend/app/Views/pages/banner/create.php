@@ -329,6 +329,50 @@
 </div>
 
 <script>
+    function handleMediaType() {
+        const type = document.getElementById('media_type').value;
+        
+        const groupImage = document.getElementById('group_image');
+        const inputImage = document.getElementById('image');
+        
+        const groupVideo = document.getElementById('group_video');
+        const inputVideo = document.getElementById('url_yt');
+
+        // Reset Tampilan
+        groupImage.style.display = 'none';
+        groupVideo.style.display = 'none';
+        
+        // Reset Required & Value (PENTING!)
+        // Jika hidden, kita kosongkan value-nya agar bersih
+        // Note: Untuk edit, jangan kosongkan value input file karena readonly, 
+        // tapi untuk URL text bisa dikosongkan jika mau strict.
+        
+        inputImage.required = false; 
+        inputVideo.required = false;
+
+        if (type === 'image') {
+            groupImage.style.display = 'block';
+            
+            // Logika Required:
+            // - Di Create: Wajib
+            // - Di Edit: Tidak Wajib (karena mungkin pakai gambar lama)
+            // Cek apakah ini halaman create atau edit (bisa cek URL atau keberadaan gambar preview)
+            const isEditPage = document.querySelector('.current-img-container'); 
+            if (!isEditPage) {
+                inputImage.required = true; 
+            }
+            
+            // Bersihkan input video jika ganti ke image
+            inputVideo.value = ''; 
+
+        } else if (type === 'video') {
+            groupVideo.style.display = 'block';
+            inputVideo.required = true; // Video wajib isi URL
+            
+            // Bersihkan input file jika ganti ke video
+            inputImage.value = ''; 
+        }
+    }
     // Logic Show/Hide
     function handleMediaType() {
         const type = document.getElementById('media_type').value;
