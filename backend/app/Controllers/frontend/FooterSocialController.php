@@ -188,7 +188,6 @@ class FooterSocialController extends BaseController
             'account_name'     => $this->request->getPost('account_name'),
             'account_url'      => $this->request->getPost('account_url'),
             'sorting'          => $this->request->getPost('sorting') ?? 0,
-            'is_active'        => $this->request->getPost('is_active') ?? 0,
             'updated_by'       => session()->get('id_user'),
         ];
 

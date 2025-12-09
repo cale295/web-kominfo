@@ -226,7 +226,7 @@ public function update($id)
             'description'      => $this->request->getPost('description'),
             'is_featured'      => $isFeatured,
             'sorting'          => $this->request->getPost('sorting') ?? 0,
-            'is_active'        => $this->request->getPost('is_active') ?? 0,
+            'is_active'        => $this->request->getPost('is_active'),
         ];
 
         // Handle File Upload & Replace

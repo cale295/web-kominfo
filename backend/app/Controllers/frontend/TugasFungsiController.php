@@ -160,7 +160,7 @@ class TugasFungsiController extends BaseController
             'id_tugas'     => $id,
             'type'         => $this->request->getPost('type'),
             'description'  => $this->request->getPost('description'),
-            'is_active'    => $this->request->getPost('is_active') ?? 0,
+            'is_active'    => $this->request->getPost('is_active'),
         ];
 
         if (!$this->tugasModel->save($data)) {

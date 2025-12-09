@@ -241,7 +241,7 @@ public function update($id = null)
         'kategori'    => $kategoriBaru,
         'slug'        => $slugBaru,
         'keterangan'  => $this->request->getPost('keterangan'),
-        'status'      => $this->request->getPost('status') ?? 'active',
+        'status'      => $this->request->getPost('status'),
         'is_show_nav' => $this->request->getPost('is_show_nav') ?? '0',
         'sorting_nav' => $this->request->getPost('sorting_nav'),
     ];

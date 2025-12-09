@@ -214,7 +214,7 @@ public function create()
             'slug'           => url_title($this->request->getPost('nama_program'), '-', true),
             'sorting'        => $this->request->getPost('sorting'),
             // Handle checkbox: jika tidak dicentang nilainya null, jadi kita set ke 0
-            'is_active'      => $this->request->getPost('is_active') ?? 0, 
+            'is_active'      => $this->request->getPost('is_active'), 
         ];
 
         // 4. Logika Update File Lampiran

@@ -218,7 +218,6 @@ class AgendaController extends BaseController
             'start_date'    => $this->request->getPost('start_date'),
             'end_date'      => $this->request->getPost('end_date'),
             'location'      => $this->request->getPost('location'),
-            'status'        => $this->request->getPost('status') ?? 'inactive',
         ];
 
         // Folder upload (gunakan FCPATH)

@@ -192,7 +192,7 @@ class HomeServiceController extends BaseController
             'title'      => $this->request->getPost('title'),
             'link'       => $this->request->getPost('link'),
             'sorting'    => $this->request->getPost('sorting') ?? 0,
-            'is_active'  => $this->request->getPost('is_active') ?? 0,
+            'is_active'  => $this->request->getPost('is_active'),
         ];
 
         // --- Handle File Upload ---
