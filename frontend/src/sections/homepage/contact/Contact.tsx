@@ -25,6 +25,8 @@ interface PetaData {
   status: string;
 }
 
+
+
 export default function HubungiKami() {
   const [contactItems, setContactItems] = useState<ContactItem[]>([]);
   const [petaData, setPetaData] = useState<PetaData | null>(null);
