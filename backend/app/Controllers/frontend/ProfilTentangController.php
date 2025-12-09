@@ -168,7 +168,6 @@ class ProfilTentangController extends BaseController
             'title'      => $this->request->getPost('title'),
             'content'    => $this->request->getPost('content'),
             'sorting'    => $this->request->getPost('sorting') ?? 0,
-            'is_active'  => $this->request->getPost('is_active') ?? 0,
         ];
 
         // Handle Image Upload & Replace

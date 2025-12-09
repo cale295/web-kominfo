@@ -180,7 +180,6 @@ class FooterStatisticsController extends BaseController
             'stat_value'       => $this->request->getPost('stat_value'),
             'auto_update'      => $this->request->getPost('auto_update') ?? 0,
             'sorting'          => $this->request->getPost('sorting') ?? 0,
-            'is_active'        => $this->request->getPost('is_active'),
             'updated_at'       => session()->get('id_user'),
         ];
 

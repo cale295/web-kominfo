@@ -193,7 +193,6 @@ class KontakSocialController extends BaseController
             'icon_class'       => $this->request->getPost('icon_class'),
             'link_url'         => $this->request->getPost('link_url'),
             'urutan'           => $this->request->getPost('urutan'),
-            'status'           => $this->request->getPost('status'),
         ];
 
         // Save (Validasi model berjalan otomatis)

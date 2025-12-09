@@ -189,7 +189,6 @@ public function toggleStatus()
             'title'        => $this->request->getPost('title'),
             'subtitle'     => $this->request->getPost('subtitle'),
             'description'  => $this->request->getPost('description'),
-            'is_active'    => $this->request->getPost('is_active'),
         ];
 
         // Handle Image Upload (Optional on Update)

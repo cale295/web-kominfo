@@ -208,7 +208,6 @@ class BeritaUtamaController extends BaseController
         $this->utamaModel->update($id, [
             'id_berita' => $this->request->getPost('id_berita'),
             'jenis' => $this->request->getPost('jenis'),
-            'status' => $this->request->getPost('status'),
         ]);
 
         return redirect()->to('/berita-utama')->with('success', 'Berita utama berhasil diperbarui.');

@@ -184,7 +184,6 @@ class AgendaPelatihanController extends BaseController
             'waktu'          => $this->request->getPost('waktu'),
             'tempat'         => $this->request->getPost('tempat'),
             'deskripsi'      => $this->request->getPost('deskripsi'),
-            'status'         => $this->request->getPost('status'),
         ];
 
         // Update tanggal publish jika status berubah jadi published

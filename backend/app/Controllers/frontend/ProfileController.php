@@ -201,7 +201,6 @@ public function update($id)
         'title'      => $post['title'] ?? $menu_profile['title'],
         'slug'       => url_title($post['title'], '-', true),
         'sorting'    => $post['sorting'] ?? $menu_profile['sorting'],
-        'is_active'  => $post['is_active'] ?? $menu_profile['is_active'],
         'content'    => $post['content'] ?? $menu_profile['content'],
         'updated_at' => date('Y-m-d H:i:s'),
         'image'      => $menu_profile['image'], // default foto lama

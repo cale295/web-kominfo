@@ -217,7 +217,6 @@ public function edit($id)
             'slug'        => url_title($this->request->getPost('nama'), '-', true),
             'deskripsi'   => $this->request->getPost('deskripsi'),
             'sorting'     => $this->request->getPost('sorting') ?? 0,
-            'is_active'   => $this->request->getPost('is_active'),
         ];
 
         if (!$this->strukturModel->save($data)) {

@@ -197,7 +197,6 @@ class KontakController extends BaseController
             'telepon'        => $this->request->getPost('telepon'),
             'fax'            => $this->request->getPost('fax'),
             'map_link'       => $this->request->getPost('map_link'),
-            'status'         => $this->request->getPost('status'),
         ];
 
         // 4. Proses Update ke Database

@@ -206,7 +206,6 @@ class PejabatController extends BaseController
             // Update slug jika jabatan berubah
             'slug'                 => url_title($this->request->getPost('jabatan'), '-', true),
             'urutan'               => $this->request->getPost('urutan'),
-            'is_active' => $this->request->getPost('is_active'), // Default 0 jika checkbox tidak dicentang
         ];
 
         // 4. Logika Upload Foto (Jika ada file baru diupload)
