@@ -27,6 +27,7 @@ import BannerPopupComponent from "../components/bannerpopup/BannerPopup";
 import DaftarInformasiPublik from "../sections/informasipubliksection/daftarinformasipublik/Daftar_Informasi_publik";
 import PermohonanInformasi from "../sections/informasipubliksection/permohonaninformasi/PermohonanInformasi";
 import PengadaanBarangJasa from "../sections/informasipubliksection/pengadaanbarangjasa/PengadaanBarangJasa";
+import AjukanPermohonan from "../sections/ppidsection/ajukanpermohonan/AjukanPermohonan";
 
 const HomePage: React.FC = () => {
   return (
@@ -108,6 +109,7 @@ const AppRouter: React.FC = () => {
         <Route path="/laporan_kinerja" element={<Kinerja />} />
         <Route path="/daftar_informasi_publik" element={<DaftarInformasiPublik />} />
         <Route path="/permohonan_informasi" element={<PermohonanInformasi />} />
+        <Route path="/ajukan_permohonan" element={<AjukanPermohonan />} />"
       </Routes>
       <Footer />
       <AccessibilityPanel />

@@ -10,47 +10,60 @@ class ApiPpidPermohonanController extends ResourceController
     protected $modelName = PpidPermohonanModel::class;
     protected $format    = 'json';
 
-    /**
-     * Create: Endpoint untuk Masyarakat mengajukan permohonan
-     * Method: POST /api/ppid_permohonan
-     */
     public function create()
     {
-        // 🔹 TAMBAHKAN INI AGAR EDITOR TIDAK ERROR "Undefined method getVar"
-        /** @var \CodeIgniter\HTTP\IncomingRequest $request */
         $request = $this->request;
 
-        // 1. Generate ID Unik 8 Digit
+        // 1. Ambil Data (Support JSON Raw & Form Data)
+        // Jika request adalah JSON, ambil body JSON. Jika bukan, ambil $_POST biasa.
+        if ($request->getHeaderLine('Content-Type') === 'application/json') {
+            $input = $request->getJSON(true); // true = array associative
+        } else {
+            $input = $request->getVar(); // fallback ke form-data biasa
+        }
+
+        // Cek jika input kosong
+        if (!$input) {
+            return $this->fail(['message' => 'Data JSON tidak terbaca atau kosong'], 400);
+        }
+
+        // 2. Generate ID Unik
         $uniqueId = $this->generateUniqueId();
 
-        // 2. Ambil data dari JSON Body atau Form Data menggunakan variable $request
+        // 3. Mapping Data (Gunakan Null Coalescing '??' biar gak error undefined index)
         $data = [
             'id_formulir'               => $uniqueId,
-            'nik'                       => $request->getVar('nik'),
-            'nama'                      => $request->getVar('nama'),
-            'no_telepon'                => $request->getVar('no_telepon'),
-            'email'                     => $request->getVar('email'),
-            'alamat'                    => $request->getVar('alamat'),
-            'pekerjaan'                 => $request->getVar('pekerjaan'),
-            'cara_memperoleh_informasi' => $request->getVar('cara_memperoleh_informasi'),
-            'cara_mendapatkan_salinan'  => $request->getVar('cara_mendapatkan_salinan'),
-            'rincian_informasi'         => $request->getVar('rincian_informasi'),
-            'tujuan_penggunaan'         => $request->getVar('tujuan_penggunaan'),
-            'pemohon_informasi'         => $request->getVar('pemohon_informasi'),
-            'status'                    => 'pending', 
+            'nik'                       => $input['nik'] ?? '',
+            'nama'                      => $input['nama'] ?? '',
+            'no_telepon'                => $input['no_telepon'] ?? '',
+            'email'                     => $input['email'] ?? '',
+            'alamat'                    => $input['alamat'] ?? '',
+            'pekerjaan'                 => $input['pekerjaan'] ?? '',
+            'cara_memperoleh_informasi' => $input['cara_memperoleh_informasi'] ?? '',
+            'cara_mendapatkan_salinan'  => $input['cara_mendapatkan_salinan'] ?? '',
+            'rincian_informasi'         => $input['rincian_informasi'] ?? '',
+            'tujuan_penggunaan'         => $input['tujuan_penggunaan'] ?? '',
+            'pemohon_informasi'         => $input['pemohon_informasi'] ?? '',
+            'status'                    => 'pending',
             'tanggal_permohonan'        => date('Y-m-d H:i:s')
         ];
 
-        // 3. Validasi dan Insert via Model
+        // 4. Insert dengan Model
+        // Model akan otomatis menjalankan validasi jika disetting di Model file
         if ($this->model->insert($data)) {
             return $this->respondCreated([
                 'status'    => 201,
                 'message'   => 'Permohonan berhasil dikirim.',
-                'ticket_id' => $uniqueId, // ID ini digunakan user untuk cek status
+                'ticket_id' => $uniqueId,
                 'data'      => $data
             ]);
         } else {
-            return $this->fail($this->model->errors());
+            // PENTING: Kembalikan pesan error validasi agar React tahu salahnya dimana
+            return $this->fail([
+                'status' => 400,
+                'message' => 'Validasi Gagal',
+                'errors' => $this->model->errors() 
+            ], 400);
         }
     }
 
