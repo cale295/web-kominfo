@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class PermohonanInformasiModel extends Model
 {
-    protected $table            = 'permohonan_informasi';
+    protected $table            = 't_ip_permohonan_informasi';
     protected $primaryKey       = 'id_permohonan'; // Disesuaikan dengan SQL
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
