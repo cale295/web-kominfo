@@ -99,6 +99,7 @@ class BannerController extends BaseController
     }
 
     // --- PROCESS CREATE ---
+// SIMPAN DATA
     public function create()
     {
         $access = $this->getAccess(session()->get('role'));
@@ -106,34 +107,52 @@ class BannerController extends BaseController
             return redirect()->to('/banner')->with('error', 'Akses ditolak.');
         }
 
+        // Ambil input
         $mediaType = $this->request->getPost('media_type');
+        
+        // ============================================================
+        // 1. VALIDASI DINAMIS (KUNCI UTAMA)
+        // ============================================================
+        if ($mediaType === 'video') {
+            // Jika Video: URL Youtube WAJIB
+            $this->bannerModel->setValidationRule('url_yt', 'required|valid_url');
+            // Gambar TIDAK WAJIB
+            // (Note: Validasi upload gambar sebaiknya manual di controller karena CI4 model validation untuk file kadang tricky)
+        } else {
+            // Jika Image: URL Youtube TIDAK WAJIB
+            $this->bannerModel->setValidationRule('url_yt', 'permit_empty');
+            
+            // Validasi manual: Pastikan user upload gambar
+            $file = $this->request->getFile('image');
+            if (!$file->isValid()) {
+                return redirect()->back()->withInput()->with('error', 'Anda wajib mengupload gambar jika memilih tipe Gambar.');
+            }
+        }
+        // ============================================================
+
         $gambar = $this->request->getFile('image');
         $namaFile = null;
         $urlYt = null;
 
-        // LOGIKA MEDIA TYPE
+        // Logika File & URL (Seperti sebelumnya)
         if ($mediaType === 'image') {
-            // Jika Image, proses upload
             if ($gambar && $gambar->isValid() && !$gambar->hasMoved()) {
                 $namaFile = $gambar->getRandomName();
                 $gambar->move(FCPATH . 'uploads/banner', $namaFile);
             }
-            // URL Youtube dipastikan NULL
             $urlYt = null; 
         } 
         elseif ($mediaType === 'video') {
-            // Jika Video, ambil URL Youtube
             $urlYt = $this->request->getPost('url_yt');
-            // Image dipastikan NULL (tidak ada upload)
             $namaFile = null;
         }
 
         $data = [
             'title'           => $this->request->getPost('title'),
-            'status'          => '0', // Default non-aktif
+            'status'          => $this->request->getPost('status') ?? '0',
             'image'           => $namaFile,
             'media_type'      => $mediaType,
-            'url'             => $this->request->getPost('url'),
+            'url'             => $this->request->getPost('url'), // Ini sekarang boleh kosong (karena permit_empty di model)
             'url_yt'          => $urlYt,
             'sorting'         => $this->request->getPost('sorting'),
             'keterangan'      => $this->request->getPost('keterangan'),
@@ -144,13 +163,13 @@ class BannerController extends BaseController
             'created_by_name' => session()->get('username') ?? 'Guest',
         ];
 
+        // Simpan dengan Validasi Dinamis
         if (!$this->bannerModel->insert($data)) {
             return redirect()->back()->withInput()->with('errors', $this->bannerModel->errors());
         }
 
         return redirect()->to('/banner')->with('success', 'Banner berhasil ditambahkan.');
     }
-
     // --- FORM EDIT ---
     public function edit($id)
     {
@@ -172,6 +191,7 @@ class BannerController extends BaseController
     }
 
     // --- PROCESS UPDATE ---
+// UPDATE
     public function update($id)
     {
         $access = $this->getAccess(session()->get('role'));
@@ -180,47 +200,43 @@ class BannerController extends BaseController
         }
 
         $banner = $this->bannerModel->find($id);
-        if (!$banner) {
-            return redirect()->to('/banner')->with('error', 'Data tidak ditemukan.');
-        }
+        if (!$banner) return redirect()->to('/banner')->with('error', 'Data tidak ditemukan.');
 
         $mediaType = $this->request->getPost('media_type');
-        $gambar = $this->request->getFile('image');
-        
-        $namaFile = $banner['image']; // Default pakai lama
-        $urlYt = $banner['url_yt'];   // Default pakai lama
 
-        // LOGIKA PERUBAHAN TIPE MEDIA
+        // ============================================================
+        // 1. VALIDASI DINAMIS UPDATE
+        // ============================================================
         if ($mediaType === 'video') {
-            // User pilih VIDEO
-            
-            // 1. Ambil input URL baru
-            $urlYt = $this->request->getPost('url_yt');
+            // Jika Video: URL Youtube WAJIB
+            $this->bannerModel->setValidationRule('url_yt', 'required|valid_url');
+        } else {
+            // Jika Image: URL Youtube TIDAK WAJIB
+            $this->bannerModel->setValidationRule('url_yt', 'permit_empty');
+            // Gambar tidak wajib required karena bisa pakai gambar lama
+        }
+        // ============================================================
 
-            // 2. Hapus file gambar lama (jika ada) untuk hemat space
+        $gambar = $this->request->getFile('image');
+        $namaFile = $banner['image'];
+        $urlYt = $banner['url_yt'];
+
+        // Logika Hapus File & Ganti Tipe (Sama seperti sebelumnya)
+        if ($mediaType === 'video') {
+            $urlYt = $this->request->getPost('url_yt');
             if (!empty($banner['image']) && file_exists(FCPATH . 'uploads/banner/' . $banner['image'])) {
                 @unlink(FCPATH . 'uploads/banner/' . $banner['image']);
             }
-            
-            // 3. Set kolom image jadi NULL
             $namaFile = null;
         } 
         elseif ($mediaType === 'image') {
-            // User pilih IMAGE
-
-            // 1. Cek ada upload baru gak?
             if ($gambar && $gambar->isValid() && !$gambar->hasMoved()) {
                 $namaFile = $gambar->getRandomName();
                 $gambar->move(FCPATH . 'uploads/banner', $namaFile);
-
-                // Hapus gambar lama agar tidak numpuk
                 if (!empty($banner['image']) && file_exists(FCPATH . 'uploads/banner/' . $banner['image'])) {
                     @unlink(FCPATH . 'uploads/banner/' . $banner['image']);
                 }
             }
-            // Jika tidak upload baru, $namaFile tetap pakai $banner['image']
-
-            // 2. Set URL Youtube jadi NULL
             $urlYt = null;
         }
 
@@ -228,8 +244,8 @@ class BannerController extends BaseController
             'title'           => $this->request->getPost('title'),
             'image'           => $namaFile,
             'media_type'      => $mediaType,
-            'url'             => $this->request->getPost('url'),
-            'url_yt'          => $urlYt, // Hasil logika di atas
+            'url'             => $this->request->getPost('url'), // Boleh kosong
+            'url_yt'          => $urlYt,
             'sorting'         => $this->request->getPost('sorting'),
             'keterangan'      => $this->request->getPost('keterangan'),
             'category_banner' => $this->request->getPost('category_banner'),
