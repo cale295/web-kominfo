@@ -41,15 +41,7 @@
                     </div>
 
                     <!-- Kolom Kanan -->
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Status <span class="text-danger">*</span></label>
-                            <select name="is_active" class="form-select">
-                                <option value="1" <?= old('is_active', $pejabat['is_active']) == '1' ? 'selected' : '' ?>>Aktif</option>
-                                <option value="0" <?= old('is_active', $pejabat['is_active']) == '0' ? 'selected' : '' ?>>Nonaktif</option>
-                            </select>
-                        </div>
-
+                    
                         <div class="mb-3">
                             <label class="form-label fw-bold">Ganti Gambar (Opsional)</label>
                             <input type="file" name="image" class="form-control" accept="image/*" onchange="previewImg(event)">

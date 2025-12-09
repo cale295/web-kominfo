@@ -77,13 +77,8 @@
                                         <label class="form-label fw-bold small">Urutan</label>
                                         <input type="number" class="form-control" name="sorting" value="<?= old('sorting', $profil['sorting']) ?>">
                                     </div>
-                                    <div class="col-6 pt-4">
-                                        <div class="form-check form-switch">
-                                            <input type="hidden" name="is_active" value="0">
-                                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <?= old('is_active', $profil['is_active']) == 1 ? 'checked' : '' ?>>
-                                            <label class="form-check-label fw-bold small" for="is_active">Aktif</label>
-                                        </div>
-                                    </div>
+                                   
+                               
                                 </div>
                             </div>
                         </div>

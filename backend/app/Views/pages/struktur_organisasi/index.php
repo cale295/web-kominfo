@@ -4,8 +4,7 @@
 
 <?php
 // --- LOGIKA SORTING HIERARKI (TREE) ---
-// Kita olah data flat dari controller menjadi urutan Parent -> Child di View ini.
-
+// Bagian ini TETAP DIPERTAHANKAN agar logika parent-child berjalan
 $hierarchicalData = [];
 if (!empty($struktur)) {
     $grouped = [];
@@ -43,7 +42,6 @@ if (!empty($struktur)) {
 ?>
 
 <div class="container-fluid px-4">
-    <!-- Page Header -->
     <div class="d-flex align-items-center justify-content-between my-4">
         <div>
             <h1 class="h3 mb-0 text-gray-800 fw-bold">Struktur Organisasi</h1>
@@ -55,10 +53,8 @@ if (!empty($struktur)) {
         </ol>
     </div>
 
-    <!-- Alert Messages -->
     <?= $this->include('layouts/alerts') ?>
 
-    <!-- Main Card -->
     <div class="card shadow border-0 rounded-3 mb-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-sitemap me-2"></i>Daftar Unit</h6>
@@ -68,9 +64,9 @@ if (!empty($struktur)) {
                 </a>
             <?php endif; ?>
         </div>
+        
         <div class="card-body p-0">
             <div class="table-responsive">
-                <!-- Tambahkan class 'table-tree' untuk styling khusus jika perlu -->
                 <table class="table table-hover align-middle mb-0" id="datatablesSimple">
                     <thead class="bg-light text-secondary text-uppercase small fw-bold">
                         <tr>
@@ -78,6 +74,7 @@ if (!empty($struktur)) {
                             <th class="py-3" width="30%">Nama Unit (Hierarki)</th>
                             <th class="text-center py-3" width="10%">Status</th>
                             <th class="text-center py-3" width="10%">Urutan</th>
+                            <th class="text-center py-3" width="10%">Toggle</th>
                             <th class="text-center py-3" width="15%">Aksi</th>
                         </tr>
                     </thead>
@@ -94,13 +91,13 @@ if (!empty($struktur)) {
                             </tr>
                         <?php else : ?>
                             <?php 
-                                // Loop menggunakan data yang sudah diurutkan hierarkis
                                 foreach ($hierarchicalData as $index => $item) : 
-                                    // Hitung padding berdasarkan depth (misal 30px per level)
+                                    // Hitung padding berdasarkan depth (30px per level)
                                     $paddingLeft = $item['depth'] * 30;
                             ?>
                                 <tr>
                                     <td class="text-center fw-bold text-secondary"><?= $index + 1 ?></td>
+                                    
                                     <td>
                                         <div style="padding-left: <?= $paddingLeft ?>px;">
                                             <?php if ($item['depth'] > 0): ?>
@@ -112,7 +109,7 @@ if (!empty($struktur)) {
                                             </span>
                                         </div>
                                         <?php if ($item['depth'] == 0): ?>
-                                            <div class="small text-muted fst-italic mt-1">Slug: <?= esc($item['slug']) ?></div>
+                                            <div class="small text-muted fst-italic mt-1 ps-1">Slug: <?= esc($item['slug']) ?></div>
                                         <?php endif; ?>
                                     </td>
 
@@ -123,16 +120,24 @@ if (!empty($struktur)) {
                                             <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Non-Aktif</span>
                                         <?php endif; ?>
                                     </td>
+
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark border"><?= esc($item['sorting']) ?></span>
                                     </td>
-                                    <td class="text-center">
-                                    <?= btn_toggle($item['id_struktur'], $item['is_active'], 'struktur_organisasi/toggle-status') ?>
-                                    </td>
+
                                     <td>
-                                        <div class="d-flex gap-2 justify-content-center">
+                                        <div class="d-flex justify-content-center align-items-center h-100">
+                                            <?= btn_toggle($item['id_struktur'], $item['is_active'], 'struktur_organisasi/toggle-status') ?>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-center align-items-center h-100">
                                             <?php if ($can_update): ?>
-                                                <a href="/struktur_organisasi/<?= $item['id_struktur'] ?>/edit" class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Edit">
+                                                <a href="/struktur_organisasi/<?= $item['id_struktur'] ?>/edit" 
+                                                   class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" 
+                                                   data-bs-toggle="tooltip" 
+                                                   title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             <?php endif; ?>
@@ -141,7 +146,10 @@ if (!empty($struktur)) {
                                                 <form action="/struktur_organisasi/<?= $item['id_struktur'] ?>" method="post" class="d-inline" onsubmit="return confirm('Hapus data ini?');">
                                                     <?= csrf_field() ?>
                                                     <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Hapus">
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-danger btn-sm rounded-circle shadow-sm" 
+                                                            data-bs-toggle="tooltip" 
+                                                            title="Hapus">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
@@ -158,8 +166,12 @@ if (!empty($struktur)) {
     </div>
 </div>
 
+<style>
+    .hover-scale { transition: transform 0.2s; }
+    .hover-scale:hover { transform: scale(1.05); }
+</style>
+
 <script>
-    // Tooltip Init
     document.addEventListener('DOMContentLoaded', function () {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

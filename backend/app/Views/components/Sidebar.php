@@ -63,7 +63,7 @@ $menuItems = [
         'submenu' => [
             ['title' => 'Profil Tentang', 'url' => '/profil_tentang', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Tugas & Fungsi', 'url' => '/tugas_fungsi', 'roles' => ['superadmin', 'admin']],
-            ['title' => 'Struktur Pejabat', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Struktur Pejabat', 'url' => '/pejabat_struktural', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Struktur Organisasi', 'url' => '/struktur_organisasi', 'roles' => ['superadmin', 'admin']],
         
         ]
