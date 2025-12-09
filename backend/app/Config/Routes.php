@@ -216,9 +216,8 @@ $routes->group('api', function ($routes) {
     $routes->get('agenda_pelatihan', 'Api\ApiAgendaPelatihanController::index');
     $routes->get('agenda_pelatihan/(:num)', 'Api\ApiAgendaPelatihanController::show/$1');
 
-    // Ppid Permohonan
-    $routes->get('ppid_permohonan', 'Api\ApiPpidPermohonanController::index');
     $routes->post('ppid_permohonan', 'Api\ApiPpidPermohonanController::create');
+    $routes->get('ppid_permohonan/status/(:segment)', 'Api\ApiPpidPermohonanController::checkStatus/$1');
 
     // Ip Swakelola
     $routes->get('ip_swakelola', 'Api\ApiIpSwakelolaController::index');
