@@ -25,7 +25,14 @@ interface PetaData {
   status: string;
 }
 
-
+interface ContactSocialMedia {
+  id_kontak_social: string;
+  platform: string;
+  icon_class: string;
+  link_url: string;
+  urutan: string;
+  status: string;
+}
 
 export default function HubungiKami() {
   const [contactItems, setContactItems] = useState<ContactItem[]>([]);
@@ -33,6 +40,7 @@ export default function HubungiKami() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [loadingPeta, setLoadingPeta] = useState<boolean>(true);
+  const [contactSocials, setContactSocials] = useState<ContactSocialMedia[]>([]);
 
   const fetchContactItems = async () => {
     try {
@@ -99,6 +107,32 @@ export default function HubungiKami() {
   useEffect(() => {
     fetchContactItems();
     fetchPetaData();
+  }, []);
+
+  const fetchContactSocials = async () => {
+    try {
+      const response = await api.get('/kontak_social');
+
+      if (response.data.status === 200 && response.data.data && response.data.data.length > 0) {
+        const activeSocials = response.data.data
+          .filter((item: ContactSocialMedia) => 
+            item.status === '1' || item.status.toLowerCase() === 'aktif'
+          )
+          .sort((a: ContactSocialMedia, b: ContactSocialMedia) => 
+            Number(a.urutan) - Number(b.urutan)
+          );
+        
+        setContactSocials(activeSocials);
+      } else {
+        setContactSocials([]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching contact socials:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchContactSocials();
   }, []);
 
   // Fungsi untuk memformat telepon dan fax
@@ -209,46 +243,18 @@ export default function HubungiKami() {
             {/* Social Media */}
             <div className="d-flex mx-4 gap-6 pt-6 border-top">
               <p className="fw-semibold text-gray-700 mb-0 align-self-center">Ikuti Kami:</p>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 text-red-600-hover transition-colors"
-                aria-label="YouTube"
-                title="YouTube"
-              >
-                <i className="fab fa-youtube fa-lg"></i>
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 text-blue-600-hover transition-colors"
-                aria-label="Facebook"
-                title="Facebook"
-              >
-                <i className="fab fa-facebook-f fa-lg"></i>
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 text-pink-600-hover transition-colors"
-                aria-label="Instagram"
-                title="Instagram"
-              >
-                <i className="fab fa-instagram fa-lg"></i>
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 text-blue-400-hover transition-colors"
-                aria-label="Twitter"
-                title="Twitter"
-              >
-                <i className="fab fa-twitter fa-lg"></i>
-              </a>
+              {contactSocials.map((social) => (
+                <a
+                  key={social.id_kontak_social}
+                  href={social.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover-text-blue-800 fa-lg"
+                  title={social.platform}
+                >
+                  <i className={social.icon_class}></i>
+                </a>
+              ))}
             </div>
           </div>
 

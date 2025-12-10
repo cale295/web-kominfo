@@ -15,6 +15,7 @@ interface kanal {
   id_footer_social: number;
   platform_name: string;
   paltform_icon: string;
+  account_name: string;
   account_url: string;
   is_active: number;
   sorting: number;
@@ -253,10 +254,10 @@ const Footer: React.FC = () => {
                   className="kanal-link"
                   target="_blank"
                   rel="noopener noreferrer"
-                  title={k.platform_name}
+                  title={k.account_name}
                 >
                   {getPlatformIcon(k.platform_name, k.paltform_icon)}
-                  {formatPlatformName(k.platform_name)}
+                  {formatPlatformName(k.account_name)}
                 </a>
               ))
             ) : (
