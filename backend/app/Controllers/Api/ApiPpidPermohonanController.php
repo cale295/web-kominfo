@@ -10,10 +10,6 @@ class ApiPpidPermohonanController extends ResourceController
     protected $modelName = PpidPermohonanModel::class;
     protected $format    = 'json';
 
-    public function index()
-{
-    return view('ppid/cek_status_simple');
-}
     public function create()
     {
         $request = $this->request;

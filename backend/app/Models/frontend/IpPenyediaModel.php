@@ -32,7 +32,7 @@ class IpPenyediaModel extends Model
     // Validation
     protected $validationRules = [
         // ✅ TAMBAHKAN INI (Wajib ada agar placeholder {id} berfungsi saat edit)
-        'id' => 'required', 
+        'id' => 'permit_empty', 
 
         'id_rup' => [
             // Gunakan 'required' karena di DB kolom ini NOT NULL

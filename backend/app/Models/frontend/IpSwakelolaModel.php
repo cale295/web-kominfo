@@ -30,7 +30,7 @@ class IpSwakelolaModel extends Model
     // Validation
     protected $validationRules = [
         // Wajib ada agar placeholder {id} berfungsi saat edit
-        'id' => 'required',
+        'id' => ['rules' => 'permit_empty'],
 
         'id_rup' => [
             'rules'  => 'required|max_length[50]|is_unique[t_ip_swakelola.id_rup,id,{id}]',
