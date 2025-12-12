@@ -1,617 +1,439 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('styles') ?>
 <style>
-    /* Base Styles - No Animation, Maximum Performance */
+    /* Mengambil Font Inter agar sama dengan Sidebar */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     :root {
-        --primary: #0D47A1;
-        --primary-light: #E3F2FD;
-        --secondary: #1565C0;
-        --success: #2E7D32;
-        --warning: #F57C00;
-        --danger: #C62828;
-        --gray-50: #FAFAFA;
-        --gray-100: #F5F5F5;
-        --gray-200: #EEEEEE;
-        --gray-300: #E0E0E0;
-        --gray-700: #616161;
-        --gray-900: #212121;
+        /* Variabel diambil dari Sidebar.php untuk konsistensi */
+        --primary: #3b82f6;
+        --primary-soft: #eff6ff;
+        --secondary: #64748b;
+        --text-main: #1e293b;
+        --text-muted: #94a3b8;
+        --bg-body: #f8fafc; /* Warna background halaman */
+        --card-bg: #ffffff;
+        --border: #e2e8f0;
+        --success: #10b981;
+        --success-soft: #d1fae5;
+        --warning: #f59e0b;
+        --warning-soft: #fef3c7;
+        --danger: #ef4444;
+        --danger-soft: #fee2e2;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     }
 
-    /* Reset untuk performance */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* Base Layout - Simple and Fast */
     body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 14px;
-        line-height: 1.4;
-        background-color: var(--gray-100);
-        color: var(--gray-900);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        font-size: 0.925rem;
     }
 
     .dashboard-wrapper {
-        max-width: 1400px;
+        padding: 2rem;
+        max-width: 1600px;
         margin: 0 auto;
-        padding: 16px;
     }
 
-    /* Header - Simple and Clean */
-    .simple-header {
-        background: white;
-        border: 1px solid var(--gray-300);
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-        position: relative;
-    }
-
-    .simple-header h1 {
-        font-size: 20px;
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 4px;
-    }
-
-    .simple-header .user-info {
+    /* --- HEADER SECTION --- */
+    .page-header {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 12px;
-        margin-top: 8px;
+        margin-bottom: 2rem;
     }
 
-    .user-role {
-        background: var(--primary-light);
-        color: var(--primary);
-        padding: 4px 12px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 500;
-        border: 1px solid #BBDEFB;
-    }
-
-    /* Stats Grid - Simple Boxes */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .stat-box {
-        background: white;
-        border: 1px solid var(--gray-300);
-        border-radius: 8px;
-        padding: 20px;
-        position: relative;
-    }
-
-    .stat-box::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: var(--primary);
-    }
-
-    .stat-number {
-        font-size: 32px;
+    .header-title h1 {
+        font-size: 1.5rem;
         font-weight: 700;
-        color: var(--gray-900);
-        line-height: 1;
-        margin: 8px 0;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
     }
 
-    .stat-label {
-        font-size: 13px;
-        color: var(--gray-700);
-        font-weight: 500;
-    }
-
-    .stat-subtext {
-        font-size: 12px;
-        color: var(--gray-700);
+    .header-title p {
+        color: var(--secondary);
+        font-size: 0.9rem;
         margin-top: 4px;
     }
 
-    /* Simple Icon - No Animation */
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--gray-100);
+    .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--card-bg);
+        padding: 8px 16px;
+        border-radius: 50px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .role-tag {
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
         border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* --- CARDS & STATS --- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Gaya Icon mirip Sidebar */
+    .card-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        color: var(--primary);
-        margin-bottom: 12px;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
     }
 
-    /* Quick Info Panel */
-    .info-panel {
-        background: white;
-        border: 1px solid var(--gray-300);
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 20px;
-    }
-
-    .info-panel h3 {
-        font-size: 16px;
+    .card-title {
+        color: var(--secondary);
+        font-size: 0.85rem;
         font-weight: 600;
-        color: var(--gray-900);
-        margin-bottom: 12px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--gray-200);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
     }
 
-    /* Simple Table - No Complex Styling */
-    .simple-table-container {
-        background: white;
-        border: 1px solid var(--gray-300);
-        border-radius: 8px;
+    .card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-main);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-footer {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Warna Spesifik per Card */
+    .card-blue .card-icon-wrapper { background: var(--primary-soft); color: var(--primary); }
+    .card-green .card-icon-wrapper { background: var(--success-soft); color: var(--success); }
+    .card-orange .card-icon-wrapper { background: var(--warning-soft); color: var(--warning); }
+    .card-red .card-icon-wrapper { background: var(--danger-soft); color: var(--danger); }
+
+    /* --- INFO PANEL --- */
+    .system-info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-item h4 { font-size: 0.8rem; color: var(--secondary); margin-bottom: 4px; font-weight: 500;}
+    .info-item div { font-size: 0.95rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;}
+
+    /* --- TABLE STYLING --- */
+    .table-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
         overflow: hidden;
-        margin-bottom: 20px;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
     }
 
-    .table-header {
-        background: var(--gray-50);
-        padding: 16px;
-        border-bottom: 1px solid var(--gray-300);
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
     }
 
-    .table-header h3 {
-        font-size: 16px;
+    .card-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-main); }
+    .card-header span { font-size: 0.8rem; color: var(--secondary); }
+
+    .custom-table { width: 100%; border-collapse: collapse; }
+    
+    .custom-table th {
+        background: var(--bg-body);
+        color: var(--secondary);
         font-weight: 600;
-        color: var(--gray-900);
-    }
-
-    .simple-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .simple-table th {
-        background: var(--gray-100);
-        padding: 12px 16px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        padding: 1rem 1.5rem;
         text-align: left;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--gray-700);
-        border-bottom: 1px solid var(--gray-300);
+        border-bottom: 1px solid var(--border);
     }
 
-    .simple-table td {
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--gray-200);
-        font-size: 14px;
-        color: var(--gray-900);
+    .custom-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-main);
+        font-size: 0.9rem;
     }
+    
+    .custom-table tr:last-child td { border-bottom: none; }
+    .custom-table tr:hover { background-color: #f8fafc; }
 
-    .simple-table tr:last-child td {
-        border-bottom: none;
-    }
+    /* Status Icons in Table */
+    .status-check { color: var(--success); font-size: 1.1rem; }
+    .status-x { color: var(--border); font-size: 1.1rem; }
 
-    /* Simple Check/X Icons */
-    .check-icon {
-        color: var(--success);
-        font-weight: bold;
-    }
-
-    .x-icon {
-        color: var(--gray-300);
-        font-weight: bold;
-    }
-
-    /* Activity List - Simple */
-    .activity-list {
-        background: white;
-        border: 1px solid var(--gray-300);
-        border-radius: 8px;
-    }
-
+    /* --- ACTIVITY LIST --- */
+    .activity-list { list-style: none; }
     .activity-item {
-        padding: 16px;
-        border-bottom: 1px solid var(--gray-200);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: flex-start;
-        gap: 12px;
+        gap: 1rem;
     }
+    .activity-item:last-child { border-bottom: none; }
 
-    .activity-item:last-child {
-        border-bottom: none;
-    }
-
-    .activity-icon {
-        width: 32px;
-        height: 32px;
-        background: var(--gray-100);
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        color: var(--primary);
+    .activity-icon-box {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        background: var(--bg-body);
+        display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
+        color: var(--secondary);
+        font-size: 0.9rem;
     }
 
-    .activity-content {
-        flex-grow: 1;
-    }
+    .activity-details h5 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; color: var(--text-main); }
+    .activity-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 
-    .activity-title {
-        font-weight: 500;
-        color: var(--gray-900);
-        margin-bottom: 2px;
-    }
-
-    .activity-time {
-        font-size: 12px;
-        color: var(--gray-700);
-    }
-
-    /* Utility Classes */
-    .text-primary {
-        color: var(--primary);
-    }
-
-    .text-success {
-        color: var(--success);
-    }
-
-    .text-warning {
-        color: var(--warning);
-    }
-
-    .mb-16 {
-        margin-bottom: 16px;
-    }
-
-    .mb-24 {
-        margin-bottom: 24px;
-    }
-
-    /* Simple Status Badges */
-    .status-badge {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-
-    .status-active {
-        background: #E8F5E9;
-        color: var(--success);
-        border: 1px solid #C8E6C9;
-    }
-
-    .status-pending {
-        background: #FFF3E0;
-        color: var(--warning);
-        border: 1px solid #FFE0B2;
-    }
-
-    /* No Hover Effects for Low-end Devices */
-    @media (hover: hover) {
-        /* Only apply hover effects on devices that support it */
-        .stat-box:hover {
-            border-color: var(--primary);
-        }
-        
-        .activity-item:hover {
-            background: var(--gray-50);
-        }
-        
-        .simple-table tr:hover {
-            background: var(--gray-50);
-        }
-    }
-
-    /* Mobile Responsive - Simple */
+    /* --- BADGES --- */
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+    .badge-success { background: var(--success-soft); color: var(--success); }
+    
+    /* Responsive */
     @media (max-width: 768px) {
-        .dashboard-wrapper {
-            padding: 12px;
-        }
-        
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .simple-table {
-            display: block;
-            overflow-x: auto;
-        }
-        
-        .stat-number {
-            font-size: 28px;
-        }
-    }
-
-    /* Very Low-end Device Optimization */
-    @media (max-width: 480px) {
-        body {
-            font-size: 13px;
-        }
-        
-        .dashboard-wrapper {
-            padding: 8px;
-        }
-        
-        .simple-header,
-        .stat-box,
-        .info-panel,
-        .simple-table-container,
-        .activity-list {
-            padding: 12px;
-        }
-        
-        .stat-number {
-            font-size: 24px;
-        }
-    }
-
-    /* Print Styles */
-    @media print {
-        body {
-            background: white;
-        }
-        
-        .dashboard-wrapper {
-            max-width: 100%;
-            padding: 0;
-        }
-        
-        .simple-header,
-        .stat-box,
-        .info-panel,
-        .simple-table-container,
-        .activity-list {
-            border: 1px solid #000;
-            box-shadow: none;
-            margin-bottom: 10px;
-            page-break-inside: avoid;
-        }
+        .dashboard-wrapper { padding: 1rem; }
+        .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .system-info-grid { grid-template-columns: 1fr; }
+        .custom-table { display: block; overflow-x: auto; white-space: nowrap; }
     }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <div class="dashboard-wrapper">
-    <!-- Simple Header -->
-    <div class="simple-header">
-        <h1>Dashboard Administrasi</h1>
-        <p style="color: var(--gray-700); margin-bottom: 8px;">
-            Portal Manajemen Konten Pemerintahan
-        </p>
-        <div class="user-info">
-            <span style="color: var(--gray-900); font-weight: 500;">
-                <?= esc(session()->get('full_name')) ?>
-            </span>
-            <span class="user-role">
-                <?= strtoupper(str_replace('_', ' ', session()->get('role'))) ?>
-            </span>
+    
+    <div class="page-header">
+        <div class="header-title">
+            <h1>Dashboard Administrasi</h1>
+            <p>Selamat datang kembali, pantau kinerja sistem hari ini.</p>
+        </div>
+        <div class="user-badge">
+            <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                <span style="font-weight: 600; font-size: 0.9rem;"><?= esc(session()->get('full_name')) ?></span>
+                <span class="role-tag"><?= strtoupper(str_replace('_', ' ', session()->get('role'))) ?></span>
+            </div>
+            <div style="width: 38px; height: 38px; background: #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #64748b;">
+                <i class="bi bi-person-fill"></i>
+            </div>
         </div>
     </div>
 
-    <!-- Simple Stats Grid -->
-    <div class="stats-grid mb-24">
-        <div class="stat-box">
-            <div class="stat-icon">
+    <div class="stats-grid">
+        <div class="card card-blue">
+            <div class="card-icon-wrapper">
                 <i class="bi bi-newspaper"></i>
             </div>
-            <div class="stat-number">245</div>
-            <div class="stat-label">Total Berita</div>
-            <div class="stat-subtext">Terbit: 215 | Draft: 30</div>
-            <div class="status-badge status-active" style="margin-top: 8px;">
-                <i class="bi bi-check-circle" style="margin-right: 4px;"></i>
-                Sistem Aktif
+            <div class="card-title">Total Berita</div>
+            <div class="card-value"><?= $total_berita ?></div>
+            <div class="card-footer">
+                <span class="badge badge-success"><i class="bi bi-arrow-up"></i> <?= $publish_berita ?> Terbit</span>
+                <span style="margin-left: auto;">Draft: <?= $draft_berita ?></span>
             </div>
         </div>
 
-        <div class="stat-box">
-            <div class="stat-icon">
-                <i class="bi bi-calendar-event"></i>
+        <div class="card card-green">
+            <div class="card-icon-wrapper">
+                <i class="bi bi-calendar-check"></i>
             </div>
-            <div class="stat-number">18</div>
-            <div class="stat-label">Agenda Kegiatan</div>
-            <div class="stat-subtext">Mendatang: 8 | Selesai: 10</div>
+            <div class="card-title">Agenda Kegiatan</div>
+            <div class="card-value"><?= $agenda_total ?></div>
+            <div class="card-footer">
+                <span><?= $agenda_upcoming ?> akan datang</span>
+                <span style="margin-left: auto; color: var(--success); font-weight: 600;">Active</span>
+            </div>
         </div>
 
-        <div class="stat-box">
-            <div class="stat-icon">
-                <i class="bi bi-folder"></i>
+        <div class="card card-orange">
+            <div class="card-icon-wrapper">
+                <i class="bi bi-images"></i>
             </div>
-            <div class="stat-number">532</div>
-            <div class="stat-label">Galeri Foto</div>
-            <div class="stat-subtext">Publik: 489 | Private: 43</div>
+            <div class="card-title">Galeri Foto</div>
+            <div class="card-value"><?= $gallery_total ?></div>
+            <div class="card-footer">
+                <span>Total album foto tersimpan</span>
+            </div>
         </div>
 
-        <div class="stat-box">
-            <div class="stat-icon">
+        <div class="card card-red">
+            <div class="card-icon-wrapper">
                 <i class="bi bi-file-earmark-text"></i>
             </div>
-            <div class="stat-number">89</div>
-            <div class="stat-label">Dokumen</div>
-            <div class="stat-subtext">Terbaru: 12 bulan ini</div>
-        </div>
-    </div>
-
-    <!-- Simple Info Panel -->
-    <div class="info-panel mb-24">
-        <h3>Informasi Sistem</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-            <div>
-                <div style="font-weight: 500; color: var(--gray-900); margin-bottom: 4px;">
-                    Status Server
-                </div>
-                <div style="color: var(--success); font-weight: 500;">
-                    <i class="bi bi-check-circle-fill" style="margin-right: 6px;"></i>
-                    Online
-                </div>
-            </div>
-            <div>
-                <div style="font-weight: 500; color: var(--gray-900); margin-bottom: 4px;">
-                    Last Backup
-                </div>
-                <div style="color: var(--gray-700);">
-                    2024-03-15 03:00
-                </div>
-            </div>
-            <div>
-                <div style="font-weight: 500; color: var(--gray-900); margin-bottom: 4px;">
-                    Storage Used
-                </div>
-                <div style="color: var(--gray-700);">
-                    2.4 GB / 10 GB
-                </div>
+            <div class="card-title">Dokumen</div>
+            <div class="card-value"><?= $document_total ?></div>
+            <div class="card-footer">
+                <span>+<?= $document_new ?> bulan ini</span>
             </div>
         </div>
     </div>
 
-    <!-- Simple Access Table -->
-    <div class="simple-table-container mb-24">
-        <div class="table-header">
-            <h3>Hak Akses Berdasarkan Role</h3>
-            <p style="color: var(--gray-700); font-size: 13px; margin-top: 4px;">
-                Role aktif: <strong class="text-primary"><?= ucfirst(session()->get('role')) ?></strong>
-            </p>
-        </div>
-        
-        <div style="overflow-x: auto;">
-            <table class="simple-table">
-                <thead>
-                    <tr>
-                        <th>Modul & Menu</th>
-                        <th style="text-align: center;">Super Admin</th>
-                        <th style="text-align: center;">Admin</th>
-                        <th style="text-align: center;">Editor</th>
-                        <th style="text-align: center;">Viewer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Dashboard</strong></td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                    </tr>
-                    <tr>
-                        <td>Manajemen Berita</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                    </tr>
-                    <tr>
-                        <td style="padding-left: 24px;">- Kategori Berita</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                    </tr>
-                    <tr>
-                        <td>Agenda & Galeri</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                    </tr>
-                    <tr>
-                        <td>Manajemen Dokumen</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                    </tr>
-                    <tr>
-                        <td>Pengaturan Sistem</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                    </tr>
-                    <tr>
-                        <td>Manajemen User</td>
-                        <td style="text-align: center;" class="check-icon">✓</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                        <td style="text-align: center;" class="x-icon">✗</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Simple Activity List -->
-    <div class="activity-list">
-        <div class="table-header" style="border-bottom: 1px solid var(--gray-300);">
-            <h3>Aktivitas Terakhir</h3>
-        </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon">
-                <i class="bi bi-plus-circle"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Berita baru dipublikasikan</div>
-                <div class="activity-time">5 menit yang lalu</div>
+    <div class="system-info-grid">
+        <div class="info-item">
+            <h4>Status Server</h4>
+            <div style="color: var(--success);">
+                <i class="bi bi-hdd-network-fill"></i> Online / Stable
             </div>
         </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon">
-                <i class="bi bi-pencil-square"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Agenda kegiatan diperbarui</div>
-                <div class="activity-time">1 jam yang lalu</div>
+        <div class="info-item">
+            <h4>Penyimpanan</h4>
+            <div style="color: var(--primary);">
+                <i class="bi bi-pie-chart-fill"></i> 2.4 GB / 10 GB
             </div>
         </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon">
-                <i class="bi bi-upload"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Dokumen berhasil diunggah</div>
-                <div class="activity-time">3 jam yang lalu</div>
-            </div>
-        </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon">
-                <i class="bi bi-shield-check"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Backup sistem otomatis</div>
-                <div class="activity-time">Kemarin, 03:00</div>
+        <div class="info-item">
+            <h4>Terakhir Backup</h4>
+            <div style="color: var(--secondary);">
+                <i class="bi bi-clock-history"></i> 2024-03-15 03:00
             </div>
         </div>
     </div>
 
-    <!-- Simple Footer Info -->
-    <div style="margin-top: 24px; padding: 16px; background: white; border: 1px solid var(--gray-300); border-radius: 8px; text-align: center;">
-        <div style="color: var(--gray-700); font-size: 12px;">
-            Sistem Dashboard v1.0 • Terakhir diperbarui: 15 Maret 2024
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+        
+        <div class="table-card">
+            <div class="card-header">
+                <h3>Hak Akses Role</h3>
+                <span>Role: <strong style="color: var(--primary);"><?= ucfirst($user_role) ?></strong></span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th class="text-center">Create</th>
+                            <th class="text-center">Read</th>
+                            <th class="text-center">Update</th>
+                            <th class="text-center">Delete</th>
+                            <th class="text-center">Publish</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($access_rights)): ?>
+                            <tr><td colspan="6" class="text-center">Tidak ada data akses.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($access_rights as $access): ?>
+                                <tr>
+                                    <td><strong><?= esc($access['module_name']) ?></strong></td>
+                                    <td style="text-align: center;">
+                                        <i class="bi <?= $access['can_create'] ? 'bi-check-circle-fill status-check' : 'bi-dash-circle status-x' ?>"></i>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <i class="bi <?= $access['can_read'] ? 'bi-check-circle-fill status-check' : 'bi-dash-circle status-x' ?>"></i>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <i class="bi <?= $access['can_update'] ? 'bi-check-circle-fill status-check' : 'bi-dash-circle status-x' ?>"></i>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <i class="bi <?= $access['can_delete'] ? 'bi-check-circle-fill status-check' : 'bi-dash-circle status-x' ?>"></i>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <i class="bi <?= $access['can_publish'] ? 'bi-check-circle-fill status-check' : 'bi-dash-circle status-x' ?>"></i>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div style="margin-top: 8px; color: var(--gray-700); font-size: 12px;">
-            <span style="color: var(--success); font-weight: 500;">
-                <i class="bi bi-check-circle-fill" style="margin-right: 4px;"></i>
-                Semua sistem berjalan normal
-            </span>
+
+        <div class="table-card" style="height: fit-content;">
+            <div class="card-header">
+                <h3>Aktivitas Terakhir</h3>
+                <a href="#" style="font-size: 0.8rem; color: var(--primary); text-decoration: none;">Lihat Semua</a>
+            </div>
+            <div class="activity-list">
+                <?php if (!empty($last_logs)): ?>
+                    <?php foreach ($last_logs as $log): ?>
+                        <div class="activity-item">
+                            <div class="activity-icon-box">
+                                <?php
+                                $keterangan = strtolower($log['keterangan'] ?? '');
+                                if (strpos($keterangan, 'tambah') !== false || strpos($keterangan, 'create') !== false) {
+                                    echo '<i class="bi bi-plus-lg" style="color: var(--success);"></i>';
+                                } elseif (strpos($keterangan, 'edit') !== false || strpos($keterangan, 'update') !== false) {
+                                    echo '<i class="bi bi-pencil-fill" style="color: var(--warning);"></i>';
+                                } elseif (strpos($keterangan, 'hapus') !== false || strpos($keterangan, 'delete') !== false) {
+                                    echo '<i class="bi bi-trash-fill" style="color: var(--danger);"></i>';
+                                } else {
+                                    echo '<i class="bi bi-clock"></i>';
+                                }
+                                ?>
+                            </div>
+                            <div class="activity-details">
+                                <h5><?= esc($log['keterangan']) ?></h5>
+                                <div class="activity-meta">
+                                    <span><?= date('d M H:i', strtotime($log['created_date'])) ?></span>
+                                    <span>•</span>
+                                    <span><?= esc($log['username'] ?? 'System') ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                        Belum ada aktivitas.
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
+
     </div>
+    
+    <div style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.8rem;">
+        &copy; <?= date('Y') ?> Government Administration System. All rights reserved.
+    </div>
+
 </div>
-
-<!-- Zero JavaScript - Pure HTML/CSS Solution -->
 <?= $this->endSection() ?>

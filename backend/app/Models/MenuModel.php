@@ -33,6 +33,7 @@ class MenuModel extends Model
     protected $afterFind            = [];
     protected $beforeDelete         = [];
     protected $afterDelete          = [];
+    
 
 
     // =========================================================
@@ -89,4 +90,5 @@ class MenuModel extends Model
 
         return $branch;
     }
+    
 }
