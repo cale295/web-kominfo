@@ -1,5 +1,7 @@
 <?= $this->extend('layouts/main') ?>
+
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 
 <style>
     :root {
@@ -421,22 +423,7 @@
         </div>
     </div>
 
-    <!-- Alert Errors -->
-    <?php if (session()->getFlashdata('errors')): ?>
-        <div class="alert alert-danger mb-4">
-            <div class="d-flex align-items-start">
-                <i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 1.5rem;"></i>
-                <div class="flex-grow-1">
-                    <strong>Terjadi Kesalahan:</strong>
-                    <ul class="mt-2 mb-0">
-                        <?php foreach (session()->getFlashdata('errors') as $error): ?>
-                            <li><?= esc($error) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
+    
 
     <!-- Form Card -->
     <div class="card">

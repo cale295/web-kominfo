@@ -1,6 +1,8 @@
 <?= $this->extend('layouts/main') ?>
 
-<?= $this->section('styles') ?>
+<?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
+
 <style>
     :root {
         --primary-gov: #1e40af;
@@ -409,17 +411,7 @@
     </div>
 
     <!-- Error Alert -->
-    <?php if (session()->getFlashdata('errors')): ?>
-        <div class="alert alert-danger-gov alert-dismissible fade show" role="alert">
-            <strong>Terdapat kesalahan pada form:</strong>
-            <ul class="mt-2">
-                <?php foreach (session()->getFlashdata('errors') as $error): ?>
-                    <li><?= esc($error) ?></li>
-                <?php endforeach; ?>
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif; ?>
+
 
     <!-- Form Card -->
     <div class="card form-card-gov">

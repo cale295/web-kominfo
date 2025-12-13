@@ -122,50 +122,41 @@ class AgendaController extends BaseController
     // ==========================================================
     // POST /agenda → simpan agenda baru
     // ==========================================================
-    public function create()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_create']) {
-            return redirect()->to('/agenda')->with('error', 'Kamu tidak punya izin menambah agenda.');
-        }
+// ... dalam AgendaController.php
 
-        $validation = $this->validate([
-            'activity_name' => 'required|min_length[3]',
-            'start_date'    => 'required|valid_date',
-            'end_date'      => 'required|valid_date',
-            
-            // =======================================================================
-            // PERBAIKAN: Aturan 'is_image[image]' dihapus untuk mengatasi masalah PNG.
-            // Kita hanya bergantung pada 'ext_in' untuk memeriksa ekstensi.
-            // =======================================================================
-            'image' => 'required|ext_in[image,jpg,jpeg,png]' 
-        ]);
-
-        if (!$validation) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        $data = [
-            'activity_name' => $this->request->getPost('activity_name'),
-            'description'   => $this->request->getPost('description'),
-            'start_date'    => $this->request->getPost('start_date'),
-            'end_date'      => $this->request->getPost('end_date'),
-            'location'      => $this->request->getPost('location'),
-            'status'        => $this->request->getPost('status') ?? 'active',
-        ];
-
-        // Upload gambar jika ada
-        if ($img = $this->request->getFile('image')) {
-            if ($img->isValid() && !$img->hasMoved()) {
-                $newName = $img->getRandomName();
-                $img->move(FCPATH . 'uploads/agenda/', $newName); // Gunakan FCPATH
-                $data['image'] = $newName;
-            }
-        }
-
-        $this->agendaModel->insert($data);
-        return redirect()->to('/agenda')->with('success', 'Agenda berhasil ditambahkan!');
+public function create()
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_create']) {
+        return redirect()->to('/agenda')->with('error', 'Kamu tidak punya izin menambah agenda.');
     }
+
+    $data = [
+        'activity_name' => $this->request->getPost('activity_name'),
+        'description'   => $this->request->getPost('description'),
+        'start_date'    => $this->request->getPost('start_date'),
+        'end_date'      => $this->request->getPost('end_date'),
+        'location'      => $this->request->getPost('location'),
+        'status'        => $this->request->getPost('status') ?? 'active',
+    ];
+
+    // Upload gambar (tetap di Controller karena ini melibatkan Request dan File handling)
+    if ($img = $this->request->getFile('image')) {
+        if ($img->isValid() && !$img->hasMoved()) {
+            // Catatan: Anda juga bisa menambahkan validasi file di Model
+            $newName = $img->getRandomName();
+            $img->move(FCPATH . 'uploads/agenda/', $newName);
+            $data['image'] = $newName;
+        }
+    }
+
+    // --- PERBAIKAN UTAMA DI SINI ---
+        if (!$this->agendaModel->insert($data)) {
+            return redirect()->back()->withInput()->with('errors', $this->agendaModel->errors());
+        }
+
+    return redirect()->to('/agenda')->with('success', 'Agenda berhasil ditambahkan!');
+}
 
     // ==========================================================
     // GET /pages/agenda/{id}/edit → form edit agenda
@@ -188,71 +179,69 @@ class AgendaController extends BaseController
     // ==========================================================
     // PUT /pages/agenda/{id} → update agenda
     // ==========================================================
-    public function update($id = null)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/agenda')->with('error', 'Kamu tidak punya izin mengubah agenda.');
-        }
+  // ==========================================================
+// PUT /pages/agenda/{id} → update agenda
+// ==========================================================
+public function update($id = null)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_update']) {
+        return redirect()->to('/agenda')->with('error', 'Kamu tidak punya izin mengubah agenda.');
+    }
 
-        $img = $this->request->getFile('image');
+    $agenda = $this->agendaModel->find($id);
+    if (!$agenda) {
+        return redirect()->to('/agenda')->with('error', 'Agenda tidak ditemukan.');
+    }
 
-        // =======================================================================
-        // PERBAIKAN: Aturan validasi file ditambahkan di sini agar konsisten
-        // dengan method create() dan lebih rapi.
-        // =======================================================================
-        $rules = [
-            'activity_name' => 'required|min_length[3]',
-            'start_date'    => 'required|valid_date',
-            'end_date'      => 'required|valid_date',
-            'image'         => 'required|ext_in[image,jpg,jpeg,png]' // 'is_image' juga dihapus
+    $data = [
+        'activity_name' => $this->request->getPost('activity_name'),
+        'description'   => $this->request->getPost('description'),
+        'start_date'    => $this->request->getPost('start_date'),
+        'end_date'      => $this->request->getPost('end_date'),
+        'location'      => $this->request->getPost('location'),
+    ];
+
+    $img = $this->request->getFile('image');
+    $uploadPath = FCPATH . 'uploads/agenda/';
+    
+    // 1. --- VALIDASI FILE (TETAP DI CONTROLLER JIKA TIDAK ADA DI MODEL) ---
+    // Aturan untuk file tidak bisa dimasukkan ke insert/update Model, 
+    // jadi tetap validasi di sini jika file *diisi* atau *wajib*.
+    if ($img && $img->isValid() && $img->getSize() > 0) {
+        $fileRules = [
+            'image' => 'uploaded[image]|max_size[image,1024]|ext_in[image,jpg,jpeg,png]',
         ];
 
-        if (!$this->validate($rules)) {
+        // Validasi HANYA untuk file jika ada
+        if (!$this->validate($fileRules)) {
+             // Jika validasi file GAGAL, kirim error kembali
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $data = [
-            'activity_name' => $this->request->getPost('activity_name'),
-            'description'   => $this->request->getPost('description'),
-            'start_date'    => $this->request->getPost('start_date'),
-            'end_date'      => $this->request->getPost('end_date'),
-            'location'      => $this->request->getPost('location'),
-        ];
+        // Proses upload file jika validasi file lolos
+        $newName = $img->getRandomName();
 
-        // Folder upload (gunakan FCPATH)
-        $uploadPath = FCPATH . 'uploads/agenda/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true);
+        if (!$img->move($uploadPath, $newName)) {
+            return redirect()->back()->with('error', 'Gagal menyimpan gambar. Pastikan folder "uploads/agenda" writable.');
         }
 
-        // Upload file baru (Gunakan getSize() > 0 untuk memastikan file benar-benar di-upload)
-        if ($img && $img->isValid() && $img->getSize() > 0) {
-            
-            // =======================================================================
-            // PERBAIKAN: Pengecekan ekstensi manual dihapus,
-            // karena sudah ditangani oleh $this->validate($rules) di atas.
-            // =======================================================================
+        $data['image'] = $newName;
 
-            $newName = $img->getRandomName();
-
-            if (!$img->move($uploadPath, $newName)) {
-                return redirect()->back()->with('error', 'Gagal menyimpan gambar. Pastikan folder "uploads/agenda" writable.');
-            }
-
-            $data['image'] = $newName;
-
-            // hapus gambar lama
-            $old = $this->agendaModel->find($id);
-            if ($old && !empty($old['image']) && file_exists($uploadPath . $old['image'])) {
-                @unlink($uploadPath . $old['image']); // gunakan @ untuk menekan error jika file tidak ada
-            }
+        // hapus gambar lama
+        if (!empty($agenda['image']) && file_exists($uploadPath . $agenda['image'])) {
+            @unlink($uploadPath . $agenda['image']); 
         }
-
-        $this->agendaModel->update($id, $data);
-        return redirect()->to('/agenda')->with('success', 'Agenda berhasil diperbarui.');
+    }
+    // 2. --- EKSEKUSI UPDATE DENGAN VALIDASI MODEL ---
+    // Jika ada error dari validasi Model (misal: activity_name kosong), ini akan gagal.
+    if (!$this->agendaModel->update($id, $data)) {
+        // Jika Validasi Model GAGAL
+        return redirect()->back()->withInput()->with('errors', $this->agendaModel->errors());
     }
 
+    return redirect()->to('/agenda')->with('success', 'Agenda berhasil diperbarui.');
+}
     // ==========================================================
     // DELETE /pages/agenda/{id} → hapus agenda
     // ==========================================================
