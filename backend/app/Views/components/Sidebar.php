@@ -1,23 +1,33 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <?php
 $session  = session();
-$role     = $session->get('role') ?? 'superadmin'; // Default fallback
+$role     = $session->get('role') ?? 'superadmin'; 
 $fullName = $session->get('full_name') ?? 'Guest User';
 $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($fullName) . "&background=3b82f6&color=ffffff&bold=true&format=svg";
 $uri = service('uri');
 $segments = $uri->getSegments();
 $currentPath = '/' . (isset($segments[0]) ? $segments[0] : 'dashboard');
 if(count($segments) > 1) {
-
     $currentPath = '/' . implode('/', $segments);
 }
+
+
 $menuItems = [
-    [
+   [
         'type' => 'item', 
         'title' => 'Dashboard', 
-        'icon' => 'bi-grid-1x2-fill', 
+        'icon' => 'bi-speedometer2',
         'url' => '/dashboard', 
         'roles' => ['superadmin', 'admin', 'editor'],
+        'color' => '#4e73df', 
+        'bg' => 'rgba(78, 115, 223, 0.1)' 
+    ],
+    [
+        'type' => 'item', 
+        'title' => 'Pengaturan Menu', 
+        'icon' => 'bi-gear-fill', 
+        'url' => '/menu', 
+        'roles' => ['superadmin'],
         'color' => '#4e73df', 
         'bg' => 'rgba(78, 115, 223, 0.1)' 
     ],
@@ -65,7 +75,6 @@ $menuItems = [
             ['title' => 'Tugas & Fungsi', 'url' => '/tugas_fungsi', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Struktur Pejabat', 'url' => '/pejabat_struktural', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Struktur Organisasi', 'url' => '/struktur_organisasi', 'roles' => ['superadmin', 'admin']],
-        
         ]
     ],
     [
@@ -76,9 +85,17 @@ $menuItems = [
         'color' => '#1cc88a', 
         'bg' => 'rgba(28, 200, 138, 0.1)',
         'submenu' => [
-            
             ['title' => 'Perencanaan', 'url' => '/informasi_perencanaan', 'roles' => ['superadmin', 'admin']],
-            ['title' => 'Pengadaan Barang dan Jasa', 'url' => '/', 'roles' => ['superadmin', 'admin']],
+            [
+                'title' => 'Pengadaan Barang & Jasa', 
+                'url' => '#',
+                'roles' => ['superadmin', 'admin'],
+                'submenu' => [ 
+                    ['title' => 'Swakelola', 'url' => '/ip_swakelola', 'roles' => ['superadmin', 'admin']],
+                    ['title' => 'Penyedia', 'url' => '/ip_penyedia', 'roles' => ['superadmin', 'admin']],
+                ]
+            ],
+
             ['title' => 'Laporan Keuangan', 'url' => '/laporan_keuangan', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Laporan Kinerja', 'url' => '/laporan_kinerja', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Pendidikan dan Pelatihan', 'url' => '/agenda_pelatihan', 'roles' => ['superadmin', 'admin']],
@@ -92,12 +109,11 @@ $menuItems = [
         'title' => 'Galeri & Media', 
         'icon' => 'bi-images', 
         'roles' => ['superadmin', 'admin'],
-        'color' => '#f6c23e', // Kuning
+        'color' => '#f6c23e', 
         'bg' => 'rgba(246, 194, 62, 0.1)',
         'submenu' => [
             ['title' => 'Album Foto', 'url' => '/album', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['superadmin', 'admin']],
-           
         ]
     ],
     [
@@ -123,6 +139,7 @@ $menuItems = [
         'submenu' => [
             ['title' => 'Pengaturan Footer', 'url' => '/footer_opd', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Footer Sosial Media', 'url' => '/footer_social', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Pengunjung', 'url' => '/footer_statistics', 'roles' => ['superadmin', 'admin']],
         ]
     ],
     ['type' => 'header', 'title' => 'SYSTEM SETTINGS'],
@@ -136,7 +153,6 @@ $menuItems = [
         'submenu' => [
             ['title' => 'Manajemen User', 'url' => '/manage_user', 'roles' => ['superadmin']],
             ['title' => 'Hak Akses', 'url' => '/access_rights', 'roles' => ['superadmin']],
-            ['title' => 'Pengaturan Menu', 'url' => '/menu', 'roles' => ['superadmin']],
         ]
     ],
     [
@@ -208,7 +224,7 @@ $menuItems = [
     .user-name { font-weight: 600; color: #334155; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-role { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
 
-    /* Menu Wrapper (Scrollable) */
+    
     .sidebar-menu-wrapper { flex: 1; overflow-y: auto; padding: 0 0 1rem 0; }
     .sidebar-menu-wrapper::-webkit-scrollbar { width: 5px; }
     .sidebar-menu-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -231,7 +247,6 @@ $menuItems = [
         border-radius: 10px; cursor: pointer;
     }
 
-    /* --- ICON WRAPPER (Colored Box) --- */
     .icon-wrapper {
         width: 34px; height: 34px;
         min-width: 34px;
@@ -242,36 +257,31 @@ $menuItems = [
         font-size: 1.1rem;
     }
 
-    /* Hover State */
     .sidebar-link:hover { background: var(--hover-bg); color: var(--sb-text-active); }
     .sidebar-link:hover .icon-wrapper { transform: scale(1.05); }
 
-    /* Active State */
     .sidebar-link.active, .has-submenu.open > .sidebar-link {
         background: var(--active-bg);
         color: var(--sb-text-active);
         font-weight: 600;
     }
     
-    /* Arrow Rotate */
     .arrow { margin-left: auto; font-size: 0.75rem; transition: transform 0.3s ease; color: #94a3b8; }
     .has-submenu.open > .sidebar-link .arrow { transform: rotate(180deg); color: var(--sb-text-active); }
 
-    /* Submenu */
+    
     .submenu { display: none; list-style: none; padding: 0.25rem 0; animation: slideDown 0.2s ease forwards; }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-    .has-submenu.open .submenu { display: block; }
+    .has-submenu.open > .submenu { display: block; }
 
     .submenu-item {
         display: flex; align-items: center;
-        padding: 0.6rem 1rem 0.6rem 3.8rem; /* Indentation relative to icon */
+        padding: 0.6rem 1rem 0.6rem 3.8rem;
         text-decoration: none; color: var(--sb-text);
         font-size: 0.85rem; font-weight: 500;
         margin: 0 0.75rem 0.15rem 0.75rem;
         border-radius: 8px; position: relative;
     }
 
-    /* Submenu Line Indicator */
     .submenu-item::before {
         content: ''; position: absolute; left: 2.25rem; top: 50%;
         transform: translateY(-50%); width: 5px; height: 5px;
@@ -284,23 +294,48 @@ $menuItems = [
     .submenu-item.active { color: var(--primary); background: white; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
     .submenu-item.active::before { background: var(--primary); width: 7px; height: 7px; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 
+    
+    .has-submenu-level-3 > .submenu-item .arrow {
+        transform: rotate(-90deg);
+    }
+    .has-submenu-level-3.open > .submenu-item .arrow {
+        transform: rotate(0deg); 
+    }
+    
+    .submenu-level-3 {
+        display: none;
+        list-style: none;
+        padding: 0;
+        animation: slideDown 0.2s ease forwards;
+    }
+    .has-submenu-level-3.open > .submenu-level-3 {
+        display: block;
+    }
+    
+    .submenu-item-level-3 {
+        display: flex; align-items: center;
+        padding: 0.5rem 1rem 0.5rem 4.8rem; 
+        text-decoration: none; color: var(--sb-text);
+        font-size: 0.8rem; 
+        font-weight: 500;
+        margin: 0 0.75rem 0.15rem 0.75rem;
+        border-radius: 8px;
+    }
+    .submenu-item-level-3:hover { color: var(--sb-text-active); background: var(--hover-bg); }
+    .submenu-item-level-3.active { color: var(--primary); font-weight: 700; background: rgba(59, 130, 246, 0.05); }
+
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
     /* Footer */
     .sidebar-footer { padding: 1rem; border-top: 1px solid var(--border); background: #ffffff; }
     .logout-btn { 
         background: #fff5f5; color: var(--danger); 
-        border: 1px solid #ffecec; justify-content: center; 
-        font-weight: 600;
+        border: 1px solid #ffecec; justify-content: center; font-weight: 600;
     }
     .logout-btn:hover { background: #fee2e2; border-color: #fecaca; }
-    .logout-btn i { margin-right: 8px; }
 
-    /* Mobile Overlay */
-    .sidebar-overlay {
-        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.4); z-index: 1030; backdrop-filter: blur(2px);
-    }
-
-    /* Responsive */
+    /* Mobile */
+    .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1030; backdrop-filter: blur(2px); }
     @media (max-width: 768px) {
         #sidebar { transform: translateX(-100%); }
         #sidebar.mobile-open { transform: translateX(0); }
@@ -328,10 +363,7 @@ $menuItems = [
         <ul class="menu-list">
             <?php foreach ($menuItems as $item): ?>
                 <?php 
-                // Filter Permission
                 if (isset($item['roles']) && !in_array($role, $item['roles'])) continue;
-                
-                // Set default colors jika tidak didefinisikan di array
                 $iconColor = $item['color'] ?? '#64748b';
                 $iconBg    = $item['bg'] ?? 'rgba(100, 116, 139, 0.1)';
                 ?>
@@ -341,12 +373,17 @@ $menuItems = [
                 
                 <?php elseif ($item['type'] === 'dropdown'): ?>
                     <?php 
-                        // Cek apakah submenu aktif
+                      
                         $isSubActive = false;
                         foreach($item['submenu'] as $sub) {
-                            if(strpos($currentPath, $sub['url']) === 0) { // match partial url
-                                $isSubActive = true; 
-                                break; 
+                            if (isset($sub['submenu'])) {
+                                // Cek Level 3
+                                foreach($sub['submenu'] as $subLevel3) {
+                                    if(strpos($currentPath, $subLevel3['url']) === 0) { $isSubActive = true; break; }
+                                }
+                            } else {
+                                // Cek Level 2 Biasa
+                                if(strpos($currentPath, $sub['url']) === 0) { $isSubActive = true; break; }
                             }
                         }
                     ?>
@@ -355,18 +392,46 @@ $menuItems = [
                             <div class="icon-wrapper" style="color: <?= $iconColor ?>; background-color: <?= $iconBg ?>;">
                                 <i class="<?= $item['icon'] ?>"></i>
                             </div>
-                            
                             <span><?= $item['title'] ?></span>
                             <i class="bi bi-chevron-down arrow"></i>
                         </a>
+                        
                         <ul class="submenu">
                             <?php foreach ($item['submenu'] as $subItem): ?>
                                 <?php if (in_array($role, $subItem['roles'])): ?>
-                                    <li>
-                                        <a href="<?= $subItem['url'] ?>" class="submenu-item <?= ($currentPath === $subItem['url']) ? 'active' : '' ?>">
-                                            <?= $subItem['title'] ?>
-                                        </a>
-                                    </li>
+                                    
+                                    <?php if(isset($subItem['submenu'])): 
+                                       
+                                        $isLevel3Active = false;
+                                        foreach($subItem['submenu'] as $l3) {
+                                            if(strpos($currentPath, $l3['url']) === 0) { $isLevel3Active = true; break; }
+                                        }
+                                    ?>
+                                        <li class="has-submenu-level-3 <?= $isLevel3Active ? 'open' : '' ?>">
+                                            <a href="javascript:void(0)" class="submenu-item" onclick="toggleLevel3(this, event)">
+                                                <?= $subItem['title'] ?>
+                                                <i class="bi bi-chevron-down arrow"></i>
+                                            </a>
+                                            <ul class="submenu-level-3">
+                                                <?php foreach($subItem['submenu'] as $lvl3Item): ?>
+                                                    <?php if (in_array($role, $lvl3Item['roles'])): ?>
+                                                    <li>
+                                                        <a href="<?= $lvl3Item['url'] ?>" class="submenu-item-level-3 <?= ($currentPath === $lvl3Item['url']) ? 'active' : '' ?>">
+                                                            <i class="bi bi-dot"></i> <?= $lvl3Item['title'] ?>
+                                                        </a>
+                                                    </li>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        </li>
+                                    <?php else: ?>
+                                        <li>
+                                            <a href="<?= $subItem['url'] ?>" class="submenu-item <?= ($currentPath === $subItem['url']) ? 'active' : '' ?>">
+                                                <?= $subItem['title'] ?>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </ul>
@@ -396,32 +461,32 @@ $menuItems = [
 </nav>
 
 <script>
-/**
- * Fungsi Accordion Menu
- * Klik menu, tutup menu lain, toggle panah
- */
 function toggleMenu(element) {
     const parentListItem = element.closest('li.has-submenu');
     
     if (parentListItem) {
-        // Opsional: Tutup menu lain yang sedang terbuka agar sidebar rapi
+        // Tutup menu Level 1 lain
         const allMenus = document.querySelectorAll('li.has-submenu');
         allMenus.forEach(menu => {
             if (menu !== parentListItem && menu.classList.contains('open')) {
                 menu.classList.remove('open');
             }
         });
-        
-        // Toggle class 'open' pada elemen yang diklik
         parentListItem.classList.toggle('open');
     }
 }
 
-/**
- * Helper untuk Mobile Toggle
- * Panggil fungsi ini dari tombol hamburger di header utama Anda.
- * Contoh: <button onclick="openSidebar()">Menu</button>
- */
+
+function toggleLevel3(element, event) {
+    event.stopPropagation(); 
+    event.preventDefault();  
+
+    const parentListItem = element.closest('li.has-submenu-level-3');
+    if (parentListItem) {
+        parentListItem.classList.toggle('open');
+    }
+}
+
 function openSidebar() {
     document.getElementById('sidebar').classList.add('mobile-open');
     document.getElementById('sidebarOverlay').classList.add('show');
@@ -432,11 +497,23 @@ function closeSidebar() {
     document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
-// Auto Scroll ke menu aktif saat load
+// Auto Scroll ke menu aktif
 document.addEventListener("DOMContentLoaded", function() {
-    const activeItem = document.querySelector('.submenu-item.active') || document.querySelector('.sidebar-link.active');
+    const activeItem = document.querySelector('.submenu-item.active') || 
+                       document.querySelector('.sidebar-link.active') || 
+                       document.querySelector('.submenu-item-level-3.active');
+    
     if (activeItem) {
-        activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Jika ada di dalam level 3, pastikan parent (Level 2 & 1) terbuka
+        const level3Parent = activeItem.closest('.has-submenu-level-3');
+        if(level3Parent) level3Parent.classList.add('open');
+
+        const level1Parent = activeItem.closest('.has-submenu');
+        if(level1Parent) level1Parent.classList.add('open');
+
+        setTimeout(() => {
+            activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
     }
 });
 </script>
