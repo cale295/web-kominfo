@@ -242,38 +242,37 @@
         margin-bottom: 16px;
     }
     /* Style Toggle Switch */
-.status-btn {
-    background: none; border: none; padding: 0;
-    display: flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity 0.3s;
-}
-.status-btn:hover { opacity: 0.8; }
-.status-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .status-btn {
+        background: none; border: none; padding: 0;
+        display: flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity 0.3s;
+    }
+    .status-btn:hover { opacity: 0.8; }
+    .status-btn:disabled { cursor: not-allowed; opacity: 0.5; }
 
-.status-btn .switch {
-    position: relative; width: 42px; height: 22px;
-    background-color: #cbd5e1; /* Warna mati (Gray-300) */
-    border-radius: 20px; transition: all 0.3s ease;
-}
-.status-btn .switch::after {
-    content: ''; position: absolute; width: 18px; height: 18px;
-    background-color: white; border-radius: 50%;
-    top: 2px; left: 2px; transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
+    .status-btn .switch {
+        position: relative; width: 42px; height: 22px;
+        background-color: #cbd5e1; /* Warna mati (Gray-300) */
+        border-radius: 20px; transition: all 0.3s ease;
+    }
+    .status-btn .switch::after {
+        content: ''; position: absolute; width: 18px; height: 18px;
+        background-color: white; border-radius: 50%;
+        top: 2px; left: 2px; transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
 
-.status-btn .switch.active { background-color: #059669; /* Warna hidup (Success) */ }
-.status-btn .switch.active::after { left: 22px; }
+    .status-btn .switch.active { background-color: #059669; /* Warna hidup (Success) */ }
+    .status-btn .switch.active::after { left: 22px; }
 
-.status-btn .switch-label {
-    font-size: 0.8rem; font-weight: 600; color: #334155;
-    min-width: 65px; text-align: left;
-}
+    .status-btn .switch-label {
+        font-size: 0.8rem; font-weight: 600; color: #334155;
+        min-width: 65px; text-align: left;
+    }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 
-<!-- Page Header -->
 <div class="gov-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
@@ -297,11 +296,40 @@
 
 <?= $this->include('layouts/alerts') ?>
 
-<!-- Table Card -->
+<div class="card mb-3 shadow-sm border-0">
+    <div class="card-body py-3">
+        <div class="row align-items-center">
+            <div class="col-md-2 mb-2 mb-md-0">
+                <div class="d-flex align-items-center">
+                    <label for="limitSelect" class="me-2 small fw-bold text-muted">Tampil:</label>
+                    <select id="limitSelect" class="form-select form-select-sm shadow-none border-gray-300" style="width: 80px;">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="-1">Semua</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-md-6"></div>
+
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control border-start-0 shadow-none ps-0" placeholder="Cari Judul, Topik, atau Penulis...">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card table-card">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table gov-table mb-0">
+            <table class="table gov-table mb-0" id="beritaTable">
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
@@ -324,10 +352,10 @@
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tableBody">
                     <?php if (empty($berita)): ?>
                         <tr>
-                            <td colspan="15">
+                            <td colspan="18">
                                 <div class="no-data">
                                     <i class="bi bi-inbox"></i>
                                     <p class="mb-0">Belum ada data berita</p>
@@ -336,96 +364,73 @@
                         </tr>
                     <?php else: ?>
                         <?php foreach ($berita as $i => $row): ?>
-                            <tr>
-                                <td class="text-center"><?= $i + 1 ?></td>
+                            <tr class="data-row">
+                                <td class="text-center row-number"><?= $i + 1 ?></td>
 
-                                <!-- Cover -->
                                 <td class="text-center">
                                     <?php if (!empty($row['feat_image'])): ?>
                                         <img src="<?= base_url($row['feat_image']) ?>"
-                                            alt="Cover" class="img-thumbnail"
-                                            style="width:80px;height:60px;object-fit:cover;">
+                                             alt="Cover" class="img-thumbnail"
+                                             style="width:80px;height:60px;object-fit:cover;">
                                     <?php else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Additional Images -->
-<td class="text-center">
+                                <td class="text-center">
                                     <?php
                                     $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
                                     $hasValidImage = false;
 
                                     if (!empty($additional)):
                                         foreach ($additional as $img):
-                                            // 1. Normalisasi: Cek apakah ini format baru (array) atau lama (string)
                                             $pathGambar = '';
                                             $captionTooltip = '';
 
                                             if (is_array($img)) {
-                                                // Format Baru: ['path' => '...', 'caption' => '...']
                                                 $pathGambar = $img['path'] ?? '';
                                                 $captionTooltip = $img['caption'] ?? '';
                                             } else {
-                                                // Format Lama: hanya string path 'uploads/...'
                                                 $pathGambar = $img;
                                             }
 
-                                            // Jika path kosong, skip
                                             if (empty($pathGambar)) continue;
-
-                                            // 2. Cek file fisik
-                                            // Gunakan $pathGambar yang sudah distring-kan, bukan $img (array)
                                             $filePath = FCPATH . ltrim($pathGambar, '/');
-                                            
-                                            if (!file_exists($filePath)) {
-                                                continue; 
-                                            }
-
+                                            if (!file_exists($filePath)) continue;
                                             $hasValidImage = true; 
                                             ?>
-                                            
                                             <img src="<?= base_url($pathGambar) ?>"
                                                  alt="Foto Tambahan"
                                                  title="<?= esc($captionTooltip) ?>"
                                                  class="img-thumbnail mb-1"
                                                  style="width:50px;height:40px;object-fit:cover;cursor:help;">
-                                            
                                         <?php endforeach;
-
                                         if (!$hasValidImage): ?>
                                             <span class="text-muted">-</span>
                                         <?php endif;
-
                                     else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
 
-
-                                <!-- Judul -->
                                 <td style="min-width: 200px;">
-                                    <strong><?= esc($row['judul']) ?></strong>
+                                    <strong class="searchable"><?= esc($row['judul']) ?></strong>
                                 </td>
 
-                                <!-- Topik -->
-                                <td><?= esc($row['topik'] ?? '-') ?></td>
+                                <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
 
-                                <!-- Konten -->
                                 <td>
                                     <div class="content-preview">
                                         <?= strip_tags($row['content']) ?>
                                     </div>
                                 </td>
 
-                                <!-- Konten 2 -->
                                 <td>
                                     <div class="content-preview">
                                         <?= strip_tags($row['content2'] ?? '-') ?>
                                     </div>
                                 </td>
 
-                                <!-- Kategori -->
                                 <td>
                                     <?php
                                     if (!empty($row['kategori'])) {
@@ -450,7 +455,6 @@
                                     ?>
                                 </td>
 
-                                <!-- Status Tayang -->
                                 <td class="text-center">
                                     <?php if ($row['status'] == '1'): ?>
                                         <span class="badge bg-success">
@@ -467,7 +471,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Status Berita -->
                                 <td class="text-center">
                                     <?php
                                     $statusBerita = [
@@ -484,33 +487,30 @@
                                     </span>
                                 </td>
 
-                                <!-- Dibuat Oleh -->
-                                <td><?= esc($row['created_by_name'] ?? '-') ?></td>
+                                <td class="searchable"><?= esc($row['created_by_name'] ?? '-') ?></td>
 
-                                <!-- Waktu Dibuat -->
                                 <td class="text-center" style="white-space: nowrap;">
                                     <?= !empty($row['created_at']) ? date('d M Y H:i', strtotime($row['created_at'])) : '-' ?>
                                 </td>
 
-                                <!-- Diupdate Oleh -->
                                 <td><?= esc($row['updated_by_name'] ?? '-') ?></td>
 
-                                <!-- Update Terakhir -->
                                 <td class="text-center" style="white-space: nowrap;">
                                     <?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?>
                                 </td>
 
                                 <td><?= esc($row['hit'] ?? '-') ?></td>
-<td class="text-center">
-    <button type="button" class="status-btn" 
-            data-id="<?= $row['id_berita'] ?>" 
-            data-url="<?= site_url('berita/toggle-status') ?>"> <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
-        <span class="switch-label">
-            <?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?>
-        </span>
-    </button>
-</td>
-                                <!-- Aksi -->
+                                
+                                <td class="text-center">
+                                    <button type="button" class="status-btn" 
+                                            data-id="<?= $row['id_berita'] ?>" 
+                                            data-url="<?= site_url('berita/toggle-status') ?>"> <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
+                                        <span class="switch-label">
+                                            <?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?>
+                                        </span>
+                                    </button>
+                                </td>
+                                
                                 <td class="text-center" style="white-space: nowrap;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
@@ -533,11 +533,9 @@
                                                 </button>
                                             </form>
                                         <?php endif; ?>
-                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" 
-   class="btn btn-info btn-sm">
-    <i class="bi bi-journal-text"></i> Log
-</a>
-
+                                        <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" class="btn btn-info btn-sm">
+                                            <i class="bi bi-journal-text"></i> Log
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -546,9 +544,14 @@
                 </tbody>
             </table>
         </div>
+        <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center" id="paginationInfo">
+            <small class="text-muted">Menampilkan <span id="showingStart">0</span> - <span id="showingEnd">0</span> dari <span id="totalData">0</span> data</small>
+        </div>
     </div>
 </div>
+
 <script>
+// --- Script Toggle Status ---
 $(document).on('click', '.status-btn', function () {
     let btn = $(this);
     let id = btn.data('id');
@@ -556,11 +559,10 @@ $(document).on('click', '.status-btn', function () {
     let switchEl = btn.find('.switch');
     let labelEl = btn.find('.switch-label');
     
-    // Ambil Token CSRF dari input hidden yang biasanya ada di layout/form delete
+    // Ambil Token CSRF
     let csrfName = '<?= csrf_token() ?>';
     let csrfHash = $('input[name="'+csrfName+'"]').val(); 
 
-    // Efek loading
     btn.prop('disabled', true);
     btn.css('opacity', '0.5');
 
@@ -574,7 +576,6 @@ $(document).on('click', '.status-btn', function () {
             btn.css('opacity', '1');
             
             if (res.status === 'success') {
-                // 1. Update Tampilan
                 if (res.newStatus == 1) {
                     switchEl.addClass('active');
                     labelEl.text('Aktif');
@@ -582,12 +583,9 @@ $(document).on('click', '.status-btn', function () {
                     switchEl.removeClass('active');
                     labelEl.text('Non-Aktif');
                 }
-                
-                // 2. Update Token CSRF (PENTING untuk request selanjutnya)
                 $('input[name="'+csrfName+'"]').val(res.token);
             } else {
                 alert('Gagal: ' + res.message);
-                // Jika token mismatch, update token dari respon error jika ada
                 if(res.token) $('input[name="'+csrfName+'"]').val(res.token);
             }
         },
@@ -598,6 +596,64 @@ $(document).on('click', '.status-btn', function () {
             alert('Terjadi kesalahan koneksi ke server.');
         }
     });
+});
+
+// --- Script Search & Filter Limit ---
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const limitSelect = document.getElementById('limitSelect');
+    const tableBody = document.getElementById('tableBody');
+    const rows = Array.from(tableBody.querySelectorAll('tr.data-row')); // Ambil semua baris data
+    const totalDataSpan = document.getElementById('totalData');
+    const showingStartSpan = document.getElementById('showingStart');
+    const showingEndSpan = document.getElementById('showingEnd');
+
+    // Filter Logic
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const limit = parseInt(limitSelect.value);
+        let visibleCount = 0;
+        let totalFiltered = 0;
+
+        // 1. Filter Search First
+        const filteredRows = rows.filter(row => {
+            // Cari hanya di kolom yang punya class .searchable (Judul, Topik, Penulis)
+            // atau cari di seluruh text content row jika ingin lebih luas
+            const textContent = row.textContent.toLowerCase();
+            return textContent.includes(searchTerm);
+        });
+
+        // 2. Hide All Rows First
+        rows.forEach(row => row.style.display = 'none');
+
+        // 3. Show Filtered Rows based on Limit
+        filteredRows.forEach((row, index) => {
+            totalFiltered++;
+            if (limit === -1 || visibleCount < limit) {
+                row.style.display = '';
+                // Update nomor urut agar tetap rapih (opsional, kalau mau nomornya urut ulang)
+                // row.querySelector('.row-number').textContent = visibleCount + 1;
+                visibleCount++;
+            }
+        });
+
+        // Update Info Pagination Sederhana
+        if (totalFiltered > 0) {
+            showingStartSpan.textContent = 1;
+            showingEndSpan.textContent = visibleCount;
+        } else {
+            showingStartSpan.textContent = 0;
+            showingEndSpan.textContent = 0;
+        }
+        totalDataSpan.textContent = totalFiltered;
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('keyup', filterTable);
+    limitSelect.addEventListener('change', filterTable);
+
+    // Initial Load
+    filterTable();
 });
 </script>
 

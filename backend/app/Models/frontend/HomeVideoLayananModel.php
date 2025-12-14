@@ -43,7 +43,7 @@ class HomeVideoLayananModel extends Model
             'label'  => 'Link YouTube'
         ],
         'thumb_image' => [
-            'rules'  => 'required|max_length[255]',
+            'rules'  => 'permit_empty|max_length[255]',
             'label'  => 'Thumbnail Video'
         ],
         'is_featured' => [

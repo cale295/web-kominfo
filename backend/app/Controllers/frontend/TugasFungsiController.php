@@ -112,6 +112,7 @@ class TugasFungsiController extends BaseController
         if (!$access || !$access['can_create']) {
             return redirect()->to('/tugas_fungsi')->with('error', 'Akses ditolak.');
         }
+        
         return view('pages/tugas_fungsi/create');
     }
 
