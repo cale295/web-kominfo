@@ -12,7 +12,7 @@ interface ListKeuangan {
 }
 
 const Keuangan: React.FC = () => {
-  const [Keuangan, setKeuangan] = useState<ListKeuangan[]>([]);
+  const [keuangan, setKeuangan] = useState<ListKeuangan[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [openKategori, setOpenKategori] = useState<string | null>(null);
@@ -36,6 +36,7 @@ const Keuangan: React.FC = () => {
     } catch (err) {
       console.error("Error fetching Keuangan", err);
       setError("Gagal memuat data Keuangan. Silahkan coba lagi.");
+      setKeuangan([]); // Pastikan array kosong saat error
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ const Keuangan: React.FC = () => {
     fetchKeuangan();
   }, []);
 
-  const groupedData = Keuangan.reduce((acc, item) => {
+  const groupedData = keuangan.reduce((acc, item) => {
     if (!acc[item.kategori]) {
       acc[item.kategori] = [];
     }
@@ -64,27 +65,29 @@ const Keuangan: React.FC = () => {
     );
   }
 
-  if (error && Keuangan.length === 0) {
-    return (
-      <div className="container-fluid px-3 py-3">
-        <div className="text-center text-danger">
-          <p>{error}</p>
-          <button className="btn btn-primary" onClick={fetchKeuangan}>
-            Coba Lagi
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="program-container">
       <h2 className="program-title">Keuangan</h2>
 
+      {/* Tampilkan error message jika ada */}
+      {error && (
+        <div className="alert alert-danger mb-3" role="alert">
+          {error}
+          <button 
+            className="btn btn-sm btn-outline-danger ms-3" 
+            onClick={fetchKeuangan}
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
+
       <div className="table-toolbar">
         <div>
           Show
-          <select>
+          <select 
+            disabled={keuangan.length === 0}
+          >
             <option>10</option>
             <option>25</option>
             <option>50</option>
@@ -93,7 +96,11 @@ const Keuangan: React.FC = () => {
         </div>
 
         <div className="search-box">
-          Search: <input type="text" placeholder="Cari Keuangan..." />
+          Search: <input 
+            type="text" 
+            placeholder="Cari Keuangan..." 
+            disabled={keuangan.length === 0}
+          />
         </div>
       </div>
 
@@ -107,76 +114,87 @@ const Keuangan: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(groupedData).map(([kategori, items]) => {
-              const isOpen = openKategori === kategori;
+            {keuangan.length > 0 ? (
+              Object.entries(groupedData).map(([kategori, items]) => {
+                const isOpen = openKategori === kategori;
+                const totalItems = items.length;
 
-              return (
-                <React.Fragment key={kategori}>
-                  {/* === HEADER KATEGORI === */}
-                  <tr
-                    className="category-row"
-                    onClick={() => toggleAccordion(kategori)}
-                  >
-                    <td>
-                      <span className="toggle-icon">{isOpen ? "▾" : "▸"}</span>
-                      📁 <strong>{kategori}</strong>
-                    </td>
+                return (
+                  <React.Fragment key={kategori}>
+                    {/* === HEADER KATEGORI === */}
+                    <tr
+                      className="category-row"
+                      onClick={() => toggleAccordion(kategori)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <td>
+                        <span className="toggle-icon">{isOpen ? "▾" : "▸"}</span>
+                        📁 <strong>{kategori}</strong>
+                      </td>
 
-                    <td className="text-center">0</td>
-                    <td></td>
-                  </tr>
+                      <td className="text-center">{totalItems} dokumen</td>
+                      <td></td>
+                    </tr>
 
-                  {/* === DOKUMEN DALAM KATEGORI === */}
-                  {isOpen &&
-                    items.map((item) => (
-                      <tr key={item.id_laporan_keuangan} className="file-row">
-                        <td className="file-name">
-                          <span className="file-indent" />
-                          📄 {item.judul_dokumen}
-                        </td>
+                    {/* === DOKUMEN DALAM KATEGORI === */}
+                    {isOpen &&
+                      items.map((item) => (
+                        <tr key={item.id_laporan_keuangan} className="file-row">
+                          <td className="file-name">
+                            <span className="file-indent" />
+                            📄 {item.judul_dokumen}
+                          </td>
 
-                        <td className="text-center">{item.tahun}</td>
+                          <td className="text-center">{item.tahun}</td>
 
-                        <td className="text-center">
-                          <a
-                            href={item.download_url}
-                            className="btn-unduh"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download
-                          >
-                            Unduh
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                </React.Fragment>
-              );
-            })}
+                          <td className="text-center">
+                            <a
+                              href={item.download_url}
+                              className="btn-unduh"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              download
+                            >
+                              Unduh
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                  </React.Fragment>
+                );
+              })
+            ) : (
+              // Tampilkan baris kosong ketika tidak ada data
+              <tr>
+                <td colSpan={3} className="text-center py-4">
+                  Tidak ada data keuangan
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="table-footer">
         <div>
-          Showing 1 to {Keuangan.length} of {Keuangan.length} entries
+          Showing {keuangan.length > 0 ? 1 : 0} to {keuangan.length} of {keuangan.length} entries
         </div>
 
         <ul className="pagination">
           <li>
-            <button>Previous</button>
+            <button disabled={keuangan.length === 0}>Previous</button>
           </li>
-          <li className="active">
-            <button>1</button>
-          </li>
-          <li>
-            <button>2</button>
+          <li className={keuangan.length > 0 ? "active" : ""}>
+            <button disabled={keuangan.length === 0}>1</button>
           </li>
           <li>
-            <button>3</button>
+            <button disabled={keuangan.length === 0}>2</button>
           </li>
           <li>
-            <button>Next</button>
+            <button disabled={keuangan.length === 0}>3</button>
+          </li>
+          <li>
+            <button disabled={keuangan.length === 0}>Next</button>
           </li>
         </ul>
       </div>

@@ -25,11 +25,12 @@ const DaftarInformasiPublik: React.FC = () => {
       if (response.data.status && Array.isArray(response.data.data)) {
         setInformasiPublik(response.data.data);
       } else {
-        setInformasiPublik([]);
+        setInformasiPublik([]); // Tetap set array kosong
       }
     } catch (err) {
       console.error("Error fetching informasi publik", err);
       setError("Gagal memuat data informasi publik. Silahkan coba lagi.");
+      setInformasiPublik([]); // Pastikan array kosong saat error
     } finally {
       setLoading(false);
     }
@@ -50,22 +51,22 @@ const DaftarInformasiPublik: React.FC = () => {
     );
   }
 
-  if (error && informasiPublik.length === 0) {
-    return (
-      <div className="program-container">
-        <div className="text-center text-danger py-5">
-          <p>{error}</p>
-          <button className="btn-unduh mt-2" onClick={fetchInformasiPublik}>
-            Coba Lagi
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="program-container">
       <h2 className="program-title">Informasi Publik</h2>
+
+      {/* Tampilkan pesan error jika ada, tapi tetap tampilkan tabel */}
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+          <button 
+            className="btn btn-sm btn-outline-danger ms-3" 
+            onClick={fetchInformasiPublik}
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
 
       <div className="table-toolbar">
         <div>
@@ -93,46 +94,55 @@ const DaftarInformasiPublik: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {informasiPublik.map((info) => (
-              <tr key={info.id_daftar_ip} className="category-row">
-                <td>{info.judul_dokumen}</td>
-                <td>{info.tahun}</td>
-                <td>
-                  <a
-                    href={info.download_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-unduh"
-                  >
-                    Download
-                  </a>
+            {informasiPublik.length > 0 ? (
+              informasiPublik.map((info) => (
+                <tr key={info.id_daftar_ip} className="category-row">
+                  <td>{info.judul_dokumen}</td>
+                  <td>{info.tahun}</td>
+                  <td>
+                    <a
+                      href={info.download_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-unduh"
+                    >
+                      Download
+                    </a>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              // Tampilkan baris kosong ketika tidak ada data
+              <tr>
+                <td colSpan={3} className="text-center py-4">
+                  Tidak ada data informasi publik
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="table-footer">
         <div>
-          Showing 1 to {informasiPublik.length} of {informasiPublik.length} entries
+          Showing {informasiPublik.length > 0 ? 1 : 0} to {informasiPublik.length} of {informasiPublik.length} entries
         </div>
 
         <ul className="pagination">
           <li>
-            <button>Previous</button>
+            <button disabled={informasiPublik.length === 0}>Previous</button>
           </li>
-          <li className="active">
-            <button>1</button>
-          </li>
-          <li>
-            <button>2</button>
+          <li className={informasiPublik.length > 0 ? "active" : ""}>
+            <button disabled={informasiPublik.length === 0}>1</button>
           </li>
           <li>
-            <button>3</button>
+            <button disabled={informasiPublik.length === 0}>2</button>
           </li>
           <li>
-            <button>Next</button>
+            <button disabled={informasiPublik.length === 0}>3</button>
+          </li>
+          <li>
+            <button disabled={informasiPublik.length === 0}>Next</button>
           </li>
         </ul>
       </div>

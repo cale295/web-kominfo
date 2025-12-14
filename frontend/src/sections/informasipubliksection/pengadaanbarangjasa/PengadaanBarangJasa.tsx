@@ -54,6 +54,12 @@ const PengadaanBarangJasa: React.FC = () => {
     } catch (err) {
       console.error(`Error fetching ${type === 'penyedia' ? 'Penyedia' : 'Swakelola'}`, err);
       setError(`Gagal memuat data ${type === 'penyedia' ? 'Penyedia' : 'Swakelola'}. Silahkan coba lagi.`);
+      // Pastikan array kosong saat error
+      if (type === 'penyedia') {
+        setPenyedia([]);
+      } else {
+        setSwakelola([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -118,22 +124,22 @@ const PengadaanBarangJasa: React.FC = () => {
     );
   }
 
-  if (error && getCurrentData().length === 0) {
-    return (
-      <div className="program-container">
-        <div className="text-center text-danger py-5">
-          <p>{error}</p>
-          <button className="btn-unduh mt-2" onClick={() => fetchData(activeTab)}>
-            Coba Lagi
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="program-container">
       <h2 className="program-title">Pengadaan Barang & Jasa</h2>
+      
+      {/* Tampilkan error message jika ada */}
+      {error && (
+        <div className="alert alert-danger mb-3" role="alert">
+          {error}
+          <button 
+            className="btn btn-sm btn-outline-danger ms-3" 
+            onClick={() => fetchData(activeTab)}
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
       
       {/* Tab Navigation */}
       <div className="tab-navigation mb-4">
@@ -160,6 +166,7 @@ const PengadaanBarangJasa: React.FC = () => {
               setEntriesPerPage(Number(e.target.value));
               setCurrentPage(1);
             }}
+            disabled={getCurrentData().length === 0}
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -178,6 +185,7 @@ const PengadaanBarangJasa: React.FC = () => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
+            disabled={getCurrentData().length === 0}
           />
         </div>
       </div>
@@ -216,8 +224,8 @@ const PengadaanBarangJasa: React.FC = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={activeTab === 'penyedia' ? 6 : 4} className="text-center py-3">
-                  Tidak ada data ditemukan
+                <td colSpan={activeTab === 'penyedia' ? 6 : 4} className="text-center py-4">
+                  {searchTerm ? "Tidak ada data yang cocok dengan pencarian" : "Tidak ada data"}
                 </td>
               </tr>
             )}
@@ -230,6 +238,7 @@ const PengadaanBarangJasa: React.FC = () => {
           Showing {filteredData.length > 0 ? indexOfFirstEntry + 1 : 0} to{" "}
           {Math.min(indexOfLastEntry, filteredData.length)} of{" "}
           {filteredData.length} entries
+          {searchTerm && filteredData.length === 0 && " (setelah filter)"}
         </div>
 
         {totalPages > 1 && (

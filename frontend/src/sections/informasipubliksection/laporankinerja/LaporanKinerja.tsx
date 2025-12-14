@@ -12,7 +12,7 @@ interface ListKinerja {
 }
 
 const Kinerja: React.FC = () => {
-  const [Kinerja, setKinerja] = useState<ListKinerja[]>([]);
+  const [kinerja, setKinerja] = useState<ListKinerja[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [openKategori, setOpenKategori] = useState<string | null>(null);
@@ -36,6 +36,7 @@ const Kinerja: React.FC = () => {
     } catch (err) {
       console.error("Error fetching Kinerja", err);
       setError("Gagal memuat data Kinerja. Silahkan coba lagi.");
+      setKinerja([]); // Pastikan array kosong saat error
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ const Kinerja: React.FC = () => {
     fetchKinerja();
   }, []);
 
-  const groupedData = Kinerja.reduce((acc, item) => {
+  const groupedData = kinerja.reduce((acc, item) => {
     if (!acc[item.kategori]) {
       acc[item.kategori] = [];
     }
@@ -64,27 +65,29 @@ const Kinerja: React.FC = () => {
     );
   }
 
-  if (error && Kinerja.length === 0) {
-    return (
-      <div className="container-fluid px-3 py-3">
-        <div className="text-center text-danger">
-          <p>{error}</p>
-          <button className="btn btn-primary" onClick={fetchKinerja}>
-            Coba Lagi
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="program-container">
       <h2 className="program-title">Kinerja</h2>
 
+      {/* Tampilkan error message jika ada */}
+      {error && (
+        <div className="alert alert-danger mb-3" role="alert">
+          {error}
+          <button 
+            className="btn btn-sm btn-outline-danger ms-3" 
+            onClick={fetchKinerja}
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
+
       <div className="table-toolbar">
         <div>
           Show
-          <select>
+          <select 
+            disabled={kinerja.length === 0}
+          >
             <option>10</option>
             <option>25</option>
             <option>50</option>
@@ -93,7 +96,11 @@ const Kinerja: React.FC = () => {
         </div>
 
         <div className="search-box">
-          Search: <input type="text" placeholder="Cari Kinerja..." />
+          Search: <input 
+            type="text" 
+            placeholder="Cari Kinerja..." 
+            disabled={kinerja.length === 0}
+          />
         </div>
       </div>
 
@@ -107,76 +114,87 @@ const Kinerja: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(groupedData).map(([kategori, items]) => {
-              const isOpen = openKategori === kategori;
+            {kinerja.length > 0 ? (
+              Object.entries(groupedData).map(([kategori, items]) => {
+                const isOpen = openKategori === kategori;
+                const totalItems = items.length;
 
-              return (
-                <React.Fragment key={kategori}>
-                  {/* === HEADER KATEGORI === */}
-                  <tr
-                    className="category-row"
-                    onClick={() => toggleAccordion(kategori)}
-                  >
-                    <td>
-                      <span className="toggle-icon">{isOpen ? "▾" : "▸"}</span>
-                      📁 <strong>{kategori}</strong>
-                    </td>
+                return (
+                  <React.Fragment key={kategori}>
+                    {/* === HEADER KATEGORI === */}
+                    <tr
+                      className="category-row"
+                      onClick={() => toggleAccordion(kategori)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <td>
+                        <span className="toggle-icon">{isOpen ? "▾" : "▸"}</span>
+                        📁 <strong>{kategori}</strong>
+                      </td>
 
-                    <td className="text-center">0</td>
-                    <td></td>
-                  </tr>
+                      <td className="text-center">{totalItems} dokumen</td>
+                      <td></td>
+                    </tr>
 
-                  {/* === DOKUMEN DALAM KATEGORI === */}
-                  {isOpen &&
-                    items.map((item) => (
-                      <tr key={item.id_laporan_kinerja} className="file-row">
-                        <td className="file-name">
-                          <span className="file-indent" />
-                          📄 {item.judul_dokumen}
-                        </td>
+                    {/* === DOKUMEN DALAM KATEGORI === */}
+                    {isOpen &&
+                      items.map((item) => (
+                        <tr key={item.id_laporan_kinerja} className="file-row">
+                          <td className="file-name">
+                            <span className="file-indent" />
+                            📄 {item.judul_dokumen}
+                          </td>
 
-                        <td className="text-center">{item.tahun}</td>
+                          <td className="text-center">{item.tahun}</td>
 
-                        <td className="text-center">
-                          <a
-                            href={item.download_url}
-                            className="btn-unduh"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download
-                          >
-                            Unduh
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                </React.Fragment>
-              );
-            })}
+                          <td className="text-center">
+                            <a
+                              href={item.download_url}
+                              className="btn-unduh"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              download
+                            >
+                              Unduh
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                  </React.Fragment>
+                );
+              })
+            ) : (
+              // Tampilkan baris kosong ketika tidak ada data
+              <tr>
+                <td colSpan={3} className="text-center py-4">
+                  Tidak ada data kinerja
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="table-footer">
         <div>
-          Showing 1 to {Kinerja.length} of {Kinerja.length} entries
+          Showing {kinerja.length > 0 ? 1 : 0} to {kinerja.length} of {kinerja.length} entries
         </div>
 
         <ul className="pagination">
           <li>
-            <button>Previous</button>
+            <button disabled={kinerja.length === 0}>Previous</button>
           </li>
-          <li className="active">
-            <button>1</button>
-          </li>
-          <li>
-            <button>2</button>
+          <li className={kinerja.length > 0 ? "active" : ""}>
+            <button disabled={kinerja.length === 0}>1</button>
           </li>
           <li>
-            <button>3</button>
+            <button disabled={kinerja.length === 0}>2</button>
           </li>
           <li>
-            <button>Next</button>
+            <button disabled={kinerja.length === 0}>3</button>
+          </li>
+          <li>
+            <button disabled={kinerja.length === 0}>Next</button>
           </li>
         </ul>
       </div>

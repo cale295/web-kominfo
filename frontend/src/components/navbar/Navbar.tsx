@@ -39,6 +39,19 @@ export interface KontakSocialType {
   status: string;
 }
 
+interface Banner {
+  id_banner: string;
+  title: string;
+  status: string;
+  image: string;
+  media_type: string;
+  url: string;
+  url_yt: string;
+  sorting: string;
+  keterangan: string;
+  category_banner: string;
+}
+
 type MenuType = "main" | "berita";
 
 function Navbar() {
@@ -49,6 +62,29 @@ function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [kontakSocials, setKontakSocials] = useState<KontakSocialType[]>([]);
+  const [heroBanner, setHeroBanner] = useState<Banner | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchBanner = async () => {
+      try {
+        const res = await api.get("/banner");
+        const banners: Banner[] = res?.data?.data || [];
+
+        const selected = banners.find(
+          (b) => b.category_banner === "1" && b.status === "1"
+        );
+
+        if (selected) setHeroBanner(selected);
+      } catch (error) {
+        console.error("Gagal fetch banner:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBanner();
+  }, []);
 
   // Deteksi route untuk menentukan menu type
   const getMenuTypeFromPath = (pathname: string): MenuType => {
@@ -214,12 +250,25 @@ function Navbar() {
             style={{ textDecoration: "none", color: "white" }}
             className="d-flex flex-column align-items-center gap-3 header-row"
           >
+            {isLoading ? (
+          <div className="hero-banner-loading">
+            <p>Memuat banner...</p>
+          </div>
+        ) : heroBanner ? (
             <img
-              src="/assets/logo.png"
-              alt="Logo Kominfo"
-              className="w-24"
-              style={{ width: "6rem" }}
+              src={`${api.defaults.baseURL?.replace(
+                "/api",
+                ""
+              )}/uploads/banner/${heroBanner.image}`}
+              alt={heroBanner.title}
+              className="hero-banner-image"
             />
+          )
+         : (
+          <div className="hero-banner-placeholder">
+            <p>Banner tidak tersedia</p>
+          </div>
+        )}
 
             <h1 className="font-bold text-lg leading-snug tracking-wide text-center text-white">
               DINAS KOMUNIKASI DAN INFORMATIKA <br /> KOTA TANGERANG

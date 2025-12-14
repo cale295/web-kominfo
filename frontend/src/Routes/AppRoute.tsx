@@ -34,6 +34,7 @@ import AjukanPermohonan from "../sections/ppidsection/ajukanpermohonan/AjukanPer
 // 1. IMPORT COMPONENT CEK STATUS (Sesuaikan path foldernya)
 import CheckStatus from "../sections/ppidsection/lacakpermohonan/LacakPermohonan";
 import PendidikanPelatihan from "../sections/informasipubliksection/pendidikanpelatihan/PendidikanPelatihan";
+import KerjasamaDaerah from "../sections/informasipubliksection/kerjasamadaerah/KerjasamaDaerah";
 
 const HomePage: React.FC = () => {
   return (
@@ -129,6 +130,7 @@ const AppRouter: React.FC = () => {
         <Route path="/laporan_kinerja" element={<Kinerja />} />
         <Route path="/daftar_informasi_publik" element={<DaftarInformasiPublik />} />
         <Route path="/agenda_pelatihan" element={<PendidikanPelatihan />} />
+        <Route path="/kerjasama_daerah" element={<KerjasamaDaerah />} />
         <Route path="/permohonan_informasi" element={<PermohonanInformasi />} />
         <Route path="/ajukan_permohonan" element={<AjukanPermohonan />} />
         
