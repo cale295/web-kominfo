@@ -56,6 +56,10 @@ class PejabatStrukturalController extends BaseController
         if (!$access['can_create']) {
             return redirect()->to('/pejabat_struktural')->with('error', 'Akses ditolak.');
         }
+        $count = $this->pejabatModel->countAll();
+        if ($count >= 1) {
+            return redirect()->to('/pejabat_struktural')->with('error', 'Maksimal 1 data pejabat struktural.');
+        }
         return view('pages/pejabat_struktural/create');
     }
 public function toggleStatus()

@@ -29,6 +29,9 @@ class TugasFungsiModel extends Model
 
     // Validation Rules
     protected $validationRules = [
+        'id_tugas' => [
+            'rules'  => 'permit_empty',
+        ],
         'type' => [
             'rules'  => 'required|in_list[tugas,fungsi]',
             'label'  => 'Tipe (Tugas/Fungsi)'
@@ -37,9 +40,5 @@ class TugasFungsiModel extends Model
             'rules'  => 'required',
             'label'  => 'Deskripsi'
         ],
-        'is_active' => [
-            'rules'  => 'required|in_list[0,1]',
-            'label'  => 'Status Aktif'
-        ]
     ];
 }

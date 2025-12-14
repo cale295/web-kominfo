@@ -91,6 +91,11 @@ class BannerController extends BaseController
             return redirect()->to('/banner')->with('error', 'Akses ditolak.');
         }
 
+        $count = $this->bannerModel->countAllResults();
+        if ($count >= 10) {
+            return redirect()->to('/banner')->with('error', 'Maksimal 10 banner.');
+        }
+
         $data = [
             'title' => 'Tambah Banner',
             'selected_kategori' => $this->request->getGet('kategori')
