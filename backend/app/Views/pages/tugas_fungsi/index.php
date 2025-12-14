@@ -47,16 +47,15 @@
                         <tr class="text-uppercase text-secondary text-xs fw-bolder" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                             <th class="text-center py-3 border-0" width="5%">#</th>
                             <th class="py-3 border-0" width="15%">Kategori</th>
-                            <th class="py-3 border-0" width="45%">Deskripsi Tugas/Fungsi</th>
+                            <th class="py-3 border-0" width="55%">Deskripsi Tugas/Fungsi</th>
                             <th class="text-center py-3 border-0" width="10%">Status</th>
-                            <th class="text-center py-3 border-0" width="10%">Aksi Toggle</th>
                             <th class="text-center py-3 border-0" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
                         <?php if (empty($tugas_fungsi)) : ?>
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="5" class="text-center py-5">
                                     <div class="empty-state py-4">
                                         <div class="mb-3 text-muted opacity-25">
                                             <i class="fas fa-folder-open fa-4x"></i>
@@ -93,18 +92,6 @@
                                         <p class="mb-0 text-secondary small lh-sm text-wrap" style="max-height: 100px; overflow-y: auto;">
                                             <?= nl2br(esc(strip_tags($item['description']))) ?>
                                         </p>
-                                    </td>
-
-                                    <td class="text-center">
-                                        <?php if ($item['is_active'] == 1) : ?>
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3">
-                                                Aktif
-                                            </span>
-                                        <?php else : ?>
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3">
-                                                Non-Aktif
-                                            </span>
-                                        <?php endif; ?>
                                     </td>
 
                                     <td class="text-center">

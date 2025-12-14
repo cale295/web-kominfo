@@ -62,6 +62,17 @@ $menuItems = [
             ['title' => 'Tag', 'url' => '/berita_tag', 'roles' => ['superadmin', 'admin']],
         ]
     ],
+    [
+        'type' => 'dropdown', 
+        'title' => 'Program SKPD', 
+        'icon' => 'bi-journal-bookmark-fill', 
+        'roles' => ['superadmin', 'admin'],
+        'color' => '#f6c23e', 
+        'bg' => 'rgba(246, 194, 62, 0.1)',
+        'submenu' => [
+            ['title' => 'Program SKPD', 'url' => '/program', 'roles' => ['superadmin', 'admin']],
+        ]
+    ],
     ['type' => 'header', 'title' => 'HALAMAN PUBLIK'],
     [
         'type' => 'dropdown', 

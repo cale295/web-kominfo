@@ -4,7 +4,6 @@
 <?= $this->include('layouts/alerts') ?>
 
 <div class="container-fluid px-4">
-    <!-- Page Header -->
     <div class="d-flex align-items-center justify-content-between my-4">
         <div>
             <h1 class="h3 mb-0 text-gray-800 fw-bold">Profil & Tentang</h1>
@@ -16,8 +15,6 @@
         </ol>
     </div>
 
-
-
     <?php if (session()->getFlashdata('error')): ?>
         <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
             <div class="d-flex align-items-center">
@@ -28,7 +25,6 @@
         </div>
     <?php endif; ?>
 
-    <!-- Main Card -->
     <div class="card shadow border-0 rounded-3 mb-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-book-open me-2"></i>Daftar Konten</h6>
@@ -44,10 +40,8 @@
                     <thead class="bg-light text-secondary text-uppercase small fw-bold">
                         <tr>
                             <th class="text-center py-3" width="5%">No</th>
-                            <th class="py-3" width="15%">Kategori</th>
                             <th class="text-center py-3" width="10%">Gambar</th>
-                            <th class="py-3" width="30%">Judul & Konten</th>
-                            <th class="text-center py-3" width="10%">Status</th>
+                            <th class="py-3" width="45%">Judul & Konten</th> <th class="text-center py-3" width="10%">Status</th>
                             <th class="text-center py-3" width="10%">Urutan</th>
                             <th class="text-center py-3" width="15%">Aksi</th>
                         </tr>
@@ -55,7 +49,7 @@
                     <tbody>
                         <?php if (empty($profils)) : ?>
                             <tr>
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="6" class="text-center py-5">
                                     <div class="text-muted opacity-50 mb-2">
                                         <i class="fas fa-file-alt fa-3x"></i>
                                     </div>
@@ -67,11 +61,6 @@
                             <?php foreach ($profils as $index => $item) : ?>
                                 <tr>
                                     <td class="text-center fw-bold text-secondary"><?= $index + 1 ?></td>
-                                    <td>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2">
-                                            <?= esc(str_replace('_', ' ', strtoupper($item['section']))) ?>
-                                        </span>
-                                    </td>
                                     <td class="text-center">
                                         <?php if (!empty($item['image_url']) && file_exists($item['image_url'])): ?>
                                             <div class="position-relative d-inline-block rounded overflow-hidden shadow-sm border bg-light">
@@ -83,22 +72,15 @@
                                     </td>
                                     <td>
                                         <div class="fw-bold text-dark mb-1"><?= esc($item['title']) ?></div>
-                                        <div class="small text-muted text-truncate" style="max-width: 300px;">
+                                        <div class="small text-muted text-truncate" style="max-width: 350px;">
                                             <?= strip_tags($item['content']) ?>
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <?php if ($item['is_active'] == 1) : ?>
-                                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-2">Aktif</span>
-                                        <?php else : ?>
-                                            <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Non-Aktif</span>
-                                        <?php endif; ?>
+                                        <?= btn_toggle($item['id_tentang'], $item['is_active'], 'profil_tentang/toggle-status') ?>
                                     </td>
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark border"><?= esc($item['sorting']) ?></span>
-                                    </td>
-                                    <td class="text-center">
-                                    <?= btn_toggle($item['id_tentang'], $item['is_active'], 'profil_tentang/toggle-status') ?>
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center">
