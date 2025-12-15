@@ -171,8 +171,7 @@ function Navbar() {
         .map((parent: CategoryItemType) => ({
           ...parent,
           children: filtered.filter(
-            (child: CategoryItemType) =>
-              child.id_parent === parent.id_kategori
+            (child: CategoryItemType) => child.id_parent === parent.id_kategori
           ),
         }));
 
@@ -251,24 +250,24 @@ function Navbar() {
             className="d-flex flex-column align-items-center gap-3 header-row"
           >
             {isLoading ? (
-          <div className="hero-banner-loading">
-            <p>Memuat banner...</p>
-          </div>
-        ) : heroBanner ? (
-            <img
-              src={`${api.defaults.baseURL?.replace(
-                "/api",
-                ""
-              )}/uploads/banner/${heroBanner.image}`}
-              alt={heroBanner.title}
-              className="hero-banner-image"
-            />
-          )
-         : (
-          <div className="hero-banner-placeholder">
-            <p>Banner tidak tersedia</p>
-          </div>
-        )}
+              <div className="hero-banner-loading">
+                <p>Memuat banner...</p>
+              </div>
+            ) : heroBanner ? (
+              <img
+                src={`${api.defaults.baseURL?.replace(
+                  "/api",
+                  ""
+                )}/uploads/banner/${heroBanner.image}`}
+                alt={heroBanner.title}
+                 className="w-24"
+              style={{ width: "6rem" }}
+              />
+            ) : (
+              <div className="hero-banner-placeholder">
+                <p>Banner tidak tersedia</p>
+              </div>
+            )}
 
             <h1 className="font-bold text-lg leading-snug tracking-wide text-center text-white">
               DINAS KOMUNIKASI DAN INFORMATIKA <br /> KOTA TANGERANG
