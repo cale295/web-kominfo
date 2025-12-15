@@ -611,12 +611,6 @@ public function edit($id)
                     'required' => 'Kategori wajib dipilih minimal satu.'
                 ]
             ],
-            'tanggal' => [
-                'rules'  => 'required',
-                'errors' => [
-                    'required' => 'Tanggal wajib diisi.'
-                ],
-            ]
         ];
 
         // 4. Logika Validasi Gambar (Hanya jika upload baru)
@@ -803,7 +797,7 @@ if ($submitType === 'draft') {
             'additional_images' => json_encode($finalAdditionalImages, JSON_UNESCAPED_SLASHES),
             'slug'              => url_title($post['judul'], '-', true),
             'caption'           => $captionCover,
-            'tanggal'           => $post['tanggal'],
+            'tanggal'           => $post['tanggal'],null,
             'status'            => $status,
             'status_berita'     => $statusBerita,
             'updated_by_id'     => session()->get('id_user'),

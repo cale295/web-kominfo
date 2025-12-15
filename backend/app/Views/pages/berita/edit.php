@@ -468,13 +468,16 @@
         </div>
 
         <div class="action-buttons d-flex justify-content-end gap-2">
-            <a href="<?= site_url('berita') ?>" class="btn btn-secondary">
-                <i class="bi bi-x-circle"></i> Batal
-            </a>
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-save"></i> Update Berita
-            </button>
-        </div>
+    <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
+    
+    <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
+        <i class="bi bi-file-earmark-text"></i> Simpan Draft
+    </button>
+    
+    <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
+        <i class="bi bi-send"></i> Publikasikan
+    </button>
+</div>
     </form>
 </div>
 
