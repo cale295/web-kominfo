@@ -126,6 +126,10 @@ $routes->post('agenda_pelatihan/toggle-status', 'frontend\AgendaPelatihanControl
 // Ip Kerja Sama Daerah
 $routes->resource('ip_kerjasama_daerah', ['controller' => 'frontend\IpKerjasamaDaerahController', 'except' => ['show']]);
 $routes->post('ip_kerjasama_daerah/toggle-status', 'frontend\IpKerjasamaDaerahController::toggleStatus');
+// Pengumuman
+$routes->resource('pengumuman',['controller' => 'frontend\PengumumanController', 'expect' => ['show']]);
+$routes->post('pengumuman/toggle-status', 'frontend\PengumumanController::toggleStatus');
+
 
 
 // berita kategori
@@ -202,6 +206,10 @@ $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::upd
 // API ROUTES
 // =========================================================
 $routes->group('api', function ($routes) {
+
+    //Pengumanan
+    $routes->get('pengumuman', 'Api\ApiPengumumanController::index');
+    $routes->get('pengumuman/(:num)', 'Api\ApiPengumumanController::show/$1');
 
     //tugas fungsi
     $routes->get('tugasfungsi', 'Api\ApiTugasFungsiController::index');
