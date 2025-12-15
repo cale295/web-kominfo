@@ -1,271 +1,259 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?= $this->include('layouts/alerts') ?>
 
 <style>
     :root {
-        --primary-color: #2c3e50;
-        --secondary-color: #95a5a6;
-        --accent-color: #3498db;
+        --primary-soft: #eef2ff;
+        --primary-text: #4f46e5;
+        --success-soft: #ecfdf5;
+        --success-text: #059669;
+        --danger-soft: #fef2f2;
+        --danger-text: #dc2626;
+        --warning-soft: #fffbeb;
+        --warning-text: #d97706;
+        --info-soft: #eff6ff;
+        --info-text: #3b82f6;
     }
 
-    /* Header Styling */
-    .page-header {
-        background: white;
-        padding: 1.5rem 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        border-left: 5px solid var(--accent-color);
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    /* Gradient Title */
+    .text-gradient {
+        background: linear-gradient(45deg, #4e73df, #224abe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
-    /* Card Styling */
-    .card-table {
-        background: white;
+    /* Modern Card */
+    .card-modern {
         border: none;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        overflow: hidden;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
+    }
+
+    /* Soft Badges & Buttons */
+    .btn-soft-primary { background-color: var(--primary-soft); color: var(--primary-text); border: none; }
+    .btn-soft-primary:hover { background-color: #4f46e5; color: white; }
+    
+    .btn-soft-danger { background-color: var(--danger-soft); color: var(--danger-text); border: none; }
+    .btn-soft-danger:hover { background-color: #dc2626; color: white; }
+
+    /* Image Hover Effect */
+    .img-hover-zoom {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .img-hover-zoom:hover {
+        transform: scale(1.5);
+        z-index: 10;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        cursor: zoom-in;
     }
 
     /* Table Styling */
     .table thead th {
-        background-color: #f8f9fa;
-        color: var(--primary-color);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        border-bottom: 2px solid #eaecf0;
-        padding: 1rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        border-bottom: 2px solid #f3f4f6;
     }
-
-    .table tbody td {
-        padding: 1rem;
+    .table tbody tr td {
         vertical-align: middle;
-        border-bottom: 1px solid #f0f2f5;
+        padding: 1rem 0.75rem;
     }
-
-    /* Thumbnail Gallery Styling */
-    .gallery-thumb-wrapper {
-        width: 80px;
-        height: 80px;
-        border-radius: 8px;
-        overflow: hidden;
-        position: relative;
-        cursor: pointer;
-        border: 2px solid #f0f2f5;
-        transition: transform 0.2s;
-    }
-
-    .gallery-thumb-wrapper:hover {
-        transform: scale(1.05);
-        border-color: var(--accent-color);
-    }
-
-    .gallery-thumb {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Mencegah gambar gepeng */
-    }
-
-    /* Badge Album */
-    .badge-album {
-        background-color: #e3f2fd;
-        color: #1565c0;
-        padding: 5px 10px;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 0.85rem;
-        text-decoration: none;
-    }
-    .badge-album:hover {
-        background-color: #bbdefb;
-        color: #0d47a1;
-    }
-
-    /* Action Buttons */
-    .btn-action {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        transition: all 0.2s;
-        margin: 0 2px;
+    .table-hover tbody tr:hover {
+        background-color: #f9fafb;
     }
     
-    .btn-edit-custom { background-color: #fff3cd; color: #856404; }
-    .btn-edit-custom:hover { background-color: #ffeeba; }
-
-    .btn-delete-custom { background-color: #f8d7da; color: #721c24; }
-    .btn-delete-custom:hover { background-color: #f5c6cb; }
-
-    /* Empty State */
-    .empty-state {
-        padding: 4rem;
-        text-align: center;
-        color: #95a5a6;
+    .icon-wrapper {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        padding: 5px;
     }
 </style>
 
-<?= $this->include('layouts/alerts') ?>
-
-<div class="container-fluid py-4">
-
-    <div class="page-header">
-        <div>
-            <h3 class="m-0 fw-bold" style="color: var(--primary-color);">
-                <i class="bi bi-camera me-2"></i>Daftar Foto
-            </h3>
-            <p class="text-muted m-0 mt-1">Kelola semua materi foto dalam galeri Anda</p>
+<div class="container-fluid px-4 pb-5">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between my-4 py-2">
+        <div class="mb-3 mb-md-0">
+            <h1 class="h3 fw-bolder mb-1 text-gradient">Layanan Utama</h1>
+            <p class="text-muted small mb-0">
+                <i class="fas fa-th-large me-1 text-primary"></i> 
+                Kelola daftar layanan/shortcut yang tampil di halaman utama website.
+            </p>
         </div>
-        <div>
-            <a href="<?= site_url('gallery/new') ?>" class="btn btn-primary shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Upload Foto
-            </a>
-        </div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm mb-0 border">
+                <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none fw-bold text-primary small"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item active small" aria-current="page">Home Service</li>
+            </ol>
+        </nav>
     </div>
 
-    <div class="card card-table">
-        <div class="card-body p-0">
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger border-0 shadow-sm border-start border-4 border-danger rounded-3 fade show mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center justify-content-center bg-white text-danger me-3 shadow-sm rounded-circle" style="width: 32px; height: 32px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Terjadi Kesalahan!</h6>
+                    <small><?= session()->getFlashdata('error') ?></small>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="card card-modern">
+        <div class="card-header bg-white py-4 border-0 d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold text-dark mb-0">Daftar Layanan</h5>
+                <span class="text-muted small">Kelola shortcut aplikasi atau layanan publik</span>
+            </div>
             
-            <?php if (empty($gallery)): ?>
-                <div class="empty-state">
-                    <i class="bi bi-images display-4 mb-3 d-block text-secondary"></i>
-                    <h5>Belum ada foto</h5>
-                    <p>Mulai dengan mengupload foto pertama Anda.</p>
-                    <a href="<?= site_url('gallery/new') ?>" class="btn btn-outline-primary mt-2">Upload Sekarang</a>
-                </div>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th width="5%" class="text-center">No</th>
-                                <th width="12%">Preview</th>
-                                <th width="35%">Detail Foto</th>
-                                <th width="20%">Album</th>
-                                <th width="15%">Tanggal Upload</th>
-                                <th width="13%" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($gallery as $i => $row): ?>
-                            <tr>
-                                <td class="text-center fw-bold text-secondary"><?= $i + 1 ?></td>
-                                
-                                <td>
-                                    <?php if (!empty($row['file_path']) && file_exists('uploads/gallery/' . $row['file_path'])): ?>
-                                        <div class="gallery-thumb-wrapper shadow-sm" 
-                                             onclick="showImageModal('<?= base_url('uploads/gallery/' . $row['file_path']) ?>', '<?= esc($row['photo_title']) ?>')">
-                                            <img src="<?= base_url('uploads/gallery/' . $row['file_path']) ?>" 
-                                                 class="gallery-thumb" 
-                                                 alt="Thumbnail">
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="text-muted small p-2 bg-light rounded text-center">No File</div>
-                                    <?php endif; ?>
-                                </td>
-
-                                <td>
-                                    <div class="fw-bold text-dark mb-1"><?= esc($row['photo_title']) ?></div>
-                                    <div class="text-muted small text-truncate" style="max-width: 250px;">
-                                        <?= esc($row['deskripsi']) ?: '<em class="text-light">Tidak ada deskripsi</em>' ?>
-                                    </div>
-                                </td>
-
-                                <td>
-                                    <?php if($row['album_name']): ?>
-                                        <span class="badge-album">
-                                            <i class="bi bi-folder2-open me-1"></i><?= esc($row['album_name']) ?>
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="text-muted small">- Tanpa Album -</span>
-                                    <?php endif; ?>
-                                </td>
-
-                                <td>
-                                    <div class="d-flex align-items-center text-secondary">
-                                        <i class="bi bi-calendar3 me-2"></i>
-                                        <?= date('d M Y', strtotime($row['created_at'])) ?>
-                                    </div>
-                                </td>
-
-                                <td class="text-center">
-                                    <a href="<?= site_url('gallery/' . $row['id_photo'] . '/edit') ?>" 
-                                       class="btn-action btn-edit-custom" 
-                                       title="Edit Foto">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-
-                                    <form action="<?= site_url('gallery/' . $row['id_photo']) ?>" method="post" class="d-inline delete-form">
-                                        <?= csrf_field() ?>
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="button" class="btn-action btn-delete-custom btn-delete" title="Hapus Foto">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+            <?php if ($can_create): ?>
+                <a href="/home_service/new" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0 hover-scale">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Layanan
+                </a>
             <?php endif; ?>
         </div>
-    </div>
-</div>
 
-<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg bg-transparent">
-            <div class="modal-body p-0 position-relative text-center">
-                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                <img src="" id="modalImage" class="img-fluid rounded shadow" style="max-height: 85vh;">
-                <h5 class="mt-3 text-white text-shadow" id="modalCaption"></h5>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="datatablesSimple">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="text-center py-3 text-uppercase font-monospace" width="5%">No</th>
+                            <th class="text-center py-3 text-uppercase" width="10%">Icon</th>
+                            <th class="py-3 text-uppercase" width="25%">Nama Layanan</th>
+                            <th class="py-3 text-uppercase" width="25%">URL Tujuan</th>
+                            <th class="text-center py-3 text-uppercase" width="10%">Urutan</th>
+                            <th class="text-center py-3 text-uppercase" width="10%">Status</th>
+                            <th class="text-center py-3 text-uppercase" width="15%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($services)) : ?>
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="py-4">
+                                        <div class="mb-3 opacity-25">
+                                            <i class="fas fa-concierge-bell fa-4x text-secondary"></i>
+                                        </div>
+                                        <h6 class="fw-bold text-secondary">Belum ada layanan</h6>
+                                        <p class="small text-muted mb-0">Silakan tambahkan layanan baru untuk ditampilkan di beranda.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php else : ?>
+                            <?php foreach ($services as $index => $item) : ?>
+                                <tr>
+                                    <td class="text-center fw-bold text-muted"><?= $index + 1 ?></td>
+                                    
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <?php if (!empty($item['icon_image']) && file_exists($item['icon_image'])): ?>
+                                                <div class="icon-wrapper shadow-sm img-hover-zoom">
+                                                    <img src="<?= base_url($item['icon_image']) ?>" alt="Icon" style="width: 100%; height: 100%; object-fit: contain;">
+                                                </div>
+                                            <?php else: ?>
+                                                <span class="badge bg-light text-secondary border rounded-pill px-3 py-2">No Icon</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="fw-bold text-dark"><?= esc($item['title']) ?></div>
+                                        <div class="d-flex align-items-center text-muted small mt-1">
+                                            <i class="far fa-clock me-1 text-secondary" style="font-size: 0.7rem;"></i>
+                                            <span>Update: <?= date('d M Y', strtotime($item['updated_at'])) ?></span>
+                                        </div>
+                                    </td>
+                                    
+                                    <td>
+                                        <?php if ($item['link']): ?>
+                                            <a href="<?= esc($item['link']) ?>" target="_blank" 
+                                               class="btn btn-light btn-sm text-primary text-decoration-none border shadow-sm px-3 rounded-pill" 
+                                               style="font-size: 0.8rem; max-width: 250px;" 
+                                               data-bs-toggle="tooltip" title="Kunjungi URL">
+                                                <i class="fas fa-external-link-alt me-2"></i>
+                                                <span class="d-inline-block text-truncate align-middle" style="max-width: 150px;">
+                                                    <?= esc($item['link']) ?>
+                                                </span>
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted small fst-italic">- Tidak ada link -</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark border shadow-sm px-3 py-2 rounded-pill font-monospace" style="font-size: 0.85rem;">
+                                            <?= esc($item['sorting']) ?>
+                                        </span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center" data-bs-toggle="tooltip" title="Klik untuk mengubah status">
+                                            <?= btn_toggle($item['id_service'], $item['is_active'], 'home_service/toggle-status') ?>
+                                        </div>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <?php if ($can_update): ?>
+                                                <a href="/home_service/<?= $item['id_service'] ?>/edit" 
+                                                   class="btn btn-soft-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
+                                                   style="width: 32px; height: 32px;"
+                                                   data-bs-toggle="tooltip" title="Edit Layanan">
+                                                    <i class="fas fa-pen fa-xs"></i>
+                                                </a>
+                                            <?php endif; ?>
+
+                                            <?php if ($can_delete): ?>
+                                                <form action="/home_service/<?= $item['id_service'] ?>" method="post" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus layanan ini?');">
+                                                    <?= csrf_field() ?>
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <button type="submit" 
+                                                            class="btn btn-soft-danger btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
+                                                            style="width: 32px; height: 32px;"
+                                                            data-bs-toggle="tooltip" title="Hapus Permanen">
+                                                        <i class="fas fa-trash-alt fa-xs"></i>
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card-footer bg-white border-top-0 py-3">
+            <div class="d-flex align-items-center text-muted small">
+                <i class="fas fa-sort-numeric-down me-2 text-primary"></i>
+                <span>Gunakan kolom <strong>Urutan</strong> untuk mengatur posisi tampilan layanan di halaman utama.</span>
             </div>
         </div>
     </div>
 </div>
 
-<?= $this->endSection() ?>
-
-<?= $this->section('scripts') ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-    // 1. Script untuk Modal Preview Gambar
-    function showImageModal(src, title) {
-        document.getElementById('modalImage').src = src;
-        document.getElementById('modalCaption').innerText = title;
-        var myModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-        myModal.show();
-    }
-
-    // 2. Script untuk SweetAlert2 Delete
-    document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', function() {
-            const form = this.closest('.delete-form');
-            Swal.fire({
-                title: 'Hapus Foto?',
-                text: "Foto ini akan dihapus permanen dari galeri!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#95a5a6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
 </script>
+
 <?= $this->endSection() ?>

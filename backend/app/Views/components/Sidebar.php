@@ -62,6 +62,7 @@ $menuItems = [
             ['title' => 'Tag', 'url' => '/berita_tag', 'roles' => ['superadmin', 'admin']],
         ]
     ],
+    ['type' => 'header', 'title' => 'ProGRAM SKPD'],
     [
         'type' => 'dropdown', 
         'title' => 'Program SKPD', 
