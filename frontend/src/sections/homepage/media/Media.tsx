@@ -86,7 +86,6 @@ const Media: React.FC = () => {
       {mainVideo && (
         <div className="row mb-4">
           <div className="col-12">
-            <h4 className="mb-3">{mainVideo.title}</h4>
             <div className="ratio ratio-16x9">
               <iframe
                 src={convertToEmbedUrl(mainVideo.youtube_url)}
