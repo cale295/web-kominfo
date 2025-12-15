@@ -40,22 +40,11 @@ class PejabatStrukturalModel extends Model
             'label' => 'Status',
             'rules' => 'required|in_list[0,1]'
         ],
-        // Validasi gambar di handle manual di controller untuk update (agar bisa skip jika tidak ganti gambar)
-        // Namun kita definisikan aturan dasar di sini
-        'image' => [
-            'label' => 'Gambar Struktur',
-            'rules' => 'required|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]|max_size[image,5120]' // Max 5MB
-        ]
     ];
 
     protected $validationMessages = [
         'title' => [
             'required' => 'Judul wajib diisi.'
         ],
-        'image' => [
-            'is_image' => 'File yang diupload harus berupa gambar.',
-            'mime_in'  => 'Format gambar harus JPG, JPEG, atau PNG.',
-            'max_size' => 'Ukuran gambar maksimal 5MB.'
-        ]
     ];
 }
