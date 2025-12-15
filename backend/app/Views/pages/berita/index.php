@@ -162,97 +162,41 @@
         border: none;
     }
 
-    .gov-table .btn-warning {
-        background: var(--warning);
-        color: white;
-    }
+    .gov-table .btn-warning { background: var(--warning); color: white; }
+    .gov-table .btn-warning:hover { background: #b45309; transform: translateY(-1px); }
 
-    .gov-table .btn-warning:hover {
-        background: #b45309;
-        transform: translateY(-1px);
-    }
+    .gov-table .btn-danger { background: var(--danger); color: white; }
+    .gov-table .btn-danger:hover { background: #b91c1c; transform: translateY(-1px); }
 
-    .gov-table .btn-danger {
-        background: var(--danger);
-        color: white;
-    }
+    .gov-table .btn-info { background: var(--info); color: white; }
+    .gov-table .btn-info:hover { background: #0369a1; transform: translateY(-1px); }
 
-    .gov-table .btn-danger:hover {
-        background: #b91c1c;
-        transform: translateY(-1px);
-    }
-
-    .gov-table .btn-info {
-        background: var(--info);
-        color: white;
-    }
-
-    .gov-table .btn-info:hover {
-        background: #0369a1;
-        transform: translateY(-1px);
-    }
-
-    /* Content Preview */
     .content-preview {
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        line-height: 1.4;
+        max-width: 300px; overflow: hidden; text-overflow: ellipsis;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
-        .gov-header {
-            padding: 20px;
-        }
-        
-        .gov-header h1 {
-            font-size: 1.375rem;
-        }
-
-        .gov-table thead th,
-        .gov-table tbody td {
-            padding: 10px 12px;
-            font-size: 0.8125rem;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .action-buttons .btn {
-            width: 100%;
-        }
+        .gov-header { padding: 20px; }
+        .gov-header h1 { font-size: 1.375rem; }
+        .action-buttons { flex-direction: column; gap: 8px; }
+        .action-buttons .btn { width: 100%; }
     }
 
-    /* No Data State */
-    .no-data {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--gray-500);
-    }
+    .no-data { text-align: center; padding: 60px 20px; color: var(--gray-500); }
+    .no-data i { font-size: 4rem; color: var(--gray-300); margin-bottom: 16px; }
 
-    .no-data i {
-        font-size: 4rem;
-        color: var(--gray-300);
-        margin-bottom: 16px;
-    }
     /* Style Toggle Switch */
     .status-btn {
         background: none; border: none; padding: 0;
         display: flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity 0.3s;
     }
     .status-btn:hover { opacity: 0.8; }
-    .status-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .status-btn:disabled { cursor: not-allowed !important; opacity: 0.4; }
 
     .status-btn .switch {
         position: relative; width: 42px; height: 22px;
-        background-color: #cbd5e1; /* Warna mati (Gray-300) */
-        border-radius: 20px; transition: all 0.3s ease;
+        background-color: #cbd5e1; border-radius: 20px; transition: all 0.3s ease;
     }
     .status-btn .switch::after {
         content: ''; position: absolute; width: 18px; height: 18px;
@@ -261,7 +205,7 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
-    .status-btn .switch.active { background-color: #059669; /* Warna hidup (Success) */ }
+    .status-btn .switch.active { background-color: #059669; }
     .status-btn .switch.active::after { left: 22px; }
 
     .status-btn .switch-label {
@@ -276,10 +220,7 @@
 <div class="gov-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h1>
-                <i class="bi bi-newspaper"></i>
-                Daftar Berita
-            </h1>
+            <h1><i class="bi bi-newspaper"></i> Daftar Berita</h1>
         </div>
         <div class="action-buttons d-flex gap-2">
             <?php if (!empty($can_create)): ?>
@@ -311,9 +252,7 @@
                     </select>
                 </div>
             </div>
-            
             <div class="col-md-6"></div>
-
             <div class="col-md-4">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white border-end-0 text-muted">
@@ -341,13 +280,14 @@
                         <th>Konten 2</th>
                         <th>Kategori</th>
                         <th>Tags</th>
+                        <th>Tanggal Tayang</th>
                         <th class="text-center">Status Tayang</th>
                         <th class="text-center">Status Berita</th>
                         <th>Dibuat Oleh</th>
                         <th class="text-center">Waktu Dibuat</th>
                         <th>Diupdate Oleh</th>
                         <th class="text-center">Update Terakhir</th>
-                        <th>dilihat</th>
+                        <th>Dilihat</th>
                         <th>Status</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -364,14 +304,17 @@
                         </tr>
                     <?php else: ?>
                         <?php foreach ($berita as $i => $row): ?>
+                            <?php 
+                                // LOGIKA KONDISI
+                                $isTayang = ($row['status'] == '1');
+                                $isDraft  = ($row['status'] != '1' && $row['status'] != '5');
+                            ?>
                             <tr class="data-row">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
                                 <td class="text-center">
                                     <?php if (!empty($row['feat_image'])): ?>
-                                        <img src="<?= base_url($row['feat_image']) ?>"
-                                             alt="Cover" class="img-thumbnail"
-                                             style="width:80px;height:60px;object-fit:cover;">
+                                        <img src="<?= base_url($row['feat_image']) ?>" alt="Cover" class="img-thumbnail" style="width:80px;height:60px;object-fit:cover;">
                                     <?php else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
@@ -381,93 +324,56 @@
                                     <?php
                                     $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
                                     $hasValidImage = false;
-
                                     if (!empty($additional)):
                                         foreach ($additional as $img):
-                                            $pathGambar = '';
-                                            $captionTooltip = '';
-
-                                            if (is_array($img)) {
-                                                $pathGambar = $img['path'] ?? '';
-                                                $captionTooltip = $img['caption'] ?? '';
-                                            } else {
-                                                $pathGambar = $img;
-                                            }
-
+                                            $pathGambar = is_array($img) ? ($img['path'] ?? '') : $img;
+                                            $captionTooltip = is_array($img) ? ($img['caption'] ?? '') : '';
                                             if (empty($pathGambar)) continue;
                                             $filePath = FCPATH . ltrim($pathGambar, '/');
                                             if (!file_exists($filePath)) continue;
                                             $hasValidImage = true; 
                                             ?>
-                                            <img src="<?= base_url($pathGambar) ?>"
-                                                 alt="Foto Tambahan"
-                                                 title="<?= esc($captionTooltip) ?>"
-                                                 class="img-thumbnail mb-1"
-                                                 style="width:50px;height:40px;object-fit:cover;cursor:help;">
+                                            <img src="<?= base_url($pathGambar) ?>" alt="Foto Tambahan" title="<?= esc($captionTooltip) ?>" class="img-thumbnail mb-1" style="width:50px;height:40px;object-fit:cover;cursor:help;">
                                         <?php endforeach;
-                                        if (!$hasValidImage): ?>
-                                            <span class="text-muted">-</span>
-                                        <?php endif;
+                                        if (!$hasValidImage): ?><span class="text-muted">-</span><?php endif;
                                     else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
 
-                                <td style="min-width: 200px;">
-                                    <strong class="searchable"><?= esc($row['judul']) ?></strong>
-                                </td>
-
+                                <td style="min-width: 200px;"><strong class="searchable"><?= esc($row['judul']) ?></strong></td>
                                 <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
+                                <td><div class="content-preview"><?= strip_tags($row['content']) ?></div></td>
+                                <td><div class="content-preview"><?= strip_tags($row['content2'] ?? '-') ?></div></td>
 
                                 <td>
-                                    <div class="content-preview">
-                                        <?= strip_tags($row['content']) ?>
-                                    </div>
+                                    <?php if (!empty($row['kategori'])): ?>
+                                        <?php foreach ($row['kategori'] as $katName): ?>
+                                            <span class="badge bg-secondary me-1 mb-1"><?= esc($katName) ?></span>
+                                        <?php endforeach; ?>
+                                    <?php else: ?><span class="text-muted">-</span><?php endif; ?>
                                 </td>
 
                                 <td>
-                                    <div class="content-preview">
-                                        <?= strip_tags($row['content2'] ?? '-') ?>
-                                    </div>
+                                    <?php if (!empty($row['tags'])): ?>
+                                        <?php foreach ($row['tags'] as $tag): ?>
+                                            <span class="badge bg-secondary me-1 mb-1"><?= esc($tag) ?></span>
+                                        <?php endforeach; ?>
+                                    <?php else: ?><span class="text-muted">-</span><?php endif; ?>
                                 </td>
-
                                 <td>
-                                    <?php
-                                    if (!empty($row['kategori'])) {
-                                        foreach ($row['kategori'] as $katName) {
-                                            echo '<span class="badge bg-secondary me-1 mb-1">' . esc($katName) . '</span>';
-                                        }
-                                    } else {
-                                        echo '<span class="text-muted">-</span>';
-                                    }
-                                    ?>
-                                </td>
-
-                                <td>
-                                    <?php
-                                    if (!empty($row['tags'])) {
-                                        foreach ($row['tags'] as $tag) {
-                                            echo '<span class="badge bg-secondary me-1 mb-1">' . esc($tag) . '</span>';
-                                        }
-                                    } else {
-                                        echo '<span class="text-muted">-</span>';
-                                    }
-                                    ?>
+                                    <?php if (!empty($row['tanggal'])): ?>
+                                        <?= date('d M Y', strtotime($row['tanggal'])) ?>
+                                    <?php else: ?><span class="text-muted">-</span><?php endif; ?>
                                 </td>
 
                                 <td class="text-center">
                                     <?php if ($row['status'] == '1'): ?>
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle"></i> Tayang
-                                        </span>
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Tayang</span>
                                     <?php elseif ($row['status'] == '5'): ?>
-                                        <span class="badge bg-secondary">
-                                            <i class="bi bi-x-circle"></i> Tidak Tayang
-                                        </span>
+                                        <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Tidak Tayang</span>
                                     <?php else: ?>
-                                        <span class="badge bg-warning">
-                                            <i class="bi bi-clock"></i> Draft
-                                        </span>
+                                        <span class="badge bg-warning"><i class="bi bi-clock"></i> Draft</span>
                                     <?php endif; ?>
                                 </td>
 
@@ -482,50 +388,36 @@
                                     ];
                                     [$class, $text, $icon] = $statusBerita[$row['status_berita']] ?? ['bg-secondary', '-', 'question-circle'];
                                     ?>
-                                    <span class="badge <?= $class ?>">
-                                        <i class="bi bi-<?= $icon ?>"></i> <?= $text ?>
-                                    </span>
+                                    <span class="badge <?= $class ?>"><i class="bi bi-<?= $icon ?>"></i> <?= $text ?></span>
                                 </td>
 
                                 <td class="searchable"><?= esc($row['created_by_name'] ?? '-') ?></td>
-
-                                <td class="text-center" style="white-space: nowrap;">
-                                    <?= !empty($row['created_at']) ? date('d M Y H:i', strtotime($row['created_at'])) : '-' ?>
-                                </td>
-
+                                <td class="text-center" style="white-space: nowrap;"><?= !empty($row['created_at']) ? date('d M Y H:i', strtotime($row['created_at'])) : '-' ?></td>
                                 <td><?= esc($row['updated_by_name'] ?? '-') ?></td>
-
-                                <td class="text-center" style="white-space: nowrap;">
-                                    <?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?>
-                                </td>
-
+                                <td class="text-center" style="white-space: nowrap;"><?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?></td>
                                 <td><?= esc($row['hit'] ?? '-') ?></td>
                                 
                                 <td class="text-center">
                                     <button type="button" class="status-btn" 
                                             data-id="<?= $row['id_berita'] ?>" 
-                                            data-url="<?= site_url('berita/toggle-status') ?>"> <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
-                                        <span class="switch-label">
-                                            <?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?>
-                                        </span>
+                                            data-url="<?= site_url('berita/toggle-status') ?>"
+                                            <?= $isDraft ? 'disabled title="Draft tidak dapat diaktifkan"' : '' ?>> 
+                                        <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
+                                        <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
                                     </button>
                                 </td>
                                 
                                 <td class="text-center" style="white-space: nowrap;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
-                                            <a href="<?= site_url('berita/show/' . $row['slug']) ?>" class="btn btn-info">
-                                                <i class="bi bi-eye"></i> Lihat
-                                            </a>
+                                            <a href="<?= site_url('berita/show/' . $row['slug']) ?>" class="btn btn-info"><i class="bi bi-eye"></i> Lihat</a>
                                         <?php endif; ?>
                                         
                                         <?php if (!empty($can_update)): ?>
-                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning">
-                                                <i class="bi bi-pencil"></i> Edit
-                                            </a>
+                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
                                         <?php endif; ?>
 
-                                        <?php if (!empty($can_delete)): ?>
+                                        <?php if (!empty($can_delete) && !$isTayang): ?>
                                             <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post">
                                                 <?= csrf_field() ?>
                                                 <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Yakin membuang berita ini ke sampah?')">
@@ -533,9 +425,8 @@
                                                 </button>
                                             </form>
                                         <?php endif; ?>
-                                        <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" class="btn btn-info btn-sm">
-                                            <i class="bi bi-journal-text"></i> Log
-                                        </a>
+
+                                        <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" class="btn btn-info btn-sm"><i class="bi bi-journal-text"></i> Log</a>
                                     </div>
                                 </td>
                             </tr>
@@ -558,8 +449,6 @@ $(document).on('click', '.status-btn', function () {
     let url = btn.data('url'); 
     let switchEl = btn.find('.switch');
     let labelEl = btn.find('.switch-label');
-    
-    // Ambil Token CSRF
     let csrfName = '<?= csrf_token() ?>';
     let csrfHash = $('input[name="'+csrfName+'"]').val(); 
 
@@ -567,21 +456,17 @@ $(document).on('click', '.status-btn', function () {
     btn.css('opacity', '0.5');
 
     $.ajax({
-        url: url,
-        type: "POST",
+        url: url, type: "POST",
         data: { id: id, [csrfName]: csrfHash },
         dataType: "json",
         success: function(res) {
             btn.prop('disabled', false);
             btn.css('opacity', '1');
-            
             if (res.status === 'success') {
                 if (res.newStatus == 1) {
-                    switchEl.addClass('active');
-                    labelEl.text('Aktif');
+                    switchEl.addClass('active'); labelEl.text('Aktif');
                 } else {
-                    switchEl.removeClass('active');
-                    labelEl.text('Non-Aktif');
+                    switchEl.removeClass('active'); labelEl.text('Non-Aktif');
                 }
                 $('input[name="'+csrfName+'"]').val(res.token);
             } else {
@@ -589,70 +474,53 @@ $(document).on('click', '.status-btn', function () {
                 if(res.token) $('input[name="'+csrfName+'"]').val(res.token);
             }
         },
-        error: function(xhr, status, error) {
-            btn.prop('disabled', false);
-            btn.css('opacity', '1');
-            console.error(error);
+        error: function() {
+            btn.prop('disabled', false); btn.css('opacity', '1');
             alert('Terjadi kesalahan koneksi ke server.');
         }
     });
 });
 
-// --- Script Search & Filter Limit ---
+// --- Script Search & Filter ---
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const limitSelect = document.getElementById('limitSelect');
     const tableBody = document.getElementById('tableBody');
-    const rows = Array.from(tableBody.querySelectorAll('tr.data-row')); // Ambil semua baris data
+    const rows = Array.from(tableBody.querySelectorAll('tr.data-row'));
     const totalDataSpan = document.getElementById('totalData');
     const showingStartSpan = document.getElementById('showingStart');
     const showingEndSpan = document.getElementById('showingEnd');
 
-    // Filter Logic
     function filterTable() {
         const searchTerm = searchInput.value.toLowerCase();
         const limit = parseInt(limitSelect.value);
         let visibleCount = 0;
         let totalFiltered = 0;
 
-        // 1. Filter Search First
-        const filteredRows = rows.filter(row => {
-            // Cari hanya di kolom yang punya class .searchable (Judul, Topik, Penulis)
-            // atau cari di seluruh text content row jika ingin lebih luas
+        rows.forEach(row => {
             const textContent = row.textContent.toLowerCase();
-            return textContent.includes(searchTerm);
-        });
-
-        // 2. Hide All Rows First
-        rows.forEach(row => row.style.display = 'none');
-
-        // 3. Show Filtered Rows based on Limit
-        filteredRows.forEach((row, index) => {
-            totalFiltered++;
-            if (limit === -1 || visibleCount < limit) {
-                row.style.display = '';
-                // Update nomor urut agar tetap rapih (opsional, kalau mau nomornya urut ulang)
-                // row.querySelector('.row-number').textContent = visibleCount + 1;
-                visibleCount++;
+            const matchesSearch = textContent.includes(searchTerm);
+            
+            if (matchesSearch) {
+                totalFiltered++;
+                if (limit === -1 || visibleCount < limit) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            } else {
+                row.style.display = 'none';
             }
         });
 
-        // Update Info Pagination Sederhana
-        if (totalFiltered > 0) {
-            showingStartSpan.textContent = 1;
-            showingEndSpan.textContent = visibleCount;
-        } else {
-            showingStartSpan.textContent = 0;
-            showingEndSpan.textContent = 0;
-        }
+        showingStartSpan.textContent = totalFiltered > 0 ? 1 : 0;
+        showingEndSpan.textContent = visibleCount;
         totalDataSpan.textContent = totalFiltered;
     }
 
-    // Event Listeners
     searchInput.addEventListener('keyup', filterTable);
     limitSelect.addEventListener('change', filterTable);
-
-    // Initial Load
     filterTable();
 });
 </script>

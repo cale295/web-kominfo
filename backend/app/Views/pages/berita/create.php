@@ -373,13 +373,25 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
             </div>
         </div>
 
+        <div class="mb-3">
+            <label for="form-laber">tanggal</label>
+            <input type="date" name="tanggal" class="form-control" value="<?= old('tanggal') ?>">
+        </div>
+
         <input type="hidden" name="status" value="0">
         <input type="hidden" name="status_berita" value="2">
 
-        <div class="action-buttons d-flex justify-content-end gap-2">
-            <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
-            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Simpan Berita</button>
-        </div>
+<div class="action-buttons d-flex justify-content-end gap-2">
+    <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
+    
+    <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
+        <i class="bi bi-file-earmark-text"></i> Simpan Draft
+    </button>
+    
+    <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
+        <i class="bi bi-send"></i> Publikasikan
+    </button>
+</div>
     </form>
 </div>
 

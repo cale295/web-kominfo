@@ -292,6 +292,12 @@ public function new()
                     'required' => 'Kategori wajib dipilih minimal satu.'
                 ]
             ],
+            'tanggal' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Tanggal wajib diisi.'
+                ],
+            ],
             'sumber' => [
                 'rules'  => 'required|max_length[255]',
                 'errors' => [
@@ -301,11 +307,11 @@ public function new()
 // Tambahkan ini di dalam array $rules
             'additional_images' => [
                 // 'required' adalah kuncinya agar tidak wajib diisi
-                'rules'  => 'required', 
+                'rules'  => 'permit_empty', 
             ],
             // Jika ingin memvalidasi file hanya jika user mengupload (opsional tapi divalidasi):
-            'additional_images.*' => [
-                'rules'  => 'required|max_size[additional_images,2048]|is_image[additional_images]|mime_in[additional_images,image/jpg,image/jpeg,image/png]',
+            'additional_images.' => [
+                'rules'  => 'permit_empty|max_size[additional_images,2048]|is_image[additional_images]|mime_in[additional_images,image/jpg,image/jpeg,image/png]',
                 'errors' => [
                     'max_size' => 'Ukuran foto tambahan maksimal 2MB.',
                     'is_image' => 'File tambahan harus berupa gambar.',
@@ -400,7 +406,17 @@ public function new()
                 }
             }
         }
-
+        
+$post = $this->request->getPost();
+// --- LOGIKA DRAFT BARU ---
+$submitType = $this->request->getPost('submit_type');
+if ($submitType === 'draft') {
+    $status       = '5'; // Status Aktif/Non-aktif (biasanya untuk toggle di index)
+    $statusBerita = 0;   // Sesuai permintaan: Draft = 0
+} else {
+    $status       = '1'; // Status Aktif
+    $statusBerita = 4;   // Sesuai permintaan: Publikasi = 4
+}
         // 3. SIMPAN DATA
  $post = $this->request->getPost();
 $kategoriIds = is_array($post['id_kategori']) ? $post['id_kategori'] : explode(',', $post['id_kategori']);
@@ -415,40 +431,39 @@ if (is_string($tagsIds) && !empty($tagsIds)) {
 }
 $idTagsUtama = !empty($tagsIds) ? $tagsIds[0] : null;
 // ... (kode sebelumnya)
-    $data = [
-        'judul'             => $post['judul'],
-        'topik'             => $post['topik'],
-        'intro'             => $post['intro'],
-        'sumber'            => $post['sumber'],
-        'content'           => $post['content'],
-        'content2'          => $post['content2'],
-        'id_kategori'       => $idKategori,
-        'id_tags'           => $idTagsUtama, // ✅ TAMBAHKAN BARIS INI
-        'link_video'        => $post['link_video'] ?? null,
-        'keyword'           => $post['keyword'] ?? null,
-        'feat_image'        => $featImagePath,
-        
-        // --- TAMBAHKAN BAGIAN INI ---
-        'id_berita_terkait'  => !empty($post['id_berita_terkait']) ? $post['id_berita_terkait'] : null,
-        'id_berita_terkait2' => !empty($post['id_berita_terkait2']) ? $post['id_berita_terkait2'] : null,
-        // -----------------------------
+   $data = [
+    'judul'             => $post['judul'],
+    'topik'             => $post['topik'],
+    'intro'             => $post['intro'],
+    'sumber'            => $post['sumber'],
+    'content'           => $post['content'],
+    'content2'          => $post['content2'],
+    'id_kategori'       => $idKategori,
+    'id_tags'           => $idTagsUtama,
+    'link_video'        => $post['link_video'] ?? null,
+    'keyword'           => $post['keyword'] ?? null,
+    'feat_image'        => $featImagePath,
+    'id_berita_terkait'  => !empty($post['id_berita_terkait']) ? $post['id_berita_terkait'] : null,
+    'id_berita_terkait2' => !empty($post['id_berita_terkait2']) ? $post['id_berita_terkait2'] : null,
+    'caption'           => $post['caption_cover'] ?? null, 
+    'additional_images' => !empty($additionalData) ? json_encode($additionalData) : null,
+    'slug'              => url_title($post['judul'], '-', true),
+    'hash_berita'       => bin2hex(random_bytes(16)),
+    
+    // --- GUNAKAN VARIABEL DINAMIS DI SINI ---
+    'status'            => $status,
+    'status_berita'     => $statusBerita,
+    
+    'tanggal'           => $post['tanggal'] ?? date('Y-m-d'),
+    'created_by_id'     => session()->get('id_user'),
+    'created_by_role'   => session()->get('role'),
+    'created_by_name'   => session()->get('username'),
+    'created_at'        => date('Y-m-d H:i:s')
+];
 
-        'caption'           => $post['caption_cover'] ?? null, 
-        'additional_images' => !empty($additionalData) ? json_encode($additionalData) : null,
-        'slug'              => url_title($post['judul'], '-', true),
-        'hash_berita'       => bin2hex(random_bytes(16)),
-        'status'            => '5',
-        'status_berita'     => 0,
-        'created_by_id'     => session()->get('id_user'),
-        'created_by_role'   => session()->get('role'),
-        'created_by_name'   => session()->get('username'),
-        'created_at'        => date('Y-m-d H:i:s')
-    ];
-    // ... (kode selanjutnya)
-
-        if (!$this->beritaModel->save($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
-        }
+if (!$this->beritaModel->save($data)) {
+    return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
+}
 
         $idBerita = $this->beritaModel->getInsertID();
    if (!empty($kategoriIds)) {
@@ -464,7 +479,8 @@ if (is_string($tagsIds) && !empty($tagsIds)) {
 } elseif (!is_array($tagsIds)) {
     $tagsIds = [];
 }
-
+$message = ($submitType === 'draft') ? 'Berita berhasil disimpan sebagai draft.' : 'Berita berhasil dipublikasikan.';
+return redirect()->to('/berita')->with('success', $message);
 // ✅ GANTI BAGIAN INI JUGA
 if (!empty($tagsIds)) {
     $this->beritaModel->saveTagsBerita($idBerita, $tagsIds);
@@ -595,6 +611,12 @@ public function edit($id)
                     'required' => 'Kategori wajib dipilih minimal satu.'
                 ]
             ],
+            'tanggal' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Tanggal wajib diisi.'
+                ],
+            ]
         ];
 
         // 4. Logika Validasi Gambar (Hanya jika upload baru)
@@ -737,6 +759,14 @@ public function edit($id)
             }
         }
 
+        $submitType = $this->request->getPost('submit_type');
+if ($submitType === 'draft') {
+    $status       = '1';
+    $statusBerita = 0;
+} else {
+    $status       = '1';
+    $statusBerita = 4;
+}
 
         // 7. PERSIAPAN DATA SAVE
         // ----------------------
@@ -773,8 +803,9 @@ public function edit($id)
             'additional_images' => json_encode($finalAdditionalImages, JSON_UNESCAPED_SLASHES),
             'slug'              => url_title($post['judul'], '-', true),
             'caption'           => $captionCover,
-            'status'            => $post['status'] ?? 0,
-            'status_berita'     => $post['status_berita'] ?? 0,
+            'tanggal'           => $post['tanggal'],
+            'status'            => $status,
+            'status_berita'     => $statusBerita,
             'updated_by_id'     => session()->get('id_user'),
             'updated_by_name'   => session()->get('username'),
             'updated_at'        => date('Y-m-d H:i:s'),
@@ -1007,32 +1038,127 @@ public function edit($id)
         $this->beritaLogModel->insert($logData);
     }
     
-    public function log($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_read']) {
-            return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin melihat log berita.');
+public function log($id)
+{
+    $access = $this->getAccess(session()->get('role'));
+    if (!$access || !$access['can_read']) {
+        return redirect()->to('/berita')->with('error', 'Kamu tidak punya izin melihat log berita.');
+    }
+
+    $berita = $this->beritaModel->find($id);
+    if (!$berita) {
+        return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+    }
+
+    // ✅ AMBIL SEMUA LOG (TAMPILKAN SEMUA PERUBAHAN STATUS BERITA)
+    $logs = $this->beritaLogModel
+        ->select('t_berita_log.*, m_users.full_name') 
+        ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left') 
+        ->where('t_berita_log.id_berita', $id)
+        ->orderBy('t_berita_log.created_date', 'DESC') // ✅ TERBARU DI ATAS
+        ->findAll();
+
+    // ✅ PROSES DATA UNTUK MENDETEKSI PERUBAHAN STATUS_BERITA & KONTEN
+    // Data dari query sudah DESC (terbaru ke terlama)
+    $processedLogs = [];
+    $nextLog = null; // ✅ Gunakan nextLog karena kita loop dari terbaru
+
+    foreach ($logs as $index => $log) {
+        $currentData = json_decode($log['log'], true);
+        
+        // ✅ INISIALISASI SEMUA VARIABEL DI AWAL
+        $changes = [];
+        $statusBeritaChanged = false;
+        $statusBeritaChangeInfo = null;
+        
+        // ✅ Bandingkan dengan log BERIKUTNYA (yang lebih lama)
+        if ($nextLog !== null) {
+            $nextData = json_decode($nextLog['log'], true);
+            
+            // ✅ CEK PERUBAHAN STATUS_BERITA (0=Draft, 4=Layak Tayang)
+            $currentStatusBerita = $currentData['status_berita'] ?? 0;
+            $nextStatusBerita = $nextData['status_berita'] ?? 0;
+            
+            if ($currentStatusBerita != $nextStatusBerita) {
+                $statusBeritaChanged = true;
+                $statusBeritaChangeInfo = [
+                    'from' => $nextStatusBerita, // dari yang lama
+                    'to' => $currentStatusBerita  // ke yang baru
+                ];
+            }
+            
+            // Bandingkan field-field penting (hanya jika status berubah atau perlu tracking detail)
+            $fieldsToCompare = [
+                'judul' => 'Judul',
+                'intro' => 'Intro',
+                'content' => 'Konten',
+                'content2' => 'Konten Tambahan',
+                'topik' => 'Topik',
+                'sumber' => 'Sumber',
+                'keyword' => 'Keyword',
+                'feat_image' => 'Foto Cover',
+                'link_video' => 'Link Video',
+                'caption' => 'Caption Cover'
+            ];
+
+            foreach ($fieldsToCompare as $field => $label) {
+                $currentValue = $currentData[$field] ?? '';
+                $nextValue = $nextData[$field] ?? '';
+                
+                if ($currentValue != $nextValue) {
+                    $changes[] = [
+                        'field' => $label,
+                        'old' => $nextValue,      // yang lama
+                        'new' => $currentValue     // yang baru
+                    ];
+                }
+            }
+
+            // Cek perubahan kategori
+            $currentKategori = $currentData['kategori_berita'] ?? [];
+            $nextKategori = $nextData['kategori_berita'] ?? [];
+            
+            $currentKatNames = array_column($currentKategori, 'kategori');
+            $nextKatNames = array_column($nextKategori, 'kategori');
+            
+            if ($currentKatNames != $nextKatNames) {
+                $changes[] = [
+                    'field' => 'Kategori',
+                    'old' => implode(', ', $nextKatNames),
+                    'new' => implode(', ', $currentKatNames)
+                ];
+            }
+
+            // Cek perubahan galeri foto
+            $currentGaleri = $currentData['galeri_foto'] ?? [];
+            $nextGaleri = $nextData['galeri_foto'] ?? [];
+            
+            if (count($currentGaleri) != count($nextGaleri)) {
+                $changes[] = [
+                    'field' => 'Galeri Foto',
+                    'old' => count($nextGaleri) . ' foto',
+                    'new' => count($currentGaleri) . ' foto'
+                ];
+            }
         }
 
-        $berita = $this->beritaModel->find($id);
-        if (!$berita) return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
+        $processedLogs[] = [
+            'log' => $log,
+            'data' => $currentData,
+            'changes' => $changes,
+            'hasChanges' => !empty($changes),
+            'statusBeritaChanged' => $statusBeritaChanged ?? false,
+            'statusBeritaChangeInfo' => $statusBeritaChangeInfo ?? null,
+            'currentStatusBerita' => $currentData['status_berita'] ?? 0
+        ];
 
-// Pastikan sesuaikan nama tabel dan nama kolom ID-nya
-                $logs = $this->beritaLogModel
-                    // 1. Pilih semua data log, DAN full_name dari tabel users
-                    ->select('t_berita_log.*, m_users.full_name') 
-                    
-                    // 2. Sambungkan (Join) ke tabel users
-                    // Asumsi: tabel log punya kolom 'id_user' yang nyambung ke 'id' di tabel users
-                    ->join('m_users', 'm_users.id_user = t_berita_log.id_user', 'left') 
-                    
-                    ->where('id_berita', $id)
-                    ->orderBy('t_berita_log.created_date', 'DESC')
-                    ->findAll();
-                        return view('pages/berita/logs', [
-                            'title' => 'Log Berita',
-                            'berita' => $berita,
-                            'logs' => $logs
-                        ]);
-                    }
+        $nextLog = $log; // ✅ Simpan log saat ini untuk dibandingkan di iterasi berikutnya
+    }
+
+    return view('pages/berita/logs', [
+        'title' => 'Riwayat Perubahan Status Berita',
+        'berita' => $berita,
+        'logs' => $processedLogs // ✅ Sudah urut DESC: Terbaru di atas
+    ]);
+}
 }

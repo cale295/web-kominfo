@@ -23,7 +23,7 @@ protected $allowedFields = [
     'dokumen_title', 'dokumen_duo_title', 'dokumen_tigo_title', 'dokumen_quatro_title',
     'dokumen', 'dokumen_duo', 'dokumen_tigo', 'dokumen_quatro',
     'old_berita', 'note', 'note_revisi', 'trash','id_tags',
-    'additional_images'  // ✅ tambahkan ini
+    'additional_images','tanggal' // ✅ tambahkan ini
 ];
 
 

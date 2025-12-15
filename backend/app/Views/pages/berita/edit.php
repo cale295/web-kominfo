@@ -423,7 +423,14 @@
                        placeholder="Contoh: Kompas.com, Detik, Internal" 
                        value="<?= esc(old('sumber', $berita['sumber'])) ?>">
             </div>
+
+            <div class="mb-3">
+                <label for="form-label">Tanggal</label>
+                <input type="date" name="tanggal" class="form-control" value="<?= esc(old('tanggal', $berita['tanggal'])) ?>">
+            </div>
         </div>
+
+        
 
         <div class="form-section">
             <div class="section-title"><i class="bi bi-gear"></i> Status & Catatan Admin</div>
