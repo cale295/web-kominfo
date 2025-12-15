@@ -295,7 +295,7 @@
                 <tbody id="tableBody">
                     <?php if (empty($berita)): ?>
                         <tr>
-                            <td colspan="18">
+                            <td colspan="19">
                                 <div class="no-data">
                                     <i class="bi bi-inbox"></i>
                                     <p class="mb-0">Belum ada data berita</p>
@@ -398,35 +398,54 @@
                                 <td><?= esc($row['hit'] ?? '-') ?></td>
                                 
                                 <td class="text-center">
-                                    <button type="button" class="status-btn" 
-                                            data-id="<?= $row['id_berita'] ?>" 
-                                            data-url="<?= site_url('berita/toggle-status') ?>"
-                                            <?= $isDraft ? 'disabled title="Draft tidak dapat diaktifkan"' : '' ?>> 
-                                        <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
-                                        <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
-                                    </button>
+                                    <?php if ($isDraft): ?>
+                                        <span class="text-muted">-</span>
+                                    <?php else: ?>
+                                        <button type="button" class="status-btn" 
+                                                data-id="<?= $row['id_berita'] ?>" 
+                                                data-url="<?= site_url('berita/toggle-status') ?>"> 
+                                            <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
+                                            <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
+                                        </button>
+                                    <?php endif; ?>
                                 </td>
                                 
                                 <td class="text-center" style="white-space: nowrap;">
                                     <div class="d-flex flex-column gap-1">
-                                        <?php if (!empty($can_read)): ?>
-                                            <a href="<?= site_url('berita/show/' . $row['slug']) ?>" class="btn btn-info"><i class="bi bi-eye"></i> Lihat</a>
-                                        <?php endif; ?>
-                                        
-                                        <?php if (!empty($can_update)): ?>
-                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
-                                        <?php endif; ?>
+                                        <?php if ($isDraft): ?>
+                                            <?php if (!empty($can_update)): ?>
+                                                <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+                                            <?php endif; ?>
 
-                                        <?php if (!empty($can_delete) && !$isTayang): ?>
-                                            <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Yakin membuang berita ini ke sampah?')">
-                                                    <i class="bi bi-trash"></i> Trash
-                                                </button>
-                                            </form>
-                                        <?php endif; ?>
+                                            <?php if (!empty($can_delete)): ?>
+                                                <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Yakin membuang berita ini ke sampah?')">
+                                                        <i class="bi bi-trash"></i> Trash
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
 
-                                        <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" class="btn btn-info btn-sm"><i class="bi bi-journal-text"></i> Log</a>
+                                        <?php else: ?>
+                                            <?php if (!empty($can_read)): ?>
+                                                <a href="<?= site_url('berita/show/' . $row['slug']) ?>" class="btn btn-info"><i class="bi bi-eye"></i> Lihat</a>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (!empty($can_update)): ?>
+                                                <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+                                            <?php endif; ?>
+
+                                            <?php if (!empty($can_delete) && !$isTayang): ?>
+                                                <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Yakin membuang berita ini ke sampah?')">
+                                                        <i class="bi bi-trash"></i> Trash
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+
+                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" class="btn btn-info btn-sm"><i class="bi bi-journal-text"></i> Log</a>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
