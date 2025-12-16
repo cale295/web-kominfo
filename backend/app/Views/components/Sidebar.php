@@ -44,6 +44,7 @@ $menuItems = [
             ['title' => 'Layanan', 'url' => '/home_service', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Video Layanan', 'url' => '/home_video_layanan', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Agenda', 'url' => '/agenda', 'roles' => ['superadmin', 'admin']],
+            ['title' => 'Pengumuman', 'url' => '/pengumuman', 'roles' => ['superadmin', 'admin']],
             ['title' => 'Pejabat Publik', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin']],
         ]
     ],

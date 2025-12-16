@@ -2,169 +2,120 @@
 
 <?= $this->section('styles') ?>
 <style>
-    /* Enhanced Modern Styling */
+    /* Simple Clean Styling */
     :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        --danger-gradient: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        --primary-color: #2563eb;
+        --border-color: #e5e7eb;
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --bg-hover: #f9fafb;
     }
 
     .cursor-pointer { cursor: pointer; }
     
-    /* Header Section */
+    /* Header Section - Minimal */
     .page-header {
-        background: var(--primary-gradient);
-        border-radius: 20px;
-        padding: 2rem;
+        background: white;
+        border-bottom: 2px solid var(--border-color);
+        padding: 1.5rem 0;
         margin-bottom: 2rem;
-        color: white;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        position: relative;
-        overflow: hidden;
     }
     
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -20%;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
+    .page-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
     }
     
-    .page-header::after {
-        content: '';
-        position: absolute;
-        bottom: -30%;
-        left: -10%;
-        width: 200px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
-    }
-    
-    .page-header-content {
-        position: relative;
-        z-index: 1;
-    }
-    
-    .stats-badge {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        display: inline-block;
-        margin-top: 0.5rem;
+    .page-header p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 0;
     }
 
-    /* Enhanced Card */
+    /* Card - Simple */
     .menu-card {
-        border: none;
-        border-radius: 24px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
         overflow: hidden;
-        transition: all 0.3s ease;
-    }
-    
-    .menu-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
     }
 
-    /* Table Styling */
+    /* Table Styling - Minimal */
     .table thead {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border: none;
+        background: #f9fafb;
+        border-bottom: 1px solid var(--border-color);
     }
     
     .table thead th {
         border: none;
-        padding: 1.2rem 1rem;
-        font-weight: 700;
-        letter-spacing: 0.5px;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
         font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    /* Parent Row Enhanced */
+    .table tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    /* Parent Row */
     .parent-row {
-        transition: all 0.3s ease;
-        border-left: 4px solid transparent;
+        transition: background-color 0.2s;
     }
     
     .parent-row:hover {
-        background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%) !important;
-        border-left-color: #667eea;
-        transform: translateX(2px);
-    }
-    
-    .parent-row.expanded {
-        background: linear-gradient(90deg, #f0f3ff 0%, #ffffff 100%) !important;
-        border-left-color: #667eea;
+        background-color: var(--bg-hover);
     }
 
-    /* Child Row Enhanced */
+    /* Child Row */
     .child-row {
-        background: linear-gradient(90deg, #fafbff 0%, #ffffff 100%);
+        background: #fafbfc;
         display: none;
-        border-left: 4px solid #e9ecef;
     }
     
     .child-row:hover {
-        background: linear-gradient(90deg, #f5f7ff 0%, #ffffff 100%);
-        border-left-color: #a5b4fc;
+        background: #f5f6f7;
     }
     
     .child-row.show {
         display: table-row;
-        animation: slideDown 0.4s ease-out;
     }
 
-    /* Icon Styling */
+    /* Toggle Icon */
     .toggle-icon {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.2s;
         display: inline-block;
-        font-size: 0.85rem;
-        color: #cbd5e1;
-        font-weight: bold;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
     }
     
     .parent-row.expanded .toggle-icon {
         transform: rotate(90deg);
-        color: #667eea;
     }
 
-    /* Menu Icon Container */
-    .menu-icon-container {
-        width: 42px;
-        height: 42px;
-        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-        border: 2px solid #667eea30;
-        border-radius: 12px;
+    /* Menu Icon - Simple */
+    .menu-icon {
+        width: 32px;
+        height: 32px;
+        background: #f3f4f6;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
-    }
-    
-    .parent-row:hover .menu-icon-container,
-    .child-row:hover .menu-icon-container {
-        background: var(--primary-gradient);
-        border-color: transparent;
-        transform: rotate(5deg) scale(1.1);
-    }
-    
-    .parent-row:hover .menu-icon-container i,
-    .child-row:hover .menu-icon-container i {
-        color: white !important;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
     }
 
-    /* Tree Line Enhanced */
+    /* Tree Line - Simple */
     .tree-line {
         position: relative;
-        padding-left: 32px;
-        margin-left: 16px;
+        padding-left: 24px;
+        margin-left: 12px;
     }
     
     .tree-line::before {
@@ -172,9 +123,9 @@
         position: absolute;
         left: 0;
         top: 50%;
-        width: 24px;
-        height: 2px;
-        background: linear-gradient(90deg, #667eea 0%, transparent 100%);
+        width: 16px;
+        height: 1px;
+        background: var(--border-color);
     }
     
     .tree-line::after {
@@ -182,285 +133,151 @@
         position: absolute;
         left: 0;
         top: -100%;
-        width: 2px;
+        width: 1px;
         height: 200%;
-        background: linear-gradient(180deg, #667eea50 0%, #667eea20 100%);
+        background: var(--border-color);
     }
 
-    /* Beautiful Toggle Switch */
-    .toggle-container {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .form-switch {
-        padding-left: 0;
-        margin-bottom: 0;
-    }
-    
+    /* Toggle Switch - Simple */
     .form-switch .form-check-input {
-        width: 3.5rem;
-        height: 1.75rem;
+        width: 2.75rem;
+        height: 1.5rem;
         cursor: pointer;
-        border: none;
-        background-color: #e2e8f0;
-        background-image: none;
-        position: relative;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 2px solid #d1d5db;
+        background-color: white;
+        transition: all 0.2s;
     }
     
-    /* Toggle Handle (Circle) */
-    .form-switch .form-check-input::before {
-        content: '';
-        position: absolute;
-        width: 1.35rem;
-        height: 1.35rem;
-        border-radius: 50%;
-        background: white;
-        top: 50%;
-        left: 0.2rem;
-        transform: translateY(-50%);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Icon Inside Handle - OFF State */
-    .form-switch .form-check-input::after {
-        content: '✕';
-        position: absolute;
-        width: 1.35rem;
-        height: 1.35rem;
-        left: 0.2rem;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-        font-weight: bold;
-        color: #94a3b8;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1;
-    }
-    
-    /* Checked State */
     .form-switch .form-check-input:checked {
-        background: var(--success-gradient);
-        box-shadow: 0 4px 16px rgba(56, 239, 125, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
     }
     
-    /* Handle Movement - Checked */
-    .form-switch .form-check-input:checked::before {
-        left: calc(100% - 1.55rem);
-        box-shadow: 0 3px 12px rgba(56, 239, 125, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Icon Change - Checked */
-    .form-switch .form-check-input:checked::after {
-        content: '✓';
-        left: calc(100% - 1.55rem);
-        color: #10b981;
-        font-size: 0.8rem;
-    }
-    
-    /* Hover Effects */
-    .form-switch .form-check-input:hover:not(:disabled) {
-        transform: scale(1.05);
-    }
-    
-    .form-switch .form-check-input:not(:checked):hover {
-        background-color: #cbd5e1;
-    }
-    
-    /* Focus State */
     .form-switch .form-check-input:focus {
-        box-shadow: 0 0 0 0.3rem rgba(102, 126, 234, 0.25);
-        outline: none;
-    }
-    
-    /* Disabled State */
-    .form-switch .form-check-input:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    
-    /* Loading State */
-    .form-switch .form-check-input.loading {
-        pointer-events: none;
-        opacity: 0.7;
-    }
-    
-    .form-switch .form-check-input.loading::after {
-        content: '⟳';
-        animation: spin 0.8s linear infinite;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
     /* Status Label */
     .status-label {
-        font-weight: 700;
         font-size: 0.75rem;
-        letter-spacing: 0.3px;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-left: 0.5rem;
     }
     
-    .status-label.text-success {
-        color: #10b981 !important;
-        text-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
-    }
-    
-    .status-label.text-muted {
-        color: #64748b !important;
-    }
-    
-    /* Spin Animation for Loading */
-    @keyframes spin {
-        from { transform: translateY(-50%) rotate(0deg); }
-        to { transform: translateY(-50%) rotate(360deg); }
+    .status-label.active {
+        color: var(--primary-color);
     }
 
-    /* Badge Styling */
-    .badge-custom {
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.7rem;
-        letter-spacing: 0.5px;
+    /* Badge - Simple */
+    .badge-simple {
+        display: inline-block;
+        padding: 0.25rem 0.625rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
     }
 
-    /* URL Code */
+    .badge-primary {
+        background: #eff6ff;
+        color: var(--primary-color);
+    }
+
+    .badge-secondary {
+        background: #f3f4f6;
+        color: var(--text-secondary);
+    }
+
+    /* URL Code - Simple */
     code {
-        background: linear-gradient(135deg, #f8f9ff 0%, #f0f3ff 100%);
-        color: #667eea;
-        padding: 0.4rem 0.8rem;
-        border-radius: 8px;
-        border: 1px solid #e0e7ff;
-        font-weight: 600;
-        font-size: 0.8rem;
+        background: #f3f4f6;
+        color: var(--text-primary);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8125rem;
+        font-family: 'Courier New', monospace;
     }
 
-    /* Action Buttons Enhanced */
-    .action-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
+    /* Action Buttons - Simple */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 6px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
+        border: 1px solid var(--border-color);
+        background: white;
+        color: var(--text-secondary);
+        transition: all 0.2s;
     }
     
-    .action-btn:hover {
-        transform: translateY(-2px) scale(1.05);
+    .btn-action:hover {
+        background: var(--bg-hover);
+        border-color: var(--text-secondary);
     }
     
-    .btn-edit {
-        background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
-        color: #667eea;
-    }
-    
-    .btn-edit:hover {
-        background: var(--primary-gradient);
-        color: white;
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-delete {
-        background: linear-gradient(135deg, #eb334920 0%, #f45c4320 100%);
-        color: #eb3349;
-    }
-    
-    .btn-delete:hover {
-        background: var(--danger-gradient);
-        color: white;
-        box-shadow: 0 6px 20px rgba(235, 51, 73, 0.4);
+    .btn-action.btn-delete:hover {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #ef4444;
     }
 
-    /* Add Menu Button */
-    .btn-add-menu {
-        background: var(--primary-gradient);
+    /* Primary Button - Simple */
+    .btn-primary-simple {
+        background: var(--primary-color);
         border: none;
-        padding: 0.8rem 2rem;
-        border-radius: 50px;
-        font-weight: 600;
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        transition: all 0.3s ease;
+        padding: 0.625rem 1.25rem;
+        border-radius: 6px;
+        color: white;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: background 0.2s;
     }
     
-    .btn-add-menu:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+    .btn-primary-simple:hover {
+        background: #1d4ed8;
     }
 
-    /* Empty State */
+    /* Empty State - Simple */
     .empty-state {
-        padding: 4rem 2rem;
+        padding: 3rem 2rem;
         text-align: center;
     }
     
     .empty-state-icon {
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 2rem;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: #f3f4f6;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 3rem;
-        color: #cbd5e1;
+        font-size: 2rem;
+        color: var(--text-secondary);
     }
 
     /* Submenu Badge */
-    .submenu-badge {
-        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-        color: #667eea;
-        padding: 0.2rem 0.6rem;
-        border-radius: 50px;
-        font-size: 0.65rem;
-        font-weight: 700;
-        border: 1px solid #667eea30;
-    }
-
-    /* Animations */
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-    
-    .loading {
-        animation: pulse 1.5s ease-in-out infinite;
+    .submenu-count {
+        background: #f3f4f6;
+        color: var(--text-secondary);
+        padding: 0.125rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 500;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
         .page-header {
-            padding: 1.5rem;
-            border-radius: 16px;
+            padding: 1rem 0;
         }
         
-        .menu-card {
-            border-radius: 16px;
-        }
-        
-        .action-btn {
-            width: 32px;
-            height: 32px;
+        .table thead th,
+        .table tbody td {
+            padding: 0.75rem 0.5rem;
         }
     }
 </style>
@@ -470,159 +287,209 @@
 <?= $this->include('layouts/alerts') ?>
 
 <div class="container-fluid py-4">
-    <!-- Enhanced Header -->
+    <!-- Simple Header -->
     <div class="page-header">
-        <div class="page-header-content">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h2 class="fw-bold mb-2">
-                        <i class="bi bi-diagram-3 me-2"></i><?= esc($title) ?>
-                    </h2>
-                    <p class="mb-2 opacity-90">Kelola struktur menu website dengan mudah dan efisien</p>
-                    <div class="stats-badge">
-                        <i class="bi bi-layers-fill me-2"></i>
-                        <strong><?= count($menus) ?></strong> Total Menu
-                    </div>
-                </div>
-                <?php if ($can_create): ?>
-                    <a href="<?= site_url('menu/new') ?>" class="btn btn-add-menu text-white">
-                        <i class="bi bi-plus-circle me-2"></i>Tambah Menu Baru
-                    </a>
-                <?php endif; ?>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2>
+                    <i class="bi bi-list-ul me-2"></i><?= esc($title) ?>
+                </h2>
+                <p><?= count($menus) ?> total menu</p>
             </div>
+            <?php if ($can_create): ?>
+                <a href="<?= site_url('menu/new') ?>" class="btn btn-primary-simple">
+                    <i class="bi bi-plus-lg me-1"></i>Tambah Menu
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Enhanced Card -->
+    <!-- Simple Card -->
     <div class="menu-card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="40%">Nama Menu</th>
+                        <th width="25%">URL / Route</th>
+                        <th width="15%" class="text-center">Status</th>
+                        <th width="15%" class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Memisahkan Parent dan Child
+                    $parents = array_filter($menus, fn($m) => $m['parent_id'] == 0 || empty($m['parent_id']));
+                    $allChildren = array_filter($menus, fn($m) => !empty($m['parent_id']) && $m['parent_id'] != 0);
+                    
+                    // Grouping child
+                    $groupedChildren = [];
+                    foreach ($allChildren as $child) {
+                        $groupedChildren[$child['parent_id']][] = $child;
+                    }
+
+                    $counter = 1;
+
+                    if (empty($parents)): ?>
                         <tr>
-                            <th class="py-3 ps-4" width="5%">#</th>
-                            <th class="py-3" width="40%">NAMA MENU</th>
-                            <th class="py-3" width="25%">URL / ROUTE</th>
-                            <th class="py-3 text-center" width="15%">STATUS</th>
-                            <th class="py-3 text-center" width="15%">AKSI</th>
+                            <td colspan="5" class="p-0">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="bi bi-inbox"></i>
+                                    </div>
+                                    <h5 class="fw-semibold mb-2">Belum Ada Menu</h5>
+                                    <p class="text-muted mb-3">Mulai dengan menambahkan menu pertama</p>
+                                    <?php if ($can_create): ?>
+                                        <a href="<?= site_url('menu/new') ?>" class="btn btn-primary-simple">
+                                            <i class="bi bi-plus-lg me-1"></i>Tambah Menu
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Memisahkan Parent dan Child
-                        $parents = array_filter($menus, fn($m) => $m['parent_id'] == 0 || empty($m['parent_id']));
-                        $allChildren = array_filter($menus, fn($m) => !empty($m['parent_id']) && $m['parent_id'] != 0);
-                        
-                        // Grouping child
-                        $groupedChildren = [];
-                        foreach ($allChildren as $child) {
-                            $groupedChildren[$child['parent_id']][] = $child;
-                        }
+                    <?php endif;
 
-                        $counter = 1;
-
-                        if (empty($parents)): ?>
-                            <tr>
-                                <td colspan="5" class="p-0">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon">
-                                            <i class="bi bi-inbox"></i>
-                                        </div>
-                                        <h5 class="fw-bold text-dark mb-2">Belum Ada Menu</h5>
-                                        <p class="text-muted mb-4">Mulai dengan menambahkan menu pertama Anda</p>
-                                        <?php if ($can_create): ?>
-                                            <a href="<?= site_url('menu/new') ?>" class="btn btn-add-menu text-white">
-                                                <i class="bi bi-plus-circle me-2"></i>Tambah Menu
-                                            </a>
+                    foreach ($parents as $parent):
+                        $hasChild = isset($groupedChildren[$parent['id_menu']]);
+                    ?>
+                        <tr class="parent-row <?= $hasChild ? 'cursor-pointer' : '' ?>" 
+                            <?= $hasChild ? 'onclick="toggleRows('.$parent['id_menu'].', this)"' : '' ?>>
+                            
+                            <td>
+                                <span class="badge-simple badge-secondary"><?= $counter++ ?></span>
+                            </td>
+                            
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div style="width: 20px;" class="me-2">
+                                        <?php if ($hasChild): ?>
+                                            <i class="bi bi-chevron-right toggle-icon"></i>
                                         <?php endif; ?>
                                     </div>
-                                </td>
-                            </tr>
-                        <?php endif;
 
-                        foreach ($parents as $parent):
-                            $hasChild = isset($groupedChildren[$parent['id_menu']]);
+                                    <div>
+                                        <div class="fw-semibold text-dark"><?= esc($parent['menu_name']) ?></div>
+                                        <?php if($hasChild): ?>
+                                            <span class="submenu-count mt-1 d-inline-block">
+                                                <?= count($groupedChildren[$parent['id_menu']]) ?> submenu
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <?php if(!empty($parent['menu_url']) && $parent['menu_url'] != '#'): ?>
+                                    <code><?= esc($parent['menu_url']) ?></code>
+                                <?php else: ?>
+                                    <span class="text-muted">—</span>
+                                <?php endif; ?>
+                            </td>
+                            
+                            <td class="text-center" onclick="event.stopPropagation()">
+                                <?php if ($can_update): ?>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input toggle-status" type="checkbox" role="switch"
+                                                   data-id="<?= $parent['id_menu'] ?>"
+                                                   data-url="<?= site_url('menu/toggleStatus/' . $parent['id_menu']) ?>"
+                                                   id="toggle-<?= $parent['id_menu'] ?>"
+                                                   <?= ($parent['status'] === 'active') ? 'checked' : '' ?>>
+                                        </div>
+                                        <label for="toggle-<?= $parent['id_menu'] ?>" class="status-label <?= ($parent['status'] === 'active') ? 'active' : '' ?>" style="cursor: pointer;">
+                                            <?= ($parent['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
+                                        </label>
+                                    </div>
+                                <?php else: ?>
+                                    <span class="badge-simple <?= ($parent['status'] === 'active') ? 'badge-primary' : 'badge-secondary' ?>">
+                                        <?= ($parent['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            
+                            <td class="text-center" onclick="event.stopPropagation()">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <?php if ($can_update): ?>
+                                        <a href="<?= site_url('menu/' . $parent['id_menu'].'/edit') ?>" 
+                                           class="btn-action" 
+                                           data-bs-toggle="tooltip" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <?php if ($can_delete): ?>
+                                        <form action="<?= site_url('menu/' . $parent['id_menu']) ?>" method="post" class="d-inline"
+                                              onsubmit="return confirm('Hapus menu ini? Submenu akan ikut terhapus.');">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="submit" class="btn-action btn-delete" 
+                                                    data-bs-toggle="tooltip" title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <?php if ($hasChild): 
+                            foreach ($groupedChildren[$parent['id_menu']] as $child):
                         ?>
-                            <tr class="parent-row <?= $hasChild ? 'cursor-pointer' : '' ?>" 
-                                <?= $hasChild ? 'onclick="toggleRows('.$parent['id_menu'].', this)"' : '' ?>>
-                                
-                                <td class="ps-4">
-                                    <span class="badge bg-light text-primary fw-bold"><?= $counter++ ?></span>
-                                </td>
-                                
+                            <tr class="child-row child-of-<?= $parent['id_menu'] ?>">
+                                <td></td>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <div style="width: 28px;" class="me-2 text-center">
-                                            <?php if ($hasChild): ?>
-                                                <i class="bi bi-chevron-right toggle-icon"></i>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <div class="menu-icon-container me-3">
-                                            <i class="<?= esc($parent['menu_icon']) ?> text-primary"></i>
-                                        </div>
-                                        
-                                        <div>
-                                            <span class="fw-bold text-dark d-block mb-1"><?= esc($parent['menu_name']) ?></span>
-                                            <?php if($hasChild): ?>
-                                                <span class="submenu-badge">
-                                                    <i class="bi bi-diagram-3 me-1"></i>
-                                                    <?= count($groupedChildren[$parent['id_menu']]) ?> Submenu
-                                                </span>
-                                            <?php endif; ?>
+                                    <div class="d-flex align-items-center ps-4">
+                                        <div class="tree-line">
+                                            <div class="menu-icon me-3" style="width: 28px; height: 28px; font-size: 0.8rem;">
+                                                <i class="<?= esc($child['menu_icon']) ?>"></i>
+                                            </div>
+                                            <span class="text-secondary"><?= esc($child['menu_name']) ?></span>
                                         </div>
                                     </div>
                                 </td>
-                                
                                 <td>
-                                    <?php if(!empty($parent['menu_url']) && $parent['menu_url'] != '#'): ?>
-                                        <code><?= esc($parent['menu_url']) ?></code>
-                                    <?php else: ?>
-                                        <span class="badge badge-custom bg-light text-secondary">
-                                            <i class="bi bi-folder2 me-1"></i>Group Header
-                                        </span>
-                                    <?php endif; ?>
+                                    <code><?= esc($child['menu_url']) ?: '—' ?></code>
                                 </td>
                                 
-                                <td class="text-center" onclick="event.stopPropagation()">
+                                <td class="text-center">
                                     <?php if ($can_update): ?>
-                                        <div class="toggle-container">
-                                            <div class="form-check form-switch">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <div class="form-check form-switch mb-0">
                                                 <input class="form-check-input toggle-status" type="checkbox" role="switch"
-                                                       data-id="<?= $parent['id_menu'] ?>"
-                                                       data-url="<?= site_url('menu/toggleStatus/' . $parent['id_menu']) ?>"
-                                                       id="toggle-<?= $parent['id_menu'] ?>"
-                                                       <?= ($parent['status'] === 'active') ? 'checked' : '' ?>>
+                                                       data-id="<?= $child['id_menu'] ?>"
+                                                       data-url="<?= site_url('menu/toggleStatus/' . $child['id_menu']) ?>"
+                                                       id="toggle-child-<?= $child['id_menu'] ?>"
+                                                       <?= ($child['status'] === 'active') ? 'checked' : '' ?>>
                                             </div>
-                                            <label for="toggle-<?= $parent['id_menu'] ?>" class="status-label <?= ($parent['status'] === 'active') ? 'text-success' : 'text-muted' ?>" style="cursor: pointer;">
-                                                <?= ($parent['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
+                                            <label for="toggle-child-<?= $child['id_menu'] ?>" class="status-label <?= ($child['status'] === 'active') ? 'active' : '' ?>" style="cursor: pointer;">
+                                                <?= ($child['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
                                             </label>
                                         </div>
                                     <?php else: ?>
-                                        <span class="badge badge-custom <?= ($parent['status'] === 'active') ? 'bg-success' : 'bg-secondary' ?>">
-                                            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>
-                                            <?= ucfirst($parent['status']) ?>
+                                        <span class="badge-simple <?= ($child['status'] === 'active') ? 'badge-primary' : 'badge-secondary' ?>">
+                                            <?= ($child['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
                                         </span>
                                     <?php endif; ?>
                                 </td>
                                 
-                                <td class="text-center" onclick="event.stopPropagation()">
+                                <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
                                         <?php if ($can_update): ?>
-                                            <a href="<?= site_url('menu/' . $parent['id_menu'].'/edit') ?>" 
-                                               class="action-btn btn-edit" 
-                                               data-bs-toggle="tooltip" title="Edit Menu">
-                                                <i class="bi bi-pencil-square"></i>
+                                            <a href="<?= site_url('menu/' . $child['id_menu'].'/edit') ?>" 
+                                               class="btn-action" 
+                                               data-bs-toggle="tooltip" title="Edit">
+                                                <i class="bi bi-pencil"></i>
                                             </a>
                                         <?php endif; ?>
 
                                         <?php if ($can_delete): ?>
-                                            <form action="<?= site_url('menu/' . $parent['id_menu']) ?>" method="post" class="d-inline"
-                                                  onsubmit="return confirm('⚠️ Hapus menu ini?\n\nPeringatan: Submenu di bawahnya akan ikut terhapus!');">
+                                            <form action="<?= site_url('menu/' . $child['id_menu']) ?>" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Hapus submenu ini?');">
                                                 <?= csrf_field() ?>
                                                 <input type="hidden" name="_method" value="DELETE">
-                                                <button type="submit" class="action-btn btn-delete" 
-                                                        data-bs-toggle="tooltip" title="Hapus Menu">
+                                                <button type="submit" class="btn-action btn-delete" 
+                                                        data-bs-toggle="tooltip" title="Hapus">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -630,80 +497,13 @@
                                     </div>
                                 </td>
                             </tr>
+                        <?php 
+                            endforeach; 
+                        endif; ?>
 
-                            <?php if ($hasChild): 
-                                foreach ($groupedChildren[$parent['id_menu']] as $child):
-                            ?>
-                                <tr class="child-row child-of-<?= $parent['id_menu'] ?>">
-                                    <td></td>
-                                    <td class="py-3">
-                                        <div class="d-flex align-items-center ps-5">
-                                            <div class="tree-line">
-                                                <div class="menu-icon-container me-3" style="width: 32px; height: 32px;">
-                                                    <i class="<?= esc($child['menu_icon']) ?> text-muted small"></i>
-                                                </div>
-                                                <span class="text-secondary fw-semibold"><?= esc($child['menu_name']) ?></span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <code class="small"><?= esc($child['menu_url']) ?: '-' ?></code>
-                                    </td>
-                                    
-                                    <td class="text-center">
-                                        <?php if ($can_update): ?>
-                                            <div class="toggle-container">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input toggle-status" type="checkbox" role="switch"
-                                                           data-id="<?= $child['id_menu'] ?>"
-                                                           data-url="<?= site_url('menu/toggleStatus/' . $child['id_menu']) ?>"
-                                                           id="toggle-child-<?= $child['id_menu'] ?>"
-                                                           <?= ($child['status'] === 'active') ? 'checked' : '' ?>>
-                                                </div>
-                                                <label for="toggle-child-<?= $child['id_menu'] ?>" class="status-label <?= ($child['status'] === 'active') ? 'text-success' : 'text-muted' ?>" style="cursor: pointer;">
-                                                    <?= ($child['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
-                                                </label>
-                                            </div>
-                                        <?php else: ?>
-                                            <span class="badge badge-custom <?= ($child['status'] === 'active') ? 'bg-success' : 'bg-secondary' ?>">
-                                                <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>
-                                                <?= ucfirst($child['status']) ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </td>
-                                    
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <?php if ($can_update): ?>
-                                                <a href="<?= site_url('menu/' . $child['id_menu'].'/edit') ?>" 
-                                                   class="action-btn btn-edit" 
-                                                   data-bs-toggle="tooltip" title="Edit Submenu">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                            <?php endif; ?>
-
-                                            <?php if ($can_delete): ?>
-                                                <form action="<?= site_url('menu/' . $child['id_menu']) ?>" method="post" class="d-inline"
-                                                      onsubmit="return confirm('⚠️ Hapus submenu ini?');">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="action-btn btn-delete" 
-                                                            data-bs-toggle="tooltip" title="Hapus Submenu">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php 
-                                endforeach; 
-                            endif; ?>
-
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -720,18 +520,16 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
 
-        // Toggle Status dengan AJAX
+        // Toggle Status
         const toggles = document.querySelectorAll('.toggle-status');
         
         toggles.forEach(toggle => {
             toggle.addEventListener('change', function() {
                 const url = this.getAttribute('data-url');
-                const label = this.closest('.toggle-container').querySelector('.status-label');
+                const label = this.parentElement.nextElementSibling;
                 const isChecked = this.checked;
 
-                // Add loading state
                 this.disabled = true;
-                this.classList.add('loading');
 
                 fetch(url, {
                     method: 'POST',
@@ -744,61 +542,36 @@
                 .then(response => response.json())
                 .then(data => {
                     if(data.success) {
-                        // Update UI dengan animasi smooth
-                        setTimeout(() => {
-                            if(isChecked) {
-                                label.textContent = 'Aktif';
-                                label.classList.remove('text-muted');
-                                label.classList.add('text-success');
-                            } else {
-                                label.textContent = 'Nonaktif';
-                                label.classList.remove('text-success');
-                                label.classList.add('text-muted');
-                            }
-                            
-                            // Success feedback
-                            showNotification('✓ Status berhasil diupdate', 'success');
-                        }, 200);
+                        if(isChecked) {
+                            label.textContent = 'Aktif';
+                            label.classList.add('active');
+                        } else {
+                            label.textContent = 'Nonaktif';
+                            label.classList.remove('active');
+                        }
                     } else {
-                        // Revert jika gagal
                         this.checked = !isChecked;
-                        showNotification('✕ Gagal update status: ' + (data.message || 'Error'), 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     this.checked = !isChecked;
-                    showNotification('✕ Terjadi kesalahan koneksi', 'error');
                 })
                 .finally(() => {
                     this.disabled = false;
-                    this.classList.remove('loading');
                 });
             });
         });
     });
 
-    // Accordion Toggle Function
+    // Toggle Accordion
     function toggleRows(parentId, element) {
         element.classList.toggle('expanded');
         const childRows = document.querySelectorAll(`.child-of-${parentId}`);
         
         childRows.forEach(row => {
-            if (row.classList.contains('show')) {
-                row.classList.remove('show');
-                setTimeout(() => { 
-                    if(!row.classList.contains('show')) row.style.display = 'none'; 
-                }, 400);
-            } else {
-                row.style.display = 'table-row';
-                requestAnimationFrame(() => row.classList.add('show'));
-            }
+            row.classList.toggle('show');
         });
-    }
-
-
-    function showNotification(message, type = 'info') {
-        console.log(`${type.toUpperCase()}: ${message}`);
     }
 </script>
 <?= $this->endSection() ?>

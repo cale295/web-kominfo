@@ -127,9 +127,8 @@ $routes->post('agenda_pelatihan/toggle-status', 'frontend\AgendaPelatihanControl
 $routes->resource('ip_kerjasama_daerah', ['controller' => 'frontend\IpKerjasamaDaerahController', 'except' => ['show']]);
 $routes->post('ip_kerjasama_daerah/toggle-status', 'frontend\IpKerjasamaDaerahController::toggleStatus');
 // Pengumuman
-$routes->resource('pengumuman',['controller' => 'frontend\PengumumanController', 'expect' => ['show']]);
+$routes->resource('pengumuman', ['controller' => 'frontend\PengumumanController','except'     => ['new', 'show'] ]);
 $routes->post('pengumuman/toggle-status', 'frontend\PengumumanController::toggleStatus');
-
 
 
 // berita kategori

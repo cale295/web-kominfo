@@ -29,7 +29,6 @@ class PengumumanController extends BaseController
             'can_delete' => (bool)$access['can_delete'],
         ];
     }
-
     
     public function index()
     {
@@ -38,8 +37,10 @@ class PengumumanController extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat modul ini.');
         }
 
+        // Ambil data terbaru
         $data = $this->pengumumanModel->orderBy('created_at', 'DESC')->findAll();
 
+        // Pastikan path view sesuai dengan struktur folder Anda
         return view('pages/pengumuman/index', [
             'pengumuman' => $data,
             'can_create' => $access['can_create'],
@@ -48,117 +49,93 @@ class PengumumanController extends BaseController
         ]);
     }
 
-        public function toggleStatus()
-    {
-        // 1. Cek Request AJAX
-        if (!$this->request->isAJAX()) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        }
-
-        // 2. CEK HAK AKSES
-        // Pastikan Controller punya property $this->accessRightsModel & fungsi getAccess()
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
-
-        if (!$access || !$access['can_update']) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Anda tidak memiliki izin untuk mengubah data ini.',
-                'token' => csrf_hash()
-            ]);
-        }
-
-        // 3. LOAD MODEL & AMBIL DATA
-        // ==================================================
-        $model = new \App\Models\frontend\PengumumanModel(); // <--- GANTI INI SESUAI MODUL
-        // ==================================================
-
-        $id = $this->request->getPost('id');
-        $data = $model->find($id);
-
-        if ($data) {
-            // Logic Toggle (1 -> 0, 0 -> 1)
-            $newStatus = ($data['status'] == '1') ? '0' : '1';
-
-            // Data Update (Termasuk Audit Trail)
-            $updateData = [
-                'status'            => $newStatus,
-                'updated_at'        => date('Y-m-d H:i:s'),
-                'updated_by_id'     => session()->get('id_user'),
-                'updated_by_name'   => session()->get('username'),
-            ];
-
-            if ($model->update($id, $updateData)) {
-                return $this->response->setJSON([
-                    'status'    => 'success',
-                    'message'   => 'Status berhasil diperbarui',
-                    'newStatus' => $newStatus,
-                    'token'     => csrf_hash() // Kirim token baru
-                ]);
-            }
-        }
-
-        return $this->response->setJSON([
-            'status'  => 'error',
-            'message' => 'Gagal update status atau data tidak ditemukan',
-            'token'   => csrf_hash()
-        ]);
-    }
-    public function new()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_create']) {
-            return redirect()->to('/pengumuman')->with('error', 'Akses ditolak.');
-        }
-        return view('pages/pengumuman/create');
-    }
-
+    // =========================================================================
+    // UPDATE UTAMA: CREATE DATA (MENANGANI INPUT DARI MODAL)
+    // =========================================================================
     public function create()
     {
+        // 1. Cek Hak Akses
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_create']) return redirect()->to('/pengumuman');
 
-        $tipeMedia = $this->request->getPost('tipe_media');
+        // 2. Tentukan Aturan Validasi
+        // Kita validasi di Controller agar bisa redirect back dengan error spesifik
+        $rules = [
+            'judul' => [
+                'rules' => 'required',
+                'errors' => ['required' => 'Judul pengumuman wajib diisi.']
+            ],
+            'content' => [
+                'rules' => 'required',
+                'errors' => ['required' => 'Isi pengumuman wajib diisi.']
+            ],
+            'featured_image' => [
+                'rules' => 'uploaded[featured_image]|is_image[featured_image]|mime_in[featured_image,image/jpg,image/jpeg,image/png]|max_size[featured_image,2048]',
+                'errors' => [
+                    'uploaded' => 'Gambar Cover (Featured Image) wajib diupload.',
+                    'is_image' => 'File harus berupa gambar.',
+                    'max_size' => 'Ukuran gambar maksimal 2MB.'
+                ]
+            ]
+        ];
 
-        $data = [
+        // Validasi Kondisional: Jika Tipe Media = File, maka File Wajib Upload
+        if ($this->request->getPost('tipe_media') == 'file') {
+            $rules['file_media'] = [
+                'rules' => 'uploaded[file_media]|max_size[file_media,5120]|ext_in[file_media,pdf,doc,docx]',
+                'errors' => [
+                    'uploaded' => 'File dokumen wajib diupload jika memilih tipe Media File.',
+                    'max_size' => 'Ukuran file dokumen maksimal 5MB.',
+                    'ext_in'   => 'Format file harus PDF, DOC, atau DOCX.'
+                ]
+            ];
+        }
+
+        // 3. Jalankan Validasi
+        if (!$this->validate($rules)) {
+            // PENTING: Jika gagal, redirect kembali ke halaman index + bawa input & error
+            // Ini akan memicu Javascript di View untuk membuka kembali Modal
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // 4. Proses Upload Gambar Cover
+        $img = $this->request->getFile('featured_image');
+        $namaGambar = $img->getRandomName();
+        $img->move('uploads/pengumuman', $namaGambar);
+
+        // 5. Proses Data Media (Link vs File)
+        $tipeMedia = $this->request->getPost('tipe_media');
+        $fileMediaName = null;
+        $linkUrl = $this->request->getPost('link_url');
+
+        if ($tipeMedia == 'file') {
+            $fileDoc = $this->request->getFile('file_media');
+            $fileMediaName = $fileDoc->getRandomName();
+            $fileDoc->move('uploads/pengumuman', $fileMediaName);
+            $linkUrl = null; // Pastikan link kosong jika pilih file
+        } else {
+            // Jika Link
+            $fileMediaName = null; // Pastikan file kosong
+        }
+
+        // 6. Simpan ke Database
+        $this->pengumumanModel->save([
             'judul'          => $this->request->getPost('judul'),
             'content'        => $this->request->getPost('content'),
             'tipe_media'     => $tipeMedia,
-            'link_url'       => ($tipeMedia == 'link') ? $this->request->getPost('link_url') : null,
-            'status'         => $this->request->getPost('status'),
-            'featured_image' => '', // Default kosong dulu
-            'file_media'     => null
-        ];
-
-        // 1. Upload Featured Image (Wajib di DB Schema)
-        $img = $this->request->getFile('featured_image');
-        if ($img && $img->isValid() && !$img->hasMoved()) {
-            $newName = $img->getRandomName();
-            $img->move('uploads/pengumuman', $newName);
-            $data['featured_image'] = 'uploads/pengumuman/' . $newName;
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Gambar Utama wajib diupload.');
-        }
-
-        // 2. Upload File Media (Jika tipe = file)
-        if ($tipeMedia == 'file') {
-            $fileDoc = $this->request->getFile('file_media');
-            if ($fileDoc && $fileDoc->isValid() && !$fileDoc->hasMoved()) {
-                $docName = $fileDoc->getRandomName();
-                $fileDoc->move('uploads/pengumuman', $docName);
-                $data['file_media'] = 'uploads/pengumuman/' . $docName;
-            } else {
-                return redirect()->back()->withInput()->with('error', 'File Dokumen wajib diupload jika tipe media adalah File.');
-            }
-        }
-
-        if (!$this->pengumumanModel->save($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->pengumumanModel->errors());
-        }
+            'link_url'       => $linkUrl,
+            'file_media'     => ($fileMediaName) ? 'uploads/pengumuman/' . $fileMediaName : null,
+            'featured_image' => 'uploads/pengumuman/' . $namaGambar,
+            'status'         => $this->request->getPost('status') ?? 0, // Default 0
+            'created_by'     => session()->get('id_user') // Opsional
+        ]);
 
         return redirect()->to('/pengumuman')->with('success', 'Pengumuman berhasil ditambahkan.');
     }
 
+    // =========================================================================
+    // BAGIAN EDIT & UPDATE (MASIH MENGGUNAKAN HALAMAN TERPISAH)
+    // =========================================================================
     public function edit($id)
     {
         $access = $this->getAccess(session()->get('role'));
@@ -182,8 +159,16 @@ class PengumumanController extends BaseController
         $oldData = $this->pengumumanModel->find($id);
         if (!$oldData) return redirect()->to('/pengumuman')->with('error', 'Data tidak ditemukan.');
 
-        $tipeMedia = $this->request->getPost('tipe_media');
+        // Validasi minimal (Gambar & File opsional saat update)
+        if (!$this->validate([
+            'judul' => 'required',
+            'content' => 'required'
+        ])) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
 
+        $tipeMedia = $this->request->getPost('tipe_media');
+        
         $data = [
             'id_pengumuman' => $id,
             'judul'         => $this->request->getPost('judul'),
@@ -192,7 +177,7 @@ class PengumumanController extends BaseController
             'link_url'      => ($tipeMedia == 'link') ? $this->request->getPost('link_url') : null,
         ];
 
-        // 1. Handle Featured Image
+        // 1. Handle Update Featured Image
         $img = $this->request->getFile('featured_image');
         if ($img && $img->isValid() && !$img->hasMoved()) {
             $newName = $img->getRandomName();
@@ -205,7 +190,7 @@ class PengumumanController extends BaseController
             }
         }
 
-        // 2. Handle File Media
+        // 2. Handle Update File Media
         if ($tipeMedia == 'file') {
             $fileDoc = $this->request->getFile('file_media');
             if ($fileDoc && $fileDoc->isValid() && !$fileDoc->hasMoved()) {
@@ -213,26 +198,22 @@ class PengumumanController extends BaseController
                 $fileDoc->move('uploads/pengumuman', $docName);
                 $data['file_media'] = 'uploads/pengumuman/' . $docName;
 
-                // Hapus file lama jika ada
+                // Hapus file lama
                 if (!empty($oldData['file_media']) && file_exists($oldData['file_media'])) {
                     unlink($oldData['file_media']);
                 }
             } else {
-                // Jika tidak upload baru, pertahankan yang lama (validasi manual jika beralih dari link ke file)
-                if(empty($oldData['file_media']) && $oldData['tipe_media'] != 'file') {
-                     return redirect()->back()->withInput()->with('error', 'File Dokumen wajib diupload.');
+                // Jika switch ke File tapi tidak upload baru, cek apa sudah ada file sebelumnya
+                if ($oldData['tipe_media'] != 'file' && empty($oldData['file_media'])) {
+                    return redirect()->back()->withInput()->with('error', 'File Dokumen wajib diupload saat mengubah tipe ke File.');
                 }
-                // Jika sudah ada file lama, biarkan (tidak perlu update kolom file_media)
             }
         } else {
-            // Jika tipe link, kosongkan file_media di DB? 
-            // Opsional: $data['file_media'] = null; (tergantung kebutuhan, biasanya disimpan saja tidak apa-apa)
+            // Jika berubah jadi Link, set file null (opsional: hapus file fisik jika mau)
             $data['file_media'] = null; 
         }
 
-        if (!$this->pengumumanModel->save($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->pengumumanModel->errors());
-        }
+        $this->pengumumanModel->save($data);
 
         return redirect()->to('/pengumuman')->with('success', 'Pengumuman berhasil diperbarui.');
     }
@@ -244,11 +225,10 @@ class PengumumanController extends BaseController
 
         $data = $this->pengumumanModel->find($id);
         if ($data) {
-            // Hapus gambar utama
+            // Hapus file fisik
             if (!empty($data['featured_image']) && file_exists($data['featured_image'])) {
                 unlink($data['featured_image']);
             }
-            // Hapus file dokumen
             if (!empty($data['file_media']) && file_exists($data['file_media'])) {
                 unlink($data['file_media']);
             }
@@ -258,5 +238,54 @@ class PengumumanController extends BaseController
         }
 
         return redirect()->to('/pengumuman')->with('error', 'Gagal menghapus data.');
+    }
+
+    // =========================================================================
+    // FUNGSI AJAX TOGGLE STATUS (TIDAK ADA PERUBAHAN)
+    // =========================================================================
+    public function toggleStatus()
+    {
+        if (!$this->request->isAJAX()) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+
+        if (!$access || !$access['can_update']) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Anda tidak memiliki izin untuk mengubah data ini.',
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $id = $this->request->getPost('id');
+        $data = $this->pengumumanModel->find($id);
+
+        if ($data) {
+            $newStatus = ($data['status'] == '1') ? '0' : '1';
+            $updateData = [
+                'status'            => $newStatus,
+                'updated_at'        => date('Y-m-d H:i:s'),
+                'updated_by_id'     => session()->get('id_user'),
+                // 'updated_by_name'   => session()->get('username'), 
+            ];
+
+            if ($this->pengumumanModel->update($id, $updateData)) {
+                return $this->response->setJSON([
+                    'status'    => 'success',
+                    'message'   => 'Status berhasil diperbarui',
+                    'newStatus' => $newStatus,
+                    'token'     => csrf_hash()
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Gagal update status atau data tidak ditemukan',
+            'token'   => csrf_hash()
+        ]);
     }
 }
