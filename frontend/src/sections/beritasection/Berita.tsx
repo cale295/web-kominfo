@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Searchbar from "../../components/searchbar/Searchbar";
 import "./css/berita.css";
@@ -13,7 +13,7 @@ interface BeritaItem {
   slug: string;
   intro: string;
   feat_image: string;
-  created_at: string;
+  tanggal: string;
   hit: string;
   kategori?: string[];
   kategori_slugs?: string[];
@@ -52,7 +52,7 @@ const Berita: React.FC = () => {
   const [beritaTerkini, setBeritaTerkini] = useState<BeritaItem[]>([]);
   const [tagPopuler, setTagPopuler] = useState<Tag[]>([]);
   const [allBerita, setAllBerita] = useState<BeritaItem[]>([]);
-  const [kategoriList, setKategoriList] = useState<Kategori[]>([]); // Tambah state untuk kategori
+  const [kategoriList, setKategoriList] = useState<Kategori[]>([]);
 
   // State untuk Search dan Filter
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -62,13 +62,22 @@ const Berita: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [beritaByTag, setBeritaByTag] = useState<BeritaItem[]>([]);
   const [loadingTag, setLoadingTag] = useState<boolean>(false);
-  const [selectedKategori, setSelectedKategori] = useState<Kategori | null>(
-    null
-  );
+  const [selectedKategori, setSelectedKategori] = useState<Kategori | null>(null);
   const [loadingKategori, setLoadingKategori] = useState<boolean>(false);
-  const [beritaByKategori, setBeritaByKategori] = useState<BeritaItem[]>([]); // Perbaiki typo
+  const [beritaByKategori, setBeritaByKategori] = useState<BeritaItem[]>([]);
+
+  // State untuk Lazy Loading Berita Terkini
+  const [page, setPage] = useState<number>(1);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [initialBeritaTerkini, setInitialBeritaTerkini] = useState<BeritaItem[]>([]);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
+  const ITEMS_PER_PAGE = 10;
+
+  // Helper function untuk check filter mode
+  const isFilterMode = hasSearched || selectedTag || selectedKategori;
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -159,27 +168,80 @@ const Berita: React.FC = () => {
 
       // Setup Tag & Populer
       if (data.tag) {
-  setTagPopuler(data.tag);
-}
-
+        setTagPopuler(data.tag);
+      }
 
       const populer = [...beritaData]
         .sort((a, b) => Number(b.hit) - Number(a.hit))
         .slice(0, 5);
       setBeritaPopuler(populer);
 
-      // Setup Berita Terkini
-      const terkini = [...beritaData]
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-        .slice(0, 10);
-      setBeritaTerkini(terkini);
+      // Setup Berita Terkini (Initial 10 items)
+      const sortedBerita = [...beritaData].sort(
+        (a, b) =>
+          new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime()
+      );
+      setInitialBeritaTerkini(sortedBerita);
+      
+      // Set initial berita terkini (first page)
+      const initialItems = sortedBerita.slice(0, ITEMS_PER_PAGE);
+      setBeritaTerkini(initialItems);
+      setHasMore(sortedBerita.length > ITEMS_PER_PAGE);
+      setPage(1);
+
     } catch (error) {
       console.error("Gagal fetch berita:", error);
     }
   };
+
+  // =========================================
+  // LAZY LOADING BERITA TERKINI
+  // =========================================
+  const loadMoreBerita = useCallback(async () => {
+    if (loadingMore || !hasMore || isFilterMode) return;
+
+    setLoadingMore(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const nextPage = page + 1;
+    const startIndex = page * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    
+    const moreBerita = initialBeritaTerkini.slice(startIndex, endIndex);
+    
+    if (moreBerita.length > 0) {
+      setBeritaTerkini(prev => [...prev, ...moreBerita]);
+      setPage(nextPage);
+      setHasMore(endIndex < initialBeritaTerkini.length);
+    } else {
+      setHasMore(false);
+    }
+    
+    setLoadingMore(false);
+  }, [page, loadingMore, hasMore, initialBeritaTerkini, isFilterMode]);
+
+  // Setup Intersection Observer untuk lazy loading
+  useEffect(() => {
+    if (!observerTarget.current || !hasMore || isFilterMode || loadingMore) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreBerita();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    const currentTarget = observerTarget.current;
+    observer.observe(currentTarget);
+
+    return () => {
+      if (currentTarget) observer.unobserve(currentTarget);
+    };
+  }, [loadMoreBerita, hasMore, isFilterMode, loadingMore]);
 
   // =========================================
   // FILTER BERITA BERDASARKAN KATEGORI
@@ -187,7 +249,7 @@ const Berita: React.FC = () => {
   const filterBeritaByKategori = (kategori: Kategori) => {
     setLoadingKategori(true);
     setSelectedKategori(kategori);
-    setSelectedTag(null); // Clear tag filter
+    setSelectedTag(null);
 
     // Clear search saat filter by kategori
     setIsSearching(false);
@@ -230,41 +292,41 @@ const Berita: React.FC = () => {
   // FILTER BERITA BERDASARKAN TAG (Lokal)
   // =========================================
   const filterBeritaByTag = (tag: Tag) => {
-  setLoadingTag(true);
-  setSelectedTag(tag);
-  setSelectedKategori(null); // Clear kategori filter
+    setLoadingTag(true);
+    setSelectedTag(tag);
+    setSelectedKategori(null);
 
-  // Clear search saat filter by tag
-  setIsSearching(false);
-  setSearchQuery("");
-  setSearchResults([]);
-  setHasSearched(false);
+    // Clear search saat filter by tag
+    setIsSearching(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    setHasSearched(false);
 
-  // Filter berita yang memiliki tag yang dipilih
-  const filteredBerita = allBerita.filter((berita) => {
-    if (!berita.tags || !Array.isArray(berita.tags)) return false;
+    // Filter berita yang memiliki tag yang dipilih
+    const filteredBerita = allBerita.filter((berita) => {
+      if (!berita.tags || !Array.isArray(berita.tags)) return false;
 
-    return berita.tags.some((tagString) =>
-      tagString?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
-    );
-  });
+      return berita.tags.some((tagString) =>
+        tagString?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
+      );
+    });
 
-  console.log("📊 Found berita with tag:", filteredBerita.length);
+    console.log("📊 Found berita with tag:", filteredBerita.length);
 
-  // Jika tidak ada data, coba fallback dengan keyword di judul/intro
-  if (filteredBerita.length === 0) {
-    const filteredByKeyword = allBerita.filter(
-      (berita) =>
-        berita.judul?.toLowerCase().includes(tag.nama_tag?.toLowerCase()) ||
-        berita.intro?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
-    );
-    setBeritaByTag(filteredByKeyword);
-  } else {
-    setBeritaByTag(filteredBerita); 
-  }
+    // Jika tidak ada data, coba fallback dengan keyword di judul/intro
+    if (filteredBerita.length === 0) {
+      const filteredByKeyword = allBerita.filter(
+        (berita) =>
+          berita.judul?.toLowerCase().includes(tag.nama_tag?.toLowerCase()) ||
+          berita.intro?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
+      );
+      setBeritaByTag(filteredByKeyword);
+    } else {
+      setBeritaByTag(filteredBerita);
+    }
 
-  setLoadingTag(false);
-};
+    setLoadingTag(false);
+  };
 
   // =========================================
   // HANDLE SEARCH
@@ -400,10 +462,10 @@ const Berita: React.FC = () => {
   // =========================================
   // RENDER BERITA CARD (Reusable Component)
   // =========================================
-  const renderBeritaCard = (item: BeritaItem) => (
+  const renderBeritaCard = (item: BeritaItem, index: number) => (
     <Link
       to={`/berita/${item.slug}`}
-      key={item.id_berita}
+      key={`${item.id_berita}-${index}`}
       className="berita-terkini-card mb-3 text-decoration-none d-block"
     >
       <div className="berita-terkini-card-body">
@@ -422,7 +484,7 @@ const Berita: React.FC = () => {
           <h6 className="berita-terkini-title">{item.judul}</h6>
           <p className="berita-terkini-intro">{item.intro}</p>
           <div className="berita-terkini-date">
-            {formatDate(item.created_at)}
+            {formatDate(item.tanggal)}
           </div>
         </div>
       </div>
@@ -461,7 +523,7 @@ const Berita: React.FC = () => {
           </div>
         );
       }
-      return searchResults.map(renderBeritaCard);
+      return searchResults.map((item, index) => renderBeritaCard(item, index));
     }
 
     // 3. Jika ada tag yang dipilih (filter lokal)
@@ -489,7 +551,7 @@ const Berita: React.FC = () => {
           </div>
         );
       }
-      return beritaByTag.map(renderBeritaCard);
+      return beritaByTag.map((item, index) => renderBeritaCard(item, index));
     }
 
     // 4. Jika ada kategori yang dipilih
@@ -517,15 +579,43 @@ const Berita: React.FC = () => {
           </div>
         );
       }
-      return beritaByKategori.map(renderBeritaCard);
+      return beritaByKategori.map((item, index) => renderBeritaCard(item, index));
     }
 
-    // 5. Default: tampilkan berita terkini
-    return beritaTerkini.length > 0 ? (
-      beritaTerkini.map(renderBeritaCard)
-    ) : (
-      <p className="text-muted">Memuat berita terkini...</p>
-    );
+    // 5. Default: tampilkan berita terkini dengan lazy loading
+    if (beritaTerkini.length > 0) {
+      return (
+        <>
+          {beritaTerkini.map((item, index) => renderBeritaCard(item, index))}
+          
+          {/* Loading indicator */}
+          {loadingMore && (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary spinner-border-sm" role="status">
+                <span className="visually-hidden">Memuat lebih banyak...</span>
+              </div>
+              <p className="text-muted mt-2 small">Memuat berita...</p>
+            </div>
+          )}
+          
+          {/* Observer target untuk lazy loading */}
+          {hasMore && !loadingMore && (
+            <div ref={observerTarget} style={{ height: '20px' }}></div>
+          )}
+          
+          {/* End of content message */}
+          {!hasMore && beritaTerkini.length > 0 && (
+            <div className="text-center py-4">
+              <p className="text-muted small">
+                Menampilkan semua {beritaTerkini.length} berita
+              </p>
+            </div>
+          )}
+        </>
+      );
+    }
+    
+    return <p className="text-muted">Memuat berita terkini...</p>;
   };
 
   const getMainContentTitle = () => {
@@ -541,9 +631,6 @@ const Berita: React.FC = () => {
     return "Berita Terkini";
   };
 
-  // Check if we're in filter mode
-  const isFilterMode = hasSearched || selectedTag || selectedKategori;
-
   // =========================================
   // RENDER
   // =========================================
@@ -555,7 +642,7 @@ const Berita: React.FC = () => {
       </div>
 
       {/* Filter Indicator */}
-      {(selectedTag || selectedKategori || hasSearched) && (
+      {isFilterMode && (
         <div className="row mb-4">
           <div className="col-12">
             <div className="alert alert-info d-flex justify-content-between align-items-center">
@@ -632,7 +719,7 @@ const Berita: React.FC = () => {
                         <div className="carousel-caption-custom">
                           <h5 className="caption-title">{item.judul}</h5>
                           <p className="caption-date">
-                            {formatDate(item.created_at)}
+                            {formatDate(item.tanggal)}
                           </p>
                         </div>
                       </Link>
@@ -708,12 +795,15 @@ const Berita: React.FC = () => {
               <h5 className="section-title">
                 <Triangle className="icon-triangle" /> Berita Terkini
               </h5>
-              <div style={{ maxHeight: "850px", overflowY: "auto" }}>
-                {beritaTerkini.length > 0 ? (
-                  beritaTerkini.map(renderBeritaCard)
-                ) : (
-                  <p className="text-muted">Memuat berita terkini...</p>
-                )}
+              <div 
+                className="berita-terkini-scroll-container"
+                style={{ 
+                  maxHeight: "850px", 
+                  overflowY: "auto",
+                  position: "relative"
+                }}
+              >
+                {getMainContent()}
               </div>
             </div>
 
@@ -764,7 +854,7 @@ const Berita: React.FC = () => {
                 <Triangle className="icon-triangle" />
                 {getMainContentTitle()}
               </h5>
-              <div style={{ maxHeight: "800px", overflowY: "auto" }}>
+              <div className="berita-terkini-scroll-container">
                 {getMainContent()}
               </div>
             </div>

@@ -265,7 +265,7 @@ export default function Agenda() {
       <div className="container">
         <div className="row g-4 align-items-stretch">
           {/* News Section */}
-          <div className="col">
+          <div className="col" style={{ border: 2 }}>
             <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
             <div className=" news-card position-relative overflow-hidden">
               {loadingBerita ? (
@@ -330,19 +330,19 @@ export default function Agenda() {
             <div className="d-flex flex-wrap gap-3 mb-3">
               <button
                 onClick={() => setActiveTab("agenda")}
-                className={`btn tab-btn ${
+                className={`tab-btn ${
                   activeTab === "agenda" ? "active" : ""
                 }`}
               >
-                <Calendar size={18} className="me-2" /> Agenda
+                Agenda
               </button>
               <button
                 onClick={() => setActiveTab("pengumuman")}
-                className={`btn tab-btn ${
+                className={`tab-btn ${
                   activeTab === "pengumuman" ? "active" : ""
                 }`}
               >
-                <Bell size={18} className="me-2" /> Pengumuman
+                Pengumuman
               </button>
             </div>
 

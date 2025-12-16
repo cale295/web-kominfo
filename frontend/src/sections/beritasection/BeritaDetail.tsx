@@ -107,10 +107,12 @@ interface BeritaDetail {
   judul: string;
   intro: string;
   content: string;
+  id_berita_terkait?: string;
   content2?: string;
+  id_berita_terkait2?: string;
   feat_image: string;
   additional_images?: any;
-  created_at: string;
+  tanggal: string;
   updated_at: string;
   hit: string;
   created_by_name?: string;
@@ -134,11 +136,38 @@ interface BeritaTerkait {
   created_at: string;
 }
 
+// Komponen BeritaTerkaitSisipan Sederhana
+interface BeritaTerkaitSisipanProps {
+  berita: BeritaTerkait;
+  onItemClick: (slug: string) => void;
+}
+
+const BeritaTerkaitSisipan: React.FC<BeritaTerkaitSisipanProps> = ({
+  berita,
+  onItemClick,
+}) => {
+  return (
+    <div 
+      className="berita-sisipan-simple mt-4 mb-4 cursor-pointer"
+      onClick={() => onItemClick(berita.slug)}
+    >
+      <div className="sisipan-content p-3 ">
+        <div className="sisipan-label mb-2">
+        <strong>Baca Juga:</strong>
+      </div>
+        <h6 className="sisipan-judul mb-0 fw-bold">{berita.judul}</h6>
+      </div>
+    </div>
+  );
+};
+
 const BeritaDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [berita, setBerita] = useState<BeritaDetail | null>(null);
-  const [beritaTerkait, setBeritaTerkait] = useState<BeritaTerkait[]>([]);
+  const [beritaTerkaitSisipan1, setBeritaTerkaitSisipan1] = useState<BeritaTerkait | null>(null);
+  const [beritaTerkaitSisipan2, setBeritaTerkaitSisipan2] = useState<BeritaTerkait | null>(null);
+  const [beritaTerkaitSidebar, setBeritaTerkaitSidebar] = useState<BeritaTerkait[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -178,6 +207,7 @@ const BeritaDetail: React.FC = () => {
     console.log("Image URL:", fullUrl);
     return fullUrl;
   };
+  
   const allImages = useMemo(() => {
     if (!berita) return [];
 
@@ -251,6 +281,12 @@ const BeritaDetail: React.FC = () => {
     };
   }, []);
 
+  const fetchBeritaManualTerkait = async (idTerkait: string, semuaBerita: BeritaTerkait[]) => {
+    if (!idTerkait) return null;
+    
+    return semuaBerita.find((item: BeritaTerkait) => item.id_berita === idTerkait);
+  };
+
   useEffect(() => {
     const fetchBeritaDetail = async () => {
       if (!id) return;
@@ -269,17 +305,32 @@ const BeritaDetail: React.FC = () => {
         if (data) {
           setBerita(data);
           console.log("Data Berita Detail:", data);
-          console.log("Featured Image Path:", data.feat_image);
-          console.log("Full Image URL:", getImageUrl(data.feat_image));
-          console.log("Additional Images Raw:", data.additional_images);
-          console.log(
-            "Parsed Additional Images:",
-            parseAdditionalImages(data.additional_images)
-          );
+          console.log("ID Berita Terkait 1:", data.id_berita_terkait);
+          console.log("ID Berita Terkait 2:", data.id_berita_terkait2);
 
           const allBerita = resAll?.data?.data?.berita || [];
-          const terkait = allBerita
-            .filter((item: BeritaTerkait) => item.id_berita !== id)
+          
+          // 1. Ambil berita terkait sisipan (manual berdasarkan id)
+          if (data.id_berita_terkait) {
+            const terkait1 = await fetchBeritaManualTerkait(data.id_berita_terkait, allBerita);
+            setBeritaTerkaitSisipan1(terkait1 || null);
+          }
+
+          if (data.id_berita_terkait2) {
+            const terkait2 = await fetchBeritaManualTerkait(data.id_berita_terkait2, allBerita);
+            setBeritaTerkaitSisipan2(terkait2 || null);
+          }
+
+          // 2. Filter berita terkait untuk sidebar (otomatis)
+          const terkaitSidebar = allBerita
+            .filter((item: BeritaTerkait) => {
+              // Exclude berita saat ini dan berita yang sudah ditampilkan sebagai sisipan
+              if (item.id_berita === id) return false;
+              if (data.id_berita_terkait && item.id_berita === data.id_berita_terkait) return false;
+              if (data.id_berita_terkait2 && item.id_berita === data.id_berita_terkait2) return false;
+              
+              return true;
+            })
             .sort(
               (a: BeritaTerkait, b: BeritaTerkait) =>
                 new Date(b.created_at).getTime() -
@@ -287,7 +338,11 @@ const BeritaDetail: React.FC = () => {
             )
             .slice(0, 4);
 
-          setBeritaTerkait(terkait);
+          setBeritaTerkaitSidebar(terkaitSidebar);
+
+          console.log("Berita Terkait Sisipan 1:", beritaTerkaitSisipan1);
+          console.log("Berita Terkait Sisipan 2:", beritaTerkaitSisipan2);
+          console.log("Berita Terkait Sidebar:", terkaitSidebar);
         } else {
           setError("Berita tidak ditemukan");
         }
@@ -369,17 +424,12 @@ const BeritaDetail: React.FC = () => {
             <div className="article-meta">
               <span className="meta-item">
                 <Calendar size={16} />
-                {formatDate(berita.created_at)}
+                {formatDate(berita.tanggal)}
               </span>
               <span className="meta-item">
                 <Eye size={16} />
-                {berita.hit} views
+                {berita.hit}
               </span>
-              {berita.created_by_name && (
-                <span className="meta-item">
-                  Penulis: {berita.created_by_name}
-                </span>
-              )}
               <button className="btn-share" onClick={handleShare}>
                 <Share2 size={16} />
                 Bagikan
@@ -404,15 +454,33 @@ const BeritaDetail: React.FC = () => {
               )}
             </div>
 
+            {/* Content 1 */}
             <div
               className="article-content"
               dangerouslySetInnerHTML={{ __html: berita.content }}
             />
 
+            {/* Sisipan Berita Terkait 1 */}
+            {beritaTerkaitSisipan1 && (
+              <BeritaTerkaitSisipan
+                berita={beritaTerkaitSisipan1}
+                onItemClick={handleBeritaTerkaitClick}
+              />
+            )}
+
+            {/* Content 2 (jika ada) */}
             {berita.content2 && (
               <div
                 className="article-content"
                 dangerouslySetInnerHTML={{ __html: berita.content2 }}
+              />
+            )}
+
+            {/* Sisipan Berita Terkait 2 (setelah content2) */}
+            {beritaTerkaitSisipan2 && (
+              <BeritaTerkaitSisipan
+                berita={beritaTerkaitSisipan2}
+                onItemClick={handleBeritaTerkaitClick}
               />
             )}
 
@@ -453,11 +521,12 @@ const BeritaDetail: React.FC = () => {
 
         <div className="col-lg-4">
           <div className="sidebar-sticky">
-            <h5 className="sidebar-title">Berita Terkait</h5>
+            {/* Bagian Berita Terkait untuk Sidebar */}
+            <h5 className="sidebar-title">Berita Terkait Lainnya</h5>
 
-            {beritaTerkait.length > 0 ? (
+            {beritaTerkaitSidebar.length > 0 ? (
               <div className="berita-terkait-list">
-                {beritaTerkait.map((item) => (
+                {beritaTerkaitSidebar.map((item) => (
                   <div
                     key={item.id_berita}
                     className="berita-terkait-item"
@@ -491,7 +560,7 @@ const BeritaDetail: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-muted">Tidak ada berita terkait</p>
+              <p className="text-muted">Tidak ada berita terkait lainnya</p>
             )}
           </div>
         </div>

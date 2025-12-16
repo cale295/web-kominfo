@@ -536,3 +536,111 @@
     font-size: 0.95rem;
   }
 }
+
+/* tambahkan di akhir file berita.css */
+
+/* Lazy Loading Styles */
+.berita-terkini-scroll-container {
+  max-height: 850px;
+  overflow-y: auto;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+.berita-terkini-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.berita-terkini-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.berita-terkini-scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.berita-terkini-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Loading indicator */
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.loading-dots {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 20px;
+}
+
+.loading-dots div {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #007bff;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.loading-dots div:nth-child(1) {
+  left: 8px;
+  animation: loading-dots1 0.6s infinite;
+}
+
+.loading-dots div:nth-child(2) {
+  left: 8px;
+  animation: loading-dots2 0.6s infinite;
+}
+
+.loading-dots div:nth-child(3) {
+  left: 32px;
+  animation: loading-dots2 0.6s infinite;
+}
+
+.loading-dots div:nth-child(4) {
+  left: 56px;
+  animation: loading-dots3 0.6s infinite;
+}
+
+@keyframes loading-dots1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes loading-dots2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}
+
+@keyframes loading-dots3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+/* End of content message */
+.end-of-content {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  border-top: 1px solid #dee2e6;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}

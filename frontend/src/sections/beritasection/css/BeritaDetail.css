@@ -197,7 +197,7 @@
 }
 
 .indicator-dot.active {
-  background: #0d6efd;
+  background: #2d479c;
 }
 
 .indicator-dot:hover {
@@ -316,4 +316,36 @@
   max-width: 90%;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* CSS untuk Berita Terkait Sisipan Sederhana */
+.berita-sisipan-simple {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.berita-sisipan-simple:hover .sisipan-content {
+  background-color: #e9ecef;
+  border-color: #2d479c;
+}
+
+.sisipan-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.sisipan-content {
+  transition: all 0.2s ease;
+  border-left: 3px solid #2d479c;
+}
+
+.sisipan-judul {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #2d479c;
+}
+
+/* Untuk hover effect pada sisipan sederhana */
+.cursor-pointer {
+  cursor: pointer;
 }
