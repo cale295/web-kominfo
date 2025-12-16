@@ -797,7 +797,7 @@ if ($submitType === 'draft') {
             'additional_images' => json_encode($finalAdditionalImages, JSON_UNESCAPED_SLASHES),
             'slug'              => url_title($post['judul'], '-', true),
             'caption'           => $captionCover,
-            'tanggal'           => $post['tanggal'],null,
+            'tanggal'           => $post['tanggal'],
             'status'            => $status,
             'status_berita'     => $statusBerita,
             'updated_by_id'     => session()->get('id_user'),

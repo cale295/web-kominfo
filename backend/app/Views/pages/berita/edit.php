@@ -2,7 +2,11 @@
 <?= $this->section('styles') ?>
 <?= $this->include('layouts/alerts') ?>
 
+
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
 
 <style>
     /* --- VARIABLES --- */
@@ -424,12 +428,15 @@
                        value="<?= esc(old('sumber', $berita['sumber'])) ?>">
             </div>
 
-            <div class="mb-3">
-                <label for="form-label">Tanggal</label>
-                <input type="date" name="tanggal" class="form-control" value="<?= esc(old('tanggal', $berita['tanggal'])) ?>">
-            </div>
-        </div>
-
+<div class="mb-3">
+    <label class="form-label">Waktu Publish</label>
+    <div class="input-group">
+        <span class="input-group-text bg-white"><i class="bi bi-calendar-event"></i></span>
+        <input type="text" id="datetime-picker" name="tanggal" class="form-control bg-white" 
+               placeholder="Pilih tanggal dan jam..." 
+// Opsi alternatif jika formatnya berantakan:
+value="<?= old('tanggal', date('Y-m-d H:i', strtotime($berita['tanggal']))) ?>"    </div>
+</div>
         
 
         <div class="form-section">
@@ -482,7 +489,9 @@
 </div>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <script>
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
@@ -563,6 +572,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    flatpickr("#datetime-picker", {
+        enableTime: true,       // Aktifkan pemilih waktu
+        dateFormat: "Y-m-d H:i", // Format yang dikirim ke database (MySQL biasanya Y-m-d H:i:s)
+        time_24hr: true,        // Format 24 jam
+        locale: "id",           // Bahasa Indonesia
+        altInput: true,         // Tampilkan format yang lebih mudah dibaca user
+        altFormat: "j F Y, H:i", // Contoh: 14 Desember 2024, 14:30
+        minDate: "today",       // (Opsional) Tidak boleh pilih tanggal lampau
+        defaultDate: "<?= old('tanggal') ? old('tanggal') : '' ?>" // Load old value jika ada error validasi
+    });
+    
     function removeFile(indexToRemove) {
         const newDt = new DataTransfer();
         Array.from(dt.files).forEach((file, i) => {
