@@ -260,7 +260,7 @@ const Berita: React.FC = () => {
     );
     setBeritaByTag(filteredByKeyword);
   } else {
-    setBeritaByTag(filteredBerita); // ✅ Perbaikan: gunakan filteredBerita bukan filteredByKeyword
+    setBeritaByTag(filteredBerita); 
   }
 
   setLoadingTag(false);

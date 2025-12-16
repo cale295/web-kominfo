@@ -89,6 +89,7 @@
     /* Custom Table */
     .gov-table {
         margin: 0;
+        font-size: 0.85rem;
     }
 
     .gov-table thead {
@@ -99,20 +100,20 @@
         color: var(--gray-700);
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         letter-spacing: 0.5px;
-        padding: 14px 16px;
+        padding: 12px 10px;
         border: none;
         border-bottom: 2px solid var(--gray-200);
         white-space: nowrap;
     }
 
     .gov-table tbody td {
-        padding: 14px 16px;
+        padding: 12px 10px;
         vertical-align: middle;
         color: var(--gray-700);
         border-bottom: 1px solid var(--gray-100);
-        font-size: 0.875rem;
+        font-size: 0.8rem;
     }
 
     .gov-table tbody tr {
@@ -126,10 +127,13 @@
     /* Image Thumbnails */
     .img-thumbnail {
         border: 2px solid var(--gray-200);
-        border-radius: 8px;
-        padding: 4px;
+        border-radius: 6px;
+        padding: 3px;
         background: white;
         transition: all 0.2s;
+        width: 60px !important;
+        height: 45px !important;
+        object-fit: cover;
     }
 
     .img-thumbnail:hover {
@@ -139,11 +143,13 @@
 
     /* Badges */
     .badge {
-        padding: 6px 12px;
+        padding: 4px 8px;
         font-weight: 500;
-        border-radius: 6px;
-        font-size: 0.75rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
         letter-spacing: 0.3px;
+        display: inline-block;
+        margin-bottom: 2px;
     }
 
     .bg-success { background-color: var(--success) !important; }
@@ -154,12 +160,14 @@
 
     /* Action Buttons in Table */
     .gov-table .btn {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-        border-radius: 6px;
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        border-radius: 4px;
         font-weight: 500;
         transition: all 0.2s;
         border: none;
+        width: 100%;
+        margin-bottom: 3px;
     }
 
     .gov-table .btn-warning { background: var(--warning); color: white; }
@@ -172,45 +180,139 @@
     .gov-table .btn-info:hover { background: #0369a1; transform: translateY(-1px); }
 
     .content-preview {
-        max-width: 300px; overflow: hidden; text-overflow: ellipsis;
-        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-height: 1.4;
+        font-size: 0.8rem;
     }
 
+    /* Compact Date Cells */
+    .compact-date {
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    /* Status Toggle */
+    .status-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+    
+    .status-btn .switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        background-color: #cbd5e1;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .status-btn .switch::after {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        background-color: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .status-btn .switch.active {
+        background-color: #059669;
+    }
+    
+    .status-btn .switch.active::after {
+        left: 18px;
+    }
+    
+    .status-btn .switch-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #334155;
+        min-width: 60px;
+        text-align: left;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-        .gov-header { padding: 20px; }
-        .gov-header h1 { font-size: 1.375rem; }
+        .gov-header { padding: 16px; }
+        .gov-header h1 { font-size: 1.25rem; }
         .action-buttons { flex-direction: column; gap: 8px; }
         .action-buttons .btn { width: 100%; }
+        .gov-table { font-size: 0.8rem; }
+        .content-preview { max-width: 150px; }
     }
 
-    .no-data { text-align: center; padding: 60px 20px; color: var(--gray-500); }
-    .no-data i { font-size: 4rem; color: var(--gray-300); margin-bottom: 16px; }
-
-    /* Style Toggle Switch */
-    .status-btn {
-        background: none; border: none; padding: 0;
-        display: flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity 0.3s;
+    .no-data {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--gray-500);
     }
-    .status-btn:hover { opacity: 0.8; }
-    .status-btn:disabled { cursor: not-allowed !important; opacity: 0.4; }
-
-    .status-btn .switch {
-        position: relative; width: 42px; height: 22px;
-        background-color: #cbd5e1; border-radius: 20px; transition: all 0.3s ease;
-    }
-    .status-btn .switch::after {
-        content: ''; position: absolute; width: 18px; height: 18px;
-        background-color: white; border-radius: 50%;
-        top: 2px; left: 2px; transition: all 0.3s ease;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    
+    .no-data i {
+        font-size: 3rem;
+        color: var(--gray-300);
+        margin-bottom: 12px;
     }
 
-    .status-btn .switch.active { background-color: #059669; }
-    .status-btn .switch.active::after { left: 22px; }
+    /* Pagination Styles */
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background-color: var(--gray-50);
+        border-top: 1px solid var(--gray-200);
+    }
 
-    .status-btn .switch-label {
-        font-size: 0.8rem; font-weight: 600; color: #334155;
-        min-width: 65px; text-align: left;
+    .pagination-info {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+    }
+
+    .pagination-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .page-info {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+        margin: 0 10px;
+    }
+
+    .pagination-controls .btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+
+    .pagination-controls .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-input {
+        width: 60px;
+        text-align: center;
+        font-size: 0.85rem;
+        padding: 4px 8px;
+        border: 1px solid var(--gray-300);
+        border-radius: 4px;
     }
 </style>
 <?= $this->endSection() ?>
@@ -240,10 +342,10 @@
 <div class="card mb-3 shadow-sm border-0">
     <div class="card-body py-3">
         <div class="row align-items-center">
-            <div class="col-md-2 mb-2 mb-md-0">
+            <div class="col-md-3 col-lg-2 mb-2 mb-md-0">
                 <div class="d-flex align-items-center">
                     <label for="limitSelect" class="me-2 small fw-bold text-muted">Tampil:</label>
-                    <select id="limitSelect" class="form-select form-select-sm shadow-none border-gray-300" style="width: 80px;">
+                    <select id="limitSelect" class="form-select form-select-sm shadow-none border-gray-300" style="width: 90px;">
                         <option value="10" selected>10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -252,8 +354,8 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-6"></div>
-            <div class="col-md-4">
+            <div class="col-md-5 col-lg-6"></div>
+            <div class="col-md-4 col-lg-4">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white border-end-0 text-muted">
                         <i class="bi bi-search"></i>
@@ -272,30 +374,23 @@
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
-                        <th>Cover</th>
-                        <th>Foto Tambahan</th>
+                        <th class="text-center">Cover</th>
+                        <th class="text-center">Foto</th>
                         <th>Judul</th>
                         <th>Topik</th>
                         <th>Konten</th>
-                        <th>Konten 2</th>
                         <th>Kategori</th>
-                        <th>Tags</th>
-                        <th>Tanggal Tayang</th>
                         <th class="text-center">Status Tayang</th>
                         <th class="text-center">Status Berita</th>
-                        <th>Dibuat Oleh</th>
-                        <th class="text-center">Waktu Dibuat</th>
-                        <th>Diupdate Oleh</th>
-                        <th class="text-center">Update Terakhir</th>
-                        <th>Dilihat</th>
-                        <th>Status</th>
+                        <th class="text-center">Dibuat</th>
+                        <th class="text-center">Status</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     <?php if (empty($berita)): ?>
                         <tr>
-                            <td colspan="18">
+                            <td colspan="12">
                                 <div class="no-data">
                                     <i class="bi bi-inbox"></i>
                                     <p class="mb-0">Belum ada data berita</p>
@@ -305,130 +400,158 @@
                     <?php else: ?>
                         <?php foreach ($berita as $i => $row): ?>
                             <?php 
-                                // LOGIKA KONDISI
- $isTayang        = ($row['status'] == '1');   // status tayang (publish)
-$isLayakTayang   = ($row['status_berita'] == '4'); // lolos editorial
-
+                                $isTayang = ($row['status'] == '1');
+                                $isLayakTayang = ($row['status_berita'] == '4');
                             ?>
                             <tr class="data-row">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
+                                <!-- Cover Image -->
                                 <td class="text-center">
                                     <?php if (!empty($row['feat_image'])): ?>
-                                        <img src="<?= base_url($row['feat_image']) ?>" alt="Cover" class="img-thumbnail" style="width:80px;height:60px;object-fit:cover;">
+                                        <img src="<?= base_url($row['feat_image']) ?>" alt="Cover" class="img-thumbnail">
                                     <?php else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- Additional Images -->
                                 <td class="text-center">
                                     <?php
                                     $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
                                     $hasValidImage = false;
                                     if (!empty($additional)):
                                         foreach ($additional as $img):
-                                            $pathGambar = is_array($img) ? ($img['path'] ?? '') : $img;
-                                            $captionTooltip = is_array($img) ? ($img['caption'] ?? '') : '';
-                                            if (empty($pathGambar)) continue;
-                                            $filePath = FCPATH . ltrim($pathGambar, '/');
-                                            if (!file_exists($filePath)) continue;
-                                            $hasValidImage = true; 
-                                            ?>
-                                            <img src="<?= base_url($pathGambar) ?>" alt="Foto Tambahan" title="<?= esc($captionTooltip) ?>" class="img-thumbnail mb-1" style="width:50px;height:40px;object-fit:cover;cursor:help;">
-                                        <?php endforeach;
-                                        if (!$hasValidImage): ?><span class="text-muted">-</span><?php endif;
-                                    else: ?>
+                                            if (!$hasValidImage): // Hanya tampilkan satu gambar pertama
+                                                $pathGambar = is_array($img) ? ($img['path'] ?? '') : $img;
+                                                $captionTooltip = is_array($img) ? ($img['caption'] ?? '') : '';
+                                                if (!empty($pathGambar)):
+                                                    $filePath = FCPATH . ltrim($pathGambar, '/');
+                                                    if (file_exists($filePath)):
+                                                        $hasValidImage = true;
+                                                    ?>
+                                                    <img src="<?= base_url($pathGambar) ?>" alt="Foto" title="<?= esc($captionTooltip) ?>" class="img-thumbnail">
+                                                    <?php endif;
+                                                endif;
+                                            endif;
+                                        endforeach;
+                                    endif;
+                                    if (!$hasValidImage): ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
 
-                                <td style="min-width: 200px;"><strong class="searchable"><?= esc($row['judul']) ?></strong></td>
-                                <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
-                                <td><div class="content-preview"><?= strip_tags($row['content']) ?></div></td>
-                                <td><div class="content-preview"><?= strip_tags($row['content2'] ?? '-') ?></div></td>
-
-                                <td>
-                                    <?php if (!empty($row['kategori'])): ?>
-                                        <?php foreach ($row['kategori'] as $katName): ?>
-                                            <span class="badge bg-secondary me-1 mb-1"><?= esc($katName) ?></span>
-                                        <?php endforeach; ?>
-                                    <?php else: ?><span class="text-muted">-</span><?php endif; ?>
-                                </td>
-
-                                <td>
-                                    <?php if (!empty($row['tags'])): ?>
-                                        <?php foreach ($row['tags'] as $tag): ?>
-                                            <span class="badge bg-secondary me-1 mb-1"><?= esc($tag) ?></span>
-                                        <?php endforeach; ?>
-                                    <?php else: ?><span class="text-muted">-</span><?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if (!empty($row['tanggal'])): ?>
-                                        <?= date('d M Y', strtotime($row['tanggal'])) ?>
-                                    <?php else: ?><span class="text-muted">-</span><?php endif; ?>
-                                </td>
-
-                                <td class="text-center">
-                                    <?php if ($row['status'] == '1'): ?>
-                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Tayang</span>
-                                    <?php elseif ($row['status'] == '5'): ?>
-                                        <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Tidak Tayang</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-warning"><i class="bi bi-clock"></i> Draft</span>
+                                <!-- Title -->
+                                <td style="min-width: 180px;">
+                                    <strong class="searchable"><?= esc($row['judul']) ?></strong>
+                                    <?php if (!empty($row['hit'])): ?>
+                                        <small class="d-block text-muted mt-1">
+                                            <i class="bi bi-eye"></i> <?= $row['hit'] ?> dilihat
+                                        </small>
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- Topic -->
+                                <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
+
+                                <!-- Content Preview -->
+                                <td>
+                                    <div class="content-preview" title="<?= strip_tags($row['content']) ?>">
+                                        <?= strip_tags(mb_substr($row['content'], 0, 100)) ?>...
+                                    </div>
+                                </td>
+
+                                <!-- Categories -->
+                                <td style="min-width: 120px;">
+                                    <?php if (!empty($row['kategori'])): ?>
+                                        <?php 
+                                        $displayCount = 0;
+                                        foreach ($row['kategori'] as $katName):
+                                            if ($displayCount < 2): ?>
+                                                <span class="badge bg-secondary d-block mb-1"><?= esc($katName) ?></span>
+                                                <?php 
+                                                $displayCount++;
+                                            endif;
+                                        endforeach;
+                                        if (count($row['kategori']) > 2): ?>
+                                            <small class="text-muted">+<?= count($row['kategori']) - 2 ?> lainnya</small>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- Publish Status -->
+                                <td class="text-center">
+                                    <?php if ($row['status'] == '1'): ?>
+                                        <span class="badge bg-success">Tayang</span>
+                                    <?php elseif ($row['status'] == '5'): ?>
+                                        <span class="badge bg-secondary">Tidak Tayang</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-warning">Draft</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- News Status -->
                                 <td class="text-center">
                                     <?php
                                     $statusBerita = [
-                                        '0' => ['bg-secondary', 'Draft', 'file-earmark'],
-                                        '2' => ['bg-info', 'Menunggu Verifikasi', 'hourglass-split'],
-                                        '3' => ['bg-success', 'Perbaikan', 'wrench'],
-                                        '4' => ['bg-warning', 'Layak Tayang', 'check-circle'],
-                                        '6' => ['bg-danger', 'Revisi', 'arrow-clockwise']
+                                        '0' => ['bg-secondary', 'Draft'],
+                                        '2' => ['bg-info', 'Verifikasi'],
+                                        '3' => ['bg-success', 'Perbaikan'],
+                                        '4' => ['bg-warning', 'Layak Tayang'],
+                                        '6' => ['bg-danger', 'Revisi']
                                     ];
-                                    [$class, $text, $icon] = $statusBerita[$row['status_berita']] ?? ['bg-secondary', '-', 'question-circle'];
+                                    [$class, $text] = $statusBerita[$row['status_berita']] ?? ['bg-secondary', '-'];
                                     ?>
-                                    <span class="badge <?= $class ?>"><i class="bi bi-<?= $icon ?>"></i> <?= $text ?></span>
+                                    <span class="badge <?= $class ?>"><?= $text ?></span>
                                 </td>
 
-                                <td class="searchable"><?= esc($row['created_by_name'] ?? '-') ?></td>
-                                <td class="text-center" style="white-space: nowrap;"><?= !empty($row['created_at']) ? date('d M Y H:i', strtotime($row['created_at'])) : '-' ?></td>
-                                <td><?= esc($row['updated_by_name'] ?? '-') ?></td>
-                                <td class="text-center" style="white-space: nowrap;"><?= !empty($row['updated_at']) ? date('d M Y H:i', strtotime($row['updated_at'])) : '-' ?></td>
-                                <td><?= esc($row['hit'] ?? '-') ?></td>
+                                <!-- Created Date -->
+                                <td class="text-center compact-date">
+                                    <?= !empty($row['created_at']) ? date('d/m/y', strtotime($row['created_at'])) : '-' ?>
+                                </td>
                                 
+                                <!-- Status Toggle -->
                                 <td class="text-center">
                                     <button type="button" class="status-btn" 
-        data-id="<?= $row['id_berita'] ?>" 
-        data-url="<?= site_url('berita/toggle-status') ?>"
-        <?= !$isLayakTayang ? 'disabled title="Status belum Layak Tayang"' : '' ?>>
-<div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
-<span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
-
+                                            data-id="<?= $row['id_berita'] ?>" 
+                                            data-url="<?= site_url('berita/toggle-status') ?>"
+                                            <?= !$isLayakTayang ? 'disabled title="Status belum Layak Tayang"' : '' ?>>
+                                        <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
+                                        <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
                                     </button>
                                 </td>
                                 
-                                <td class="text-center" style="white-space: nowrap;">
+                                <!-- Actions -->
+                                <td class="text-center" style="min-width: 110px;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
-                                            <a href="<?= site_url('berita/show/' . $row['slug']) ?>" class="btn btn-info"><i class="bi bi-eye"></i> Lihat</a>
+                                            <a href="<?= site_url('berita/show/' . $row['slug']) ?>" class="btn btn-info btn-sm py-1" title="Lihat Detail">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
                                         <?php endif; ?>
                                         
                                         <?php if (!empty($can_update)): ?>
-                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+                                            <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning btn-sm py-1" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
                                         <?php endif; ?>
 
                                         <?php if (!empty($can_delete) && !$isTayang): ?>
-                                            <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post">
+                                            <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post" class="d-inline">
                                                 <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Yakin membuang berita ini ke sampah?')">
-                                                    <i class="bi bi-trash"></i> Trash
+                                                <button type="submit" class="btn btn-danger btn-sm py-1 w-100" 
+                                                        onclick="return confirm('Yakin membuang berita ini ke sampah?')"
+                                                        title="Pindah ke Sampah">
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
                                         <?php endif; ?>
 
-                                        <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" class="btn btn-info btn-sm"><i class="bi bi-journal-text"></i> Log</a>
+                                        <a href="<?= site_url('berita/' . $row['id_berita'] . '/log') ?>" class="btn btn-info btn-sm py-1" title="Log Aktivitas">
+                                            <i class="bi bi-journal-text"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -437,93 +560,285 @@ $isLayakTayang   = ($row['status_berita'] == '4'); // lolos editorial
                 </tbody>
             </table>
         </div>
-        <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center" id="paginationInfo">
-            <small class="text-muted">Menampilkan <span id="showingStart">0</span> - <span id="showingEnd">0</span> dari <span id="totalData">0</span> data</small>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Menampilkan <span id="showingStart">0</span> - <span id="showingEnd">0</span> dari <span id="totalData">0</span> data
+            </div>
+            
+            <div class="pagination-controls">
+                <button id="firstPage" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chevron-double-left"></i>
+                </button>
+                <button id="prevPage" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                
+                <span class="page-info">
+                    Halaman <input type="number" id="currentPageInput" class="page-input" value="1" min="1"> dari <span id="totalPages">1</span>
+                </span>
+                
+                <button id="nextPage" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <button id="lastPage" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chevron-double-right"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-// --- Script Toggle Status ---
-$(document).on('click', '.status-btn', function () {
-    let btn = $(this);
-    let id = btn.data('id');
-    let url = btn.data('url'); 
-    let switchEl = btn.find('.switch');
-    let labelEl = btn.find('.switch-label');
-    let csrfName = '<?= csrf_token() ?>';
-    let csrfHash = $('input[name="'+csrfName+'"]').val(); 
-
-    btn.prop('disabled', true);
-    btn.css('opacity', '0.5');
-
-    $.ajax({
-        url: url, type: "POST",
-        data: { id: id, [csrfName]: csrfHash },
-        dataType: "json",
-        success: function(res) {
-            btn.prop('disabled', false);
-            btn.css('opacity', '1');
-            if (res.status === 'success') {
-                if (res.newStatus == 1) {
-                    switchEl.addClass('active'); labelEl.text('Aktif');
-                } else {
-                    switchEl.removeClass('active'); labelEl.text('Non-Aktif');
-                }
-                $('input[name="'+csrfName+'"]').val(res.token);
-            } else {
-                alert('Gagal: ' + res.message);
-                if(res.token) $('input[name="'+csrfName+'"]').val(res.token);
-            }
-        },
-        error: function() {
-            btn.prop('disabled', false); btn.css('opacity', '1');
-            alert('Terjadi kesalahan koneksi ke server.');
-        }
-    });
-});
-
-// --- Script Search & Filter ---
 document.addEventListener('DOMContentLoaded', function() {
+    // Elements
     const searchInput = document.getElementById('searchInput');
     const limitSelect = document.getElementById('limitSelect');
     const tableBody = document.getElementById('tableBody');
     const rows = Array.from(tableBody.querySelectorAll('tr.data-row'));
-    const totalDataSpan = document.getElementById('totalData');
+    
+    // Pagination elements
     const showingStartSpan = document.getElementById('showingStart');
     const showingEndSpan = document.getElementById('showingEnd');
-
-    function filterTable() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const limit = parseInt(limitSelect.value);
-        let visibleCount = 0;
-        let totalFiltered = 0;
-
-        rows.forEach(row => {
-            const textContent = row.textContent.toLowerCase();
-            const matchesSearch = textContent.includes(searchTerm);
+    const totalDataSpan = document.getElementById('totalData');
+    const totalPagesSpan = document.getElementById('totalPages');
+    const currentPageInput = document.getElementById('currentPageInput');
+    
+    // Button elements
+    const firstPageBtn = document.getElementById('firstPage');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const lastPageBtn = document.getElementById('lastPage');
+    
+    // State
+    let currentPage = 1;
+    let currentLimit = 10;
+    let currentSearch = '';
+    let totalFilteredRows = 0;
+    let totalPages = 1;
+    
+    // Initialize
+    initTable();
+    
+    // Event Listeners
+    searchInput.addEventListener('input', function() {
+        currentSearch = this.value.toLowerCase();
+        currentPage = 1;
+        currentPageInput.value = 1;
+        filterAndPaginate();
+    });
+    
+    limitSelect.addEventListener('change', function() {
+        currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
+        currentPage = 1;
+        currentPageInput.value = 1;
+        filterAndPaginate();
+    });
+    
+    // Pagination button events
+    firstPageBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage = 1;
+            currentPageInput.value = 1;
+            filterAndPaginate();
+        }
+    });
+    
+    prevPageBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            currentPageInput.value = currentPage;
+            filterAndPaginate();
+        }
+    });
+    
+    nextPageBtn.addEventListener('click', function() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            currentPageInput.value = currentPage;
+            filterAndPaginate();
+        }
+    });
+    
+    lastPageBtn.addEventListener('click', function() {
+        if (currentPage < totalPages) {
+            currentPage = totalPages;
+            currentPageInput.value = currentPage;
+            filterAndPaginate();
+        }
+    });
+    
+    currentPageInput.addEventListener('change', function() {
+        let page = parseInt(this.value);
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        
+        currentPage = page;
+        this.value = page;
+        filterAndPaginate();
+    });
+    
+    // Functions
+    function initTable() {
+        // Set default limit
+        limitSelect.value = '10';
+        currentLimit = 10;
+        
+        // Show all rows initially
+        rows.forEach((row, index) => {
+            row.style.display = '';
+            row.dataset.index = index;
+        });
+        
+        filterAndPaginate();
+    }
+    
+    function filterAndPaginate() {
+        // Filter rows based on search
+        const filteredRows = rows.filter(row => {
+            if (currentSearch === '') return true;
             
-            if (matchesSearch) {
-                totalFiltered++;
-                if (limit === -1 || visibleCount < limit) {
-                    row.style.display = '';
-                    visibleCount++;
+            const textContent = row.textContent.toLowerCase();
+            return textContent.includes(currentSearch);
+        });
+        
+        totalFilteredRows = filteredRows.length;
+        
+        // Calculate pagination
+        if (currentLimit === -1) {
+            totalPages = 1;
+            currentPage = 1;
+        } else {
+            totalPages = Math.ceil(totalFilteredRows / currentLimit);
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+                currentPageInput.value = currentPage;
+            }
+        }
+        
+        // Update UI
+        updatePaginationInfo();
+        updatePaginationButtons();
+        
+        // Show/hide rows
+        rows.forEach(row => {
+            row.style.display = 'none';
+        });
+        
+        if (currentLimit === -1) {
+            // Show all filtered rows
+            filteredRows.forEach((row, index) => {
+                row.style.display = '';
+                updateRowNumber(row, index + 1);
+            });
+        } else {
+            // Show only rows for current page
+            const startIndex = (currentPage - 1) * currentLimit;
+            const endIndex = startIndex + currentLimit;
+            
+            filteredRows.slice(startIndex, endIndex).forEach((row, index) => {
+                row.style.display = '';
+                updateRowNumber(row, startIndex + index + 1);
+            });
+        }
+        
+        // Show no data message if needed
+        const noDataRow = tableBody.querySelector('tr:not(.data-row)');
+        if (noDataRow) {
+            noDataRow.style.display = totalFilteredRows === 0 ? '' : 'none';
+        }
+    }
+    
+    function updateRowNumber(row, number) {
+        const rowNumberCell = row.querySelector('.row-number');
+        if (rowNumberCell) {
+            rowNumberCell.textContent = number;
+        }
+    }
+    
+    function updatePaginationInfo() {
+        if (totalFilteredRows === 0) {
+            showingStartSpan.textContent = '0';
+            showingEndSpan.textContent = '0';
+            totalDataSpan.textContent = '0';
+            totalPagesSpan.textContent = '1';
+            return;
+        }
+        
+        if (currentLimit === -1) {
+            showingStartSpan.textContent = '1';
+            showingEndSpan.textContent = totalFilteredRows;
+        } else {
+            const start = (currentPage - 1) * currentLimit + 1;
+            const end = Math.min(currentPage * currentLimit, totalFilteredRows);
+            showingStartSpan.textContent = start;
+            showingEndSpan.textContent = end;
+        }
+        
+        totalDataSpan.textContent = totalFilteredRows;
+        totalPagesSpan.textContent = totalPages;
+    }
+    
+    function updatePaginationButtons() {
+        firstPageBtn.disabled = currentPage <= 1;
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
+        lastPageBtn.disabled = currentPage >= totalPages;
+    }
+    
+    // --- Script Toggle Status ---
+    $(document).on('click', '.status-btn:not(:disabled)', function () {
+        let btn = $(this);
+        let id = btn.data('id');
+        let url = btn.data('url'); 
+        let switchEl = btn.find('.switch');
+        let labelEl = btn.find('.switch-label');
+        let csrfName = '<?= csrf_token() ?>';
+        let csrfHash = $('input[name="'+csrfName+'"]').val(); 
+
+        btn.prop('disabled', true);
+        btn.css('opacity', '0.5');
+
+        $.ajax({
+            url: url, 
+            type: "POST",
+            data: { 
+                id: id, 
+                [csrfName]: csrfHash 
+            },
+            dataType: "json",
+            success: function(res) {
+                btn.prop('disabled', false);
+                btn.css('opacity', '1');
+                if (res.status === 'success') {
+                    if (res.newStatus == 1) {
+                        switchEl.addClass('active'); 
+                        labelEl.text('Aktif');
+                    } else {
+                        switchEl.removeClass('active'); 
+                        labelEl.text('Non-Aktif');
+                    }
+                    $('input[name="'+csrfName+'"]').val(res.token);
+                    
+                    // Refresh page setelah 1 detik
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
                 } else {
-                    row.style.display = 'none';
+                    alert('Gagal: ' + res.message);
+                    if(res.token) {
+                        $('input[name="'+csrfName+'"]').val(res.token);
+                    }
                 }
-            } else {
-                row.style.display = 'none';
+            },
+            error: function() {
+                btn.prop('disabled', false); 
+                btn.css('opacity', '1');
+                alert('Terjadi kesalahan koneksi ke server.');
             }
         });
-
-        showingStartSpan.textContent = totalFiltered > 0 ? 1 : 0;
-        showingEndSpan.textContent = visibleCount;
-        totalDataSpan.textContent = totalFiltered;
-    }
-
-    searchInput.addEventListener('keyup', filterTable);
-    limitSelect.addEventListener('change', filterTable);
-    filterTable();
+    });
 });
 </script>
 
