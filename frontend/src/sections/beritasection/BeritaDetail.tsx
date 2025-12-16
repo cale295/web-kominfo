@@ -44,24 +44,23 @@ const parseAdditionalImages = (imagesData: any): AdditionalImage[] => {
 // Komponen Carousel
 interface CarouselProps {
   images: AdditionalImage[];
-  getImageUrl: (path: string) => string | null;
+  currentIndex: number;
+  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Carousel: React.FC<CarouselProps> = ({ images, getImageUrl }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+
+const Carousel: React.FC<CarouselProps> = ({
+  images,
+  currentIndex,
+  setCurrentIndex,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const next = () => {
+  const next = () =>
     setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
 
-  const prev = () => {
+  const prev = () =>
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -73,71 +72,34 @@ const Carousel: React.FC<CarouselProps> = ({ images, getImageUrl }) => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [images.length, isHovered]);
+  }, [images.length, isHovered, setCurrentIndex]);
 
-  const currentImage = images[currentIndex];
-
-  if (images.length === 0) return null;
+  if (!images.length) return null;
 
   return (
     <div
-      className="carousel-container position-relative"
+      className="carousel-container"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      role="region"
-      aria-label="Galeri foto berita"
     >
       <div className="carousel-slide text-center">
         <img
-          src={currentImage.url}
+          src={images[currentIndex].url}
           className="img-fluid rounded shadow-sm d-block mx-auto"
-          alt={currentImage.caption || `Foto ${currentIndex + 1}`}
           style={{ maxHeight: "500px", objectFit: "contain" }}
-          onError={(e) => {
-            console.error("Carousel image failed to load:", currentImage.url);
-            e.currentTarget.style.display = "none";
-          }}
         />
-        {currentImage.caption && (
-          <div className="carousel-caption mt-2 fst-italic text-muted small">
-            {currentImage.caption}
-          </div>
-        )}
       </div>
 
       {images.length > 1 && (
         <>
-          <button
-            className="carousel-control-prev"
-            onClick={prev}
-            aria-label="Foto sebelumnya"
-          >
-            ‹
-          </button>
-          <button
-            className="carousel-control-next"
-            onClick={next}
-            aria-label="Foto selanjutnya"
-          >
-            ›
-          </button>
-
-          <div className="carousel-indicators d-flex justify-content-center mt-3">
-            {images.map((_, idx) => (
-              <button
-                key={idx}
-                className={`indicator-dot ${idx === currentIndex ? "active" : ""}`}
-                onClick={() => goToSlide(idx)}
-                aria-label={`Lihat foto ${idx + 1}`}
-                aria-current={idx === currentIndex ? "true" : undefined}
-              />
-            ))}
-          </div>
+          <button className="carousel-control-prev" onClick={prev}>‹</button>
+          <button className="carousel-control-next" onClick={next}>›</button>
         </>
       )}
     </div>
   );
 };
+
 
 interface BeritaDetail {
   id_berita: string;
@@ -178,6 +140,8 @@ const BeritaDetail: React.FC = () => {
   const [beritaTerkait, setBeritaTerkait] = useState<BeritaTerkait[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+
 
   
 
@@ -422,16 +386,24 @@ const BeritaDetail: React.FC = () => {
             </div>
 
             <div className="article-image-section mt-4">
-              {allImages.length > 0 && (
-  <div className="unified-carousel-section mt-4 mb-4">
-    <Carousel images={allImages} getImageUrl={getImageUrl} />
-  </div>
+             {allImages.length > 0 && (
+  <>
+    <Carousel
+      images={allImages}
+      currentIndex={currentSlide}
+      setCurrentIndex={setCurrentSlide}
+    />
+
+    {allImages[currentSlide]?.caption && (
+      <div className="image-caption-outside">
+        {allImages[currentSlide].caption}
+      </div>
+    )}
+  </>
 )}
+
             </div>
 
-            <div className="article-intro">
-              <strong>{berita.intro}</strong>
-            </div>
 
             <div
               className="article-content"
