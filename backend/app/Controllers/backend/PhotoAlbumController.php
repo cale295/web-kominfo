@@ -167,29 +167,59 @@ class PhotoAlbumController extends BaseController
     }
 
     // ================= SIMPAN ALBUM BARU =================
-    public function create()
+    // ================= SIMPAN ALBUM BARU (DARI MODAL) =================
+    // Ubah nama dari 'create' menjadi 'store' agar sesuai dengan action form di View
+    public function store()
     {
+        // 1. Cek Hak Akses
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_create']) {
             return redirect()->to('/album')->with('error', 'Kamu tidak punya izin menambah album.');
         }
 
+        // 2. Validasi Input (Penting untuk Modal)
+        if (!$this->validate([
+            'album_name'  => [
+                'rules'  => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'Nama album wajib diisi.',
+                    'min_length' => 'Nama album minimal 3 karakter.'
+                ]
+            ],
+            'cover_image' => [
+                'rules'  => 'is_image[cover_image]|mime_in[cover_image,image/jpg,image/jpeg,image/png]|max_size[cover_image,2048]',
+                'errors' => [
+                    'is_image' => 'File harus berupa gambar.',
+                    'mime_in'  => 'Format gambar harus JPG atau PNG.',
+                    'max_size' => 'Ukuran gambar maksimal 2MB.'
+                ]
+            ]
+        ])) {
+            // Jika validasi gagal, kembali ke halaman dengan error (SweetAlert atau Flashdata akan menangkapnya)
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // 3. Siapkan Data
         $data = [
-            'album_name' => $this->request->getPost('album_name'),
+            'album_name'  => $this->request->getPost('album_name'),
             'description' => $this->request->getPost('description'),
         ];
 
+        // 4. Proses Upload Cover
         $cover = $this->request->getFile('cover_image');
         if ($cover && $cover->isValid() && !$cover->hasMoved()) {
             $newName = $cover->getRandomName();
+            // Simpan ke folder uploads/album_covers/
             $cover->move('uploads/album_covers/', $newName);
             $data['cover_image'] = $newName;
         }
 
+        // 5. Simpan ke Database
         if (!$this->albumModel->insert($data)) {
             return redirect()->back()->withInput()->with('errors', $this->albumModel->errors());
         }
 
+        // 6. Redirect Sukses
         return redirect()->to('/album')->with('success', 'Album berhasil ditambahkan.');
     }
 

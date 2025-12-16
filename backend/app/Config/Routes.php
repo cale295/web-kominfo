@@ -188,7 +188,8 @@ $routes->resource('banner', ['controller' => 'backend\BannerController', 'except
 $routes->get('banner/view/(:num)', 'backend\BannerController::view/$1');
 $routes->post('banner/toggle-status', 'backend\BannerController::toggleStatus');
 $routes->get('banner/click/(:num)', 'backend\BannerController::click/$1');
-
+// Rute untuk menyimpan album baru
+$routes->post('album/store', 'backend\PhotoAlbumController::store');
 
 
 //menu 

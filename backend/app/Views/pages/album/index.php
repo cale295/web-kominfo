@@ -121,9 +121,11 @@
             <h3 class="page-title"><i class="bi bi-collection-fill me-2 text-primary"></i><?= esc($title) ?></h3>
             <p class="text-muted mb-0 mt-1">Kelola album dan koleksi foto Anda di sini.</p>
         </div>
-        <a href="<?= site_url('album/new') ?>" class="btn btn-primary px-4 py-2 shadow-sm rounded-pill fw-bold">
+        
+        <button type="button" class="btn btn-primary px-4 py-2 shadow-sm rounded-pill fw-bold" 
+                data-bs-toggle="modal" data-bs-target="#addAlbumModal">
             <i class="bi bi-plus-lg me-2"></i>Album Baru
-        </a>
+        </button>
     </div>
 
     <div class="card card-table">
@@ -210,6 +212,58 @@
     </div>
 </div>
 
+<div class="modal fade" id="addAlbumModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <div class="modal-header bg-white border-bottom-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-folder-plus me-2"></i>Album Baru</h5>
+                    <p class="text-muted small mb-0">Silakan lengkapi detail album di bawah ini.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body bg-light mt-3">
+                <form action="<?= site_url('album/store') ?>" method="post" enctype="multipart/form-data" id="addAlbumForm">
+                    <?= csrf_field() ?>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Nama Album</label>
+                        <input type="text" name="album_name" class="form-control form-control-lg border-0 shadow-sm" placeholder="Contoh: Liburan Bali 2024" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Deskripsi</label>
+                        <textarea name="description" class="form-control border-0 shadow-sm" rows="3" placeholder="Ceritakan sedikit tentang album ini..."></textarea>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Cover Album (Opsional)</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-white p-2 rounded shadow-sm border" style="width: 80px; height: 80px;">
+                                <img id="coverPreview" src="https://cdn-icons-png.flaticon.com/512/83/83574.png" class="w-100 h-100 object-fit-cover rounded" style="opacity: 0.4;">
+                            </div>
+                            <div class="w-100">
+                                <input type="file" name="cover_image" id="coverInput" class="form-control form-control-sm" accept="image/*">
+                                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Format JPG/PNG. Maks 2MB.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            
+            <div class="modal-footer border-top-0 bg-white">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                <button type="button" onclick="document.getElementById('addAlbumForm').submit()" class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-save me-2"></i> Simpan Album
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="uploadModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
@@ -262,6 +316,44 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // ----------------------------------------------------------------
+    // LOGIC MODAL TAMBAH ALBUM (NEW)
+    // ----------------------------------------------------------------
+    
+    // Preview Cover Image saat dipilih
+    const coverInput = document.getElementById('coverInput');
+    const coverPreview = document.getElementById('coverPreview');
+
+    if(coverInput) {
+        coverInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    coverPreview.src = e.target.result;
+                    coverPreview.style.opacity = '1'; 
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Reset Form Tambah Album saat modal ditutup
+    const addAlbumModalEl = document.getElementById('addAlbumModal');
+    if(addAlbumModalEl) {
+        addAlbumModalEl.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('addAlbumForm').reset();
+            if(coverPreview) {
+                coverPreview.src = "https://cdn-icons-png.flaticon.com/512/83/83574.png";
+                coverPreview.style.opacity = '0.4';
+            }
+        });
+    }
+
+    // ----------------------------------------------------------------
+    // LOGIC LAINNYA (HAPUS & UPLOAD - SUDAH ADA SEBELUMNYA)
+    // ----------------------------------------------------------------
+
     // 1. Script Hapus Album (SweetAlert)
     document.querySelectorAll('.btn-delete-confirm').forEach(button => {
         button.addEventListener('click', function() {
@@ -291,21 +383,16 @@
 
     let dataTransfer = new DataTransfer(); 
 
-    // A. SAAT MODAL DIBUKA (PENTING: MENGISI ID ALBUM)
     uploadModalEl.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const idAlbum = button.getAttribute('data-id');
         const nameAlbum = button.getAttribute('data-name');
-
-        // Isi Hidden Input & Judul Modal
         uploadModalEl.querySelector('#modalAlbumId').value = idAlbum;
         uploadModalEl.querySelector('#modalAlbumName').textContent = nameAlbum;
     });
 
-    // B. LOGIKA FILE SELECT
     fileInput.addEventListener('change', handleFiles);
 
-    // C. LOGIKA DRAG AND DROP
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, preventDefaults, false);
     });
@@ -324,21 +411,17 @@
         handleFiles({ target: { files: files } });
     });
 
-    // D. FUNGSI PROSES FILE & BIKIN KARTU PREVIEW
     function handleFiles(e) {
         const newFiles = Array.from(e.target.files);
-        
         newFiles.forEach(file => {
             if (!file.type.match('image.*')) return;
             dataTransfer.items.add(file);
-
             const reader = new FileReader();
             reader.onload = function(evt) {
                 createCard(evt.target.result, file.name);
             }
             reader.readAsDataURL(file);
         });
-
         fileInput.files = dataTransfer.files;
         updateUI();
     }
@@ -363,15 +446,12 @@
         previewContainer.appendChild(div);
     }
 
-    // E. FUNGSI HAPUS SALAH SATU FOTO DARI ANTRIAN
     window.removeFile = function(btn, fileName) {
         btn.closest('.preview-card').remove();
-        
         const newDataTransfer = new DataTransfer();
         Array.from(dataTransfer.files).forEach(file => {
             if (file.name !== fileName) newDataTransfer.items.add(file);
         });
-        
         dataTransfer = newDataTransfer;
         fileInput.files = dataTransfer.files;
         updateUI();
@@ -389,7 +469,6 @@
         }
     }
 
-    // Reset saat modal ditutup
     uploadModalEl.addEventListener('hidden.bs.modal', function () {
         dataTransfer = new DataTransfer();
         fileInput.files = dataTransfer.files;
@@ -397,7 +476,6 @@
         updateUI();
     });
 
-    // Tooltip Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
