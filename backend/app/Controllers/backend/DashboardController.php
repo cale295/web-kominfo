@@ -6,7 +6,6 @@ use App\Models\AgendaModel;
 use App\Models\PhotoGalleryModel;
 use App\Models\DokumentModel;
 use App\Models\BeritaLogModel;
-use App\Models\AccessRightsModel;
 
 class DashboardController extends Controller
 {
@@ -21,12 +20,7 @@ class DashboardController extends Controller
         $gallery     = new PhotoGalleryModel();
         $document    = new DokumentModel();
         $beritaLog   = new BeritaLogModel();
-        $accessModel = new AccessRightsModel();
         
-        $userRole = session()->get('role');
-        
-        // Ambil access rights berdasarkan role user
-        $accessRights = $accessModel->where('role', $userRole)->findAll();
         
         $today = date('Y-m-d');
         
@@ -62,8 +56,6 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->find(),
             
-            'user_role'      => $userRole,
-            'access_rights'  => $accessRights,
         ];
         
         return view('/pages/Dashboard', $data);

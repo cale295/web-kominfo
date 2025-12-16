@@ -159,6 +159,7 @@ interface BeritaDetail {
   id_sub_kategori: string | null;
   kategori: string[];
   kategori_ids: string[];
+  tags: string[];
 }
 
 interface BeritaTerkait {
@@ -178,11 +179,10 @@ const BeritaDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const additionalImgs = useMemo(() => {
-    return parseAdditionalImages(berita?.additional_images);
-  }, [berita?.additional_images]);
+  
 
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
+  
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -217,6 +217,25 @@ const BeritaDetail: React.FC = () => {
     console.log("Image URL:", fullUrl);
     return fullUrl;
   };
+  const allImages = useMemo(() => {
+  if (!berita) return [];
+  
+  const images: AdditionalImage[] = [];
+  
+  // Tambahkan feat_image sebagai gambar pertama (simpan path saja)
+  if (berita.feat_image) {
+    images.push({
+      url: berita.feat_image, // Simpan path mentah
+      caption: berita.caption || ""
+    });
+  }
+  
+  // Tambahkan additional_images
+  const additionalImgs = parseAdditionalImages(berita.additional_images);
+  images.push(...additionalImgs);
+  
+  return images;
+}, [berita]);
 
   // Event listener untuk copy protection
   useEffect(() => {
@@ -403,31 +422,11 @@ const BeritaDetail: React.FC = () => {
             </div>
 
             <div className="article-image-section mt-4">
-              {berita.feat_image && (
-                <div className="main-image-wrapper mb-4">
-                  <img
-                    src={getImageUrl(berita.feat_image) || ""}
-                    className="img-fluid rounded shadow-sm"
-                    alt={berita.judul}
-                    onError={(e) => {
-                      console.error("Featured image failed to load:", berita.feat_image);
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                  {berita.caption && (
-                    <div className="image-caption text-center mt-2 fst-italic text-muted small">
-                      {berita.caption}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {additionalImgs.length > 0 && (
-                <div className="additional-images-carousel mt-4">
-                  <h5 className="mb-3">Galeri Foto</h5>
-                  <Carousel images={additionalImgs} getImageUrl={getImageUrl} />
-                </div>
-              )}
+              {allImages.length > 0 && (
+  <div className="unified-carousel-section mt-4 mb-4">
+    <Carousel images={allImages} getImageUrl={getImageUrl} />
+  </div>
+)}
             </div>
 
             <div className="article-intro">
@@ -462,10 +461,9 @@ const BeritaDetail: React.FC = () => {
               )}
             </div>
 
-            {berita.kategori && berita.kategori.length > 0 && (
+            {berita.tags && berita.tags.length > 0 && (
               <div className="article-tags mt-4">
-                <strong>Kategori:</strong>
-                {berita.kategori.map((cat, idx) => (
+                {berita.tags.map((cat, idx) => (
                   <span key={idx} className="tag-badge bg-primary text-white px-2 py-1 rounded me-2">
                     {cat}
                   </span>
