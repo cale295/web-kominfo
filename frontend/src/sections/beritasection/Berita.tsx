@@ -230,41 +230,41 @@ const Berita: React.FC = () => {
   // FILTER BERITA BERDASARKAN TAG (Lokal)
   // =========================================
   const filterBeritaByTag = (tag: Tag) => {
-    setLoadingTag(true);
-    setSelectedTag(tag);
-    setSelectedKategori(null); // Clear kategori filter
+  setLoadingTag(true);
+  setSelectedTag(tag);
+  setSelectedKategori(null); // Clear kategori filter
 
-    // Clear search saat filter by tag
-    setIsSearching(false);
-    setSearchQuery("");
-    setSearchResults([]);
-    setHasSearched(false);
+  // Clear search saat filter by tag
+  setIsSearching(false);
+  setSearchQuery("");
+  setSearchResults([]);
+  setHasSearched(false);
 
-    // Filter berita yang memiliki tag yang dipilih
-    const filteredBerita = allBerita.filter((berita) => {
-      if (!berita.tags || !Array.isArray(berita.tags)) return false;
+  // Filter berita yang memiliki tag yang dipilih
+  const filteredBerita = allBerita.filter((berita) => {
+    if (!berita.tags || !Array.isArray(berita.tags)) return false;
 
-      return berita.tags.some((tagString) =>
-        tagString?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
-      );
-    });
+    return berita.tags.some((tagString) =>
+      tagString?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
+    );
+  });
 
-    console.log("📊 Found berita with tag:", filteredBerita.length);
+  console.log("📊 Found berita with tag:", filteredBerita.length);
 
-    // Jika tidak ada data, coba fallback dengan keyword di judul/intro
-    if (filteredBerita.length === 0) {
-      const filteredByKeyword = allBerita.filter(
-        (berita) =>
-          berita.judul?.toLowerCase().includes(tag.nama_tag?.toLowerCase()) ||
-          berita.intro?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
-      );
-      setBeritaByTag(filteredByKeyword);
-    } else {
-      setBeritaByTag(filteredByKeyword);
-    }
+  // Jika tidak ada data, coba fallback dengan keyword di judul/intro
+  if (filteredBerita.length === 0) {
+    const filteredByKeyword = allBerita.filter(
+      (berita) =>
+        berita.judul?.toLowerCase().includes(tag.nama_tag?.toLowerCase()) ||
+        berita.intro?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
+    );
+    setBeritaByTag(filteredByKeyword);
+  } else {
+    setBeritaByTag(filteredBerita); // ✅ Perbaikan: gunakan filteredBerita bukan filteredByKeyword
+  }
 
-    setLoadingTag(false);
-  };
+  setLoadingTag(false);
+};
 
   // =========================================
   // HANDLE SEARCH

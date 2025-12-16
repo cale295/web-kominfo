@@ -11,7 +11,7 @@ interface AdditionalImage {
 
 const parseAdditionalImages = (imagesData: any): AdditionalImage[] => {
   if (!imagesData) return [];
-  
+
   try {
     if (Array.isArray(imagesData)) {
       return imagesData.map((item: any) => ({
@@ -19,10 +19,10 @@ const parseAdditionalImages = (imagesData: any): AdditionalImage[] => {
         caption: item.caption || "",
       }));
     }
-    
-    if (typeof imagesData === 'string') {
+
+    if (typeof imagesData === "string") {
       const trimmed = imagesData.trim();
-      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
         const parsed = JSON.parse(trimmed);
         if (Array.isArray(parsed)) {
           return parsed.map((item: any) => ({
@@ -48,7 +48,6 @@ interface CarouselProps {
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
-
 const Carousel: React.FC<CarouselProps> = ({
   images,
   currentIndex,
@@ -56,8 +55,7 @@ const Carousel: React.FC<CarouselProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const next = () =>
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+  const next = () => setCurrentIndex((prev) => (prev + 1) % images.length);
 
   const prev = () =>
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
@@ -92,14 +90,17 @@ const Carousel: React.FC<CarouselProps> = ({
 
       {images.length > 1 && (
         <>
-          <button className="carousel-control-prev" onClick={prev}>‹</button>
-          <button className="carousel-control-next" onClick={next}>›</button>
+          <button className="carousel-control-prev" onClick={prev}>
+            ‹
+          </button>
+          <button className="carousel-control-next" onClick={next}>
+            ›
+          </button>
         </>
       )}
     </div>
   );
 };
-
 
 interface BeritaDetail {
   id_berita: string;
@@ -142,11 +143,7 @@ const BeritaDetail: React.FC = () => {
   const [error, setError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
 
-
-  
-
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
-  
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -170,54 +167,58 @@ const BeritaDetail: React.FC = () => {
 
   const getImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return null;
-    
+
     const cleanPath = imagePath.replace(/^\/+/, "");
-    
-    if (cleanPath.startsWith('http')) {
+
+    if (cleanPath.startsWith("http")) {
       return cleanPath;
     }
-    
+
     const fullUrl = `${ROOT}/${cleanPath}`;
     console.log("Image URL:", fullUrl);
     return fullUrl;
   };
   const allImages = useMemo(() => {
-  if (!berita) return [];
-  
-  const images: AdditionalImage[] = [];
-  
-  // Tambahkan feat_image sebagai gambar pertama (simpan path saja)
-  if (berita.feat_image) {
-    images.push({
-      url: berita.feat_image, // Simpan path mentah
-      caption: berita.caption || ""
-    });
-  }
-  
-  // Tambahkan additional_images
-  const additionalImgs = parseAdditionalImages(berita.additional_images);
-  images.push(...additionalImgs);
-  
-  return images;
-}, [berita]);
+    if (!berita) return [];
+
+    const images: AdditionalImage[] = [];
+
+    // Tambahkan feat_image sebagai gambar pertama (simpan path saja)
+    if (berita.feat_image) {
+      images.push({
+        url: berita.feat_image, // Simpan path mentah
+        caption: berita.caption || "",
+      });
+    }
+
+    // Tambahkan additional_images
+    const additionalImgs = parseAdditionalImages(berita.additional_images);
+    images.push(...additionalImgs);
+
+    return images;
+  }, [berita]);
 
   // Event listener untuk copy protection
   useEffect(() => {
     const handleCopy = (e: ClipboardEvent) => {
       // Cegah default copy behavior
       e.preventDefault();
-      
+
       // Ambil teks yang dipilih
       const selection = window.getSelection();
       const selectedText = selection?.toString() || "";
-      
+
       if (selectedText && berita) {
         // Buat custom text dengan watermark/kredit
-        const customText = `${selectedText}\n\n---\nSumber: ${berita.judul}\nDikutip dari: ${window.location.href}\n© ${new Date().getFullYear()} - Hak Cipta Dilindungi`;
-        
+        const customText = `${selectedText}\n\n---\nSumber: ${
+          berita.judul
+        }\nDikutip dari: ${
+          window.location.href
+        }\n© ${new Date().getFullYear()} - Hak Cipta Dilindungi`;
+
         // Override clipboard dengan text custom
         e.clipboardData?.setData("text/plain", customText);
-        
+
         // Optional: Tampilkan notifikasi
         console.log("Teks disalin dengan kredit sumber");
       }
@@ -237,7 +238,7 @@ const BeritaDetail: React.FC = () => {
     const handleContextMenu = (e: MouseEvent) => {
       // Hanya disable pada area artikel
       const target = e.target as HTMLElement;
-      if (target.closest('.berita-article')) {
+      if (target.closest(".berita-article")) {
         e.preventDefault();
         return false;
       }
@@ -260,7 +261,7 @@ const BeritaDetail: React.FC = () => {
       try {
         const [resDetail, resAll] = await Promise.all([
           api.get(`/berita/${id}`),
-          api.get("/berita")
+          api.get("/berita"),
         ]);
 
         const data = resDetail?.data?.data;
@@ -271,7 +272,10 @@ const BeritaDetail: React.FC = () => {
           console.log("Featured Image Path:", data.feat_image);
           console.log("Full Image URL:", getImageUrl(data.feat_image));
           console.log("Additional Images Raw:", data.additional_images);
-          console.log("Parsed Additional Images:", parseAdditionalImages(data.additional_images));
+          console.log(
+            "Parsed Additional Images:",
+            parseAdditionalImages(data.additional_images)
+          );
 
           const allBerita = resAll?.data?.data?.berita || [];
           const terkait = allBerita
@@ -316,7 +320,7 @@ const BeritaDetail: React.FC = () => {
   };
 
   const handleBeritaTerkaitClick = (slug: string) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     navigate(`/berita/${slug}`);
   };
 
@@ -339,10 +343,7 @@ const BeritaDetail: React.FC = () => {
         <div className="alert alert-danger" role="alert">
           {error || "Berita tidak ditemukan"}
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate("/berita")}
-        >
+        <button className="btn btn-primary" onClick={() => navigate("/berita")}>
           <ArrowLeft size={18} className="me-2" />
           Kembali ke Berita
         </button>
@@ -386,24 +387,22 @@ const BeritaDetail: React.FC = () => {
             </div>
 
             <div className="article-image-section mt-4">
-             {allImages.length > 0 && (
-  <>
-    <Carousel
-      images={allImages}
-      currentIndex={currentSlide}
-      setCurrentIndex={setCurrentSlide}
-    />
+              {allImages.length > 0 && (
+                <>
+                  <Carousel
+                    images={allImages}
+                    currentIndex={currentSlide}
+                    setCurrentIndex={setCurrentSlide}
+                  />
 
-    {allImages[currentSlide]?.caption && (
-      <div className="image-caption-outside">
-        {allImages[currentSlide].caption}
-      </div>
-    )}
-  </>
-)}
-
+                  {allImages[currentSlide]?.caption && (
+                    <div className="image-caption-outside">
+                      {allImages[currentSlide].caption}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-
 
             <div
               className="article-content"
@@ -426,7 +425,11 @@ const BeritaDetail: React.FC = () => {
               {berita.link_video && (
                 <p className="article-video">
                   <strong>Video:</strong>{" "}
-                  <a href={berita.link_video} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={berita.link_video}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Tonton Video
                   </a>
                 </p>
@@ -436,7 +439,10 @@ const BeritaDetail: React.FC = () => {
             {berita.tags && berita.tags.length > 0 && (
               <div className="article-tags mt-4">
                 {berita.tags.map((cat, idx) => (
-                  <span key={idx} className="tag-badge bg-primary text-white px-2 py-1 rounded me-2">
+                  <span
+                    key={idx}
+                    className="tag-badge bg-primary text-white px-2 py-1 rounded me-2"
+                  >
                     {cat}
                   </span>
                 ))}
@@ -463,8 +469,11 @@ const BeritaDetail: React.FC = () => {
                         alt={item.judul}
                         className="terkait-image"
                         onError={(e) => {
-                          console.error("Terkait image failed to load:", item.feat_image);
-                          e.currentTarget.style.display = 'none';
+                          console.error(
+                            "Terkait image failed to load:",
+                            item.feat_image
+                          );
+                          e.currentTarget.style.display = "none";
                         }}
                       />
                     ) : (
