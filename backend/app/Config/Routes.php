@@ -170,10 +170,15 @@ $routes->post('berita-utama/toggle-status', 'backend\BeritaUtamaController::togg
 //album
 $routes->resource('album', [
     'controller' => 'backend\PhotoAlbumController',
-    'except' => ['show']
+    'except' => ['']
 ]);
+// Tambahkan baris ini agar AJAX bisa memanggil controller
+$routes->get('album/get-photos/(:num)', 'backend\PhotoAlbumController::get_photos/$1');
+$routes->post('album/upload_store', 'backend\PhotoAlbumController::upload_store');
 $routes->post('album/toggle-status', 'backend\PhotoAlbumController::toggleStatus');
-
+// BENAR (Sesuaikan dengan namespace controller Anda)
+$routes->get('album/(:num)', 'backend\PhotoAlbumController::show/$1');
+$routes->delete('photo/delete/(:num)', 'backend\PhotoAlbumController::deletePhoto/$1');
 // Gallery 
 $routes->resource('gallery', ['controller' => 'backend\PhotoGalleryController', 'except' => ['show']]);
 $routes->post('gallery/toggle-status', 'backend\PhotoGalleryController::toggleStatus');

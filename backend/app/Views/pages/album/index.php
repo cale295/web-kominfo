@@ -3,124 +3,112 @@
 <?= $this->section('content') ?>
 
 <style>
-    /* Styling Khusus Halaman Index */
-    :root {
-        --primary-color: #2c3e50;
-        --secondary-color: #95a5a6;
-        --accent-color: #3498db;
+    /* --- VARIABLE & UTAMA --- */
+    :root { 
+        --primary-bg: #f4f6f9;
+        --card-border-radius: 12px;
+        --primary-color: #4361ee; 
+        --danger-color: #ef233c;
     }
 
-    /* Header Styling */
-    .page-header {
-        background: white;
-        padding: 1.5rem 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    /* --- HEADER PAGE --- */
+    .page-header { 
+        background: white; 
+        padding: 2rem; 
+        border-radius: var(--card-border-radius); 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+        margin-bottom: 2rem; 
         border-left: 5px solid var(--primary-color);
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+    .page-title { font-weight: 800; color: #2d3436; margin: 0; font-size: 1.6rem; }
+    
+    /* --- TABEL ALBUM --- */
+    .card-table { border: none; border-radius: var(--card-border-radius); box-shadow: 0 5px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .table thead th { 
+        background-color: #f8f9fa; 
+        color: #636e72; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        font-size: 0.75rem; 
+        letter-spacing: 1px; 
+        padding: 1.2rem 1rem;
+        border-bottom: 2px solid #edf2f7;
+    }
+    .table tbody td { padding: 1.2rem 1rem; vertical-align: middle; border-bottom: 1px solid #f1f2f6; }
+    
+    /* Cover Image */
+    .album-cover-thumb { 
+        width: 70px; height: 70px; 
+        object-fit: cover; border-radius: 10px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        transition: transform 0.2s;
+    }
+    .album-cover-thumb:hover { transform: scale(1.1); }
+    .album-cover-placeholder { 
+        width: 70px; height: 70px; 
+        background: #dfe6e9; border-radius: 10px; 
+        display: flex; align-items: center; justify-content: center; 
+        color: #b2bec3; font-size: 1.8rem; 
     }
 
-    .page-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin: 0;
+    /* Tombol Aksi */
+    .btn-action-group { display: flex; gap: 5px; justify-content: center; }
+    .btn-action { 
+        width: 38px; height: 38px; 
+        border-radius: 8px; 
+        display: flex; align-items: center; justify-content: center; 
+        border: none; transition: all 0.2s; 
+        color: white;
     }
+    .btn-view { background: #3498db; } /* Biru: Lihat */
+    .btn-upload { background: #00b894; } /* Hijau: Upload */
+    .btn-edit { background: #f1c40f; color: #7f8c8d; } /* Kuning: Edit */
+    .btn-delete { background: #ff7675; } /* Merah: Hapus */
+    
+    .btn-action:hover { transform: translateY(-3px); box-shadow: 0 4px 6px rgba(0,0,0,0.15); opacity: 0.9; }
 
-    .page-subtitle {
-        font-size: 0.9rem;
-        color: #7f8c8d;
-        margin: 5px 0 0 0;
-    }
-
-    /* Card Table Styling */
-    .card-table {
-        background: white;
-        border: none;
+    /* --- MODAL UPLOAD STYLING --- */
+    .upload-area {
+        border: 2px dashed #cbd5e1;
         border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        background-color: #f8fafc;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .upload-area:hover, .upload-area.dragover {
+        border-color: var(--primary-color);
+        background-color: #eff6ff;
+    }
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+    .preview-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
         overflow: hidden;
+        background: white;
+        position: relative;
+        transition: box-shadow 0.2s;
     }
-
-    .table thead th {
-        background-color: #f8f9fa;
-        color: var(--primary-color);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #eaecf0;
-        padding: 1rem;
-    }
-
-    .table tbody td {
-        padding: 1rem;
-        vertical-align: middle;
-        color: #555;
-        font-size: 0.95rem;
-        border-bottom: 1px solid #f0f2f5;
-    }
-
-    /* Image Thumbnail Styling */
-    .album-cover-thumb {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border: 2px solid #fff;
-    }
-
-    .album-cover-placeholder {
-        width: 60px;
-        height: 60px;
-        background-color: #ecf0f1;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #bdc3c7;
-        font-size: 1.5rem;
-    }
-
-    /* Action Buttons */
-    .btn-action {
-        width: 35px;
-        height: 35px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        transition: all 0.2s;
-        margin: 0 2px;
-    }
-
-    .btn-edit-custom {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-    .btn-edit-custom:hover { background-color: #ffeeba; transform: translateY(-2px); }
-
-    .btn-delete-custom {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-    .btn-delete-custom:hover { background-color: #f5c6cb; transform: translateY(-2px); }
-
-    /* Empty State */
-    .empty-state {
-        padding: 3rem;
-        text-align: center;
-        color: #95a5a6;
-    }
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        color: #dcdde1;
+    .preview-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .preview-img-container { height: 140px; overflow: hidden; position: relative; }
+    .preview-img { width: 100%; height: 100%; object-fit: cover; }
+    .btn-remove-preview {
+        position: absolute; top: 5px; right: 5px;
+        width: 24px; height: 24px;
+        border-radius: 50%; background: rgba(239, 35, 60, 0.9);
+        color: white; border: none;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; cursor: pointer; z-index: 10;
     }
 </style>
 
@@ -130,84 +118,87 @@
 
     <div class="page-header">
         <div>
-            <h3 class="page-title"><i class="bi bi-journal-album me-2"></i><?= esc($title) ?></h3>
-            <p class="page-subtitle">Kelola galeri dan koleksi album foto Anda</p>
+            <h3 class="page-title"><i class="bi bi-collection-fill me-2 text-primary"></i><?= esc($title) ?></h3>
+            <p class="text-muted mb-0 mt-1">Kelola album dan koleksi foto Anda di sini.</p>
         </div>
-        <div>
-            <a href="<?= site_url('album/new') ?>" class="btn btn-primary shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Album
-            </a>
-        </div>
+        <a href="<?= site_url('album/new') ?>" class="btn btn-primary px-4 py-2 shadow-sm rounded-pill fw-bold">
+            <i class="bi bi-plus-lg me-2"></i>Album Baru
+        </a>
     </div>
 
     <div class="card card-table">
         <div class="card-body p-0">
-            
             <?php if (empty($albums)): ?>
-                <div class="empty-state">
-                    <i class="bi bi-images"></i>
-                    <h5>Belum ada album</h5>
-                    <p>Silakan tambahkan album baru untuk memulai koleksi.</p>
-                    <a href="<?= site_url('album/new') ?>" class="btn btn-outline-primary btn-sm mt-2">Buat Album Baru</a>
+                <div class="text-center py-5">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" width="120" alt="Empty" class="mb-3 opacity-50">
+                    <h5 class="text-muted">Belum ada album</h5>
+                    <p class="text-muted small">Mulai dengan membuat album pertama Anda.</p>
                 </div>
             <?php else: ?>
-                
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th width="5%" class="text-center">No</th>
-                                <th width="15%">Cover</th>
-                                <th width="25%">Nama Album</th>
-                                <th width="40%">Deskripsi</th>
-                                <th width="15%" class="text-center">Aksi</th>
+                                <th class="text-center" width="5%">No</th>
+                                <th width="10%">Cover</th>
+                                <th width="25%">Detail Album</th>
+                                <th width="35%">Deskripsi</th>
+                                <th class="text-center" width="25%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($albums as $i => $row): ?>
                             <tr>
-                                <td class="text-center fw-bold text-secondary"><?= $i+1 ?></td>
+                                <td class="text-center text-muted fw-bold"><?= $i+1 ?></td>
                                 
                                 <td>
                                     <?php if ($row['cover_image'] && file_exists('uploads/album_covers/' . $row['cover_image'])): ?>
-                                        <img src="<?= base_url('uploads/album_covers/'.$row['cover_image']) ?>" 
-                                             class="album-cover-thumb" 
-                                             alt="Cover">
+                                        <img src="<?= base_url('uploads/album_covers/'.$row['cover_image']) ?>" class="album-cover-thumb" alt="Cover">
                                     <?php else: ?>
-                                        <div class="album-cover-placeholder" title="No Image">
-                                            <i class="bi bi-image"></i>
-                                        </div>
+                                        <div class="album-cover-placeholder"><i class="bi bi-image"></i></div>
                                     <?php endif; ?>
                                 </td>
 
                                 <td>
-                                    <div class="fw-bold text-dark"><?= esc($row['album_name']) ?></div>
-                                    <small class="text-muted">ID: #<?= $row['id_album'] ?></small>
+                                    <div class="fw-bold text-dark fs-6"><?= esc($row['album_name']) ?></div>
+                                    <span class="badge bg-light text-secondary border mt-1">ID: #<?= $row['id_album'] ?></span>
                                 </td>
-                                
+
                                 <td>
-                                    <span class="text-muted text-truncate d-block" style="max-width: 300px;">
-                                        <?= esc($row['description']) ?: '-' ?>
-                                    </span>
+                                    <div class="text-muted small" style="line-height: 1.5;">
+                                        <?= esc($row['description']) ?: '<i class="text-muted">- Tidak ada deskripsi -</i>' ?>
+                                    </div>
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="<?= site_url('album/'.$row['id_album'].'/edit') ?>" 
-                                       class="btn-action btn-edit-custom" 
-                                       data-bs-toggle="tooltip" 
-                                       title="Edit Album">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    <div class="btn-action-group">
+                                        <a href="<?= site_url('album/'.$row['id_album']) ?>" 
+                                           class="btn-action btn-view" 
+                                           data-bs-toggle="tooltip" title="Lihat Isi Galeri">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
 
-                                    <form action="<?= site_url('album/'.$row['id_album']) ?>" method="post" class="d-inline delete-form">
-                                        <?= csrf_field() ?>
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="button" 
-                                                class="btn-action btn-delete-custom btn-delete" 
-                                                title="Hapus Album">
-                                            <i class="bi bi-trash"></i>
+                                        <button type="button" class="btn-action btn-upload" 
+                                                data-bs-toggle="modal" data-bs-target="#uploadModal"
+                                                data-id="<?= $row['id_album'] ?>" 
+                                                data-name="<?= esc($row['album_name']) ?>"
+                                                title="Upload Foto Baru">
+                                            <i class="bi bi-cloud-arrow-up-fill"></i>
                                         </button>
-                                    </form>
+
+                                        <a href="<?= site_url('album/'.$row['id_album'].'/edit') ?>" 
+                                           class="btn-action btn-edit" title="Edit Info Album">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+
+                                        <form action="<?= site_url('album/'.$row['id_album']) ?>" method="post" class="d-inline delete-form">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="button" class="btn-action btn-delete btn-delete-confirm" title="Hapus Album">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -219,36 +210,194 @@
     </div>
 </div>
 
+<div class="modal fade" id="uploadModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <div class="modal-header bg-white border-bottom-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-cloud-upload me-2"></i>Upload Foto</h5>
+                    <p class="text-muted small mb-0">Menambahkan foto ke album: <strong id="modalAlbumName" class="text-dark">Loading...</strong></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body bg-light">
+                <form action="<?= site_url('album/upload_store') ?>" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="id_album" id="modalAlbumId">
+                    
+                    <div class="upload-area p-5 text-center mb-3" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" class="d-none" name="gallery_photos[]" id="fileInput" multiple accept="image/*">
+                        <div class="mb-3">
+                            <i class="bi bi-images text-primary" style="font-size: 3rem; opacity: 0.7;"></i>
+                        </div>
+                        <h6 class="fw-bold">Klik atau Tarik Foto ke Sini</h6>
+                        <p class="text-muted small mb-0">Mendukung banyak file sekaligus (JPG, PNG)</p>
+                    </div>
+
+                    <div id="previewContainer" class="preview-grid">
+                        </div>
+
+                    <div id="emptyState" class="text-center py-4 text-muted">
+                        <small>Belum ada foto yang dipilih untuk diupload.</small>
+                    </div>
+
+                </form>
+            </div>
+            
+            <div class="modal-footer border-top-0 bg-white">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                <button type="button" onclick="document.getElementById('uploadForm').submit()" class="btn btn-primary rounded-pill px-4" id="btnSimpan" disabled>
+                    <i class="bi bi-send me-2"></i> Mulai Upload
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Script untuk SweetAlert2 Konfirmasi Hapus
-    document.querySelectorAll('.btn-delete').forEach(button => {
+    // 1. Script Hapus Album (SweetAlert)
+    document.querySelectorAll('.btn-delete-confirm').forEach(button => {
         button.addEventListener('click', function() {
             const form = this.closest('.delete-form');
-            
             Swal.fire({
-                title: 'Hapus Album?',
-                text: "Data album ini tidak dapat dikembalikan!",
+                title: 'Yakin hapus album?',
+                text: "Semua foto di dalamnya juga akan terhapus!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#95a5a6',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
+                cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
+                if (result.isConfirmed) form.submit();
             });
         });
     });
 
-    // Inisialisasi Tooltip Bootstrap (Opsional, agar hover text muncul cantik)
+    // 2. Logic Upload Modern
+    const uploadModalEl = document.getElementById('uploadModal');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const emptyState = document.getElementById('emptyState');
+    const btnSimpan = document.getElementById('btnSimpan');
+    const dropZone = document.getElementById('dropZone');
+
+    let dataTransfer = new DataTransfer(); 
+
+    // A. SAAT MODAL DIBUKA (PENTING: MENGISI ID ALBUM)
+    uploadModalEl.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const idAlbum = button.getAttribute('data-id');
+        const nameAlbum = button.getAttribute('data-name');
+
+        // Isi Hidden Input & Judul Modal
+        uploadModalEl.querySelector('#modalAlbumId').value = idAlbum;
+        uploadModalEl.querySelector('#modalAlbumName').textContent = nameAlbum;
+    });
+
+    // B. LOGIKA FILE SELECT
+    fileInput.addEventListener('change', handleFiles);
+
+    // C. LOGIKA DRAG AND DROP
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles({ target: { files: files } });
+    });
+
+    // D. FUNGSI PROSES FILE & BIKIN KARTU PREVIEW
+    function handleFiles(e) {
+        const newFiles = Array.from(e.target.files);
+        
+        newFiles.forEach(file => {
+            if (!file.type.match('image.*')) return;
+            dataTransfer.items.add(file);
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                createCard(evt.target.result, file.name);
+            }
+            reader.readAsDataURL(file);
+        });
+
+        fileInput.files = dataTransfer.files;
+        updateUI();
+    }
+
+    function createCard(imgSrc, fileName) {
+        const div = document.createElement('div');
+        div.className = 'preview-card';
+        div.innerHTML = `
+            <button type="button" class="btn-remove-preview" onclick="removeFile(this, '${fileName}')">
+                <i class="bi bi-x"></i>
+            </button>
+            <div class="preview-img-container">
+                <img src="${imgSrc}" class="preview-img">
+            </div>
+            <div class="p-2">
+                <input type="text" name="titles[]" class="form-control form-control-sm mb-2" 
+                       placeholder="Judul" value="${fileName.split('.')[0]}">
+                <textarea name="descriptions[]" class="form-control form-control-sm" 
+                          rows="1" placeholder="Deskripsi..."></textarea>
+            </div>
+        `;
+        previewContainer.appendChild(div);
+    }
+
+    // E. FUNGSI HAPUS SALAH SATU FOTO DARI ANTRIAN
+    window.removeFile = function(btn, fileName) {
+        btn.closest('.preview-card').remove();
+        
+        const newDataTransfer = new DataTransfer();
+        Array.from(dataTransfer.files).forEach(file => {
+            if (file.name !== fileName) newDataTransfer.items.add(file);
+        });
+        
+        dataTransfer = newDataTransfer;
+        fileInput.files = dataTransfer.files;
+        updateUI();
+    }
+
+    function updateUI() {
+        if (dataTransfer.files.length > 0) {
+            emptyState.style.display = 'none';
+            btnSimpan.disabled = false;
+            btnSimpan.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-2"></i>Upload ${dataTransfer.files.length} Foto`;
+        } else {
+            emptyState.style.display = 'block';
+            btnSimpan.disabled = true;
+            btnSimpan.innerHTML = `<i class="bi bi-send me-2"></i> Mulai Upload`;
+        }
+    }
+
+    // Reset saat modal ditutup
+    uploadModalEl.addEventListener('hidden.bs.modal', function () {
+        dataTransfer = new DataTransfer();
+        fileInput.files = dataTransfer.files;
+        previewContainer.innerHTML = '';
+        updateUI();
+    });
+
+    // Tooltip Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
