@@ -313,6 +313,7 @@
                         <th width="5%">#</th>
                         <th width="40%">Nama Menu</th>
                         <th width="25%">URL / Route</th>
+                        <th width="10%">Admin Url</th>
                         <th width="15%" class="text-center">Status</th>
                         <th width="15%" class="text-center">Aksi</th>
                     </tr>
@@ -386,6 +387,14 @@
                                     <span class="text-muted">—</span>
                                 <?php endif; ?>
                             </td>
+
+                               <td>
+                                <?php if(!empty($parent['admin_url']) && $parent['admin_url'] != '#'): ?>
+                                    <code><?= esc($parent['admin_url']) ?></code>
+                                <?php else: ?>
+                                    <span class="text-muted">—</span>
+                                <?php endif; ?>
+                            </td>
                             
                             <td class="text-center" onclick="event.stopPropagation()">
                                 <?php if ($can_update): ?>
@@ -451,6 +460,12 @@
                                 <td>
                                     <code><?= esc($child['menu_url']) ?: '—' ?></code>
                                 </td>
+                                <td>
+        <?= !empty($child['admin_url'])
+            ? '<code>'.esc($child['admin_url']).'</code>'
+            : '<span class="text-muted">—</span>' ?>
+    </td>
+
                                 
                                 <td class="text-center">
                                     <?php if ($can_update): ?>

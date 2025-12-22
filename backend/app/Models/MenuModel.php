@@ -10,7 +10,7 @@ class MenuModel extends Model
     protected $table            = 'm_menu';
     protected $primaryKey       = 'id_menu'; // Kolom Primary Key
     protected $returnType       = 'array';
-    protected $allowedFields    = ['menu_name', 'menu_url', 'menu_icon', 'order_number', 'parent_id', 'status']; 
+    protected $allowedFields    = ['menu_name', 'menu_url','admin_url', 'menu_icon', 'order_number', 'parent_id', 'status']; 
     
     // Properti Lainnya (Disusun rapi)
     protected $useTimestamps    = false;

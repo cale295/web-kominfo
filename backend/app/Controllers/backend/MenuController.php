@@ -123,6 +123,7 @@ class MenuController extends BaseController
         $data = [
             'menu_name'   => $this->request->getPost('menu_name'),
             'menu_url'    => $this->request->getPost('menu_url'),
+            'admin_url'   => $this->request->getPost('admin_url'),
             'menu_icon'   => $this->request->getPost('menu_icon'),
             'parent_id'   => $this->request->getPost('parent_id') ?: 0,
             'order_number'=> $this->request->getPost('order_number') ?: 0,
@@ -186,6 +187,7 @@ $order = $this->request->getPost('order_number');
 $data = [
     'menu_name'   => $this->request->getPost('menu_name'),
     'menu_url'    => $this->request->getPost('menu_url'),
+    'admin_url'   => $this->request->getPost('admin_url'),
     'menu_icon'   => $this->request->getPost('menu_icon'),
     'parent_id'   => $this->request->getPost('parent_id') ?: 0,
     'order_number'=> ($order === null ? $menu['order_number'] : $order),

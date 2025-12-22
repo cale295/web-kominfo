@@ -29,4 +29,11 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+    public static function menuAdmin()
+{
+    return new \App\Controllers\backend\AdminMenuController();
 }
+
+}
+
+

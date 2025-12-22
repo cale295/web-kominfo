@@ -432,7 +432,7 @@
                                    id="menu_url" 
                                    name="menu_url" 
                                    value="<?= esc(old('menu_url')) ?>" 
-                                   placeholder="/dashboard atau https://example.com">
+                                   placeholder="/api/dashboard atau https://example.com">
                             <i class="bi bi-globe2 input-icon"></i>
                         </div>
                         <div class="form-text-modern">
@@ -441,6 +441,27 @@
                         </div>
                     </div>
                 </div>
+
+               <div class="col-md-6 mb-4">
+    <label for="url_admin" class="form-label-modern">
+        <i class="bi bi-shield-lock-fill"></i>
+        URL Admin
+    </label>
+    <div class="input-group-modern">
+        <input type="text" 
+               class="form-control-modern" 
+               id="admin_url" 
+               name="admin_url" 
+               value="<?= esc(old('admin_url')) ?>" 
+               placeholder="/dashboard">
+        <i class="bi bi-lock input-icon"></i>
+    </div>
+    <div class="form-text-modern">
+        <i class="bi bi-lightbulb-fill"></i>
+        <span>Kosongkan jika menu hanya tampil di frontend</span>
+    </div>
+</div>
+
 
                 <div class="row">
                     <div class="col-md-6 mb-4">

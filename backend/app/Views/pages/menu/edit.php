@@ -311,10 +311,27 @@ $bootstrapIcons = [
                             <input type="text" class="form-control form-control-gov" 
                                    id="menu_url" name="menu_url" 
                                    value="<?= esc($menu['menu_url']) ?>" 
-                                   placeholder="Contoh: /dashboard">
+                                   placeholder="Contoh: /api/dashboard">
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-6 mb-4">
+    <label for="admin_url" class="form-label form-label-gov">
+        <i class="bi bi-shield-lock"></i> URL Admin
+    </label>
+    <div class="input-group-gov">
+        <i class="bi bi-lock input-icon"></i>
+        <input type="text" class="form-control form-control-gov" 
+               id="admin_url" name="admin_url" 
+               value="<?= esc($menu['admin_url'] ?? '') ?>" 
+               placeholder="/dashboard">
+    </div>
+    <div class="form-text-gov">
+        Kosongkan jika menu tidak tampil di admin panel.
+    </div>
+</div>
+
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
