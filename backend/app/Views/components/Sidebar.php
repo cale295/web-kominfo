@@ -15,6 +15,12 @@ if(count($segments) > 1) {
 $menuController = service('menuAdmin');
 $menuData = $menuController->getMenu();
 
+// Ambil access rights dari AccessRightController
+$accessRightController = service('accessRight');
+// Method bisa getUserAccess($role) atau checkAccess($role, $menuId) sesuai implementasi Anda
+// Contoh: $userAccess = $accessRightController->getUserMenuAccess($role);
+// Hasil expected: array dengan id_menu yang user boleh akses
+
 // Function untuk generate warna otomatis berdasarkan icon atau nama
 function getIconStyle($index, $menuName = '') {
     $colors = [
@@ -30,7 +36,19 @@ function getIconStyle($index, $menuName = '') {
     return $colors[$index % count($colors)];
 }
 
-function buildMenu(array $menus, $parentId = 0, &$colorIndex = 0): array
+// Function untuk cek apakah user punya akses ke menu ini
+function hasMenuAccess($menuId, $userRole, $accessRightController) {
+    // Superadmin selalu punya akses
+    if ($userRole === 'superadmin') {
+        return true;
+    }
+    
+    // Cek dari AccessRightController
+    // Sesuaikan dengan method yang ada di AccessRightController Anda
+    return $accessRightController->checkAccess($userRole, $menuId);
+}
+
+function buildMenu(array $menus, $parentId = 0, $userRole = 'guest', $accessRightController = null, &$colorIndex = 0): array
 {
     $result = [];
 
@@ -45,12 +63,16 @@ function buildMenu(array $menus, $parentId = 0, &$colorIndex = 0): array
             continue;
         }
 
+        // Filter berdasarkan access right - SKIP jika tidak punya akses
+        if ($accessRightController !== null && !hasMenuAccess($menu['id_menu'], $userRole, $accessRightController)) {
+            continue;
+        }
+
         $item = [
             'type'  => 'item',
             'title' => $menu['menu_name'],
             'url'   => $menu['admin_url'],
             'icon'  => $menu['menu_icon'] ?: 'bi bi-circle',
-            'roles' => ['superadmin','admin'],
         ];
 
         // Tambahkan warna untuk menu level 1
@@ -62,7 +84,7 @@ function buildMenu(array $menus, $parentId = 0, &$colorIndex = 0): array
         }
 
         // Rekursif untuk submenu
-        $submenu = buildMenu($menus, $menu['id_menu'], $colorIndex);
+        $submenu = buildMenu($menus, $menu['id_menu'], $userRole, $accessRightController, $colorIndex);
         if (!empty($submenu)) {
             $item['type'] = 'dropdown';
             $item['submenu'] = $submenu;
@@ -75,7 +97,7 @@ function buildMenu(array $menus, $parentId = 0, &$colorIndex = 0): array
 }
 
 $colorIndex = 0;
-$menuItems = buildMenu($menuData, 0, $colorIndex);
+$menuItems = buildMenu($menuData, 0, $role, $accessRightController, $colorIndex);
 ?>
 
 <style>
@@ -592,7 +614,6 @@ $menuItems = buildMenu($menuData, 0, $colorIndex);
         <ul class="menu-list">
             <?php foreach ($menuItems as $item): ?>
                 <?php 
-                if (isset($item['roles']) && !in_array($role, $item['roles'])) continue;
                 $iconColor = $item['color'] ?? '#64748b';
                 $iconBg    = $item['bg'] ?? 'rgba(100, 116, 139, 0.1)';
                 ?>
@@ -630,42 +651,36 @@ $menuItems = buildMenu($menuData, 0, $colorIndex);
                         
                         <ul class="submenu">
                             <?php foreach ($item['submenu'] as $subItem): ?>
-                                <?php if (in_array($role, $subItem['roles'])): ?>
-                                    
-                                    <?php if(isset($subItem['submenu'])): 
-                                        $isLevel3Active = false;
-                                        foreach($subItem['submenu'] as $l3) {
-                                            if(strpos($currentPath, $l3['url']) === 0) { 
-                                                $isLevel3Active = true; 
-                                                break; 
-                                            }
+                                <?php if(isset($subItem['submenu'])): 
+                                    $isLevel3Active = false;
+                                    foreach($subItem['submenu'] as $l3) {
+                                        if(strpos($currentPath, $l3['url']) === 0) { 
+                                            $isLevel3Active = true; 
+                                            break; 
                                         }
-                                    ?>
-                                        <li class="has-submenu-level-3 <?= $isLevel3Active ? 'open' : '' ?>">
-                                            <a href="javascript:void(0)" class="submenu-item" onclick="toggleLevel3(this, event)">
-                                                <?= $subItem['title'] ?>
-                                                <i class="bi bi-chevron-down arrow"></i>
-                                            </a>
-                                            <ul class="submenu-level-3">
-                                                <?php foreach($subItem['submenu'] as $lvl3Item): ?>
-                                                    <?php if (in_array($role, $lvl3Item['roles'])): ?>
-                                                    <li>
-                                                        <a href="<?= $lvl3Item['url'] ?>" class="submenu-item-level-3 <?= ($currentPath === $lvl3Item['url']) ? 'active' : '' ?>">
-                                                            <?= $lvl3Item['title'] ?>
-                                                        </a>
-                                                    </li>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        </li>
-                                    <?php else: ?>
-                                        <li>
-                                            <a href="<?= $subItem['url'] ?>" class="submenu-item <?= ($currentPath === $subItem['url']) ? 'active' : '' ?>">
-                                                <?= $subItem['title'] ?>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-
+                                    }
+                                ?>
+                                    <li class="has-submenu-level-3 <?= $isLevel3Active ? 'open' : '' ?>">
+                                        <a href="javascript:void(0)" class="submenu-item" onclick="toggleLevel3(this, event)">
+                                            <?= $subItem['title'] ?>
+                                            <i class="bi bi-chevron-down arrow"></i>
+                                        </a>
+                                        <ul class="submenu-level-3">
+                                            <?php foreach($subItem['submenu'] as $lvl3Item): ?>
+                                                <li>
+                                                    <a href="<?= $lvl3Item['url'] ?>" class="submenu-item-level-3 <?= ($currentPath === $lvl3Item['url']) ? 'active' : '' ?>">
+                                                        <?= $lvl3Item['title'] ?>
+                                                    </a>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a href="<?= $subItem['url'] ?>" class="submenu-item <?= ($currentPath === $subItem['url']) ? 'active' : '' ?>">
+                                            <?= $subItem['title'] ?>
+                                        </a>
+                                    </li>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </ul>
