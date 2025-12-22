@@ -144,7 +144,7 @@ $routes->resource('dokument', ['controller' => 'backend\DokumenController', 'exc
 $routes->post('dokument/toggle-status', 'backend\DokumenController::toggleStatus');
 
 // ========================================================
-// BERITA ROUTES
+// BERITA ROUTES        
 // ========================================================
 $routes->get('berita', 'backend\BeritaController::index');
 $routes->get('berita/show/(:segment)', 'backend\BeritaController::show/$1');
