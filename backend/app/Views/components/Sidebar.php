@@ -1,7 +1,6 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <?php
 $session  = session();
-$role     = $session->get('role') ?? 'superadmin'; 
+$role     = $session->get('role') ?? 'guest'; 
 $fullName = $session->get('full_name') ?? 'Guest User';
 $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($fullName) . "&background=3b82f6&color=ffffff&bold=true&format=svg";
 $uri = service('uri');
@@ -15,13 +14,10 @@ if(count($segments) > 1) {
 $menuController = service('menuAdmin');
 $menuData = $menuController->getMenu();
 
-// Ambil access rights dari AccessRightController
-$accessRightController = service('accessRight');
-// Method bisa getUserAccess($role) atau checkAccess($role, $menuId) sesuai implementasi Anda
-// Contoh: $userAccess = $accessRightController->getUserMenuAccess($role);
-// Hasil expected: array dengan id_menu yang user boleh akses
+// Service Access Right (biarkan null jika logika filter murni dari kolom database)
+$accessRightController = service('accessRight'); 
 
-// Function untuk generate warna otomatis berdasarkan icon atau nama
+// Function untuk generate warna otomatis
 function getIconStyle($index, $menuName = '') {
     $colors = [
         ['color' => '#3b82f6', 'bg' => 'rgba(59, 130, 246, 0.1)'],   // Blue
@@ -36,16 +32,33 @@ function getIconStyle($index, $menuName = '') {
     return $colors[$index % count($colors)];
 }
 
-// Function untuk cek apakah user punya akses ke menu ini
-function hasMenuAccess($menuId, $userRole, $accessRightController) {
-    // Superadmin selalu punya akses
-    if ($userRole === 'superadmin') {
-        return true;
-    }
+// Function cek akses
+// Function cek akses
+function hasMenuAccess($menu, $userRole, $accessRightController) {
+    // -----------------------------------------------------------
+    // BAGIAN INI DIHAPUS/DICOMMENT AGAR SUPERADMIN TIDAK BYPASS
+    // -----------------------------------------------------------
+    // if ($userRole === 'superadmin') {
+    //    return true;
+    // }
+    // -----------------------------------------------------------
     
-    // Cek dari AccessRightController
-    // Sesuaikan dengan method yang ada di AccessRightController Anda
-    return $accessRightController->checkAccess($userRole, $menuId);
+    // 1. Ambil data allowed_roles dari ARRAY menu
+    $allowedRolesString = $menu['allowed_roles'] ?? ''; 
+
+    // 2. Jika kosong, berarti PUBLIC (Tampil Semua)
+    if (empty(trim($allowedRolesString))) {
+        return true; 
+    }
+
+    // 3. Cek Role
+    $allowedRolesArray = array_map('trim', explode(',', $allowedRolesString));
+
+    if (in_array($userRole, $allowedRolesArray)) {
+        return true; 
+    }
+
+    return false;
 }
 
 function buildMenu(array $menus, $parentId = 0, $userRole = 'guest', $accessRightController = null, &$colorIndex = 0): array
@@ -63,10 +76,12 @@ function buildMenu(array $menus, $parentId = 0, $userRole = 'guest', $accessRigh
             continue;
         }
 
-        // Filter berdasarkan access right - SKIP jika tidak punya akses
-        if ($accessRightController !== null && !hasMenuAccess($menu['id_menu'], $userRole, $accessRightController)) {
+        // === PERBAIKAN DISINI ===
+        // Kirim $menu (Array), BUKAN $menu['id_menu']
+        if (!hasMenuAccess($menu, $userRole, $accessRightController)) {
             continue;
         }
+        // ========================
 
         $item = [
             'type'  => 'item',
@@ -75,16 +90,16 @@ function buildMenu(array $menus, $parentId = 0, $userRole = 'guest', $accessRigh
             'icon'  => $menu['menu_icon'] ?: 'bi bi-circle',
         ];
 
-        // Tambahkan warna untuk menu level 1
         if ($parentId === 0) {
             $style = getIconStyle($colorIndex, $menu['menu_name']);
             $item['color'] = $style['color'];
             $item['bg'] = $style['bg'];
             $colorIndex++;
         }
-
-        // Rekursif untuk submenu
+        
+        // Rekursif submenu
         $submenu = buildMenu($menus, $menu['id_menu'], $userRole, $accessRightController, $colorIndex);
+        
         if (!empty($submenu)) {
             $item['type'] = 'dropdown';
             $item['submenu'] = $submenu;
@@ -97,6 +112,7 @@ function buildMenu(array $menus, $parentId = 0, $userRole = 'guest', $accessRigh
 }
 
 $colorIndex = 0;
+// Kita passing $accessRightController meskipun belum dipakai maksimal, untuk struktur masa depan
 $menuItems = buildMenu($menuData, 0, $role, $accessRightController, $colorIndex);
 ?>
 

@@ -442,26 +442,47 @@
                     </div>
                 </div>
 
-               <div class="col-md-6 mb-4">
-    <label for="url_admin" class="form-label-modern">
-        <i class="bi bi-shield-lock-fill"></i>
-        URL Admin
-    </label>
-    <div class="input-group-modern">
-        <input type="text" 
-               class="form-control-modern" 
-               id="admin_url" 
-               name="admin_url" 
-               value="<?= esc(old('admin_url')) ?>" 
-               placeholder="/dashboard">
-        <i class="bi bi-lock input-icon"></i>
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <label for="admin_url" class="form-label-modern">
+            <i class="bi bi-shield-lock-fill"></i>
+            URL Admin
+        </label>
+        <div class="input-group-modern">
+            <input type="text" 
+                   class="form-control-modern" 
+                   id="admin_url" 
+                   name="admin_url" 
+                   value="<?= esc(old('admin_url')) ?>" 
+                   placeholder="/dashboard">
+            <i class="bi bi-lock input-icon"></i>
+        </div>
+        <div class="form-text-modern">
+            <i class="bi bi-lightbulb-fill"></i>
+            <span>Kosongkan jika menu hanya tampil di frontend</span>
+        </div>
     </div>
-    <div class="form-text-modern">
-        <i class="bi bi-lightbulb-fill"></i>
-        <span>Kosongkan jika menu hanya tampil di frontend</span>
+
+    <div class="col-md-6 mb-4">
+        <label for="allowed_roles" class="form-label-modern">
+            <i class="bi bi-person-badge-fill"></i>
+            Hak Akses (Roles)
+        </label>
+        <div class="input-group-modern">
+            <input type="text" 
+                   class="form-control-modern" 
+                   id="allowed_roles" 
+                   name="allowed_roles" 
+                   value="<?= esc(old('allowed_roles')) ?>" 
+                   placeholder="superadmin, admin, editor">
+            <i class="bi bi-people-fill input-icon"></i>
+        </div>
+        <div class="form-text-modern">
+            <i class="bi bi-exclamation-circle-fill text-warning"></i>
+            <span>Pisahkan dengan koma. Kosongkan untuk akses publik.</span>
+        </div>
     </div>
 </div>
-
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
