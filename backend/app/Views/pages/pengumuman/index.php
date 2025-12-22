@@ -143,10 +143,7 @@
                                             <input class="form-check-input" type="radio" name="tipe_media" id="tipeLink" value="link" onchange="toggleMedia('link')" <?= old('tipe_media') == 'link' ? 'checked' : 'checked' ?>>
                                             <label class="form-check-label" for="tipeLink"><i class="fas fa-link me-1"></i> Link URL</label>
                                         </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="tipe_media" id="tipeFile" value="file" onchange="toggleMedia('file')" <?= old('tipe_media') == 'file' ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="tipeFile"><i class="fas fa-file-pdf me-1"></i> Upload File</label>
-                                        </div>
+                                        
                                     </div>
 
                                     <div id="inputLink" class="mb-2">
@@ -154,11 +151,7 @@
                                         <input type="url" class="form-control" name="link_url" placeholder="https://contoh.com" value="<?= old('link_url') ?>">
                                     </div>
 
-                                    <div id="inputFile" class="mb-2 d-none">
-                                        <label class="form-label small text-muted">Upload Dokumen (PDF/DOC)</label>
-                                        <input type="file" class="form-control" name="file_media">
-                                        <div class="form-text small">Maksimal 5MB.</div>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
