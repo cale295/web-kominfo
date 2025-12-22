@@ -4,9 +4,11 @@ import "./Agenda.css";
 import api from "../../../services/api";
 
 interface AnnouncementItem {
-  id: number;
+  id: string; // Diubah dari number ke string untuk id_pengumuman
   title: string;
   date: string;
+  content?: string;
+  link_url?: string;
 }
 
 interface ApiAgendaItem {
@@ -18,6 +20,19 @@ interface ApiAgendaItem {
   location: string;
   image: string;
   status: string;
+}
+
+interface PengumumanItem {
+  id_pengumuman: string;
+  judul: string;
+  content: string;
+  featured_image: string;
+  tipe_media: string;
+  link_url: string;
+  file_media: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface CalendarEvent {
@@ -65,6 +80,11 @@ export default function Agenda() {
   const [errorAgenda, setErrorAgenda] = useState<string | null>(null);
   const [agendaData, setAgendaData] = useState<ApiAgendaItem[]>([]);
 
+  // State untuk Pengumuman
+  const [pengumumanData, setPengumumanData] = useState<PengumumanItem[]>([]);
+  const [loadingPengumuman, setLoadingPengumuman] = useState<boolean>(false);
+  const [errorPengumuman, setErrorPengumuman] = useState<string | null>(null);
+
   // State untuk Berita Utama
   const [beritaUtamaList, setBeritaUtamaList] = useState<BeritaItem[]>([]);
   const [loadingBerita, setLoadingBerita] = useState<boolean>(true);
@@ -93,17 +113,39 @@ export default function Agenda() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  // Generate data pengumuman dari agenda
-  const announcementData: AnnouncementItem[] = agendaData
+  // Generate data pengumuman dari agenda (fallback)
+  const announcementFromAgenda: AnnouncementItem[] = agendaData
     .filter(
       (agenda) => agenda.status === "active" || agenda.status === "published"
     )
     .map((agenda, index) => ({
-      id: index + 1,
+      id: `agenda-${index + 1}`, // Prefix untuk agenda
       title: agenda.activity_name,
       date: formatAnnouncementDate(agenda.start_date),
     }))
+    .slice(0, 7);
+
+  // Generate data pengumuman dari API pengumuman - PERBAIKAN DISINI
+  const announcementFromPengumuman: AnnouncementItem[] = pengumumanData
+    .filter(
+      (pengumuman) =>
+        pengumuman.status === "1" || 
+        pengumuman.status === "active" || 
+        pengumuman.status === "published"
+    )
+    .map((pengumuman) => ({
+      id: pengumuman.id_pengumuman, // Gunakan id_pengumuman langsung
+      title: pengumuman.judul,
+      date: formatAnnouncementDate(pengumuman.created_at),
+      content: pengumuman.content,
+      link_url: pengumuman.link_url,
+    }))
     .slice(0, 7); // Ambil maksimal 7 pengumuman
+
+  // Gunakan data pengumuman dari API jika ada, jika tidak gunakan dari agenda
+  const announcementData = pengumumanData.length > 0 
+    ? announcementFromPengumuman 
+    : announcementFromAgenda;
 
   // Fetch Berita Utama dari API
   useEffect(() => {
@@ -214,6 +256,47 @@ export default function Agenda() {
     fetchAgenda();
   }, [currentMonth, currentYear]);
 
+  // Fetch pengumuman data from API
+  useEffect(() => {
+    const fetchPengumuman = async () => {
+      try {
+        setLoadingPengumuman(true);
+        setErrorPengumuman(null);
+        
+        const res = await api.get("/pengumuman");
+        console.log("Response pengumuman:", res); // Debug log
+        
+        const json = res?.data;
+        console.log("Data pengumuman:", json); // Debug log
+        
+        if (json && json.status === 200 && Array.isArray(json.data)) {
+          console.log("Data ditemukan:", json.data); // Debug log
+          setPengumumanData(json.data);
+        } else if (json && json.status === 200 && json.data) {
+          // Jika data bukan array (mungkin object tunggal)
+          console.log("Data bukan array, konversi:", json.data);
+          setPengumumanData(Array.isArray(json.data) ? json.data : [json.data]);
+        } else {
+          console.log("Format data tidak sesuai atau tidak ada data:", json);
+          setPengumumanData([]);
+          setErrorPengumuman(json?.message || "Format data tidak sesuai");
+        }
+      } catch (error: any) {
+        console.error("Gagal fetch pengumuman:", error);
+        setErrorPengumuman(
+          error.response?.data?.message || 
+          error.message || 
+          "Gagal memuat data pengumuman"
+        );
+        setPengumumanData([]);
+      } finally {
+        setLoadingPengumuman(false);
+      }
+    };
+
+    fetchPengumuman();
+  }, []);
+
   const getDaysInMonth = (month: number, year: number) =>
     new Date(year, month, 0).getDate();
   const getFirstDayOfMonth = (month: number, year: number) =>
@@ -260,12 +343,16 @@ export default function Agenda() {
 
   const currentNews = beritaUtamaList[currentNewsIndex];
 
+  // Debug: cek apakah data pengumuman ada
+  console.log("Pengumuman data state:", pengumumanData);
+  console.log("Announcement data:", announcementData);
+
   return (
     <div className="container-fluid py-5">
       <div className="container">
         <div className="row g-4 align-items-stretch">
           {/* News Section */}
-          <div className="col" style={{ border: 2 }}>
+          <div className="col">
             <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
             <div className=" news-card position-relative overflow-hidden">
               {loadingBerita ? (
@@ -459,34 +546,45 @@ export default function Agenda() {
               </div>
             ) : (
               <div className="card border-0 shadow rounded-4">
-                {loadingAgenda ? (
+                {(loadingAgenda || loadingPengumuman) ? (
                   <div className="text-center p-4">
                     <p className="text-muted">Memuat pengumuman...</p>
                   </div>
-                ) : errorAgenda ? (
+                ) : errorPengumuman ? (
                   <div className="text-center p-4">
-                    <p className="text-danger">{errorAgenda}</p>
+                    <p className="text-danger">{errorPengumuman}</p>
                   </div>
                 ) : announcementData.length > 0 ? (
-                  announcementData.map((a) => (
-                    <div
-                      key={a.id}
-                      className="p-3 border-bottom hover-bg-light"
-                    >
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div className="d-flex align-items-center gap-2">
-                          <div className="dot bg-primary"></div>
-                          <h6 className="mb-0 fw-semibold">{a.title}</h6>
+                  <>
+                    {announcementData.map((a) => (
+                      <div
+                        key={a.id} // Sekarang menggunakan id_pengumuman yang unik
+                        className="p-3 border-bottom hover-bg-light"
+                      >
+                        <div className="d-flex justify-content-between align-items-start">
+                          <div className="d-flex align-items-center gap-2">
+                            <div>
+                              <h6 className="mb-0 fw-semibold">{a.title}</h6>
+                              {a.content && (
+                                <small className="text-muted d-block mt-1">
+                                  {a.content.substring(0, 100)}...
+                                </small>
+                              )}
+                            </div>
+                          </div>
+                          <span className="fw-bold text-blue small">
+                            {a.date}
+                          </span>
                         </div>
-                        <span className="fw-bold text-blue small">
-                          {a.date}
-                        </span>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                  </>
                 ) : (
                   <div className="text-center p-4">
                     <p className="text-muted">Tidak ada pengumuman.</p>
+                    <small className="text-secondary">
+                      Data pengumuman kosong atau tidak ditemukan
+                    </small>
                   </div>
                 )}
               </div>

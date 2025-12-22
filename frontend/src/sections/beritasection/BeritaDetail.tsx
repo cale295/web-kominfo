@@ -83,7 +83,7 @@ const Carousel: React.FC<CarouselProps> = ({
       <div className="carousel-slide text-center">
         <img
           src={images[currentIndex].url}
-          className="img-fluid rounded shadow-sm d-block mx-auto"
+          className="img-fluid shadow-sm d-block mx-auto"
           style={{ maxHeight: "500px", objectFit: "contain" }}
         />
       </div>
@@ -509,7 +509,7 @@ const BeritaDetail: React.FC = () => {
                 {berita.tags.map((cat, idx) => (
                   <span
                     key={idx}
-                    className="tag-badge bg-primary text-white px-2 py-1 rounded me-2"
+                    className="tag-badge text-blue px-2 py-1 rounded me-2"
                   >
                     {cat}
                   </span>

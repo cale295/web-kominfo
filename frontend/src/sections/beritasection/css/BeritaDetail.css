@@ -129,16 +129,12 @@
 .carousel-container {
   position: relative;
   overflow: hidden;
-  background: #f8f9fa;
-  border-radius: 8px;
   padding: 1rem;
 }
 
 .carousel-slide img {
   max-height: 500px;
   object-fit: contain;
-  background-color: #f8f9fa;
-  border-radius: 6px;
 }
 
 .carousel-caption {
