@@ -2,8 +2,6 @@
 <?= $this->section('styles') ?>
 <?= $this->include('layouts/alerts') ?>
 
-
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
@@ -125,6 +123,15 @@
     .form-section:last-child { border-bottom: none; }
     
     .action-buttons .btn { margin-left: 8px; }
+
+    /* --- SISIPAN BOX STYLE --- */
+    .sisipan-box {
+        background: #eff6ff;
+        border: 1px dashed #3b82f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -155,13 +162,20 @@
                 <label class="form-label">Intro Singkat</label>
                 <textarea name="intro" class="form-control" rows="3"><?= esc(old('intro', $berita['intro'])) ?></textarea>
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">Sumber Berita</label>
+                <input type="text" name="sumber" class="form-control" 
+                       placeholder="Contoh: Kompas.com, Detik, Internal" 
+                       value="<?= esc(old('sumber', $berita['sumber'])) ?>">
+            </div>
         </div>
 
         <div class="form-section">
-            <div class="section-title"><i class="bi bi-file-text"></i> Konten Berita</div>
+            <div class="section-title"><i class="bi bi-file-text"></i> Konten & Struktur Berita</div>
             
             <div class="mb-4">
-                <label class="form-label">Isi Berita <span class="text-danger">*</span></label>
+                <label class="form-label">Isi Berita 1 <span class="text-danger">*</span></label>
                 <div id="toolbar-content" class="ql-toolbar-custom">
                      <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
                      <button class="ql-list" value="ordered"></button><button class="ql-list" value="bullet"></button>
@@ -171,102 +185,150 @@
                     <div class="ql-editor"><?= old('content', $berita['content']) ?></div>
                 </div>
                 <textarea name="content" id="content-hidden" style="display:none;"></textarea>
+
+                <div class="sisipan-box">
+                    <label class="form-label d-flex align-items-center">
+                        <i class="bi bi-paperclip me-2"></i> Berita Sisipan 1 (Baca Juga)
+                    </label>
+                    <select name="id_berita_terkait" class="form-select">
+                        <option value="">-- Pilih Berita Sisipan --</option>
+                        <?php foreach ($beritaAll as $b): ?>
+                            <option value="<?= $b['id_berita'] ?>" 
+                                    <?= $b['id_berita'] == old('id_berita_terkait', $berita['id_berita_terkait']) ? 'selected' : '' ?>>
+                                <?= esc($b['judul']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 1.</small>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Isi Berita 2 (Opsional)</label>
-                <div id="toolbar-content2" class="ql-toolbar-custom">
-                     <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
+            <?php 
+                // Cek apakah konten 2 sebelumnya ada isinya (dari DB atau old input)
+                $hasContent2 = !empty($berita['content2']) || old('has_content2') == '1'; 
+            ?>
+
+            <div class="d-flex align-items-center mb-3 mt-5 p-3 bg-gray-50 border rounded">
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" role="switch" id="toggle-content2" 
+                           <?= $hasContent2 ? 'checked' : '' ?>>
+                    <label class="form-check-label fw-bold" for="toggle-content2">Edit/Tambah Halaman Kedua (Isi Berita 2)</label>
                 </div>
-                <div id="editor-content2" class="ql-container ql-snow">
-                    <div class="ql-editor"><?= old('content2', $berita['content2']) ?></div>
+                <input type="hidden" name="has_content2" id="has-content2-val" value="<?= $hasContent2 ? '1' : '0' ?>">
+            </div>
+
+            <div id="wrapper-content2" style="display: <?= $hasContent2 ? 'block' : 'none' ?>;">
+                <div class="mb-4 ps-3 border-start border-3 border-info">
+                    <label class="form-label">Isi Berita 2</label>
+                    <div id="toolbar-content2" class="ql-toolbar-custom">
+                         <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
+                    </div>
+                    <div id="editor-content2" class="ql-container ql-snow">
+                        <div class="ql-editor"><?= old('content2', $berita['content2']) ?></div>
+                    </div>
+                    <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
+
+                    <div class="sisipan-box mt-3">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="bi bi-paperclip me-2"></i> Berita Sisipan 2 (Baca Juga)
+                        </label>
+                        <select name="id_berita_terkait2" class="form-select">
+                            <option value="">-- Pilih Berita Sisipan --</option>
+                            <?php foreach ($beritaAll as $b): ?>
+                                <option value="<?= $b['id_berita'] ?>" 
+                                        <?= $b['id_berita'] == old('id_berita_terkait2', $berita['id_berita_terkait2']) ? 'selected' : '' ?>>
+                                    <?= esc($b['judul']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                         <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 2.</small>
+                    </div>
                 </div>
-                <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
             </div>
         </div>
 
         <div class="form-section">
-            <div class="section-title"><i class="bi bi-tags"></i> Kategori</div>
+            <div class="section-title"><i class="bi bi-tags"></i> Kategori & Klasifikasi</div>
             
-<div class="mb-3">
-    <label class="form-label">Kategori <span class="text-danger">*</span></label>
-    <?php 
-        $selected = old('id_kategori', $selected ?? []);
-        if (!is_array($selected)) $selected = explode(',', $selected);
-    ?>
-    <div class="dropdown" id="kategori-dropdown">
-        <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="kategori-toggle" aria-haspopup="true" aria-expanded="false">
-            <span id="kategori-placeholder">Pilih minimal 1 kategori</span>
-            <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
-        </button>
-        <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
-            <div class="px-3 py-2 border-bottom">
-                <div class="input-group">
-                    <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
-                    <input type="text" class="form-control border-gray-300" id="kategori-search" placeholder="Cari kategori..." autocomplete="off">
-                </div>
-            </div>
-            <div class="kategori-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
-                <?php foreach ($kategori as $kat): ?>
-                    <div class="form-check ps-3 py-1 kategori-item" data-name="<?= esc(strtolower($kat['kategori'])) ?>">
-                        <input class="form-check-input kategori-checkbox" type="checkbox" 
-                               id="kat-<?= $kat['id_kategori'] ?>" value="<?= $kat['id_kategori'] ?>"
-                               <?= in_array($kat['id_kategori'], $selected) ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="kat-<?= $kat['id_kategori'] ?>"><?= esc($kat['kategori']) ?></label>
+            <div class="mb-3">
+                <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                <?php 
+                    $selected = old('id_kategori', $selected ?? []);
+                    if (!is_array($selected)) $selected = explode(',', $selected);
+                ?>
+                <div class="dropdown" id="kategori-dropdown">
+                    <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="kategori-toggle" aria-haspopup="true" aria-expanded="false">
+                        <span id="kategori-placeholder">Pilih minimal 1 kategori</span>
+                        <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
+                    </button>
+                    <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
+                        <div class="px-3 py-2 border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
+                                <input type="text" class="form-control border-gray-300" id="kategori-search" placeholder="Cari kategori..." autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="kategori-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                            <?php foreach ($kategori as $kat): ?>
+                                <div class="form-check ps-3 py-1 kategori-item" data-name="<?= esc(strtolower($kat['kategori'])) ?>">
+                                    <input class="form-check-input kategori-checkbox" type="checkbox" 
+                                           id="kat-<?= $kat['id_kategori'] ?>" value="<?= $kat['id_kategori'] ?>"
+                                           <?= in_array($kat['id_kategori'], $selected) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="kat-<?= $kat['id_kategori'] ?>"><?= esc($kat['kategori']) ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div id="kategori-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
+                            <small>Tidak ada kategori yang cocok</small>
+                        </div>
                     </div>
-                <?php endforeach; ?>
+                </div>
+                <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= implode(',', $selected) ?>">
+                <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
-            <div id="kategori-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
-                <small>Tidak ada kategori yang cocok</small>
-            </div>
-        </div>
-    </div>
-    <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= implode(',', $selected) ?>">
-    <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
-</div>
 
-<div class="mb-3">
-    <label class="form-label">Tags</label>
-    <div class="dropdown" id="tags-dropdown">
-        <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle" aria-haspopup="true" aria-expanded="false">
-            <span id="tags-placeholder">Pilih tags (opsional)</span>
-            <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
-        </button>
-        <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
-            <div class="px-3 py-2 border-bottom">
-                <div class="input-group">
-                    <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
-                    <input type="text" class="form-control border-gray-300" id="tags-search" placeholder="Cari tags..." autocomplete="off">
-                </div>
-            </div>
-            <div class="tags-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
-                <?php foreach ($tags as $tag): ?>
-                    <div class="form-check ps-3 py-1 tags-item" data-name="<?= esc(strtolower($tag['nama_tag'])) ?>">
-                        <input class="form-check-input tags-checkbox" type="checkbox" 
-                               id="tag-<?= $tag['id_tags'] ?>" 
-                               value="<?= $tag['id_tags'] ?>"
-                               <?= in_array($tag['id_tags'], $selectedTags) ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="tag-<?= $tag['id_tags'] ?>">
-                            <?= esc($tag['nama_tag']) ?>
-                        </label>
+            <div class="mb-3">
+                <label class="form-label">Tags</label>
+                <div class="dropdown" id="tags-dropdown">
+                    <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle" aria-haspopup="true" aria-expanded="false">
+                        <span id="tags-placeholder">Pilih tags (opsional)</span>
+                        <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
+                    </button>
+                    <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
+                        <div class="px-3 py-2 border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
+                                <input type="text" class="form-control border-gray-300" id="tags-search" placeholder="Cari tags..." autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="tags-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                            <?php foreach ($tags as $tag): ?>
+                                <div class="form-check ps-3 py-1 tags-item" data-name="<?= esc(strtolower($tag['nama_tag'])) ?>">
+                                    <input class="form-check-input tags-checkbox" type="checkbox" 
+                                           id="tag-<?= $tag['id_tags'] ?>" 
+                                           value="<?= $tag['id_tags'] ?>"
+                                           <?= in_array($tag['id_tags'], $selectedTags) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="tag-<?= $tag['id_tags'] ?>">
+                                        <?= esc($tag['nama_tag']) ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div id="tags-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
+                            <small>Tidak ada tags yang cocok</small>
+                        </div>
                     </div>
-                <?php endforeach; ?>
+                </div>
+                <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $selectedTags) ?>">
+                <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
-            <div id="tags-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
-                <small>Tidak ada tags yang cocok</small>
-            </div>
-        </div>
-    </div>
-    <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $selectedTags) ?>">
-    <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
-</div>
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (SEO)</label>
                 <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma"><?= old('keyword') ?></textarea>
             </div>
-        </div>
-             <div class="mb-3">
+            
+            <div class="mb-3">
                 <label class="form-label">Sub Kategori</label>
                 <input type="text" name="id_sub_kategori" class="form-control" value="<?= esc(old('id_sub_kategori', $berita['id_sub_kategori'])) ?>">
             </div>
@@ -324,21 +386,15 @@
                     <div class="additional-preview mb-3">
                         <?php foreach ($oldAdditional as $img): ?>
                             <?php 
-                                // FIX ERROR LTRIM
                                 $path = is_array($img) ? $img['path'] : $img;
                                 $cap  = is_array($img) ? $img['caption'] : '';
-
-                                // Cek fisik file
                                 $filePath = FCPATH . ltrim($path, '/');
                                 if (!file_exists($filePath)) continue; 
                             ?>
-
                             <div class="old-image-card">
                                 <span class="old-badge">Lama</span>
                                 <button type="button" class="btn-delete-img delete-old-image" data-image="<?= $path ?>">✕</button>
-                                
                                 <img src="<?= base_url($path) ?>" alt="Old Image">
-                                
                                 <div class="card-body">
                                     <p class="text-muted small mb-0 text-truncate" title="<?= esc($cap) ?>">
                                         <?= !empty($cap) ? esc($cap) : '<i>-</i>' ?>
@@ -352,9 +408,7 @@
                 <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
                     <label class="form-label small text-info mb-2">Gambar Baru (Temporary)</label>
                     <div class="row mb-3" id="temp-additional-images">
-                        <?php 
-                        $oldCaptions = old('caption_additional', []);
-                        ?>
+                        <?php $oldCaptions = old('caption_additional', []); ?>
                         <?php foreach ($tempAdditionalImages as $index => $tempImage): ?>
                             <div class="col-md-4 mb-3">
                                 <div class="card h-100 border-info shadow-sm">
@@ -373,7 +427,6 @@
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    
                     <div class="retained-image-info mb-3">
                         <i class="bi bi-info-circle-fill"></i>
                         <strong><?= count($tempAdditionalImages) ?> gambar baru tersimpan sementara.</strong>
@@ -392,52 +445,15 @@
             </div>
         </div>
 
-        <div class="form-section">
-            <div class="section-title"><i class="bi bi-link-45deg"></i> Berita Terkait & Referensi</div>
-
-            <div class="mb-3">
-                <label class="form-label">Berita Terkait 1</label>
-                <select name="id_berita_terkait" class="form-select">
-                    <option value="">-- Pilih Berita Terkait --</option>
-                    <?php foreach ($beritaAll as $b): ?>
-                        <option value="<?= $b['id_berita'] ?>" 
-                                <?= $b['id_berita'] == old('id_berita_terkait', $berita['id_berita_terkait']) ? 'selected' : '' ?>>
-                            <?= esc($b['judul']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+        <div class="mb-3">
+            <label class="form-label">Waktu Publish</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-calendar-event"></i></span>
+                <input type="text" id="datetime-picker" name="tanggal" class="form-control bg-white" 
+                       placeholder="Pilih tanggal dan jam..." 
+                       value="<?= old('tanggal', date('Y-m-d H:i', strtotime($berita['tanggal']))) ?>">
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Berita Terkait 2</label>
-                <select name="id_berita_terkait2" class="form-select">
-                    <option value="">-- Pilih Berita Terkait --</option>
-                    <?php foreach ($beritaAll as $b): ?>
-                        <option value="<?= $b['id_berita'] ?>" 
-                                <?= $b['id_berita'] == old('id_berita_terkait2', $berita['id_berita_terkait2']) ? 'selected' : '' ?>>
-                            <?= esc($b['judul']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Sumber Berita</label>
-                <input type="text" name="sumber" class="form-control" 
-                       placeholder="Contoh: Kompas.com, Detik, Internal" 
-                       value="<?= esc(old('sumber', $berita['sumber'])) ?>">
-            </div>
-
-<div class="mb-3">
-    <label class="form-label">Waktu Publish</label>
-    <div class="input-group">
-        <span class="input-group-text bg-white"><i class="bi bi-calendar-event"></i></span>
-        <input type="text" id="datetime-picker" name="tanggal" class="form-control bg-white" 
-               placeholder="Pilih tanggal dan jam..." 
-// Opsi alternatif jika formatnya berantakan:
-value="<?= old('tanggal', date('Y-m-d H:i', strtotime($berita['tanggal']))) ?>"    </div>
-</div>
-        
+        </div>
 
         <div class="form-section">
             <div class="section-title"><i class="bi bi-gear"></i> Status & Catatan Admin</div>
@@ -475,28 +491,47 @@ value="<?= old('tanggal', date('Y-m-d H:i', strtotime($berita['tanggal']))) ?>" 
         </div>
 
         <div class="action-buttons d-flex justify-content-end gap-2">
-    <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
-    
-    <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
-        <i class="bi bi-file-earmark-text"></i> Simpan Draft
-    </button>
-    
-    <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
-        <i class="bi bi-send"></i> Publikasikan
-    </button>
-</div>
+            <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
+            <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white"><i class="bi bi-file-earmark-text"></i> Simpan Draft</button>
+            <button type="submit" name="submit_type" value="publish" class="btn btn-primary"><i class="bi bi-send"></i> Publikasikan</button>
+        </div>
     </form>
 </div>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> 
+<script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    // ============================================================
+    // 0. TOGGLE CONTENT 2 LOGIC
+    // ============================================================
+    const toggleContent2 = document.getElementById('toggle-content2');
+    const wrapperContent2 = document.getElementById('wrapper-content2');
+    const hasContent2Val = document.getElementById('has-content2-val');
+
+    function handleToggleContent2() {
+        if (toggleContent2.checked) {
+            wrapperContent2.style.display = 'block';
+            hasContent2Val.value = '1';
+        } else {
+            wrapperContent2.style.display = 'none';
+            hasContent2Val.value = '0';
+        }
+    }
+
+    toggleContent2.addEventListener('change', handleToggleContent2);
+    // Initial Run (in case DB has value)
+    handleToggleContent2();
 
     // ============================================================
     // 1. CONFIG QUILL EDITOR
     // ============================================================
+    const formBerita = document.getElementById('form-berita');
+    const contentHidden = document.getElementById('content-hidden');
+    const content2Hidden = document.getElementById('content2-hidden');
+
     const quillContent = new Quill('#editor-content .ql-editor', {
         modules: { toolbar: '#toolbar-content' },
         theme: 'snow',
@@ -507,6 +542,12 @@ document.addEventListener('DOMContentLoaded', function() {
         modules: { toolbar: '#toolbar-content2' },
         theme: 'snow',
         placeholder: 'Tulis isi berita bagian kedua di sini...'
+    });
+
+    // Sync content saat form submit
+    formBerita.addEventListener('submit', function() {
+        contentHidden.value = quillContent.root.innerHTML;
+        content2Hidden.value = quillContent2.root.innerHTML;
     });
 
     // ============================================================
@@ -572,17 +613,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    flatpickr("#datetime-picker", {
-        enableTime: true,       // Aktifkan pemilih waktu
-        dateFormat: "Y-m-d H:i", // Format yang dikirim ke database (MySQL biasanya Y-m-d H:i:s)
-        time_24hr: true,        // Format 24 jam
-        locale: "id",           // Bahasa Indonesia
-        altInput: true,         // Tampilkan format yang lebih mudah dibaca user
-        altFormat: "j F Y, H:i", // Contoh: 14 Desember 2024, 14:30
-        minDate: "today",       // (Opsional) Tidak boleh pilih tanggal lampau
-        defaultDate: "<?= old('tanggal') ? old('tanggal') : '' ?>" // Load old value jika ada error validasi
-    });
-    
     function removeFile(indexToRemove) {
         const newDt = new DataTransfer();
         Array.from(dt.files).forEach((file, i) => {
@@ -590,7 +620,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 newDt.items.add(file);
             }
         });
-        
         dt = newDt;
         additionalInput.files = dt.files;
         renderNewPreviews();
@@ -619,199 +648,107 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 5. DROPDOWN KATEGORI
+    // 5. DROPDOWN KATEGORI & TAGS
     // ============================================================
-    const toggleBtn = document.getElementById('kategori-toggle');
-    const dropdownMenu = toggleBtn.nextElementSibling;
-    const searchInput = document.getElementById('kategori-search');
-    const kategoriItems = Array.from(document.querySelectorAll('.kategori-item'));
-    const checkboxes = document.querySelectorAll('.kategori-checkbox');
-    const hiddenInput = document.getElementById('kategori-hidden');
-    const placeholder = document.getElementById('kategori-placeholder');
-    const badgeContainer = document.getElementById('selected-kategori-badges');
+    function setupDropdown(type) {
+        const toggleBtn = document.getElementById(type + '-toggle');
+        const dropdownMenu = toggleBtn.nextElementSibling;
+        const searchInput = document.getElementById(type + '-search');
+        const items = Array.from(document.querySelectorAll('.' + type + '-item'));
+        const checkboxes = document.querySelectorAll('.' + type + '-checkbox');
+        const hiddenInput = document.getElementById(type + '-hidden');
+        const placeholder = document.getElementById(type + '-placeholder');
+        const badgeContainer = document.getElementById('selected-' + type + '-badges');
+        const noResults = document.getElementById(type + '-no-results');
 
-    toggleBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const isShown = dropdownMenu.classList.contains('show');
-        dropdownMenu.classList.toggle('show', !isShown);
-        toggleBtn.setAttribute('aria-expanded', !isShown);
-        if (!isShown) setTimeout(() => searchInput.focus(), 100);
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            dropdownMenu.classList.remove('show');
-            toggleBtn.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    searchInput.addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase();
-        kategoriItems.forEach(item => {
-            const text = item.getAttribute('data-name');
-            if (text.includes(term)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isShown = dropdownMenu.classList.contains('show');
+            dropdownMenu.classList.toggle('show', !isShown);
+            if (!isShown) setTimeout(() => searchInput.focus(), 100);
         });
-    });
 
-    function updateSelection() {
-        const selectedIds = [];
-        const selectedNames = [];
-        checkboxes.forEach(cb => {
-            if (cb.checked) {
-                selectedIds.push(cb.value);
-                selectedNames.push(cb.nextElementSibling.textContent.trim());
-                cb.closest('.kategori-item').style.backgroundColor = '#eff6ff';
-            } else {
-                cb.closest('.kategori-item').style.backgroundColor = '';
+        document.addEventListener('click', (e) => {
+            if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
             }
         });
 
-        hiddenInput.value = selectedIds.join(',');
-        badgeContainer.innerHTML = '';
-        selectedNames.forEach((name, index) => {
-            const badge = document.createElement('div');
-            badge.className = 'selected-badge';
-            badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-badge" data-id="${selectedIds[index]}"></i>`;
-            badgeContainer.appendChild(badge);
-        });
-
-        if (selectedNames.length > 0) {
-            placeholder.textContent = `${selectedNames.length} Kategori Dipilih`;
-            placeholder.classList.add('text-primary', 'fw-bold');
-        } else {
-            placeholder.textContent = 'Pilih minimal 1 kategori';
-            placeholder.classList.remove('text-primary', 'fw-bold');
-        }
-
-        document.querySelectorAll('.remove-badge').forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const idToRemove = this.getAttribute('data-id');
-                const cb = document.getElementById('kat-' + idToRemove);
-                if(cb) { cb.checked = false; updateSelection(); }
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            let hasVisible = false;
+            items.forEach(item => {
+                const text = item.getAttribute('data-name');
+                if (text.includes(term)) { item.style.display = 'flex'; hasVisible = true; } 
+                else { item.style.display = 'none'; }
             });
-        });
-    }
-
-    checkboxes.forEach(cb => cb.addEventListener('change', updateSelection));
-    updateSelection();
-
-    // ============================================================
-    // 6. DROPDOWN TAGS
-    // ============================================================
-    const tagsToggleBtn = document.getElementById('tags-toggle');
-    const tagsDropdownMenu = tagsToggleBtn.nextElementSibling;
-    const tagsSearchInput = document.getElementById('tags-search');
-    const tagsItems = Array.from(document.querySelectorAll('.tags-item'));
-    const tagsCheckboxes = document.querySelectorAll('.tags-checkbox');
-    const tagsHiddenInput = document.getElementById('tags-hidden');
-    const tagsPlaceholder = document.getElementById('tags-placeholder');
-    const tagsBadgeContainer = document.getElementById('selected-tags-badges');
-    const tagsNoResults = document.getElementById('tags-no-results');
-
-    tagsToggleBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const isShown = tagsDropdownMenu.classList.contains('show');
-        tagsDropdownMenu.classList.toggle('show', !isShown);
-        tagsToggleBtn.setAttribute('aria-expanded', !isShown);
-        if (!isShown) setTimeout(() => tagsSearchInput.focus(), 100);
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!tagsToggleBtn.contains(e.target) && !tagsDropdownMenu.contains(e.target)) {
-            tagsDropdownMenu.classList.remove('show');
-            tagsToggleBtn.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    tagsSearchInput.addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase();
-        let hasVisible = false;
-        tagsItems.forEach(item => {
-            const text = item.getAttribute('data-name');
-            if (text.includes(term)) {
-                item.style.display = 'flex'; 
-                hasVisible = true;
-            } else {
-                item.style.display = 'none';
-            }
-        });
-        tagsNoResults.style.display = hasVisible ? 'none' : 'block';
-    });
-
-    function updateTagsSelection() {
-        const selectedIds = [];
-        const selectedNames = [];
-        
-        tagsCheckboxes.forEach(cb => {
-            if (cb.checked) {
-                selectedIds.push(cb.value);
-                selectedNames.push(cb.nextElementSibling.innerText.trim());
-                cb.closest('.tags-item').style.backgroundColor = '#eff6ff';
-            } else {
-                cb.closest('.tags-item').style.backgroundColor = '';
-            }
+            noResults.style.display = hasVisible ? 'none' : 'block';
         });
 
-        tagsHiddenInput.value = selectedIds.join(',');
-        tagsBadgeContainer.innerHTML = '';
-        
-        selectedNames.forEach((name, index) => {
-            const badge = document.createElement('div');
-            badge.className = 'selected-badge';
-            badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-tag-badge" data-id="${selectedIds[index]}"></i>`;
-            tagsBadgeContainer.appendChild(badge);
-        });
-
-        if (selectedNames.length > 0) {
-            tagsPlaceholder.textContent = `${selectedNames.length} Tags Dipilih`;
-            tagsPlaceholder.classList.add('text-primary', 'fw-bold');
-        } else {
-            tagsPlaceholder.textContent = 'Pilih tags (opsional)';
-            tagsPlaceholder.classList.remove('text-primary', 'fw-bold');
-        }
-
-        document.querySelectorAll('.remove-tag-badge').forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const id = this.getAttribute('data-id');
-                const cb = document.getElementById('tag-' + id);
-                if(cb) { 
-                    cb.checked = false; 
-                    updateTagsSelection(); 
+        function updateSelection() {
+            const selectedIds = [];
+            const selectedNames = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedIds.push(cb.value);
+                    selectedNames.push(cb.nextElementSibling.innerText.trim());
+                    cb.closest('.' + type + '-item').style.backgroundColor = '#eff6ff';
+                } else {
+                    cb.closest('.' + type + '-item').style.backgroundColor = '';
                 }
             });
-        });
-    }
+            hiddenInput.value = selectedIds.join(',');
+            badgeContainer.innerHTML = '';
+            selectedNames.forEach((name, idx) => {
+                const badge = document.createElement('div');
+                badge.className = 'selected-badge';
+                badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-badge" data-id="${selectedIds[idx]}"></i>`;
+                badgeContainer.appendChild(badge);
+            });
+            
+            badgeContainer.querySelectorAll('.remove-badge').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const idToRemove = this.getAttribute('data-id');
+                    const cbToUncheck = document.getElementById((type === 'kategori' ? 'kat-' : 'tag-') + idToRemove);
+                    if(cbToUncheck) { cbToUncheck.checked = false; updateSelection(); }
+                });
+            });
 
-    tagsCheckboxes.forEach(cb => cb.addEventListener('change', updateTagsSelection));
-    updateTagsSelection();
-
-    // ============================================================
-    // 7. FORM SUBMIT
-    // ============================================================
-    const form = document.getElementById('form-berita');
-    form.addEventListener('submit', function(e) {
-        const content1 = quillContent.root.innerHTML.trim();
-        const content2 = quillContent2.root.innerHTML.trim();
-        const cleanContent1 = content1.replace(/<[^>]*>/g, '').trim();
-        
-        if (cleanContent1 === '') {
-            e.preventDefault();
-            alert('Isi Berita tidak boleh kosong!');
-            quillContent.focus();
-            return false;
+            if (selectedNames.length > 0) {
+                placeholder.textContent = `${selectedNames.length} ${type === 'kategori' ? 'Kategori' : 'Tag'} Dipilih`;
+                placeholder.classList.add('text-primary', 'fw-bold');
+            } else {
+                placeholder.textContent = type === 'kategori' ? 'Pilih minimal 1 kategori' : 'Pilih tags (opsional)';
+                placeholder.classList.remove('text-primary', 'fw-bold');
+            }
         }
 
-        document.getElementById('content-hidden').value = content1;
-        document.getElementById('content2-hidden').value = content2;
+        items.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target !== this.querySelector('input')) {
+                    const cb = this.querySelector('input');
+                    cb.checked = !cb.checked;
+                }
+                updateSelection();
+            });
+        });
+        
+        updateSelection(); // Init
+    }
+
+    setupDropdown('kategori');
+    setupDropdown('tags');
+
+    flatpickr("#datetime-picker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        locale: "id",
+        altInput: true,
+        altFormat: "j F Y, H:i",
+        minDate: "today",
+        defaultDate: "<?= old('tanggal', date('Y-m-d H:i', strtotime($berita['tanggal']))) ?>"
     });
-
-}); // END DOMContentLoaded
+});
 </script>
-
 <?= $this->endSection() ?>

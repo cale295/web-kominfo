@@ -1,7 +1,6 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('styles') ?>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
 <style>
@@ -91,7 +90,7 @@
     }
     .temp-image-badge i { margin-right: 4px; }
 
-    /* --- TOMBOL HAPUS GAMBAR BARU (FITUR BARU) --- */
+    /* --- TOMBOL HAPUS GAMBAR BARU --- */
     .btn-delete-new-img {
         position: absolute; top: 5px; right: 5px;
         background: rgba(220, 38, 38, 0.9); color: white;
@@ -117,6 +116,15 @@
     .form-section { margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--gray-100); }
     .form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     
+    /* --- SISIPAN BOX STYLE --- */
+    .sisipan-box {
+        background: #eff6ff;
+        border: 1px dashed #3b82f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
     @media (max-width: 768px) {
         .form-card { padding: 20px; }
         .action-buttons { flex-direction: column; }
@@ -164,13 +172,18 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 <textarea name="intro" class="form-control" rows="3" placeholder="Deskripsi singkat yang menarik pembaca"><?= old('intro') ?></textarea>
                 <small class="text-muted">Ringkasan singkat yang akan ditampilkan di preview berita</small>
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">Sumber Berita</label>
+                <input type="text" name="sumber" class="form-control" placeholder="Contoh: Kompas.com" value="<?= old('sumber') ?>">
+            </div>
         </div>
 
         <div class="form-section">
-            <div class="section-title"><i class="bi bi-file-text"></i> Konten Berita</div>
+            <div class="section-title"><i class="bi bi-file-text"></i> Konten & Struktur Berita</div>
 
             <div class="mb-4">
-                <label class="form-label">Isi Berita <span class="text-danger">*</span></label>
+                <label class="form-label">Isi Berita 1 <span class="text-danger">*</span></label>
                 <div id="toolbar-content" class="ql-toolbar-custom">
                     <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button><button class="ql-strike"></button>
                     <select class="ql-header"><option value="1"></option><option value="2"></option><option value="3"></option><option selected></option></select>
@@ -181,17 +194,58 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                     <div class="ql-editor" data-placeholder="Tulis isi berita di sini..."></div>
                 </div>
                 <textarea name="content" id="content-hidden" style="display:none;"></textarea>
+                
+                <div class="sisipan-box">
+                    <label class="form-label d-flex align-items-center">
+                        <i class="bi bi-paperclip me-2"></i> Berita Sisipan 1 (Baca Juga)
+                    </label>
+                    <select name="id_berita_terkait" class="form-select">
+                        <option value="">-- Pilih Berita Sisipan --</option>
+                        <?php foreach ($beritaAll as $b): ?>
+                            <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait') == $b['id_berita'] ? 'selected' : '' ?>>
+                                <?= esc($b['judul']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 1.</small>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Isi Berita 2 (Opsional)</label>
-                <div id="toolbar-content2" class="ql-toolbar-custom">
-                    <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
+            <div class="d-flex align-items-center mb-3 mt-5 p-3 bg-gray-50 border rounded">
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" role="switch" id="toggle-content2" 
+                           <?= old('has_content2') || !empty($oldContent2) ? 'checked' : '' ?>>
+                    <label class="form-check-label fw-bold" for="toggle-content2">Tambah Halaman/Bagian Kedua (Isi Berita 2)</label>
                 </div>
-                <div id="editor-content2" class="ql-container ql-snow">
-                    <div class="ql-editor" data-placeholder="Tulis isi berita bagian kedua di sini..."></div>
+                <input type="hidden" name="has_content2" id="has-content2-val" value="0">
+            </div>
+
+            <div id="wrapper-content2" style="display: none;">
+                <div class="mb-4 ps-3 border-start border-3 border-info">
+                    <label class="form-label">Isi Berita 2</label>
+                    <div id="toolbar-content2" class="ql-toolbar-custom">
+                        <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
+                    </div>
+                    <div id="editor-content2" class="ql-container ql-snow">
+                        <div class="ql-editor" data-placeholder="Tulis isi berita bagian kedua di sini..."></div>
+                    </div>
+                    <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
+
+                    <div class="sisipan-box mt-3">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="bi bi-paperclip me-2"></i> Berita Sisipan 2 (Baca Juga)
+                        </label>
+                        <select name="id_berita_terkait2" class="form-select">
+                            <option value="">-- Pilih Berita Sisipan --</option>
+                            <?php foreach ($beritaAll as $b): ?>
+                                <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait2') == $b['id_berita'] ? 'selected' : '' ?>>
+                                    <?= esc($b['judul']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 2.</small>
+                    </div>
                 </div>
-                <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
             </div>
         </div>
 
@@ -234,7 +288,8 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 <input type="hidden" name="id_kategori" id="kategori-hidden" value="<?= implode(',', $oldKategori) ?>">
                 <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
-<div class="mb-3">
+
+            <div class="mb-3">
                 <label class="form-label">Tags</label>
                 <div class="dropdown" id="tags-dropdown">
                     <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle" aria-haspopup="true" aria-expanded="false">
@@ -270,6 +325,7 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $oldTags) ?>">
                 <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (SEO)</label>
                 <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma"><?= old('keyword') ?></textarea>
@@ -328,9 +384,6 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <div class="retained-image-info">
-                        <i class="bi bi-info-circle-fill"></i> <strong>Gambar sebelumnya tersimpan sementara.</strong>
-                    </div>
                 <?php endif; ?>
 
                 <div id="additional-preview-new" class="row mt-3"></div>
@@ -342,77 +395,68 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
             </div>
         </div>
 
-        <div class="form-section">
-            <div class="section-title"><i class="bi bi-link-45deg"></i> Berita Terkait</div>
-            
-            <div class="mb-3">
-                <label class="form-label">Berita Terkait 1</label>
-                <select name="id_berita_terkait" class="form-select">
-                    <option value="">-- Pilih --</option>
-                    <?php foreach ($beritaAll as $b): ?>
-                        <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait') == $b['id_berita'] ? 'selected' : '' ?>>
-                            <?= esc($b['judul']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Berita Terkait 2</label>
-                <select name="id_berita_terkait2" class="form-select">
-                    <option value="">-- Pilih --</option>
-                    <?php foreach ($beritaAll as $b): ?>
-                        <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait2') == $b['id_berita'] ? 'selected' : '' ?>>
-                            <?= esc($b['judul']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Sumber Berita</label>
-                <input type="text" name="sumber" class="form-control" placeholder="Contoh: Kompas.com" value="<?= old('sumber') ?>">
+        <div class="mb-3">
+            <label class="form-label">Waktu Publish</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-calendar-event"></i></span>
+                <input type="text" id="datetime-picker" name="tanggal" class="form-control bg-white" 
+                       placeholder="Pilih tanggal dan jam..." 
+                       value="<?= old('tanggal') ?>">
             </div>
         </div>
-
-<div class="mb-3">
-    <label class="form-label">Waktu Publish</label>
-    <div class="input-group">
-        <span class="input-group-text bg-white"><i class="bi bi-calendar-event"></i></span>
-        <input type="text" id="datetime-picker" name="tanggal" class="form-control bg-white" 
-               placeholder="Pilih tanggal dan jam..." 
-               value="<?= old('tanggal') ?>">
-    </div>
-</div>
 
         <input type="hidden" name="status" value="0">
         <input type="hidden" name="status_berita" value="2">
 
-<div class="action-buttons d-flex justify-content-end gap-2">
-    <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
-    
-    <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
-        <i class="bi bi-file-earmark-text"></i> Simpan Draft
-    </button>
-    
-    <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
-        <i class="bi bi-send"></i> Publikasikan
-    </button>
-</div>
+        <div class="action-buttons d-flex justify-content-end gap-2">
+            <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
+            
+            <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
+                <i class="bi bi-file-earmark-text"></i> Simpan Draft
+            </button>
+            
+            <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
+                <i class="bi bi-send"></i> Publikasikan
+            </button>
+        </div>
     </form>
 </div>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    
+    // ============================================================
+    // 0. TOGGLE CONTENT 2 LOGIC (NEW)
+    // ============================================================
+    const toggleContent2 = document.getElementById('toggle-content2');
+    const wrapperContent2 = document.getElementById('wrapper-content2');
+    const hasContent2Val = document.getElementById('has-content2-val');
+
+    function handleToggleContent2() {
+        if (toggleContent2.checked) {
+            wrapperContent2.style.display = 'block';
+            hasContent2Val.value = '1';
+        } else {
+            wrapperContent2.style.display = 'none';
+            hasContent2Val.value = '0';
+        }
+    }
+
+    toggleContent2.addEventListener('change', handleToggleContent2);
+    // Run on load to set initial state (e.g. if returning from validation error)
+    handleToggleContent2();
+
     // ============================================================
     // 1. CONFIG QUILL EDITOR
     // ============================================================
+    // Handler untuk sync data ke hidden textarea sebelum submit form
+    const formBerita = document.getElementById('form-berita');
+    const contentHidden = document.getElementById('content-hidden');
+    const content2Hidden = document.getElementById('content2-hidden');
+
     const quillContent = new Quill('#editor-content .ql-editor', {
         modules: { toolbar: '#toolbar-content' },
         theme: 'snow',
@@ -436,6 +480,12 @@ document.addEventListener('DOMContentLoaded', function() {
         quillContent2.clipboard.dangerouslyPasteHTML(0, oldContent2);
     }
 
+    // Sync content saat form submit
+    formBerita.addEventListener('submit', function() {
+        contentHidden.value = quillContent.root.innerHTML;
+        content2Hidden.value = quillContent2.root.innerHTML;
+    });
+
     // ============================================================
     // 2. PREVIEW COVER IMAGE
     // ============================================================
@@ -456,306 +506,155 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsDataURL(file);
         }
     });
-        // --- INIT FLATPICKR (TANGGAL & WAKTU) ---
+
+    // --- INIT FLATPICKR (TANGGAL & WAKTU) ---
     flatpickr("#datetime-picker", {
-        enableTime: true,       // Aktifkan pemilih waktu
-        dateFormat: "Y-m-d H:i", // Format yang dikirim ke database (MySQL biasanya Y-m-d H:i:s)
-        time_24hr: true,        // Format 24 jam
-        locale: "id",           // Bahasa Indonesia
-        altInput: true,         // Tampilkan format yang lebih mudah dibaca user
-        altFormat: "j F Y, H:i", // Contoh: 14 Desember 2024, 14:30
-        minDate: "today",       // (Opsional) Tidak boleh pilih tanggal lampau
-        defaultDate: "<?= old('tanggal') ? old('tanggal') : '' ?>" // Load old value jika ada error validasi
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        locale: "id",
+        altInput: true,
+        altFormat: "j F Y, H:i",
+        minDate: "today",
+        defaultDate: "<?= old('tanggal') ? old('tanggal') : '' ?>"
     });
 
     // ============================================================
-    // 3. PREVIEW ADDITIONAL IMAGES + CAPTION + DELETE (DataTransfer)
+    // 3. PREVIEW ADDITIONAL IMAGES (Logic dipersingkat)
     // ============================================================
     const additionalInput = document.getElementById('additional-images');
     const additionalPreviewNew = document.getElementById('additional-preview-new');
-    
-    // Variabel penampung file
     let dt = new DataTransfer(); 
 
     additionalInput.addEventListener('change', function(e) {
-        // Reset setiap kali browse baru
         dt = new DataTransfer();
-        for (let i = 0; i < this.files.length; i++) {
-            dt.items.add(this.files[i]);
-        }
+        for (let i = 0; i < this.files.length; i++) dt.items.add(this.files[i]);
         renderNewPreviews();
     });
 
     function renderNewPreviews() {
-        additionalPreviewNew.innerHTML = ''; // Clear container
-
+        additionalPreviewNew.innerHTML = '';
         Array.from(dt.files).forEach((file, index) => {
             if (!file.type.startsWith('image/')) return;
-
             const reader = new FileReader();
             reader.onload = function(evt) {
-                // Wrapper Column
                 const col = document.createElement('div');
                 col.className = 'col-md-4 mb-3 fade-in';
-
                 col.innerHTML = `
                     <div class="card h-100 border-gray-200 shadow-sm preview-card-wrapper">
-                        <button type="button" class="btn-delete-new-img" data-index="${index}" title="Hapus gambar ini">✕</button>
-                        
+                        <button type="button" class="btn-delete-new-img" data-index="${index}">✕</button>
                         <img src="${evt.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;">
-                        
                         <div class="card-body p-2 bg-light">
-                            <label class="form-label text-muted small mb-1">Caption:</label>
-                            <input type="text" 
-                                   name="caption_additional[]" 
-                                   class="form-control form-control-sm" 
-                                   placeholder="Ket. foto...">
+                            <input type="text" name="caption_additional[]" class="form-control form-control-sm" placeholder="Ket. foto...">
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 additionalPreviewNew.appendChild(col);
-
-                // Event Listener Hapus
-                col.querySelector('.btn-delete-new-img').addEventListener('click', function() {
-                    removeNewFile(index);
-                });
+                col.querySelector('.btn-delete-new-img').addEventListener('click', () => removeNewFile(index));
             }
             reader.readAsDataURL(file);
         });
     }
 
-    function removeNewFile(indexToRemove) {
+    function removeNewFile(index) {
         const newDt = new DataTransfer();
-        // Salin semua kecuali yang dihapus
-        Array.from(dt.files).forEach((file, i) => {
-            if (i !== indexToRemove) {
-                newDt.items.add(file);
-            }
-        });
-        
-        dt = newDt; // Update penampung
-        additionalInput.files = dt.files; // Update input element
-        renderNewPreviews(); // Render ulang
+        Array.from(dt.files).forEach((f, i) => { if (i !== index) newDt.items.add(f); });
+        dt = newDt;
+        additionalInput.files = dt.files;
+        renderNewPreviews();
     }
 
     // ============================================================
-    // 4. DROPDOWN KATEGORI
+    // 4. DROPDOWN KATEGORI & TAGS (Logic tetap sama)
     // ============================================================
-    const toggleBtn = document.getElementById('kategori-toggle');
-    const dropdownMenu = toggleBtn.nextElementSibling;
-    const searchInput = document.getElementById('kategori-search');
-    const kategoriItems = Array.from(document.querySelectorAll('.kategori-item'));
-    const checkboxes = document.querySelectorAll('.kategori-checkbox');
-    const hiddenInput = document.getElementById('kategori-hidden');
-    const placeholder = document.getElementById('kategori-placeholder');
-    const badgeContainer = document.getElementById('selected-kategori-badges');
-    const noResults = document.getElementById('kategori-no-results');
+    function setupDropdown(type) {
+        const toggleBtn = document.getElementById(type + '-toggle');
+        const dropdownMenu = toggleBtn.nextElementSibling;
+        const searchInput = document.getElementById(type + '-search');
+        const items = Array.from(document.querySelectorAll('.' + type + '-item'));
+        const checkboxes = document.querySelectorAll('.' + type + '-checkbox');
+        const hiddenInput = document.getElementById(type + '-hidden');
+        const placeholder = document.getElementById(type + '-placeholder');
+        const badgeContainer = document.getElementById('selected-' + type + '-badges');
+        const noResults = document.getElementById(type + '-no-results');
 
-    // Toggle
-    toggleBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const isShown = dropdownMenu.classList.contains('show');
-        dropdownMenu.classList.toggle('show', !isShown);
-        toggleBtn.setAttribute('aria-expanded', !isShown);
-        if (!isShown) setTimeout(() => searchInput.focus(), 100);
-    });
-
-    // Close outside
-    document.addEventListener('click', function(e) {
-        if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            dropdownMenu.classList.remove('show');
-            toggleBtn.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    // Search
-    searchInput.addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase();
-        let hasVisible = false;
-        kategoriItems.forEach(item => {
-            const text = item.getAttribute('data-name');
-            if (text.includes(term)) {
-                item.style.display = 'flex'; hasVisible = true;
-            } else {
-                item.style.display = 'none';
-            }
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isShown = dropdownMenu.classList.contains('show');
+            dropdownMenu.classList.toggle('show', !isShown);
+            if (!isShown) setTimeout(() => searchInput.focus(), 100);
         });
-        noResults.style.display = hasVisible ? 'none' : 'block';
-    });
 
-    // Badges logic
-    function updateSelection() {
-        const selectedIds = [];
-        const selectedNames = [];
-        checkboxes.forEach(cb => {
-            if (cb.checked) {
-                selectedIds.push(cb.value);
-                selectedNames.push(cb.nextElementSibling.innerText.trim());
-                cb.closest('.kategori-item').style.backgroundColor = '#eff6ff';
-            } else {
-                cb.closest('.kategori-item').style.backgroundColor = '';
+        document.addEventListener('click', (e) => {
+            if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
             }
         });
 
-        hiddenInput.value = selectedIds.join(',');
-        badgeContainer.innerHTML = '';
-        
-        selectedNames.forEach((name, index) => {
-            const badge = document.createElement('div');
-            badge.className = 'selected-badge';
-            badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-badge" data-id="${selectedIds[index]}"></i>`;
-            badgeContainer.appendChild(badge);
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            let hasVisible = false;
+            items.forEach(item => {
+                const text = item.getAttribute('data-name');
+                if (text.includes(term)) { item.style.display = 'flex'; hasVisible = true; } 
+                else { item.style.display = 'none'; }
+            });
+            noResults.style.display = hasVisible ? 'none' : 'block';
         });
 
-        if (selectedNames.length > 0) {
-            placeholder.textContent = `${selectedNames.length} Kategori Dipilih`;
-            placeholder.classList.add('text-primary', 'fw-bold');
-        } else {
-            placeholder.textContent = 'Pilih minimal 1 kategori';
-            placeholder.classList.remove('text-primary', 'fw-bold');
+        function updateSelection() {
+            const selectedIds = [];
+            const selectedNames = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedIds.push(cb.value);
+                    selectedNames.push(cb.nextElementSibling.innerText.trim());
+                    cb.closest('.' + type + '-item').style.backgroundColor = '#eff6ff';
+                } else {
+                    cb.closest('.' + type + '-item').style.backgroundColor = '';
+                }
+            });
+            hiddenInput.value = selectedIds.join(',');
+            badgeContainer.innerHTML = '';
+            selectedNames.forEach((name, idx) => {
+                const badge = document.createElement('div');
+                badge.className = 'selected-badge';
+                badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-badge" data-id="${selectedIds[idx]}"></i>`;
+                badgeContainer.appendChild(badge);
+            });
+            
+            // Re-bind remove events
+            badgeContainer.querySelectorAll('.remove-badge').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const idToRemove = this.getAttribute('data-id');
+                    const cbToUncheck = document.getElementById((type === 'kategori' ? 'kat-' : 'tag-') + idToRemove);
+                    if(cbToUncheck) { cbToUncheck.checked = false; updateSelection(); }
+                });
+            });
+
+            if (selectedNames.length > 0) {
+                placeholder.textContent = `${selectedNames.length} ${type === 'kategori' ? 'Kategori' : 'Tag'} Dipilih`;
+                placeholder.classList.add('text-primary', 'fw-bold');
+            } else {
+                placeholder.textContent = type === 'kategori' ? 'Pilih minimal 1 kategori' : 'Pilih tags (opsional)';
+                placeholder.classList.remove('text-primary', 'fw-bold');
+            }
         }
 
-        // Remove badge event
-        document.querySelectorAll('.remove-badge').forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const id = this.getAttribute('data-id');
-                const cb = document.getElementById('kat-' + id);
-                if(cb) { cb.checked = false; updateSelection(); }
+        items.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target !== this.querySelector('input')) {
+                    const cb = this.querySelector('input');
+                    cb.checked = !cb.checked;
+                }
+                updateSelection();
             });
         });
+        
+        updateSelection(); // Init on load
     }
 
-    checkboxes.forEach(cb => cb.addEventListener('change', updateSelection));
-    updateSelection(); // init
-
-    // ============================================================
-    // 5. FORM SUBMIT
-    // ============================================================
-    const form = document.getElementById('form-berita');
-    form.addEventListener('submit', function(e) {
-        const content1 = quillContent.root.innerHTML.trim();
-        const content2 = quillContent2.root.innerHTML.trim();
-        const cleanContent1 = content1.replace(/<[^>]*>/g, '').trim();
-
-        if (cleanContent1 === '') {
-            e.preventDefault();
-            alert('Isi Berita tidak boleh kosong!');
-            quillContent.focus();
-            return false;
-        }
-        document.getElementById('content-hidden').value = content1;
-        document.getElementById('content2-hidden').value = content2;
-    });
-    // ============================================================
-// TAMBAHKAN SCRIPT INI SETELAH SECTION 4 (DROPDOWN KATEGORI)
-// LETAKKAN SEBELUM SECTION 5 (FORM SUBMIT)
-// ============================================================
-
-// ============================================================
-// 4B. DROPDOWN TAGS (SAMA SEPERTI KATEGORI)
-// ============================================================
-const tagsToggleBtn = document.getElementById('tags-toggle');
-const tagsDropdownMenu = tagsToggleBtn.nextElementSibling;
-const tagsSearchInput = document.getElementById('tags-search');
-const tagsItems = Array.from(document.querySelectorAll('.tags-item'));
-const tagsCheckboxes = document.querySelectorAll('.tags-checkbox');
-const tagsHiddenInput = document.getElementById('tags-hidden');
-const tagsPlaceholder = document.getElementById('tags-placeholder');
-const tagsBadgeContainer = document.getElementById('selected-tags-badges');
-const tagsNoResults = document.getElementById('tags-no-results');
-
-// Toggle Dropdown
-tagsToggleBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    const isShown = tagsDropdownMenu.classList.contains('show');
-    tagsDropdownMenu.classList.toggle('show', !isShown);
-    tagsToggleBtn.setAttribute('aria-expanded', !isShown);
-    if (!isShown) setTimeout(() => tagsSearchInput.focus(), 100);
-});
-
-// Close dropdown when click outside
-document.addEventListener('click', function(e) {
-    if (!tagsToggleBtn.contains(e.target) && !tagsDropdownMenu.contains(e.target)) {
-        tagsDropdownMenu.classList.remove('show');
-        tagsToggleBtn.setAttribute('aria-expanded', 'false');
-    }
-});
-
-// Search/Filter Tags
-tagsSearchInput.addEventListener('input', function(e) {
-    const term = e.target.value.toLowerCase();
-    let hasVisible = false;
-    tagsItems.forEach(item => {
-        const text = item.getAttribute('data-name');
-        if (text.includes(term)) {
-            item.style.display = 'flex'; 
-            hasVisible = true;
-        } else {
-            item.style.display = 'none';
-        }
-    });
-    tagsNoResults.style.display = hasVisible ? 'none' : 'block';
-});
-
-// Update Selection & Badges
-function updateTagsSelection() {
-    const selectedIds = [];
-    const selectedNames = [];
-    
-    tagsCheckboxes.forEach(cb => {
-        if (cb.checked) {
-            selectedIds.push(cb.value);
-            selectedNames.push(cb.nextElementSibling.innerText.trim());
-            cb.closest('.tags-item').style.backgroundColor = '#eff6ff';
-        } else {
-            cb.closest('.tags-item').style.backgroundColor = '';
-        }
-    });
-
-    // Update hidden input
-    tagsHiddenInput.value = selectedIds.join(',');
-    
-    // Clear badges container
-    tagsBadgeContainer.innerHTML = '';
-    
-    // Create badges
-    selectedNames.forEach((name, index) => {
-        const badge = document.createElement('div');
-        badge.className = 'selected-badge';
-        badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-tag-badge" data-id="${selectedIds[index]}"></i>`;
-        tagsBadgeContainer.appendChild(badge);
-    });
-
-    // Update placeholder
-    if (selectedNames.length > 0) {
-        tagsPlaceholder.textContent = `${selectedNames.length} Tags Dipilih`;
-        tagsPlaceholder.classList.add('text-primary', 'fw-bold');
-    } else {
-        tagsPlaceholder.textContent = 'Pilih tags (opsional)';
-        tagsPlaceholder.classList.remove('text-primary', 'fw-bold');
-    }
-
-    // Add event listener to remove badges
-    document.querySelectorAll('.remove-tag-badge').forEach(icon => {
-        icon.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const id = this.getAttribute('data-id');
-            const cb = document.getElementById('tag-' + id);
-            if(cb) { 
-                cb.checked = false; 
-                updateTagsSelection(); 
-            }
-        });
-    });
-}
-
-// Listen to checkbox changes
-tagsCheckboxes.forEach(cb => cb.addEventListener('change', updateTagsSelection));
-
-// Initialize on page load
-updateTagsSelection();
+    setupDropdown('kategori');
+    setupDropdown('tags');
 });
 </script>
-
 <?= $this->endSection() ?>
