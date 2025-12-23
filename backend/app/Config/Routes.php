@@ -47,6 +47,7 @@ $routes->post('menu_profile/toggle-status', 'frontend\ProfileController::toggleS
 // Agenda
 $routes->resource('agenda', ['controller' => 'backend\AgendaController','except' => ['show']]);
 $routes->post('agenda/toggle-status', 'backend\AgendaController::toggleStatus');
+$routes->post('agenda/delete/(:num)', 'backend\AgendaController::delete/$1');
 
 // Profile
 $routes->resource('profile', ['controller' => 'backend\ProfileController', 'except' => ['show']]);

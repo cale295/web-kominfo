@@ -146,15 +146,12 @@
                                                 </button>
                                             <?php endif; ?>
 
-                                            <?php if ($can_delete): ?>
-                                                <form action="<?= base_url('agenda/delete/'.$agenda['id_agenda']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin hapus data ini?')">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="btn btn-soft-danger btn-sm rounded-circle shadow-sm" style="width: 32px; height: 32px;">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </button>
-                                                </form>
-                                            <?php endif; ?>
+                                            <form action="<?= base_url('agenda/delete/'.$agenda['id_agenda']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin hapus data ini?')">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-soft-danger btn-sm rounded-circle shadow-sm" style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
