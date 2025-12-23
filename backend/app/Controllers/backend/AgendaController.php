@@ -50,62 +50,60 @@ class AgendaController extends BaseController
         return view('pages/agenda/index', $data);
     }
 
-    public function toggleStatus()
-    {
-        // 1. Cek Request AJAX
-        if (!$this->request->isAJAX()) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        }
+   public function toggleStatus()
+{
+    // 1. Cek Request AJAX
+    if (!$this->request->isAJAX()) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+    }
 
-        // 2. CEK HAK AKSES
-        // Pastikan Controller punya property $this->accessRightsModel & fungsi getAccess()
-        $role = session()->get('role');
-        $access = $this->getAccess($role);
+    // 2. Cek Hak Akses
+    $role = session()->get('role');
+    $access = $this->getAccess($role);
 
-        if (!$access || !$access['can_update']) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Anda tidak memiliki izin untuk mengubah data ini.',
-                'token' => csrf_hash()
-            ]);
-        }
-
-        // 3. LOAD MODEL & AMBIL DATA
-        // ==================================================
-        $model = new \App\Models\AgendaModel(); // <--- GANTI INI SESUAI MODUL
-        // ==================================================
-
-        $id = $this->request->getPost('id');
-        $data = $model->find($id);
-
-        if ($data) {
-            // Logic Toggle (1 -> 0, 0 -> 1)
-            $newStatus = ($data['status'] == '1') ? '0' : '1';
-
-            // Data Update (Termasuk Audit Trail)
-            $updateData = [
-                'status'            => $newStatus,
-                'updated_at'        => date('Y-m-d H:i:s'),
-                'updated_by_id'     => session()->get('id_user'),
-                'updated_by_name'   => session()->get('username'),
-            ];
-
-            if ($model->update($id, $updateData)) {
-                return $this->response->setJSON([
-                    'status'    => 'success',
-                    'message'   => 'Status berhasil diperbarui',
-                    'newStatus' => $newStatus,
-                    'token'     => csrf_hash() // Kirim token baru
-                ]);
-            }
-        }
-
+    if (!$access || !$access['can_update']) {
         return $this->response->setJSON([
-            'status'  => 'error',
-            'message' => 'Gagal update status atau data tidak ditemukan',
-            'token'   => csrf_hash()
+            'status' => 'error',
+            'message' => 'Anda tidak memiliki izin akses.',
+            'token' => csrf_hash()
         ]);
     }
+
+    // 3. Proses Update Sesuai Struktur Tabel
+    $id = $this->request->getPost('id');
+    
+    // Pastikan ID ada
+    $agenda = $this->agendaModel->find($id);
+
+    if ($agenda) {
+        // Logic Toggle untuk ENUM('0','1')
+        // Jika status sekarang '1', ubah jadi '0'. Jika tidak, ubah jadi '1'.
+        $newStatus = ($agenda['status'] === '1') ? '0' : '1';
+
+        // Data yang akan diupdate (HANYA STATUS)
+        // updated_at tidak perlu dimasukkan karena database Anda sudah ON UPDATE CURRENT_TIMESTAMP
+        $updateData = [
+            'status' => $newStatus
+        ];
+
+        // Gunakan update() biasa. 
+        // Kita tidak perlu skipValidation kecuali ada rules ketat di model yang mengharuskan field lain diisi ulang.
+        if ($this->agendaModel->update($id, $updateData)) {
+            return $this->response->setJSON([
+                'status'    => 'success',
+                'message'   => 'Status berhasil diubah',
+                'newStatus' => $newStatus,
+                'token'     => csrf_hash() // Kirim token CSRF baru
+            ]);
+        }
+    }
+
+    return $this->response->setJSON([
+        'status'  => 'error',
+        'message' => 'Gagal mengupdate database.',
+        'token'   => csrf_hash()
+    ]);
+}
     // ==========================================================
     // GET /pages/agenda/new → form tambah agenda
     // ==========================================================
@@ -137,26 +135,24 @@ public function create()
         'start_date'    => $this->request->getPost('start_date'),
         'end_date'      => $this->request->getPost('end_date'),
         'location'      => $this->request->getPost('location'),
-        'status'        => $this->request->getPost('status') ?? 'active',
+        'status'        => '1', // ✅ FIX: ENUM
     ];
 
-    // Upload gambar (tetap di Controller karena ini melibatkan Request dan File handling)
     if ($img = $this->request->getFile('image')) {
         if ($img->isValid() && !$img->hasMoved()) {
-            // Catatan: Anda juga bisa menambahkan validasi file di Model
             $newName = $img->getRandomName();
             $img->move(FCPATH . 'uploads/agenda/', $newName);
             $data['image'] = $newName;
         }
     }
 
-    // --- PERBAIKAN UTAMA DI SINI ---
-        if (!$this->agendaModel->insert($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->agendaModel->errors());
-        }
+    if (!$this->agendaModel->insert($data)) {
+        return redirect()->back()->withInput()->with('errors', $this->agendaModel->errors());
+    }
 
     return redirect()->to('/agenda')->with('success', 'Agenda berhasil ditambahkan!');
 }
+
 
     // ==========================================================
     // GET /pages/agenda/{id}/edit → form edit agenda
@@ -195,12 +191,14 @@ public function update($id = null)
     }
 
     $data = [
-        'activity_name' => $this->request->getPost('activity_name'),
-        'description'   => $this->request->getPost('description'),
-        'start_date'    => $this->request->getPost('start_date'),
-        'end_date'      => $this->request->getPost('end_date'),
-        'location'      => $this->request->getPost('location'),
-    ];
+                'activity_name' => $this->request->getPost('activity_name'),
+                'description'   => $this->request->getPost('description'),
+                'start_date'    => $this->request->getPost('start_date'),
+                'end_date'      => $this->request->getPost('end_date'),
+                'location'      => $this->request->getPost('location'),
+                'status'        => $this->request->getPost('status') === '1' ? '1' : '0', // ✅
+            ];
+
 
     $img = $this->request->getFile('image');
     $uploadPath = FCPATH . 'uploads/agenda/';
@@ -289,4 +287,5 @@ public function update($id = null)
             'can_delete' => (bool) $access['can_delete'],
         ];
     }
+    
 }
