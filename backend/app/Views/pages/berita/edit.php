@@ -739,6 +739,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupDropdown('kategori');
     setupDropdown('tags');
 
+    // --- INIT FLATPICKR (TANGGAL & WAKTU) ---
+    // minDate: "today" dihapus agar bisa pilih tanggal lampau
     flatpickr("#datetime-picker", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
@@ -746,7 +748,6 @@ document.addEventListener('DOMContentLoaded', function() {
         locale: "id",
         altInput: true,
         altFormat: "j F Y, H:i",
-        minDate: "today",
         defaultDate: "<?= old('tanggal', date('Y-m-d H:i', strtotime($berita['tanggal']))) ?>"
     });
 });

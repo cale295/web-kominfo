@@ -508,6 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- INIT FLATPICKR (TANGGAL & WAKTU) ---
+    // HAPUS minDate: "today" AGAR BISA PILIH TANGGAL LAMPAU
     flatpickr("#datetime-picker", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
@@ -515,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function() {
         locale: "id",
         altInput: true,
         altFormat: "j F Y, H:i",
-        minDate: "today",
+        // minDate: "today",  <-- INI DIHAPUS
         defaultDate: "<?= old('tanggal') ? old('tanggal') : '' ?>"
     });
 
