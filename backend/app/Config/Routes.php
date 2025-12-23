@@ -50,6 +50,7 @@ $routes->post('agenda/toggle-status', 'backend\AgendaController::toggleStatus');
 
 // Profile
 $routes->resource('profile', ['controller' => 'backend\ProfileController', 'except' => ['show']]);
+
 $routes->post('profile/toggle-status', 'backend\ProfileController::toggleStatus');
 
 // Kategori

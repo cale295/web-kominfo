@@ -8,110 +8,107 @@ class UserModel extends Model
 {
     protected $table            = 'm_users';
     protected $primaryKey       = 'id_user';
-    protected $useAutoIncrement = true;
+    
+    // PENTING: False karena ID adalah NIK/NIP (Input Manual)
+    protected $useAutoIncrement = false; 
+    
     protected $returnType       = 'array';
     protected $protectFields    = true;
 
     protected $allowedFields = [
+        'id_user',      // Primary Key manual wajib masuk sini
         'full_name',
         'username',
         'email',
         'password',
         'role',
-        'created_at',
-        'updated_at',
+        'no_telp',
+        'foto',
     ];
 
     // Dates
-    protected $useTimestamps = true; // ✅ aktifkan agar otomatis update waktu
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
 
-    // Validation rules
+    // =========================================================================
+    // VALIDATION RULES (YANG SUDAH DIPERBAIKI)
+    // =========================================================================
     protected $validationRules = [
+        'id_user' => [
+            'label' => 'NIK/NIP',
+            // CUKUP begini. Jangan tambah ,id_user,{id_user} di sini.
+            'rules' => 'required|min_length[5]|max_length[20]|is_unique[m_users.id_user]',
+        ],
         'full_name' => [
-            'rules' => 'required|min_length[5]|max_length[100]',
-            'label' => 'Nama Lengkap'
+            'label' => 'Nama Lengkap',
+            'rules' => 'required|min_length[3]|max_length[100]',
         ],
         'username' => [
-            'rules' => 'required|min_length[5]|max_length[50]',
-            'label' => 'Username'
-        ],
-        'password' => [
-            // ✅ regex untuk huruf besar, angka, dan simbol
-            'rules' => 'required|min_length[8]|max_length[255]|regex_match[/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+/]',
-            'label' => 'Password'
+            'label' => 'Username',
+            // Perbaikan: Hapus parameter ignore manual, CI otomatis tahu.
+            'rules' => 'required|min_length[5]|max_length[50]|is_unique[m_users.username]',
         ],
         'email' => [
-            'rules' => 'required|min_length[6]|max_length[255]|valid_email',
-            'label' => 'Email'
+            'label' => 'Email',
+            // Perbaikan: Hapus parameter ignore manual.
+            'rules' => 'required|valid_email|max_length[255]|is_unique[m_users.email]',
+        ],
+        'password' => [
+            'label' => 'Password',
+            // Password required hanya saat insert, controller akan override ini saat update
+            'rules' => 'required|min_length[8]|max_length[255]', 
         ],
     ];
 
     protected $validationMessages = [
-        'full_name' => [
-            'required'   => 'Nama lengkap harus diisi.',
-            'min_length' => 'Nama lengkap minimal 5 karakter.',
-            'max_length' => 'Nama lengkap maksimal 100 karakter.',
+        'id_user' => [
+            'required'   => 'NIK/NIP wajib diisi.',
+            'is_unique'  => 'NIK/NIP sudah terdaftar.',
         ],
         'username' => [
-            'required'   => 'Username harus diisi.',
-            'min_length' => 'Username minimal 5 karakter.',
-            'max_length' => 'Username maksimal 50 karakter.',
-        ],
-        'password' => [
-            'required'    => 'Password harus diisi.',
-            'min_length'  => 'Password minimal 8 karakter.',
-            'regex_match' => 'Password harus mengandung minimal satu huruf besar, satu huruf kecil, satu angka, dan satu simbol.',
+            'is_unique'  => 'Username sudah digunakan.',
         ],
         'email' => [
-            'required'    => 'Email harus diisi.',
-            'valid_email' => 'Format email tidak valid.',
+            'is_unique'  => 'Email sudah digunakan.',
+            'valid_email'=> 'Format email tidak valid.',
         ],
+        'password' => [
+            'min_length' => 'Password minimal 8 karakter.',
+        ]
     ];
 
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
-    // Callbacks
+    // =========================================================================
+    // CALLBACKS (HASHING PASSWORD)
+    // =========================================================================
     protected $allowCallbacks = true;
-    protected $beforeInsert   = ['hashPassword'];
-    protected $beforeUpdate   = ['hashPassword', 'adjustEmailRule', 'adjustPasswordRule'];
+    
+    // SAYA COMMENT DULU AGAR TIDAK BENTROK DENGAN CONTROLLER
+    // Karena di Controller ProfileController.php kita sudah pakai password_hash()
+    // Jika ini dinyalakan, password akan ter-hash 2 KALI -> Gagal Login.
+    
+    protected $beforeInsert   = []; // ['hashPassword']; 
+    protected $beforeUpdate   = []; // ['hashPassword'];
 
     /**
-     * 🔒 Hash password sebelum disimpan
+     * 🔒 Hash password (Opsional: Aktifkan jika Controller mengirim password polos)
      */
-    protected function hashPassword(array $data): array
+    protected function hashPassword(array $data)
     {
-        if (!empty($data['data']['password'])) {
-            $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
-        }
-        return $data;
-    }
+        if (! isset($data['data']['password'])) return $data;
 
-    /**
-     * 💡 Saat update, password boleh kosong (tidak wajib ubah)
-     */
-    protected function adjustPasswordRule(array $data)
-    {
-        $id = $data['id'][0] ?? null;
-        if ($id) {
-            $this->validationRules['password'] = 'required|min_length[8]|max_length[255]|regex_match[/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+/]';
+        if (empty($data['data']['password'])) {
+            unset($data['data']['password']);
+            return $data;
         }
-        return $data;
-    }
 
-    /**
-     * 📧 Saat update, validasi email tetap valid tapi tidak wajib unik ke dirinya sendiri
-     */
-    protected function adjustEmailRule(array $data)
-    {
-        $id = $data['id'][0] ?? null;
-        if ($id) {
-            $this->validationRules['email'] = 'required|min_length[6]|max_length[255]|valid_email';
-        }
+        $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
+
         return $data;
     }
 }
