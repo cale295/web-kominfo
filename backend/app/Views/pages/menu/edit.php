@@ -316,22 +316,39 @@ $bootstrapIcons = [
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-4">
-    <label for="admin_url" class="form-label form-label-gov">
-        <i class="bi bi-shield-lock"></i> URL Admin
-    </label>
-    <div class="input-group-gov">
-        <i class="bi bi-lock input-icon"></i>
-        <input type="text" class="form-control form-control-gov" 
-               id="admin_url" name="admin_url" 
-               value="<?= esc($menu['admin_url'] ?? '') ?>" 
-               placeholder="/dashboard">
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <label for="admin_url" class="form-label form-label-gov">
+            <i class="bi bi-shield-lock"></i> URL Admin
+        </label>
+        <div class="input-group-gov">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="text" class="form-control form-control-gov" 
+                   id="admin_url" name="admin_url" 
+                   value="<?= esc($menu['admin_url'] ?? '') ?>" 
+                   placeholder="/dashboard">
+        </div>
+        <div class="form-text-gov">
+            Kosongkan jika menu tidak tampil di admin panel.
+        </div>
     </div>
-    <div class="form-text-gov">
-        Kosongkan jika menu tidak tampil di admin panel.
+
+    <div class="col-md-6 mb-4">
+        <label for="allowed_roles" class="form-label form-label-gov">
+            <i class="bi bi-person-badge"></i> Hak Akses (Roles)
+        </label>
+        <div class="input-group-gov">
+            <i class="bi bi-people input-icon"></i>
+            <input type="text" class="form-control form-control-gov" 
+                   id="allowed_roles" name="allowed_roles" 
+                   value="<?= esc($menu['allowed_roles'] ?? '') ?>" 
+                   placeholder="superadmin, admin, editor">
+        </div>
+        <div class="form-text-gov text-warning">
+            <i class="bi bi-info-circle"></i> Pisahkan dengan koma. Kosongkan untuk publik.
+        </div>
     </div>
 </div>
-
 
                 <div class="row">
                     <div class="col-md-6 mb-4">

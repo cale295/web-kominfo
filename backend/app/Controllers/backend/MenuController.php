@@ -128,6 +128,7 @@ class MenuController extends BaseController
             'parent_id'   => $this->request->getPost('parent_id') ?: 0,
             'order_number'=> $this->request->getPost('order_number') ?: 0,
             'status'      => $this->request->getPost('status') ?: 'active',
+            'allowed_roles' => $this->request->getPost('allowed_roles'),
         ];
 
         if (!$this->menuModel->insert($data)) {
@@ -192,6 +193,7 @@ $data = [
     'parent_id'   => $this->request->getPost('parent_id') ?: 0,
     'order_number'=> ($order === null ? $menu['order_number'] : $order),
     'status'      => $this->request->getPost('status') ?: 'active',
+    'allowed_roles' => $this->request->getPost('allowed_roles'),
 ];
 
 
