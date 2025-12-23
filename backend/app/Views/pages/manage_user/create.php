@@ -3,6 +3,10 @@
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="<?= base_url('css/pages/manage_user/create.css') ?>">
 <style>
+    /* =========================================
+       1. CUSTOM STYLES
+       ========================================= */
+
     /* Transisi halus untuk field yang muncul/hilang */
     .conditional-field {
         transition: all 0.3s ease-in-out;
@@ -41,12 +45,10 @@
         background-color: #e9ecef;
         border-radius: 3px;
         overflow: hidden;
-        display: none; /* Hidden by default */
+        display: none; 
     }
     
-    .password-strength.show {
-        display: block;
-    }
+    .password-strength.show { display: block; }
 
     .password-strength-bar {
         height: 100%;
@@ -74,6 +76,51 @@
     .role-preview.superadmin { border-left-color: #dc3545; background-color: #fff5f5; }
     .role-preview.admin { border-left-color: #0d6efd; background-color: #f0f7ff; }
     .role-preview.editor { border-left-color: #198754; background-color: #f0fff4; }
+
+    /* =========================================
+       2. NEW: SEARCH BUTTON STYLES
+       ========================================= */
+    .search-container {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start; /* Agar tombol sejajar atas jika error message muncul */
+    }
+
+    /* Memastikan input group mengambil sisa ruang */
+    .search-container .input-group-gov {
+        flex-grow: 1; 
+    }
+
+    .btn-search-gov {
+        background-color: var(--bs-primary); /* Sesuaikan dengan warna tema utama */
+        color: white;
+        border: none;
+        border-radius: 0.375rem; /* Sesuaikan radius border bootstrap */
+        padding: 10px 20px; /* Padding agar tinggi mirip input */
+        height: 48px; /* Sesuaikan tinggi dengan input-group-gov Anda */
+        font-weight: 600;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .btn-search-gov:hover {
+        filter: brightness(90%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .btn-search-gov:disabled {
+        background-color: #adb5bd;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -154,17 +201,28 @@
                             NIK (Nomor Induk Kependudukan)
                             <span class="required">*</span>
                         </label>
-                        <div class="input-group-gov">
-                            <i class="bi bi-card-text input-icon"></i>
-                            <input type="text" 
-                                   name="id_user" 
-                                   id="id_user" 
-                                   class="form-control form-control-gov" 
-                                   value="<?= old('id_user') ?>" 
-                                   placeholder="Masukkan 16 digit NIK"
-                                   required>
+                        
+                        <div class="search-container">
+                            <div class="input-group-gov">
+                                <i class="bi bi-card-text input-icon"></i>
+                                <input type="text" 
+                                       name="id_user" 
+                                       id="id_user" 
+                                       class="form-control form-control-gov" 
+                                       value="<?= old('id_user') ?>" 
+                                       placeholder="Masukkan 16 digit NIK"
+                                       required>
+                            </div>
+
+                            <button type="button" id="btn_check_data" class="btn btn-search-gov" title="Cari data otomatis">
+                                <i class="bi bi-search" id="icon_search"></i>
+                                <span class="spinner-border spinner-border-sm d-none" id="icon_loading" role="status" aria-hidden="true"></span>
+                                <span class="d-none d-md-inline">Cari</span>
+                            </button>
                         </div>
+                        <div class="form-text text-muted small mt-1">Klik cari untuk mengisi data otomatis.</div>
                     </div>
+
                     <div class="col-md-6 mb-4">
                         <label for="full_name" class="form-label form-label-gov">
                             <i class="bi bi-person"></i>
@@ -345,7 +403,7 @@
 <script>
     /**
      * ==========================================
-     * 1. ENUM ROLES & CONFIGURATION
+     * 1. CONFIGURATION
      * ==========================================
      */
     const USER_ROLES = {
@@ -378,61 +436,129 @@
      */
     document.addEventListener('DOMContentLoaded', function() {
         
-        // --- A. Handle User Type Toggle (Pegawai vs Non) ---
+        // --- VARIABLES ---
         const radioButtons = document.querySelectorAll('input[name="tipe_user"]');
         const nonPegawaiFields = document.getElementById('non_pegawai_fields');
         const identityLabel = document.getElementById('identity_label');
-        
-        // UPDATE SELECTOR: id="id_user"
         const identityInput = document.getElementById('id_user');
-        
         const usernameInput = document.getElementById('username');
         const emailInput = document.getElementById('email');
 
+        // --- A. Handle User Type Toggle ---
         function toggleUserType(type) {
             if (type === USER_TYPES.PEGAWAI) {
-                // 1. Ubah UI untuk Pegawai
+                // Pegawai Mode
                 identityLabel.innerHTML = '<i class="bi bi-person-badge"></i> NIP (Nomor Induk Pegawai) <span class="required">*</span>';
                 identityInput.placeholder = 'Masukkan NIP Pegawai';
-                
-                // 2. Sembunyikan field tambahan
                 nonPegawaiFields.classList.add('hidden');
                 
-                // 3. Matikan required field yg disembunyikan
+                // Matikan required untuk field hidden
                 usernameInput.removeAttribute('required');
                 emailInput.removeAttribute('required');
 
             } else {
-                // 1. Ubah UI untuk Non Pegawai
+                // Non-Pegawai Mode
                 identityLabel.innerHTML = '<i class="bi bi-card-heading"></i> NIK (Nomor Induk Kependudukan) <span class="required">*</span>';
                 identityInput.placeholder = 'Masukkan 16 digit NIK';
-                
-                // 2. Tampilkan field tambahan
                 nonPegawaiFields.classList.remove('hidden');
                 
-                // 3. Nyalakan required
+                // Nyalakan required
                 usernameInput.setAttribute('required', 'required');
                 emailInput.setAttribute('required', 'required');
             }
         }
 
-        // Event Listener Radio
         radioButtons.forEach(radio => {
             radio.addEventListener('change', (e) => toggleUserType(e.target.value));
         });
 
-        // Init state
+        // Init toggle
         const checkedRadio = document.querySelector('input[name="tipe_user"]:checked');
         if(checkedRadio) toggleUserType(checkedRadio.value);
 
 
-        // --- B. Handle Role Preview ---
+        // --- B. Handle Search Button (Simulasi Service) ---
+        const btnCheck = document.getElementById('btn_check_data');
+        const iconSearch = document.getElementById('icon_search');
+        const iconLoading = document.getElementById('icon_loading');
+        
+        btnCheck.addEventListener('click', async function() {
+            const idValue = identityInput.value.trim();
+            const userType = document.querySelector('input[name="tipe_user"]:checked').value;
+
+            // 1. Validasi Input Kosong
+            if (!idValue) {
+                alert('Mohon isi NIK/NIP terlebih dahulu sebelum mencari.');
+                identityInput.focus();
+                return;
+            }
+
+            // 2. Loading UI
+            btnCheck.disabled = true;
+            iconSearch.classList.add('d-none');
+            iconLoading.classList.remove('d-none');
+            // btnCheck.lastElementChild.textContent = ' Mencari...';
+
+            try {
+                // --- SIMULASI PEMANGGILAN API (Delay 1.5 detik) ---
+                // Nanti ganti dengan fetch() ke controller sungguhan
+                await new Promise(r => setTimeout(r, 1500));
+
+                // Contoh Data Dummy
+                const mockData = {
+                    success: true,
+                    data: {
+                        full_name: "Budi Santoso (Data Otomatis)",
+                        email: "budi.santoso@example.com",
+                        no_telp: "081233334444",
+                        username: "budi_s_auto"
+                    }
+                };
+
+                if (mockData.success) {
+                    const d = mockData.data;
+                    
+                    // Isi Field
+                    document.getElementById('full_name').value = d.full_name;
+                    document.getElementById('no_telp').value = d.no_telp;
+                    
+                    // Isi email/username jika mode Non-Pegawai
+                    if(userType === USER_TYPES.NON_PEGAWAI) {
+                        emailInput.value = d.email;
+                        usernameInput.value = d.username;
+                    } else {
+                        // Jika pegawai, mungkin email diisi juga walau hidden (untuk backend)
+                        emailInput.value = d.email;
+                    }
+
+                    // Feedback Visual
+                    identityInput.classList.add('is-valid');
+                    setTimeout(() => identityInput.classList.remove('is-valid'), 3000);
+                    
+                    // Pindah fokus ke Password agar user lanjut input
+                    document.getElementById('password').focus();
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Gagal mengambil data dari server.");
+            } finally {
+                // 3. Reset UI
+                btnCheck.disabled = false;
+                iconSearch.classList.remove('d-none');
+                iconLoading.classList.add('d-none');
+                // btnCheck.lastElementChild.textContent = 'Cari';
+            }
+        });
+
+
+        // --- C. Role Preview Logic ---
         const roleSelect = document.getElementById('role');
         const rolePreview = document.getElementById('rolePreview');
 
         roleSelect.addEventListener('change', function(e) {
             const selectedVal = e.target.value;
-            rolePreview.className = 'role-preview'; // Reset class
+            rolePreview.className = 'role-preview'; 
             
             if (!selectedVal) {
                 rolePreview.classList.remove('show');
@@ -457,37 +583,26 @@
         });
 
 
-        // --- C. Form Validation & Auto Fill Logic ---
+        // --- D. Form Submit Validation ---
         document.getElementById('userForm').addEventListener('submit', function(e) {
             const type = document.querySelector('input[name="tipe_user"]:checked').value;
             const pass = document.getElementById('password').value;
             const confirm = document.getElementById('password_confirm').value;
             
-            // Logic khusus Pegawai: Auto-fill username/email jika kosong
-            // Ini penting agar validasi backend/database tidak error (NOT NULL columns)
+            // Auto-fill dummy username/email for Pegawai (prevent DB errors)
             if (type === USER_TYPES.PEGAWAI) {
                 const nipVal = identityInput.value.trim();
-                
-                // Gunakan NIP sebagai username jika kosong
-                if(!usernameInput.value.trim()) {
-                    usernameInput.value = nipVal; 
-                }
-                
-                // Gunakan dummy email internal jika kosong
-                if(!emailInput.value.trim()) {
-                    emailInput.value = nipVal + '@pegawai.internal'; 
-                }
+                if(!usernameInput.value.trim()) usernameInput.value = nipVal; 
+                if(!emailInput.value.trim()) emailInput.value = nipVal + '@internal.gov'; 
             }
             
-            // Validasi Kesamaan Password
             if (pass !== confirm) {
                 e.preventDefault();
-                alert('Konfirmasi password tidak cocok dengan password utama!');
+                alert('Konfirmasi password tidak cocok!');
                 document.getElementById('password_confirm').focus();
                 return false;
             }
             
-            // Validasi Panjang Password
             if (pass.length < 8) {
                 e.preventDefault();
                 alert('Password harus minimal 8 karakter!');
@@ -496,19 +611,16 @@
             }
         });
 
-        // --- D. Utilitas Lain ---
-        
-        // Toggle Password Visibility
+
+        // --- E. Password & Username Utilities ---
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
             this.classList.toggle('bi-eye');
             this.classList.toggle('bi-eye-slash');
         });
 
-        // Username formatter (lowercase & underscore only)
         usernameInput.addEventListener('input', function(e) {
             this.value = this.value.toLowerCase().replace(/\s+/g, '_');
         });
@@ -535,17 +647,11 @@
              
              bar.style.width = strength + '%';
              if(strength < 50) { 
-                bar.style.background = '#dc3545'; 
-                text.innerText = 'Lemah'; 
-                text.style.color = '#dc3545';
+                bar.style.background = '#dc3545'; text.innerText = 'Lemah'; text.style.color = '#dc3545';
              } else if(strength < 80) { 
-                bar.style.background = '#ffc107'; 
-                text.innerText = 'Sedang'; 
-                text.style.color = '#ffc107';
+                bar.style.background = '#ffc107'; text.innerText = 'Sedang'; text.style.color = '#ffc107';
              } else { 
-                bar.style.background = '#198754'; 
-                text.innerText = 'Kuat'; 
-                text.style.color = '#198754';
+                bar.style.background = '#198754'; text.innerText = 'Kuat'; text.style.color = '#198754';
              }
         });
     });

@@ -112,19 +112,8 @@
                                         <div class="small text-dark fw-bold"><?= date('d M Y H:i', strtotime($agenda['start_date'])) ?></div>
                                         <div class="small text-muted">s/d <?= date('d M Y H:i', strtotime($agenda['end_date'])) ?></div>
                                     </td>
-                                    <td class="text-center">
-                                        <?php if ($can_update): ?>
-                                            <div class="form-check form-switch d-flex justify-content-center">
-                                                <input class="form-check-input" type="checkbox" role="switch" 
-                                                    onchange="toggleStatus(<?= $agenda['id_agenda'] ?>)" 
-                                                    <?= ($agenda['status'] == '1') ? 'checked' : '' ?> 
-                                                >
-                                            </div>
-                                        <?php else: ?>
-                                            <span class="badge <?= ($agenda['status'] == '1') ? 'bg-success' : 'bg-secondary' ?>">
-                                                <?= ($agenda['status'] == '1') ? 'Active' : 'Inactive' ?>
-                                            </span>
-                                        <?php endif; ?>
+   <td class="text-center">
+                                    <?= btn_toggle($agenda['id_agenda'], $agenda['status'], 'agenda/toggle-status') ?>
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex gap-2 justify-content-center">
