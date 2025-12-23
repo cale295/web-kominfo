@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import { Triangle, Calendar, Bell, Image } from "lucide-react";
+import { Triangle, Calendar, Bell, Image, X } from "lucide-react"; // Tambah icon X
 import "./Agenda.css";
 import api from "../../../services/api";
 
 interface AnnouncementItem {
-  id: string; // Diubah dari number ke string untuk id_pengumuman
+  id: string;
   title: string;
   date: string;
   content?: string;
   link_url?: string;
+  image?: string; // Field baru untuk gambar popup
 }
 
 interface ApiAgendaItem {
@@ -27,9 +28,7 @@ interface PengumumanItem {
   judul: string;
   content: string;
   featured_image: string;
-  tipe_media: string;
   link_url: string;
-  file_media: string | null;
   status: string;
   created_at: string;
   updated_at: string;
@@ -85,6 +84,9 @@ export default function Agenda() {
   const [loadingPengumuman, setLoadingPengumuman] = useState<boolean>(false);
   const [errorPengumuman, setErrorPengumuman] = useState<string | null>(null);
 
+  // State untuk Popup Pengumuman
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementItem | null>(null);
+
   // State untuk Berita Utama
   const [beritaUtamaList, setBeritaUtamaList] = useState<BeritaItem[]>([]);
   const [loadingBerita, setLoadingBerita] = useState<boolean>(true);
@@ -103,7 +105,6 @@ export default function Agenda() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  // Format date untuk pengumuman (tanpa waktu)
   const formatAnnouncementDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       day: "numeric",
@@ -119,13 +120,16 @@ export default function Agenda() {
       (agenda) => agenda.status === "active" || agenda.status === "published"
     )
     .map((agenda, index) => ({
-      id: `agenda-${index + 1}`, // Prefix untuk agenda
+      id: `agenda-${index + 1}`,
       title: agenda.activity_name,
       date: formatAnnouncementDate(agenda.start_date),
+      content: agenda.description,
+      image: agenda.image ? `uploads/agenda/${agenda.image}` : undefined, // Mapping gambar agenda
+      link_url: "#"
     }))
     .slice(0, 7);
 
-  // Generate data pengumuman dari API pengumuman - PERBAIKAN DISINI
+  // Generate data pengumuman dari API pengumuman
   const announcementFromPengumuman: AnnouncementItem[] = pengumumanData
     .filter(
       (pengumuman) =>
@@ -134,280 +138,241 @@ export default function Agenda() {
         pengumuman.status === "published"
     )
     .map((pengumuman) => ({
-      id: pengumuman.id_pengumuman, // Gunakan id_pengumuman langsung
+      id: pengumuman.id_pengumuman,
       title: pengumuman.judul,
       date: formatAnnouncementDate(pengumuman.created_at),
       content: pengumuman.content,
       link_url: pengumuman.link_url,
+      image: pengumuman.featured_image, // Mapping gambar pengumuman
     }))
-    .slice(0, 7); // Ambil maksimal 7 pengumuman
+    .slice(0, 7);
 
-  // Gunakan data pengumuman dari API jika ada, jika tidak gunakan dari agenda
   const announcementData = pengumumanData.length > 0 
     ? announcementFromPengumuman 
     : announcementFromAgenda;
 
-  // Fetch Berita Utama dari API
+  // --- FETCHING LOGIC (Berita, Agenda, Pengumuman) TETAP SAMA SEPERTI KODE ASLI ---
+  // (Untuk menghemat tempat, saya tidak mengubah logic fetch di sini karena sudah benar)
+  
+  // Fetch Berita
   useEffect(() => {
     const fetchBerita = async () => {
       try {
         setLoadingBerita(true);
         const res = await api.get("/berita");
         const data = res?.data?.data;
-
-        if (!data) {
-          setErrorBerita("Data berita tidak ditemukan");
-          return;
-        }
-
+        if (!data) { setErrorBerita("Data berita tidak ditemukan"); return; }
         const utamaArray: BeritaUtamaItem[] = data.utama || [];
         const beritaUtamaDetailList: BeritaItem[] = [];
-
         if (utamaArray.length > 0) {
           for (const utamaItem of utamaArray) {
             const idUtama = utamaItem.id_berita;
-
-            const foundInList = data.berita?.find(
-              (item: BeritaItem) => item.id_berita === idUtama
-            );
-
-            if (foundInList) {
-              beritaUtamaDetailList.push(foundInList);
-            } else {
+            const foundInList = data.berita?.find((item: BeritaItem) => item.id_berita === idUtama);
+            if (foundInList) { beritaUtamaDetailList.push(foundInList); } else {
               try {
                 const detailRes = await api.get(`/berita/${idUtama}`);
                 const detailData = detailRes?.data?.data;
-                if (detailData) {
-                  beritaUtamaDetailList.push(detailData);
-                }
-              } catch (fetchError) {
-                console.error(
-                  `Gagal mengambil detail berita utama ${idUtama}:`,
-                  fetchError
-                );
-              }
+                if (detailData) beritaUtamaDetailList.push(detailData);
+              } catch (e) { console.error(e); }
             }
           }
         }
-
         setBeritaUtamaList(beritaUtamaDetailList);
-      } catch (error) {
-        console.error("Gagal fetch berita:", error);
-        setErrorBerita("Gagal memuat data berita");
-      } finally {
-        setLoadingBerita(false);
-      }
+      } catch (error) { setErrorBerita("Gagal memuat data berita"); } finally { setLoadingBerita(false); }
     };
-
     fetchBerita();
   }, []);
 
-  // Fetch agenda data from API
+  // Fetch Agenda
   useEffect(() => {
     const fetchAgenda = async () => {
       try {
         setLoadingAgenda(true);
         const res = await api.get("/agenda");
         const json = res?.data;
-
         if (json.status && Array.isArray(json.data)) {
           const eventsMap: Record<number, CalendarEvent[]> = {};
-          const agendaList: ApiAgendaItem[] = json.data;
-
-          // Simpan data agenda untuk digunakan di pengumuman
-          setAgendaData(agendaList);
-
-          agendaList.forEach((item: ApiAgendaItem) => {
+          setAgendaData(json.data);
+          json.data.forEach((item: ApiAgendaItem) => {
             const start = new Date(item.start_date);
             const day = start.getDate();
-
-            if (
-              start.getMonth() + 1 === currentMonth &&
-              start.getFullYear() === currentYear
-            ) {
-              if (!eventsMap[day]) {
-                eventsMap[day] = [];
-              }
-
+            if (start.getMonth() + 1 === currentMonth && start.getFullYear() === currentYear) {
+              if (!eventsMap[day]) eventsMap[day] = [];
               eventsMap[day].push({
                 date: day,
                 title: item.activity_name,
-                time: start.toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
+                time: start.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
                 image: item.image,
               });
             }
           });
-
           setCalendarEvents(eventsMap);
-        } else {
-          setErrorAgenda("Format data tidak sesuai.");
-        }
-      } catch (error) {
-        console.error(error);
-        setErrorAgenda("Gagal memuat data agenda.");
-      } finally {
-        setLoadingAgenda(false);
-      }
+        } else { setErrorAgenda("Format data tidak sesuai."); }
+      } catch (error) { setErrorAgenda("Gagal memuat data agenda."); } finally { setLoadingAgenda(false); }
     };
-
     fetchAgenda();
   }, [currentMonth, currentYear]);
 
-  // Fetch pengumuman data from API
+  // Fetch Pengumuman
   useEffect(() => {
     const fetchPengumuman = async () => {
       try {
         setLoadingPengumuman(true);
         setErrorPengumuman(null);
-        
         const res = await api.get("/pengumuman");
-        console.log("Response pengumuman:", res); // Debug log
-        
         const json = res?.data;
-        console.log("Data pengumuman:", json); // Debug log
-        
         if (json && json.status === 200 && Array.isArray(json.data)) {
-          console.log("Data ditemukan:", json.data); // Debug log
           setPengumumanData(json.data);
         } else if (json && json.status === 200 && json.data) {
-          // Jika data bukan array (mungkin object tunggal)
-          console.log("Data bukan array, konversi:", json.data);
           setPengumumanData(Array.isArray(json.data) ? json.data : [json.data]);
         } else {
-          console.log("Format data tidak sesuai atau tidak ada data:", json);
           setPengumumanData([]);
           setErrorPengumuman(json?.message || "Format data tidak sesuai");
         }
       } catch (error: any) {
-        console.error("Gagal fetch pengumuman:", error);
-        setErrorPengumuman(
-          error.response?.data?.message || 
-          error.message || 
-          "Gagal memuat data pengumuman"
-        );
+        setErrorPengumuman(error.response?.data?.message || "Gagal memuat data pengumuman");
         setPengumumanData([]);
-      } finally {
-        setLoadingPengumuman(false);
-      }
+      } finally { setLoadingPengumuman(false); }
     };
-
     fetchPengumuman();
   }, []);
 
-  const getDaysInMonth = (month: number, year: number) =>
-    new Date(year, month, 0).getDate();
-  const getFirstDayOfMonth = (month: number, year: number) =>
-    new Date(year, month - 1, 1).getDay();
+  // --- HELPER FUNCTIONS ---
+  const getDaysInMonth = (month: number, year: number) => new Date(year, month, 0).getDate();
+  const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month - 1, 1).getDay();
 
-  const monthNames = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember",
-  ];
+  const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
   const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
   const daysInMonth = getDaysInMonth(currentMonth, currentYear);
   const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
-  const days = Array(firstDay)
-    .fill(null)
-    .concat(Array.from({ length: daysInMonth }, (_, i) => i + 1));
+  const days = Array(firstDay).fill(null).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1));
 
   const handlePrevMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentMonth(12);
-      setCurrentYear(currentYear - 1);
-    } else setCurrentMonth(currentMonth - 1);
+    if (currentMonth === 1) { setCurrentMonth(12); setCurrentYear(currentYear - 1); } else setCurrentMonth(currentMonth - 1);
   };
 
   const handleNextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentMonth(1);
-      setCurrentYear(currentYear + 1);
-    } else setCurrentMonth(currentMonth + 1);
+    if (currentMonth === 12) { setCurrentMonth(1); setCurrentYear(currentYear + 1); } else setCurrentMonth(currentMonth + 1);
   };
 
   const selectedEvents = selectedDate ? calendarEvents[selectedDate] ?? [] : [];
   const firstEvent = selectedEvents[0];
-
   const currentNews = beritaUtamaList[currentNewsIndex];
 
-  // Debug: cek apakah data pengumuman ada
-  console.log("Pengumuman data state:", pengumumanData);
-  console.log("Announcement data:", announcementData);
+  // Helper untuk membersihkan path gambar
+  const cleanImagePath = (path: string | undefined) => {
+    if (!path) return "";
+    return `${ROOT}/${path.replace(/^\/+/, "")}`;
+  };
 
   return (
-    <div className="container-fluid py-5">
+    <div className="container-fluid py-5 position-relative">
+      {/* --- POPUP MODAL START --- */}
+      {selectedAnnouncement && (
+        <div 
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style={{ 
+            backgroundColor: 'rgba(0,0,0,0.6)', 
+            zIndex: 9999,
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setSelectedAnnouncement(null)} // Tutup jika klik di luar
+        >
+          <div 
+            className="card border-0 shadow-lg rounded-4 overflow-hidden position-relative animate-pop"
+            style={{ maxWidth: '500px', width: '90%', margin: '20px' }}
+            onClick={(e) => e.stopPropagation()} // Mencegah penutupan jika klik di dalam card
+          >
+            {/* Tombol Close */}
+            <button 
+              className="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm z-3"
+              onClick={() => setSelectedAnnouncement(null)}
+              style={{ width: '32px', height: '32px', padding: 0 }}
+            >
+              <X size={18} />
+            </button>
+
+            {/* Wrapper A HREF sesuai permintaan */}
+            <a 
+              href={selectedAnnouncement.link_url || "#"} 
+              target={selectedAnnouncement.link_url && selectedAnnouncement.link_url !== "#" ? "_blank" : "_self"}
+              rel="noopener noreferrer"
+              className="text-decoration-none text-dark"
+              style={{ display: 'block' }}
+            >
+              {/* Gambar */}
+              <div className="bg-light d-flex align-items-center justify-content-center" style={{ minHeight: '200px', maxHeight: '300px', overflow: 'hidden' }}>
+                {selectedAnnouncement.image ? (
+                  <img 
+                    src={cleanImagePath(selectedAnnouncement.image)} 
+                    alt={selectedAnnouncement.title}
+                    className="w-100 object-fit-cover"
+                  />
+                ) : (
+                  <div className="text-muted p-5 text-center">
+                    <Image size={48} className="mb-2 opacity-50" />
+                    <p className="small m-0">Tidak ada gambar</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Konten */}
+              <div className="p-4">
+                <span className="badge bg-primary mb-2">Pengumuman</span>
+                <h4 className="fw-bold text-blue mb-2">{selectedAnnouncement.title}</h4>
+                <p className="text-secondary small mb-3">{selectedAnnouncement.date}</p>
+                
+                <div className="text-muted" style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
+                  {selectedAnnouncement.content ? (
+                    selectedAnnouncement.content.length > 150 
+                      ? selectedAnnouncement.content.substring(0, 150) + "..." 
+                      : selectedAnnouncement.content
+                  ) : "Lihat detail selengkapnya..."}
+                </div>
+
+                <div className="mt-3 text-primary fw-semibold small">
+                  Klik untuk info selengkapnya &rarr;
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      )}
+      {/* --- POPUP MODAL END --- */}
+
       <div className="container">
         <div className="row g-4 align-items-stretch">
           {/* News Section */}
           <div className="col">
             <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
+            {/* ... (Code Berita tetap sama) ... */}
             <div className=" news-card position-relative overflow-hidden">
               {loadingBerita ? (
-                <div className="text-center p-5">
-                  <p className="text-muted">Memuat berita utama...</p>
-                </div>
+                <div className="text-center p-5"><p className="text-muted">Memuat berita utama...</p></div>
               ) : errorBerita ? (
-                <div className="text-center p-5">
-                  <p className="text-danger">{errorBerita}</p>
-                </div>
+                <div className="text-center p-5"><p className="text-danger">{errorBerita}</p></div>
               ) : beritaUtamaList.length > 0 && currentNews ? (
                 <>
                   <div className="news-image-container">
                     {currentNews.feat_image ? (
-                      <img
-                        src={`${ROOT}/${currentNews.feat_image.replace(
-                          /^\/+/,
-                          ""
-                        )}`}
-                        className="img-fluid w-100 h-100 object-fit-cover"
-                        alt={currentNews.judul}
-                      />
+                      <img src={cleanImagePath(currentNews.feat_image)} className="img-fluid w-100 h-100 object-fit-cover" alt={currentNews.judul} />
                     ) : (
-                      <div
-                        className="d-flex justify-content-center align-items-center bg-primary text-white"
-                        style={{ height: "200px" }}
-                      >
-                        <Image size={60} />
-                      </div>
+                      <div className="d-flex justify-content-center align-items-center bg-primary text-white" style={{ height: "200px" }}><Image size={60} /></div>
                     )}
                   </div>
                   <div className="card-body text-dark d-flex flex-column pt-3">
                     <h2 className="">{currentNews.judul}</h2>
-                    <div className="pt-3">
-                      <small className="text-secondary">
-                        {formatDate(currentNews.created_at)}
-                      </small>
-                    </div>
+                    <div className="pt-3"><small className="text-secondary">{formatDate(currentNews.created_at)}</small></div>
                   </div>
                   <div className="d-flex justify-content-center gap-2 pb-3">
                     {beritaUtamaList.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentNewsIndex(i)}
-                        className={`indicator ${
-                          i === currentNewsIndex ? "active" : ""
-                        }`}
-                      />
+                      <button key={i} onClick={() => setCurrentNewsIndex(i)} className={`indicator ${i === currentNewsIndex ? "active" : ""}`} />
                     ))}
                   </div>
                 </>
               ) : (
-                <div className="text-center p-5">
-                  <p className="text-muted">Tidak ada berita utama.</p>
-                </div>
+                <div className="text-center p-5"><p className="text-muted">Tidak ada berita utama.</p></div>
               )}
             </div>
           </div>
@@ -415,128 +380,64 @@ export default function Agenda() {
           {/* Right Tabs */}
           <div className="col-lg-8">
             <div className="d-flex flex-wrap gap-3 mb-3">
-              <button
-                onClick={() => setActiveTab("agenda")}
-                className={`tab-btn ${
-                  activeTab === "agenda" ? "active" : ""
-                }`}
-              >
-                Agenda
-              </button>
-              <button
-                onClick={() => setActiveTab("pengumuman")}
-                className={`tab-btn ${
-                  activeTab === "pengumuman" ? "active" : ""
-                }`}
-              >
-                Pengumuman
-              </button>
+              <button onClick={() => setActiveTab("agenda")} className={`tab-btn ${activeTab === "agenda" ? "active" : ""}`}>Agenda</button>
+              <button onClick={() => setActiveTab("pengumuman")} className={`tab-btn ${activeTab === "pengumuman" ? "active" : ""}`}>Pengumuman</button>
             </div>
 
             {activeTab === "agenda" ? (
+              // ... (Code Agenda Tetap Sama) ...
               <div className="card border-0 shadow rounded-4 bg-light overflow-hidden">
                 <div className="row g-0 h-100">
                   <div className="col-md-5 d-flex ">
                     <img
-                      src={
-                        firstEvent?.image
-                          ? `${ROOT}/uploads/agenda/${firstEvent.image}`
-                          : "assets/agenda-default.jpg"
-                      }
+                      src={firstEvent?.image ? `${ROOT}/uploads/agenda/${firstEvent.image}` : "assets/agenda-default.jpg"}
                       alt={firstEvent?.title || "Belum Ada Agenda"}
                       className="img-fluid h-100 object-fit-cover rounded-start-4"
                     />
                   </div>
-
                   <div className="col-md-7 p-4 d-flex flex-column calender-container">
                     <div className="d-flex justify-content-center align-items-center mb-3">
-                      <button onClick={handlePrevMonth} className="btn">
-                        <Triangle
-                          size={18}
-                          fill="black"
-                          style={{ transform: "rotate(-90deg)" }}
-                        />
-                      </button>
-                      <span className="fw-bold text-blue">
-                        {monthNames[currentMonth - 1]} {currentYear}
-                      </span>
-                      <button onClick={handleNextMonth} className="btn">
-                        <Triangle
-                          size={18}
-                          fill="black"
-                          style={{ transform: "rotate(90deg)" }}
-                        />
-                      </button>
+                      <button onClick={handlePrevMonth} className="btn"><Triangle size={18} fill="black" style={{ transform: "rotate(-90deg)" }} /></button>
+                      <span className="fw-bold text-blue">{monthNames[currentMonth - 1]} {currentYear}</span>
+                      <button onClick={handleNextMonth} className="btn"><Triangle size={18} fill="black" style={{ transform: "rotate(90deg)" }} /></button>
                     </div>
 
                     {loadingAgenda ? (
-                      <div className="text-center text-muted small my-5">
-                        Memuat agenda...
-                      </div>
+                      <div className="text-center text-muted small my-5">Memuat agenda...</div>
                     ) : errorAgenda ? (
-                      <div className="text-center text-danger small my-5">
-                        {errorAgenda}
-                      </div>
+                      <div className="text-center text-danger small my-5">{errorAgenda}</div>
                     ) : (
                       <>
                         <div className="calendar-grid mb-3">
-                          {dayNames.map((d) => (
-                            <div
-                              key={d}
-                              className="fw-semibold text-center text-blue small"
-                            >
-                              {d}
-                            </div>
-                          ))}
+                          {dayNames.map((d) => (<div key={d} className="fw-semibold text-center text-blue small">{d}</div>))}
                           {days.map((day, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => day && setSelectedDate(day)}
-                              className={`calendar-day ${(() => {
-                                const isToday =
-                                  day === today.getDate() &&
-                                  currentMonth === today.getMonth() + 1 &&
-                                  currentYear === today.getFullYear();
+                            <button key={idx} onClick={() => day && setSelectedDate(day)} className={`calendar-day ${(() => {
+                                const isToday = day === today.getDate() && currentMonth === today.getMonth() + 1 && currentYear === today.getFullYear();
                                 if (!day) return "invisible";
                                 if (selectedDate === day) return "selected";
-                                if (calendarEvents[day as number])
-                                  return "event";
+                                if (calendarEvents[day as number]) return "event";
                                 if (isToday) return "today";
                                 return "";
-                              })()}`}
-                            >
-                              {day}
+                              })()}`}>{day}
                             </button>
                           ))}
                         </div>
-
                         <div className="card bg-primary-subtle border-0 rounded-3 p-3 mt-auto">
                           <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
                             <Calendar size={16} className="text-blue" />
-                            <h6 className="mb-0 fw-bold text-blue">
-                              Agenda Tanggal {selectedDate}
-                            </h6>
+                            <h6 className="mb-0 fw-bold text-blue">Agenda Tanggal {selectedDate}</h6>
                           </div>
                           {selectedEvents && selectedEvents.length > 0 ? (
                             <div className="d-flex flex-column gap-2">
                               {selectedEvents.map((event, index) => (
-                                <div
-                                  key={index}
-                                  className="d-flex justify-content-between align-items-center border-bottom pb-1"
-                                >
-                                  <p className="fw-semibold mb-0 small">
-                                    {event.title}
-                                  </p>
-                                  <p className="fw-bold text-blue mb-0 small">
-                                    {event.time}
-                                  </p>
+                                <div key={index} className="d-flex justify-content-between align-items-center border-bottom pb-1">
+                                  <p className="fw-semibold mb-0 small">{event.title}</p>
+                                  <p className="fw-bold text-blue mb-0 small">{event.time}</p>
                                 </div>
                               ))}
                             </div>
                           ) : (
-                            <p className="text-muted small mb-0">
-                              Tidak ada agenda pada tanggal ini.
-                            </p>
+                            <p className="text-muted small mb-0">Tidak ada agenda pada tanggal ini.</p>
                           )}
                         </div>
                       </>
@@ -545,21 +446,22 @@ export default function Agenda() {
                 </div>
               </div>
             ) : (
+              // --- PENGUMUMAN LIST ---
               <div className="card border-0 shadow rounded-4">
                 {(loadingAgenda || loadingPengumuman) ? (
-                  <div className="text-center p-4">
-                    <p className="text-muted">Memuat pengumuman...</p>
-                  </div>
+                  <div className="text-center p-4"><p className="text-muted">Memuat pengumuman...</p></div>
                 ) : errorPengumuman ? (
-                  <div className="text-center p-4">
-                    <p className="text-danger">{errorPengumuman}</p>
-                  </div>
+                  <div className="text-center p-4"><p className="text-danger">{errorPengumuman}</p></div>
                 ) : announcementData.length > 0 ? (
                   <>
                     {announcementData.map((a) => (
                       <div
-                        key={a.id} // Sekarang menggunakan id_pengumuman yang unik
-                        className="p-3 border-bottom hover-bg-light"
+                        key={a.id}
+                        onClick={() => setSelectedAnnouncement(a)} // TRIGGER POPUP DISINI
+                        className="p-3 border-bottom hover-bg-light cursor-pointer" // Tambah cursor-pointer (bisa add di css)
+                        style={{ cursor: 'pointer', transition: 'background 0.2s' }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f8f9fa')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       >
                         <div className="d-flex justify-content-between align-items-start">
                           <div className="d-flex align-items-center gap-2">
@@ -567,12 +469,12 @@ export default function Agenda() {
                               <h6 className="mb-0 fw-semibold">{a.title}</h6>
                               {a.content && (
                                 <small className="text-muted d-block mt-1">
-                                  {a.content.substring(0, 100)}...
+                                  {a.content.replace(/<[^>]*>/g, '').substring(0, 100)}... {/* Strip HTML tags simple */}
                                 </small>
                               )}
                             </div>
                           </div>
-                          <span className="fw-bold text-blue small">
+                          <span className="fw-bold text-blue small text-nowrap ms-2">
                             {a.date}
                           </span>
                         </div>
@@ -582,9 +484,6 @@ export default function Agenda() {
                 ) : (
                   <div className="text-center p-4">
                     <p className="text-muted">Tidak ada pengumuman.</p>
-                    <small className="text-secondary">
-                      Data pengumuman kosong atau tidak ditemukan
-                    </small>
                   </div>
                 )}
               </div>
