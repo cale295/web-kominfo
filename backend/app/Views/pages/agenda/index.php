@@ -81,7 +81,7 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="text-center py-3">No</th>
-                            <th class="text-center py-3">Dokumentasi</th>
+                            <th class="text-center py-3">Foto</th>
                             <th class="py-3">Nama Kegiatan</th>
                             <th class="py-3">Lokasi & Deskripsi</th>
                             <th class="py-3">Waktu</th>
@@ -112,7 +112,7 @@
                                         <div class="small text-dark fw-bold"><?= date('d M Y H:i', strtotime($agenda['start_date'])) ?></div>
                                         <div class="small text-muted">s/d <?= date('d M Y H:i', strtotime($agenda['end_date'])) ?></div>
                                     </td>
-   <td class="text-center">
+                                    <td class="text-center">
                                     <?= btn_toggle($agenda['id_agenda'], $agenda['status'], 'agenda/toggle-status') ?>
                                     </td>
                                     <td class="text-center">
