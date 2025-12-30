@@ -29,9 +29,23 @@
                         <label class="form-label">Alamat Lengkap</label>
                         <textarea name="alamat_lengkap" class="form-control" rows="3"><?= esc($row['alamat_lengkap']) ?></textarea>
                     </div>
-                    <?php elseif ($type == 'social'): ?>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telepon</label>
+                            <input type="text" name="telepon" class="form-control" value="<?= esc($row['telepon']) ?>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fax</label>
+                            <input type="text" name="fax" class="form-control" value="<?= esc($row['fax']) ?>">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Link Google Maps (Embed/Share)</label>
+                        <input type="text" name="map_link" class="form-control" value="<?= esc($row['map_link']) ?>" placeholder="https://maps.app.goo.gl/...">
+                    </div>
+
+                <?php elseif ($type == 'social'): ?>
                     <?php 
-                        // DEFINE ARRAY DISINI JUGA
                         $socialIcons = [
                             'bi bi-facebook'    => 'Facebook',
                             'bi bi-instagram'   => 'Instagram',
@@ -85,7 +99,6 @@
 
                 <?php elseif ($type == 'layanan'): ?>
                     <?php 
-                        // DEFINE ARRAY DISINI JUGA
                         $layananIcons = [
                             'bi bi-laptop'          => 'Laptop / Digital',
                             'bi bi-pc-display'      => 'Komputer / Monitor',
@@ -145,7 +158,7 @@
                 <?php endif; ?>
 
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i> Update Data</button>
+                    <button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i> Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -154,8 +167,14 @@
 
 <script>
     function updateIconPreview() {
-        var iconClass = document.getElementById('icon-select').value;
-        document.getElementById('icon-preview').className = iconClass + " fs-5";
+        // Cek dulu apakah elemen ada (karena di tab Instansi elemen ini tidak ada)
+        var selectElement = document.getElementById('icon-select');
+        var previewElement = document.getElementById('icon-preview');
+        
+        if (selectElement && previewElement) {
+            var iconClass = selectElement.value;
+            previewElement.className = iconClass + " fs-5";
+        }
     }
 </script>
 <?= $this->endSection() ?>
