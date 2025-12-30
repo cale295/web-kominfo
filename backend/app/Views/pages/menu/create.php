@@ -197,6 +197,14 @@
         box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         outline: none;
     }
+
+    /* Style khusus read-only */
+    .form-control-modern[readonly] {
+        background-color: #f1f5f9;
+        color: #64748b;
+        cursor: not-allowed;
+        border-color: #cbd5e1;
+    }
     
     .form-control-modern:focus ~ .input-icon,
     .form-select-modern:focus ~ .input-icon {
@@ -422,119 +430,20 @@
                     </div>
 
                     <div class="col-md-6 mb-4">
-                        <label for="menu_url" class="form-label-modern">
-                            <i class="bi bi-link-45deg"></i>
-                            URL / Route
+                        <label for="menu_icon" class="form-label-modern">
+                            <i class="bi bi-emoji-smile"></i>
+                            Icon Menu (Bootstrap Icon)
                         </label>
                         <div class="input-group-modern">
                             <input type="text" 
                                    class="form-control-modern" 
-                                   id="menu_url" 
-                                   name="menu_url" 
-                                   value="<?= esc(old('menu_url')) ?>" 
-                                   placeholder="/api/dashboard atau https://example.com">
-                            <i class="bi bi-globe2 input-icon"></i>
-                        </div>
-                        <div class="form-text-modern">
-                            <i class="bi bi-lightbulb-fill"></i>
-                            <span>Kosongkan jika menu ini memiliki submenu (parent menu)</span>
+                                   id="menu_icon" 
+                                   name="menu_icon" 
+                                   value="<?= esc(old('menu_icon')) ?>" 
+                                   placeholder="bi-house, bi-gear...">
+                            <i class="bi bi-star input-icon"></i>
                         </div>
                     </div>
-                </div>
-
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <label for="admin_url" class="form-label-modern">
-            <i class="bi bi-shield-lock-fill"></i>
-            URL Admin
-        </label>
-        <div class="input-group-modern">
-            <input type="text" 
-                   class="form-control-modern" 
-                   id="admin_url" 
-                   name="admin_url" 
-                   value="<?= esc(old('admin_url')) ?>" 
-                   placeholder="/dashboard">
-            <i class="bi bi-lock input-icon"></i>
-        </div>
-        <div class="form-text-modern">
-            <i class="bi bi-lightbulb-fill"></i>
-            <span>Kosongkan jika menu hanya tampil di frontend</span>
-        </div>
-    </div>
-
-    <div class="col-md-6 mb-4">
-        <label for="allowed_roles" class="form-label-modern">
-            <i class="bi bi-person-badge-fill"></i>
-            Hak Akses (Roles)
-        </label>
-        <div class="input-group-modern">
-            <input type="text" 
-                   class="form-control-modern" 
-                   id="allowed_roles" 
-                   name="allowed_roles" 
-                   value="<?= esc(old('allowed_roles')) ?>" 
-                   placeholder="superadmin, admin, editor">
-            <i class="bi bi-people-fill input-icon"></i>
-        </div>
-        <div class="form-text-modern">
-            <i class="bi bi-exclamation-circle-fill text-warning"></i>
-            <span>Pisahkan dengan koma. Kosongkan untuk akses publik.</span>
-        </div>
-    </div>
-</div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <label for="order_number" class="form-label-modern">
-                            <i class="bi bi-sort-numeric-down"></i>
-                            Urutan Menu
-                            <span class="required">*</span>
-                        </label>
-                        <div class="input-group-modern">
-                            <input type="number" 
-                                   class="form-control-modern" 
-                                   id="order_number" 
-                                   name="order_number" 
-                                   value="<?= esc(old('order_number', '1')) ?>" 
-                                   min="1"
-                                   placeholder="Contoh: 1, 2, 3"
-                                   required>
-                            <i class="bi bi-list-ol input-icon"></i>
-                        </div>
-                        <div class="form-text-modern">
-                            <i class="bi bi-lightbulb-fill"></i>
-                            <span>Menentukan urutan tampilan menu (dari kecil ke besar)</span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-4">
-                        <label for="status" class="form-label-modern">
-                            <i class="bi bi-toggle2-on"></i>
-                            Status Menu
-                            <span class="required">*</span>
-                        </label>
-                        <div class="input-group-modern">
-                            <select class="form-select-modern" id="status" name="status" required>
-                                <option value="active" <?= old('status', 'active') === 'active' ? 'selected' : '' ?>>
-                                    ✅ Aktif - Menu akan ditampilkan
-                                </option>
-                                <option value="inactive" <?= old('status') === 'inactive' ? 'selected' : '' ?>>
-                                    ⛔ Nonaktif - Menu disembunyikan
-                                </option>
-                            </select>
-                            <i class="bi bi-toggle-on input-icon"></i>
-                        </div>
-                        <div class="form-text-modern">
-                            <i class="bi bi-lightbulb-fill"></i>
-                            <span>Menu aktif akan langsung terlihat di sistem</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section-title mt-4">
-                    <i class="bi bi-diagram-3-fill"></i>
-                    <span>Struktur & Hierarki Menu</span>
                 </div>
 
                 <div class="row">
@@ -552,7 +461,9 @@
                                 <?php if (!empty($menus)): ?>
                                     <?php foreach ($menus as $m): ?>
                                         <?php if ($m['parent_id'] == 0): ?>
-                                            <option value="<?= $m['id_menu'] ?>" <?= old('parent_id') == $m['id_menu'] ? 'selected' : '' ?>>
+                                            <option value="<?= $m['id_menu'] ?>" 
+                                                    <?= old('parent_id') == $m['id_menu'] ? 'selected' : '' ?>
+                                                    data-is-infopublik="<?= (strtolower($m['menu_name']) === 'informasi publik') ? 'true' : 'false' ?>">
                                                 📁 <?= esc($m['menu_name']) ?>
                                             </option>
                                         <?php endif; ?>
@@ -563,7 +474,107 @@
                         </div>
                         <div class="form-text-modern">
                             <i class="bi bi-lightbulb-fill"></i>
-                            <span>Pilih parent jika menu ini merupakan submenu dari menu lain</span>
+                            <span>Pilih "Informasi Publik" untuk otomatis membuat kategori dokumen.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="menu_url" class="form-label-modern">
+                            <i class="bi bi-link-45deg"></i>
+                            URL / Route
+                        </label>
+                        <div class="input-group-modern">
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   id="menu_url" 
+                                   name="menu_url" 
+                                   value="<?= esc(old('menu_url')) ?>" 
+                                   placeholder="/api/dashboard atau https://example.com">
+                            <i class="bi bi-globe2 input-icon"></i>
+                        </div>
+                        <div class="form-text-modern" id="url-helper-text">
+                            <i class="bi bi-lightbulb-fill"></i>
+                            <span>Kosongkan jika menu ini memiliki submenu.</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="admin_url" class="form-label-modern">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            URL Admin
+                        </label>
+                        <div class="input-group-modern">
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   id="admin_url" 
+                                   name="admin_url" 
+                                   value="<?= esc(old('admin_url')) ?>" 
+                                   placeholder="/dashboard">
+                            <i class="bi bi-lock input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                     <div class="col-md-6 mb-4">
+                        <label for="allowed_roles" class="form-label-modern">
+                            <i class="bi bi-person-badge-fill"></i>
+                            Hak Akses (Roles)
+                        </label>
+                        <div class="input-group-modern">
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   id="allowed_roles" 
+                                   name="allowed_roles" 
+                                   value="<?= esc(old('allowed_roles')) ?>" 
+                                   placeholder="superadmin, admin, editor">
+                            <i class="bi bi-people-fill input-icon"></i>
+                        </div>
+                        <div class="form-text-modern">
+                            <i class="bi bi-exclamation-circle-fill text-warning"></i>
+                            <span>Pisahkan dengan koma. Kosongkan untuk akses publik.</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="order_number" class="form-label-modern">
+                            <i class="bi bi-sort-numeric-down"></i>
+                            Urutan Menu
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-group-modern">
+                            <input type="number" 
+                                   class="form-control-modern" 
+                                   id="order_number" 
+                                   name="order_number" 
+                                   value="<?= esc(old('order_number', '1')) ?>" 
+                                   min="1"
+                                   placeholder="Contoh: 1, 2, 3"
+                                   required>
+                            <i class="bi bi-list-ol input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                         <label for="status" class="form-label-modern">
+                            <i class="bi bi-toggle2-on"></i>
+                            Status Menu
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-group-modern">
+                            <select class="form-select-modern" id="status" name="status" required>
+                                <option value="active" <?= old('status', 'active') === 'active' ? 'selected' : '' ?>>
+                                    ✅ Aktif - Menu akan ditampilkan
+                                </option>
+                                <option value="inactive" <?= old('status') === 'inactive' ? 'selected' : '' ?>>
+                                    ⛔ Nonaktif - Menu disembunyikan
+                                </option>
+                            </select>
+                            <i class="bi bi-toggle-on input-icon"></i>
                         </div>
                     </div>
                 </div>
@@ -584,106 +595,125 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    // Auto-format URL input
-    const urlInput = document.getElementById("menu_url");
-    if (urlInput) {
-        urlInput.addEventListener("blur", function (e) {
-            let url = e.target.value.trim();
-            if (url && !url.startsWith("/") && !url.startsWith("http")) {
-                e.target.value = "/" + url;
-            }
-        });
+    document.addEventListener("DOMContentLoaded", function() {
+        const parentSelect = document.getElementById('parent_id');
+        const urlInput = document.getElementById('menu_url');
+        const urlHelper = document.getElementById('url-helper-text');
         
-        // Real-time validation indicator
-        urlInput.addEventListener("input", function(e) {
-            const value = e.target.value.trim();
-            if (value) {
-                if (value.startsWith("http") || value.startsWith("/")) {
-                    this.style.borderColor = "#10b981";
-                } else {
-                    this.style.borderColor = "#f59e0b";
-                }
+        // Fungsi untuk mengecek parent yang dipilih
+        function checkParentType() {
+            const selectedOption = parentSelect.options[parentSelect.selectedIndex];
+            const isInfoPublik = selectedOption.getAttribute('data-is-infopublik') === 'true';
+
+            if (isInfoPublik) {
+                // Jika Informasi Publik, matikan input URL
+                urlInput.value = "Akan digenerate otomatis";
+                urlInput.setAttribute('readonly', true);
+                urlInput.style.backgroundColor = "#eff6ff"; // Light blue bg
+                urlHelper.innerHTML = '<i class="bi bi-info-circle-fill text-primary"></i> <span class="text-primary fw-bold">URL akan otomatis dibuat berdasarkan Nama Menu (Kategori Dokumen).</span>';
             } else {
-                this.style.borderColor = "#e2e8f0";
+                // Jika bukan, kembalikan ke normal
+                if(urlInput.value === "Akan digenerate otomatis") {
+                    urlInput.value = "";
+                }
+                urlInput.removeAttribute('readonly');
+                urlInput.style.backgroundColor = ""; // Reset bg
+                urlHelper.innerHTML = '<i class="bi bi-lightbulb-fill"></i> <span>Kosongkan jika menu ini memiliki submenu.</span>';
             }
+        }
+
+        // Jalankan saat pertama load (jika user kembali dari error validation)
+        checkParentType();
+
+        // Jalankan saat user mengubah pilihan dropdown
+        parentSelect.addEventListener('change', checkParentType);
+
+        // --- SCRIPT VALIDASI LAMA ---
+        const urlInputFormat = document.getElementById("menu_url");
+        if (urlInputFormat) {
+            urlInputFormat.addEventListener("blur", function (e) {
+                // Skip formatting jika readonly
+                if (this.hasAttribute('readonly')) return;
+
+                let url = e.target.value.trim();
+                if (url && !url.startsWith("/") && !url.startsWith("http") && url !== "Akan digenerate otomatis") {
+                    e.target.value = "/" + url;
+                }
+            });
+        }
+
+        const form = document.getElementById("menuCreateForm");
+        const submitBtn = document.getElementById("submitBtn");
+        
+        form.addEventListener("submit", function (e) {
+            const menuName = document.getElementById("menu_name").value.trim();
+            const orderNum = document.getElementById("order_number").value.trim();
+            
+            let hasError = false;
+
+            if (!menuName) {
+                showError("menu_name", "Nama Menu harus diisi!");
+                hasError = true;
+            }
+
+            if (!orderNum) {
+                showError("order_number", "Urutan harus diisi!");
+                hasError = true;
+            }
+            
+            if (hasError) {
+                e.preventDefault();
+                return false;
+            }
+            
+            submitBtn.classList.add("btn-loading");
+            submitBtn.innerHTML = '<span>Menyimpan...</span>';
+            submitBtn.disabled = true;
         });
-    }
 
-    // Enhanced Form Validation
-    const form = document.getElementById("menuCreateForm");
-    const submitBtn = document.getElementById("submitBtn");
-    
-    form.addEventListener("submit", function (e) {
-        const menuName = document.getElementById("menu_name").value.trim();
-        const orderNum = document.getElementById("order_number").value.trim();
-        
-        let hasError = false;
+        function showError(elementId, message) {
+            const input = document.getElementById(elementId);
+            input.style.borderColor = "#ef4444";
+            input.focus();
+            
+            if (input.parentElement.nextElementSibling && input.parentElement.nextElementSibling.classList.contains('text-danger')) {
+                input.parentElement.nextElementSibling.remove();
+            }
 
-        // Validasi Nama
-        if (!menuName) {
-            showError("menu_name", "Nama Menu harus diisi!");
-            hasError = true;
+            const errorMsg = document.createElement("div");
+            errorMsg.className = "text-danger mt-1 fw-bold small ps-2";
+            errorMsg.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>' + message;
+            
+            input.parentElement.insertAdjacentElement('afterend', errorMsg);
+            
+            setTimeout(() => {
+                errorMsg.remove();
+                input.style.borderColor = "";
+            }, 3000);
         }
 
-        // Validasi Urutan
-        if (!orderNum) {
-            showError("order_number", "Urutan harus diisi!");
-            hasError = true;
+        // Efek Fokus Input
+        const inputs = document.querySelectorAll('.form-control-modern, .form-select-modern');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                if(!this.readOnly) {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                    this.parentElement.style.transition = 'transform 0.3s ease';
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = '';
+            });
+        });
+
+        // Tooltip Bootstrap
+        if (typeof bootstrap !== 'undefined') {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         }
-        
-        if (hasError) {
-            e.preventDefault();
-            return false;
-        }
-        
-        // Add loading state
-        submitBtn.classList.add("btn-loading");
-        submitBtn.innerHTML = '<span>Menyimpan...</span>';
-        submitBtn.disabled = true;
     });
-
-    function showError(elementId, message) {
-        const input = document.getElementById(elementId);
-        input.style.borderColor = "#ef4444";
-        input.focus();
-        
-        // Remove existing error if any
-        if (input.parentElement.nextElementSibling && input.parentElement.nextElementSibling.classList.contains('text-danger')) {
-            input.parentElement.nextElementSibling.remove();
-        }
-
-        // Create error message
-        const errorMsg = document.createElement("div");
-        errorMsg.className = "text-danger mt-1 fw-bold small ps-2";
-        errorMsg.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>' + message;
-        
-        input.parentElement.insertAdjacentElement('afterend', errorMsg);
-        
-        setTimeout(() => {
-            errorMsg.remove();
-            input.style.borderColor = "";
-        }, 3000);
-    }
-
-    // Input focus effects
-    const inputs = document.querySelectorAll('.form-control-modern, .form-select-modern');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'translateY(-2px)';
-            this.parentElement.style.transition = 'transform 0.3s ease';
-        });
-        
-        input.addEventListener('blur', function() {
-            this.parentElement.style.transform = '';
-        });
-    });
-
-    // Initialize tooltips if Bootstrap is available
-    if (typeof bootstrap !== 'undefined') {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    }
 </script>
 <?= $this->endSection() ?>

@@ -208,6 +208,58 @@ $routes->get('access_rights', 'backend\AccessRightsController::index', ['filter'
 $routes->get('access_rights/edit/(:num)', 'backend\AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
 $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
 
+//dokumen
+// ===============================
+// INDEX
+// ===============================
+$routes->get(
+    'informasi-publik/(:segment)',
+    'Frontend\DocumentController::index/$1'
+);
+
+// ===============================
+// FOLDER (virtual, tanpa tabel)
+// ===============================
+$routes->get(
+    'informasi-publik/(:segment)/folder/create',
+    'Frontend\DocumentController::create/$1'
+);
+
+$routes->post(
+    'informasi-publik/(:segment)/folder/store',
+    'Frontend\DocumentController::store/$1'
+);
+
+// ===============================
+// DOKUMEN
+// ===============================
+$routes->get(
+    'informasi-publik/(:segment)/dokumen/create/(:any)',
+    'Frontend\DocumentController::createDokumen/$1/$2'
+);
+
+$routes->post(
+    'informasi-publik/(:segment)/dokumen/store/(:any)',
+    'Frontend\DocumentController::storeDokumen/$1/$2'
+);
+
+$routes->get(
+    'informasi-publik/(:segment)/edit/(:num)',
+    'Frontend\DocumentController::edit/$1/$2'
+);
+
+$routes->post(
+    'informasi-publik/(:segment)/update/(:num)',
+    'Frontend\DocumentController::update/$1/$2'
+);
+
+$routes->get(
+    'informasi-publik/(:segment)/delete/(:num)',
+    'Frontend\DocumentController::delete/$1/$2'
+);
+
+
+
 
 // =========================================================
 // API ROUTES

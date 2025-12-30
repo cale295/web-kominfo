@@ -5,17 +5,20 @@ namespace App\Controllers\backend;
 use App\Controllers\BaseController;
 use App\Models\MenuModel;
 use App\Models\AccessRightsModel;
+use App\Models\DocumentCategoryModel;
 
 class MenuController extends BaseController
 {
     protected $menuModel;
     protected $accessRightsModel;
+    protected $kategoriModel;
     protected $module = 'menu'; // Nama modul untuk hak akses
 
     public function __construct()
     {
         $this->menuModel = new MenuModel();
         $this->accessRightsModel = new AccessRightsModel();
+        $this->kategoriModel = new DocumentCategoryModel();
     }
 
     // ========================================================
@@ -120,14 +123,44 @@ class MenuController extends BaseController
             return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin menambah menu.');
         }
 
+        $namaMenu = $this->request->getPost('menu_name');
+        $parentId = $this->request->getPost('parent_id') ?: 0;
+        $menuUrl  = $this->request->getPost('menu_url'); // Default input user
+
+        // --- LOGIKA OTOMATIS KATEGORI DOKUMEN ---
+        // 1. Cari ID menu 'Informasi Publik' (sesuaikan string namanya dengan di DB kamu)
+        $parentInfoPublik = $this->menuModel->where('menu_name', 'Informasi Publik')->first();
+        
+        // 2. Cek apakah parent yang dipilih adalah 'Informasi Publik'
+        if ($parentInfoPublik && $parentId == $parentInfoPublik['id_menu']) {
+            
+            // Buat slug bersih (contoh: Laporan Keuangan -> laporan-keuangan)
+            $slug = url_title($namaMenu, '-', true);
+
+            // Cek apakah kategori sudah ada (mencegah duplikat)
+            $existingCat = $this->kategoriModel->where('slug_kategori', $slug)->first();
+            
+            if (!$existingCat) {
+                // Insert ke tabel m_document_categories
+                $this->kategoriModel->save([
+                    'nama_kategori' => $namaMenu,
+                    'slug_kategori' => $slug
+                ]);
+            }
+
+            // 3. Override/Paksa URL menjadi format dinamis agar connect ke DocumentController
+            $menuUrl = 'informasi-publik/' . $slug;
+        }
+        // ----------------------------------------
+
         $data = [
-            'menu_name'   => $this->request->getPost('menu_name'),
-            'menu_url'    => $this->request->getPost('menu_url'),
-            'admin_url'   => $this->request->getPost('admin_url'),
-            'menu_icon'   => $this->request->getPost('menu_icon'),
-            'parent_id'   => $this->request->getPost('parent_id') ?: 0,
-            'order_number'=> $this->request->getPost('order_number') ?: 0,
-            'status'      => $this->request->getPost('status') ?: 'active',
+            'menu_name'     => $namaMenu,
+            'menu_url'      => $menuUrl, // Gunakan URL yang sudah diproses
+            'admin_url'     => $this->request->getPost('admin_url'),
+            'menu_icon'     => $this->request->getPost('menu_icon'),
+            'parent_id'     => $parentId,
+            'order_number'  => $this->request->getPost('order_number') ?: 0,
+            'status'        => $this->request->getPost('status') ?: 'active',
             'allowed_roles' => $this->request->getPost('allowed_roles'),
         ];
 
@@ -135,9 +168,8 @@ class MenuController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->menuModel->errors());
         }
 
-        return redirect()->to('/menu')->with('success', 'Menu berhasil ditambahkan.');
+        return redirect()->to('/menu')->with('success', 'Menu berhasil ditambahkan' . ($parentId == ($parentInfoPublik['id_menu'] ?? -1) ? ' & Kategori Dokumen dibuat.' : '.'));
     }
-
     // ========================================================
     // GET /menu/{id}/edit → form edit menu
     // ========================================================
@@ -184,18 +216,43 @@ class MenuController extends BaseController
             return redirect()->to('/menu')->with('error', 'Menu tidak ditemukan.');
         }
 
-$order = $this->request->getPost('order_number');
-$data = [
-    'menu_name'   => $this->request->getPost('menu_name'),
-    'menu_url'    => $this->request->getPost('menu_url'),
-    'admin_url'   => $this->request->getPost('admin_url'),
-    'menu_icon'   => $this->request->getPost('menu_icon'),
-    'parent_id'   => $this->request->getPost('parent_id') ?: 0,
-    'order_number'=> ($order === null ? $menu['order_number'] : $order),
-    'status'      => $this->request->getPost('status') ?: 'active',
-    'allowed_roles' => $this->request->getPost('allowed_roles'),
-];
+        $namaMenu = $this->request->getPost('menu_name');
+        $parentId = $this->request->getPost('parent_id') ?: 0;
+        $menuUrl  = $this->request->getPost('menu_url');
 
+        // --- LOGIKA UPDATE (OPSIONAL) ---
+        // Jika parent dipindah ke Informasi Publik, atau nama diubah, kita bisa update kategori juga
+        // Tapi untuk keamanan, biasanya update nama menu TIDAK otomatis update nama kategori 
+        // agar tidak merusak link file lama.
+        // Kode di bawah hanya memastikan URL tetap benar jika parentnya Informasi Publik.
+        
+        $parentInfoPublik = $this->menuModel->where('menu_name', 'Informasi Publik')->first();
+
+        if ($parentInfoPublik && $parentId == $parentInfoPublik['id_menu']) {
+            // Jika user tidak mengisi URL atau URL lama salah, kita perbaiki
+            // Generate slug baru
+            $slug = url_title($namaMenu, '-', true);
+            
+            // Paksa URL sesuai format controller dinamis
+            $menuUrl = 'informasi-publik/' . $slug;
+
+            // Note: Disini saya TIDAK mengupdate tabel kategori otomatis saat edit
+            // karena berisiko memutuskan relasi dengan dokumen yang sudah ada.
+            // Kategori sebaiknya diedit lewat master kategori jika salah nama.
+        }
+        // --------------------------------
+
+        $order = $this->request->getPost('order_number');
+        $data = [
+            'menu_name'     => $namaMenu,
+            'menu_url'      => $menuUrl,
+            'admin_url'     => $this->request->getPost('admin_url'),
+            'menu_icon'     => $this->request->getPost('menu_icon'),
+            'parent_id'     => $parentId,
+            'order_number'  => ($order === null ? $menu['order_number'] : $order),
+            'status'        => $this->request->getPost('status') ?: 'active',
+            'allowed_roles' => $this->request->getPost('allowed_roles'),
+        ];
 
         if (!$this->menuModel->update($id, $data)) {
             return redirect()->back()->withInput()->with('errors', $this->menuModel->errors());
