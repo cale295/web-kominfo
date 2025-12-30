@@ -155,12 +155,23 @@ public function new()
         $this->clearTemporaryImages();
     }
 
-    // ✅ PERBAIKAN: Konsisten pakai beritaTagModel
+    // Ambil ID User yang sedang login
+    $currentUserId = session()->get('id_user');
+
     $data = [
         'title' => 'Tambah Berita',
         'kategori' => $this->kategoriModel->where('trash', '0')->where('status', '1')->findAll(),
-        'tags' => $this->beritaTagModel->findAll(), // ✅ Sudah Benar
-        'beritaAll' => $this->beritaModel->findAll(),
+        'tags' => $this->beritaTagModel->findAll(),
+        
+        // --- PERUBAHAN DISINI ---
+        // Hanya ambil berita yang dibuat oleh user ini & tidak trash
+        'beritaAll' => $this->beritaModel
+                            ->where('created_by_id', $currentUserId) 
+                            ->where('trash', '0')
+                            ->orderBy('id_berita', 'DESC')
+                            ->findAll(),
+        // ------------------------
+
         'tempCoverImage' => session()->get('temp_cover_image'),
         'tempAdditionalImages' => session()->get('temp_additional_images') ?? []
     ];
@@ -507,6 +518,14 @@ public function edit($id)
         return redirect()->to('/berita')->with('error', 'Berita tidak ditemukan.');
     }
 
+    // Cek apakah user yang login adalah pembuat berita ini (opsional, untuk keamanan ekstra)
+    // Jika admin boleh edit punya orang lain, hapus blok if di bawah ini.
+    /*
+    if ($berita['created_by_id'] != session()->get('id_user') && session()->get('role') != 'admin') {
+         return redirect()->to('/berita')->with('error', 'Anda hanya bisa mengedit berita buatan sendiri.');
+    }
+    */
+
     if (!old('judul')) {
         $this->clearTemporaryImages();
     }
@@ -527,30 +546,36 @@ public function edit($id)
         'id_kategori'
     );
 
-    // ✅ PERBAIKAN TAGS
-    $allTags = $this->beritaTagModel->findAll(); // ✅ Pakai model
-    
+    $allTags = $this->beritaTagModel->findAll(); 
     $selectedTags = array_column(
         $this->beritaModel->getTagsByBerita($id), 
         'id_tags'
     );
     
-    $beritaAll = $this->beritaModel->findAll();
+    // --- PERUBAHAN DISINI ---
+    $currentUserId = session()->get('id_user');
+    
+    $beritaAll = $this->beritaModel
+        ->where('created_by_id', $currentUserId) // Hanya buatan sendiri
+        ->where('id_berita !=', $id)             // Jangan tampilkan berita yang sedang diedit
+        ->where('trash', '0')
+        ->orderBy('id_berita', 'DESC')
+        ->findAll();
+    // ------------------------
 
     return view('pages/berita/edit', [
         'title' => 'Edit Berita',
         'berita' => $berita,
         'kategori' => $kategori,
-        'beritaAll' => $beritaAll,
-        'tags' => $allTags,            // ✅ Semua Tag
-        'selectedTags' => $selectedTags, // ✅ Tag Terpilih
+        'beritaAll' => $beritaAll, // Data yang dikirim ke dropdown sudah terfilter
+        'tags' => $allTags,            
+        'selectedTags' => $selectedTags, 
         'additionalImages' => $additionalImages,
         'selected' => $selected,
         'tempCoverImage' => session()->get('temp_cover_image'),
         'tempAdditionalImages' => session()->get('temp_additional_images') ?? []
     ]);
 }
-
     // ========================================================
     // Update Berita
     // ========================================================
