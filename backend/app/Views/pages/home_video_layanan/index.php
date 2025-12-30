@@ -72,7 +72,7 @@
         transition: all 0.2s;
     }
     .img-hover-zoom:hover .play-overlay {
-        background: #dc2626; /* YouTube Red */
+        background: #dc2626;
         transform: translate(-50%, -50%) scale(1.2);
     }
 
@@ -89,6 +89,18 @@
     }
     .table-hover tbody tr:hover {
         background-color: #f9fafb;
+    }
+
+    /* Modal Styling */
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 1rem 1rem 0 0;
+    }
+    .modal-content {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 </style>
 
@@ -108,6 +120,21 @@
             </ol>
         </nav>
     </div>
+
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success border-0 shadow-sm border-start border-4 border-success rounded-3 fade show mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center justify-content-center bg-white text-success me-3 shadow-sm rounded-circle" style="width: 32px; height: 32px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Berhasil!</h6>
+                    <small><?= session()->getFlashdata('success') ?></small>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <?php if (session()->getFlashdata('error')): ?>
         <div class="alert alert-danger border-0 shadow-sm border-start border-4 border-danger rounded-3 fade show mb-4" role="alert">
@@ -132,9 +159,15 @@
             </div>
             
             <?php if ($can_create): ?>
-                <a href="/home_video_layanan/new" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0 hover-scale">
-                    <i class="fas fa-plus-circle me-2"></i>Tambah Video
-                </a>
+                <?php if (count($videos) >= 4): ?>
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0" disabled data-bs-toggle="tooltip" title="Maksimal 4 video sudah tercapai">
+                        <i class="fas fa-lock me-2"></i>Batas Video Tercapai
+                    </button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0" data-bs-toggle="modal" data-bs-target="#createVideoModal">
+                        <i class="fas fa-plus-circle me-2"></i>Tambah Video (<?= count($videos) ?>/4)
+                    </button>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
 
@@ -171,9 +204,23 @@
                                     <td class="text-center fw-bold text-muted"><?= $index + 1 ?></td>
                                     
                                     <td class="text-center">
-                                        <?php if (!empty($item['thumb_image']) && file_exists($item['thumb_image'])): ?>
+                                        <?php 
+                                        // Extract YouTube video ID from URL
+                                        $videoId = '';
+                                        if (!empty($item['youtube_url'])) {
+                                            // Handle different YouTube URL formats
+                                            if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/', $item['youtube_url'], $matches)) {
+                                                $videoId = $matches[1];
+                                            }
+                                        }
+                                        ?>
+                                        
+                                        <?php if (!empty($videoId)): ?>
                                             <div class="position-relative d-inline-block img-hover-zoom shadow-sm border" style="width: 120px; height: 70px;">
-                                                <img src="<?= base_url($item['thumb_image']) ?>" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <img src="https://img.youtube.com/vi/<?= $videoId ?>/mqdefault.jpg" 
+                                                     alt="Thumbnail" 
+                                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                                     onerror="this.onerror=null; this.src='https://img.youtube.com/vi/<?= $videoId ?>/default.jpg';">
                                                 <div class="play-overlay">
                                                     <i class="fas fa-play fa-xs"></i>
                                                 </div>
@@ -227,12 +274,21 @@
                                     <td class="text-center">
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>
-                                                <a href="/home_video_layanan/<?= $item['id_video_layanan'] ?>/edit" 
+                                                <button type="button"
                                                    class="btn btn-soft-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
                                                    style="width: 32px; height: 32px;"
-                                                   data-bs-toggle="tooltip" title="Edit Video">
+                                                   data-bs-toggle="modal" 
+                                                   data-bs-target="#editVideoModal"
+                                                   data-id="<?= $item['id_video_layanan'] ?>"
+                                                   data-title="<?= esc($item['title']) ?>"
+                                                   data-youtube="<?= esc($item['youtube_url']) ?>"
+                                                   data-embed="<?= esc($item['embed_code']) ?>"
+                                                   data-sorting="<?= $item['sorting'] ?>"
+                                                   data-featured="<?= $item['is_featured'] ?>"
+                                                   data-active="<?= $item['is_active'] ?>"
+                                                   title="Edit Video">
                                                     <i class="fas fa-pen fa-xs"></i>
-                                                </a>
+                                                </button>
                                             <?php endif; ?>
 
                                             <?php if ($can_delete): ?>
@@ -258,10 +314,153 @@
         </div>
         
         <div class="card-footer bg-white border-top-0 py-3">
-            <div class="d-flex align-items-center text-muted small">
-                <i class="fas fa-sort-numeric-down me-2 text-primary"></i>
-                <span>Video dengan status <strong>"Utama"</strong> akan muncul di posisi utama</span>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center text-muted small">
+                    <i class="fas fa-sort-numeric-down me-2 text-primary"></i>
+                    <span>Video dengan status <strong>"Utama"</strong> akan muncul di posisi utama</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge <?= count($videos) >= 4 ? 'bg-danger' : 'bg-info' ?> px-3 py-2">
+                        <i class="fas fa-film me-1"></i>
+                        Total Video: <?= count($videos) ?>/4
+                    </span>
+                </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Video -->
+<div class="modal fade" id="createVideoModal" tabindex="-1" aria-labelledby="createVideoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="createVideoModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Video Baru
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/home_video_layanan" method="post" enctype="multipart/form-data" id="createVideoForm">
+                <?= csrf_field() ?>
+                <div class="modal-body px-4 py-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Judul Video <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" placeholder="Contoh: Profil Layanan Masyarakat" value="<?= old('title') ?>" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Link YouTube <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
+                            <input type="url" class="form-control" name="youtube_url" placeholder="https://www.youtube.com/watch?v=..." value="<?= old('youtube_url') ?>" required>
+                        </div>
+                        <div class="form-text">Masukkan URL lengkap video YouTube</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Embed Code (Opsional)</label>
+                        <textarea class="form-control" name="embed_code" rows="3" placeholder='<iframe src="..."></iframe>'><?= old('embed_code') ?></textarea>
+                        <div class="form-text">Biarkan kosong jika tidak yakin.</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Urutan</label>
+                            <input type="number" class="form-control" name="sorting" value="<?= old('sorting', 0) ?>" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Pengaturan</label>
+                            <div class="form-check form-switch">
+                                <input type="hidden" name="is_featured" value="0">
+                                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" <?= old('is_featured') == 1 ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="is_featured">Video Utama</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input type="hidden" name="is_active" value="0">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <?= old('is_active', 1) == 1 ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="is_active">Status Aktif</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Simpan Video
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Video -->
+<div class="modal fade" id="editVideoModal" tabindex="-1" aria-labelledby="editVideoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="editVideoModalLabel">
+                    <i class="fas fa-edit me-2"></i>Edit Video
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="" method="post" id="editVideoForm">
+                <?= csrf_field() ?>
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="id_video_layanan" id="edit_id_video_layanan">
+                
+                <div class="modal-body px-4 py-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Judul Video <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" id="edit_title" placeholder="Contoh: Profil Layanan Masyarakat" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Link YouTube <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
+                            <input type="url" class="form-control" name="youtube_url" id="edit_youtube_url" placeholder="https://www.youtube.com/watch?v=..." required>
+                        </div>
+                        <div class="form-text">Masukkan URL lengkap video YouTube</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Embed Code (Opsional)</label>
+                        <textarea class="form-control" name="embed_code" id="edit_embed_code" rows="3" placeholder='<iframe src="..."></iframe>'></textarea>
+                        <div class="form-text">Biarkan kosong jika tidak yakin.</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Urutan</label>
+                            <input type="number" class="form-control" name="sorting" id="edit_sorting" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Pengaturan</label>
+                            <div class="form-check form-switch">
+                                <input type="hidden" name="is_featured" value="0">
+                                <input class="form-check-input" type="checkbox" id="edit_is_featured" name="is_featured" value="1">
+                                <label class="form-check-label" for="edit_is_featured">Video Utama</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input type="hidden" name="is_active" value="0">
+                                <input class="form-check-input" type="checkbox" id="edit_is_active" name="is_active" value="1">
+                                <label class="form-check-label" for="edit_is_active">Status Aktif</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Update Video
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -272,6 +471,58 @@
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Handle Edit Modal
+        const editModal = document.getElementById('editVideoModal');
+        if (editModal) {
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                
+                // Get data from button attributes
+                const id = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+                const youtube = button.getAttribute('data-youtube');
+                const embed = button.getAttribute('data-embed');
+                const sorting = button.getAttribute('data-sorting');
+                const featured = button.getAttribute('data-featured');
+                const active = button.getAttribute('data-active');
+                
+                // Fill form fields
+                document.getElementById('edit_id_video_layanan').value = id;
+                document.getElementById('edit_title').value = title;
+                document.getElementById('edit_youtube_url').value = youtube;
+                document.getElementById('edit_embed_code').value = embed || '';
+                document.getElementById('edit_sorting').value = sorting;
+                document.getElementById('edit_is_featured').checked = featured == '1';
+                document.getElementById('edit_is_active').checked = active == '1';
+                
+                // Set form action
+                document.getElementById('editVideoForm').action = '/home_video_layanan/' + id;
+            });
+        }
+
+        // Reset form when modals are closed
+        const createModal = document.getElementById('createVideoModal');
+        if (createModal) {
+            createModal.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('createVideoForm').reset();
+            });
+        }
+
+        if (editModal) {
+            editModal.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('editVideoForm').reset();
+            });
+        }
+
+        // Auto-dismiss alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
         });
     });
 </script>
