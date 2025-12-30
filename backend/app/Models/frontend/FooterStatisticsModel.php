@@ -3,6 +3,7 @@
 namespace App\Models\frontend;
 
 use CodeIgniter\Model;
+use CodeIgniter\Validation\Rules;
 
 class FooterStatisticsModel extends Model
 {
@@ -46,6 +47,11 @@ class FooterStatisticsModel extends Model
 
     // Validation Rules
     protected $validationRules = [
+
+
+        'id_footer_statis' => [
+            'rules' => 'permit_empty'
+        ],
 
         'stat_type' => [
             'rules'  => 'required|max_length[50]|is_unique[m_footer_statistics.stat_type,id_footer_statis,{id_footer_statis}]',
