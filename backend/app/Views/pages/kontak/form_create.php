@@ -5,7 +5,7 @@
     <div class="d-flex align-items-center justify-content-between my-4">
         <h1 class="h3 mb-0 text-gray-800 fw-bold"><?= esc($title) ?></h1>
         <a href="/kontak?tab=<?= $type ?>" class="btn btn-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Kembali
+            <i class="fas fa-arrow-left"></i> Kembali
         </a>
     </div>
 
@@ -42,16 +42,16 @@
                     <?php 
                         // DEFINISI LIST ICON SOCIAL DISINI
                         $socialIcons = [
-                            'bi bi-facebook'    => 'Facebook',
-                            'bi bi-instagram'   => 'Instagram',
-                            'bi bi-twitter-x'   => 'Twitter / X',
-                            'bi bi-youtube'     => 'Youtube',
-                            'bi bi-tiktok'      => 'Tiktok',
-                            'bi bi-whatsapp'    => 'Whatsapp',
-                            'bi bi-telegram'    => 'Telegram',
-                            'bi bi-linkedin'    => 'LinkedIn',
-                            'bi bi-globe'       => 'Website',
-                            'bi bi-envelope'    => 'Email',
+                            'fab fa-facebook'       => 'Facebook',
+                            'fab fa-instagram'      => 'Instagram',
+                            'fab fa-twitter'        => 'Twitter / X',
+                            'fab fa-youtube'        => 'Youtube',
+                            'fab fa-tiktok'         => 'Tiktok',
+                            'fab fa-whatsapp'       => 'Whatsapp',
+                            'fab fa-telegram'       => 'Telegram',
+                            'fab fa-linkedin'       => 'LinkedIn',
+                            'fas fa-globe'          => 'Website',
+                            'fas fa-envelope'       => 'Email',
                         ];
                     ?>
                     
@@ -75,7 +75,9 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Pilih Logo</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i id="icon-preview" class="bi bi-hash fs-5"></i></span>
+                                <span class="input-group-text bg-light d-flex align-items-center justify-content-center" style="width: 60px;">
+                                    <i id="icon-preview" class="fas fa-hashtag" style="font-size: 1.5rem;"></i>
+                                </span>
                                 <select name="icon_class" class="form-select" id="icon-select" required onchange="updateIconPreview()">
                                     <option value="" selected disabled>-- Pilih Logo --</option>
                                     <?php foreach($socialIcons as $class => $label): ?>
@@ -94,22 +96,22 @@
                     <?php 
                         // DEFINISI LIST ICON LAYANAN DISINI
                         $layananIcons = [
-                            'bi bi-laptop'          => 'Laptop / Digital',
-                            'bi bi-pc-display'      => 'Komputer / Monitor',
-                            'bi bi-phone'           => 'Handphone / Aplikasi',
-                            'bi bi-person-fill'     => 'User / Kepegawaian',
-                            'bi bi-people-fill'     => 'Publik / Masyarakat',
-                            'bi bi-person-vcard'    => 'Kartu Identitas',
-                            'bi bi-file-earmark-text'=> 'Dokumen / Berkas',
-                            'bi bi-folder2-open'    => 'Arsip / Data',
-                            'bi bi-envelope-open'   => 'Persuratan',
-                            'bi bi-megaphone'       => 'Pengumuman',
-                            'bi bi-calendar-event'  => 'Jadwal / Agenda',
-                            'bi bi-geo-alt-fill'    => 'Peta / Lokasi',
-                            'bi bi-globe2'          => 'Internet / Web',
-                            'bi bi-gear-fill'       => 'Pengaturan',
-                            'bi bi-building'        => 'Gedung / Kantor',
-                            'bi bi-headset'         => 'Call Center',
+                            'fas fa-laptop'             => 'Laptop / Digital',
+                            'fas fa-desktop'            => 'Komputer / Monitor',
+                            'fas fa-mobile-alt'         => 'Handphone / Aplikasi',
+                            'fas fa-user'               => 'User / Kepegawaian',
+                            'fas fa-users'              => 'Publik / Masyarakat',
+                            'fas fa-id-card'            => 'Kartu Identitas',
+                            'fas fa-file-alt'           => 'Dokumen / Berkas',
+                            'fas fa-folder-open'        => 'Arsip / Data',
+                            'fas fa-envelope-open'      => 'Persuratan',
+                            'fas fa-bullhorn'           => 'Pengumuman',
+                            'fas fa-calendar-alt'       => 'Jadwal / Agenda',
+                            'fas fa-map-marker-alt'     => 'Peta / Lokasi',
+                            'fas fa-globe'              => 'Internet / Web',
+                            'fas fa-cog'                => 'Pengaturan',
+                            'fas fa-building'           => 'Gedung / Kantor',
+                            'fas fa-headset'            => 'Call Center',
                         ];
                     ?>
 
@@ -130,7 +132,9 @@
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Pilih Icon</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i id="icon-preview" class="bi bi-app fs-5"></i></span>
+                                <span class="input-group-text bg-light d-flex align-items-center justify-content-center" style="width: 60px;">
+                                    <i id="icon-preview" class="fas fa-th" style="font-size: 1.5rem;"></i>
+                                </span>
                                 <select name="icon_class" class="form-select" id="icon-select" required onchange="updateIconPreview()">
                                     <option value="" selected disabled>-- Pilih Icon --</option>
                                     <?php foreach($layananIcons as $class => $label): ?>
@@ -151,7 +155,7 @@
                 <?php endif; ?>
 
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Simpan Data</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Simpan Data</button>
                 </div>
             </form>
         </div>
@@ -161,7 +165,9 @@
 <script>
     function updateIconPreview() {
         var iconClass = document.getElementById('icon-select').value;
-        document.getElementById('icon-preview').className = iconClass + " fs-5";
+        var iconPreview = document.getElementById('icon-preview');
+        iconPreview.className = iconClass;
+        iconPreview.style.fontSize = '1.5rem';
     }
 </script>
 <?= $this->endSection() ?>

@@ -40,11 +40,11 @@
                     <div class="col-md-6">
                         <label for="icon_class" class="form-label fw-bold">Pilih Icon <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <span class="input-group-text bg-light text-primary" style="font-size: 1.2rem; width: 50px; justify-content: center;">
+                            <span class="input-group-text bg-light text-primary d-flex align-items-center justify-content-center" style="font-size: 2.5rem; width: 80px; height: 80px;">
                                 <i id="iconPreview" class="fas fa-icons"></i>
                             </span>
                             
-                            <select class="form-select" id="icon_class" name="icon_class" required>
+                            <select class="form-select" id="icon_class" name="icon_class" required style="height: 80px;">
                                 <option value="" disabled selected>-- Pilih Icon --</option>
                                 
                                 <optgroup label="Media Sosial & Kontak">
@@ -124,18 +124,32 @@
     // 1. Sync Color Picker (Warna Background)
     const colorPicker = document.getElementById('colorPicker');
     const colorInput = document.getElementById('icon_bg_color');
-    const iconPreviewBox = document.querySelector('.input-group-text.bg-light'); // Ambil kotak preview
+    const iconPreviewBox = document.querySelector('.input-group-text.bg-light');
 
     colorPicker.addEventListener('input', function() {
         colorInput.value = this.value;
-        // Opsional: Ubah warna kotak preview icon sesuai warna yang dipilih
-        // iconPreviewBox.style.backgroundColor = this.value; 
-        // iconPreviewBox.style.color = '#fff';
+        // Update background color preview
+        iconPreviewBox.style.backgroundColor = this.value;
+        // Adjust text color for better visibility
+        const brightness = getBrightness(this.value);
+        iconPreviewBox.style.color = brightness > 128 ? '#000' : '#fff';
     });
 
     colorInput.addEventListener('input', function() {
         colorPicker.value = this.value;
+        iconPreviewBox.style.backgroundColor = this.value;
+        const brightness = getBrightness(this.value);
+        iconPreviewBox.style.color = brightness > 128 ? '#000' : '#fff';
     });
+
+    // Function to calculate brightness
+    function getBrightness(hexColor) {
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        return (r * 299 + g * 587 + b * 114) / 1000;
+    }
 
     // 2. Logic Preview Icon (Otomatis ganti icon saat dropdown dipilih)
     const iconSelect = document.getElementById('icon_class');
@@ -158,6 +172,13 @@
 
     // Jalankan saat halaman diload (untuk handle old input saat error validasi)
     updateIconPreview();
+
+    // Initialize color preview on load
+    if(colorInput.value) {
+        iconPreviewBox.style.backgroundColor = colorInput.value;
+        const brightness = getBrightness(colorInput.value);
+        iconPreviewBox.style.color = brightness > 128 ? '#000' : '#fff';
+    }
 </script>
 
 <?= $this->endSection() ?>

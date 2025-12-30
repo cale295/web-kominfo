@@ -641,7 +641,6 @@ function filterTable(category, btnElement) {
         }
     });
 
-    // 3. Tampilkan pesan jika kosong
     const noMsg = document.getElementById('noRowsMessage');
     if (visibleCount === 0) {
         noMsg.style.display = '';
@@ -649,7 +648,7 @@ function filterTable(category, btnElement) {
         noMsg.style.display = 'none';
     }
 
-    // 4. Update Link Tombol Tambah Banner (BAGIAN PENTING)
+   
     const btnAdd = document.getElementById('btnAddBanner');
     const baseUrl = "<?= site_url('banner/new') ?>";
 
