@@ -1,18 +1,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <?php
-/**
- * ==========================================
- * 1. SETUP SESSION
- * ==========================================
- */
 $session  = session();
 $role     = $session->get('role') ?? 'superadmin'; 
 $fullName = $session->get('full_name') ?? 'Administrator';
-// Avatar generator
 $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($fullName) . "&background=e2e8f0&color=475569&bold=true&format=svg";
-
-// URI Detection untuk penanda menu aktif
 $uri = service('uri');
 $segments = $uri->getSegments();
 $currentPath = '/' . (isset($segments[0]) ? $segments[0] : 'dashboard');
@@ -20,29 +12,21 @@ if(count($segments) > 1) {
     $currentPath = '/' . implode('/', $segments);
 }
 
-/**
- * ==========================================
- * 2. LOGIKA OTOMATIS INFORMASI PUBLIK DARI DATABASE
- * ==========================================
- */
 $menuModel = new \App\Models\MenuModel(); 
 
-// 1. Cari Parent Menu "Informasi Publik"
 $parentInfoPublik = $menuModel->where('menu_name', 'Informasi Publik')->first();
 $dynamicInfoPublikSubmenu = [];
 
 if ($parentInfoPublik) {
-    // 2. Ambil anak-anaknya (Level 2)
     $children = $menuModel->where('parent_id', $parentInfoPublik['id_menu'])
                           ->where('status', 'active')
                           ->orderBy('order_number', 'ASC')
                           ->findAll();
 
     foreach ($children as $child) {
-        // Parsing roles dari string "admin,editor" ke array
         $childRoles = !empty($child['allowed_roles']) 
                       ? array_map('trim', explode(',', $child['allowed_roles'])) 
-                      : ['superadmin', 'admin']; // Default role jika kosong
+                      : ['superadmin', 'admin']; 
 
         $menuItem = [
             'title' => $child['menu_name'],
@@ -50,7 +34,6 @@ if ($parentInfoPublik) {
             'roles' => $childRoles
         ];
 
-        // 3. Cek apakah punya anak lagi? (Level 3 - Contoh: Pengadaan Barang -> Swakelola)
         $grandChildren = $menuModel->where('parent_id', $child['id_menu'])
                                    ->where('status', 'active')
                                    ->orderBy('order_number', 'ASC')
@@ -69,7 +52,6 @@ if ($parentInfoPublik) {
                     'roles' => $gcRoles
                 ];
             }
-            // Jika ada submenu, set submenu array dan url jadi #
             $menuItem['submenu'] = $grandChildItems;
             $menuItem['url'] = '#';
         }
@@ -78,13 +60,7 @@ if ($parentInfoPublik) {
     }
 }
 
-/**
- * ==========================================
- * 3. STRUKTUR MENU BARU (DENGAN INFORMASI PUBLIK)
- * ==========================================
- */
 $menuItems = [
-    // --- ITEM: DASHBOARD ---
     [
         'type'  => 'item', 
         'title' => 'Dashboard', 
@@ -94,7 +70,7 @@ $menuItems = [
         'color' => '#4361ee', 
         'bg'    => 'rgba(67, 97, 238, 0.1)' 
     ],
-    // --- ITEM: PENGATURAN MENU ---
+
     [
         'type'  => 'item', 
         'title' => 'Pengaturan Menu', 
@@ -104,7 +80,7 @@ $menuItems = [
         'color' => '#3a0ca3', 
         'bg'    => 'rgba(58, 12, 163, 0.1)' 
     ],
-    // --- ITEM: BANNER ---
+ 
     [
         'type'  => 'item', 
         'title' => 'Banner', 
@@ -114,7 +90,7 @@ $menuItems = [
         'color' => '#7209b7', 
         'bg'    => 'rgba(114, 9, 183, 0.1)' 
     ],
-    // --- ITEM: BERITA (LIST) ---
+
     [
         'type'  => 'item', 
         'title' => 'Berita', 
@@ -124,7 +100,7 @@ $menuItems = [
         'color' => '#e74a3b', 
         'bg'    => 'rgba(231, 74, 59, 0.1)' 
     ],
-    // --- ITEM: GALERI ---
+
     [
         'type'  => 'item', 
         'title' => 'Galeri', 
@@ -135,10 +111,9 @@ $menuItems = [
         'bg'    => 'rgba(246, 194, 62, 0.1)' 
     ],
 
-    // --- SEPARATOR ---
+  
     ['type' => 'header', 'title' => 'PENGATURAN HALAMAN'],
 
-    // --- DROPDOWN: TAMPILAN MENU HOME ---
     [
         'type'    => 'dropdown', 
         'title'   => 'Tampilan Menu Home', 
@@ -156,7 +131,6 @@ $menuItems = [
         ]
     ],
 
-    // --- DROPDOWN: HAL PROFIL ---
     [
         'type'    => 'dropdown', 
         'title'   => 'Hal Profil', 
@@ -171,8 +145,7 @@ $menuItems = [
             ['title' => 'Struktur Organisasi', 'url' => '/struktur_organisasi', 'roles' => ['superadmin', 'admin']],
         ]
     ],
-    
-    // --- DROPDOWN: PENGATURAN BERITA ---
+
     [
         'type'    => 'dropdown', 
         'title'   => 'Pengaturan Berita', 
@@ -187,7 +160,6 @@ $menuItems = [
         ]
     ],
 
-    // --- DROPDOWN: INFORMASI PUBLIK (DINAMIS DARI DATABASE) ---
     [
         'type'    => 'dropdown', 
         'title'   => 'Informasi Publik', 
@@ -195,10 +167,9 @@ $menuItems = [
         'roles'   => ['superadmin', 'admin'],
         'color'   => '#1cc88a', 
         'bg'      => 'rgba(28, 200, 138, 0.1)',
-        'submenu' => $dynamicInfoPublikSubmenu // <--- MENGGUNAKAN VARIABEL DB
+        'submenu' => $dynamicInfoPublikSubmenu 
     ],
 
-    // --- DROPDOWN: PENGATURAN FOOTER ---
     [
         'type' => 'dropdown', 
         'title' => 'Pengaturan Footer', 
@@ -212,8 +183,7 @@ $menuItems = [
             ['title' => 'Pengunjung', 'url' => '/footer_statistics', 'roles' => ['superadmin', 'admin']],
         ]
     ],
-    
-    // --- DROPDOWN: USER & AKSES ---
+
     [
         'type'    => 'dropdown', 
         'title'   => 'User & Akses', 
@@ -227,7 +197,6 @@ $menuItems = [
         ]
     ],
 
-    // --- ITEM: PROFIL SAYA ---
     [
         'type'  => 'item', 
         'title' => 'Profil Saya', 
@@ -262,7 +231,7 @@ $menuItems = [
         margin: 0; padding: 0;
     }
 
-    /* --- SIDEBAR --- */
+
     #sidebar {
         width: var(--sb-width);
         height: 100vh;
@@ -277,7 +246,6 @@ $menuItems = [
         box-shadow: 4px 0 24px rgba(0,0,0,0.015);
     }
 
-    /* --- BRAND --- */
     .sidebar-brand {
         height: 70px;
         display: flex; align-items: center;
@@ -295,7 +263,7 @@ $menuItems = [
         box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.15);
     }
 
-    /* --- USER CARD --- */
+
     .user-card {
         padding: 1rem 1.5rem;
         display: flex; align-items: center; gap: 12px;
@@ -308,7 +276,7 @@ $menuItems = [
     .user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 700; color: #1e293b; }
     .user-info span { font-size: 0.75rem; color: #94a3b8; font-weight: 500; text-transform: uppercase; }
 
-    /* --- CONTENT --- */
+
     .sidebar-content {
         flex: 1;
         overflow-y: auto;
@@ -326,7 +294,7 @@ $menuItems = [
         margin: 1.5rem 0 0.5rem 0.75rem;
     }
 
-    /* --- LINKS --- */
+
     .nav-link {
         display: flex; align-items: center;
         padding: 0.7rem 0.75rem;
@@ -392,7 +360,6 @@ $menuItems = [
     .sub-link.active { color: var(--primary); font-weight: 600; background: #fff; }
     .sub-link.active::before { background: var(--primary); box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15); }
 
-    /* --- SUBMENU LEVEL 3 (untuk Informasi Publik dengan nested menu) --- */
     .sub-item-with-children > .sub-link .nav-arrow {
         transform: rotate(-90deg);
     }
@@ -471,10 +438,9 @@ $menuItems = [
         <ul>
             <?php foreach ($menuItems as $item): ?>
                 <?php 
-                // Filter Role
+         
                 if (isset($item['roles']) && !in_array($role, $item['roles'])) continue;
-                
-                // Styling
+            
                 $iColor = $item['color'] ?? '#64748b';
                 $iBg    = $item['bg'] ?? 'rgba(100, 116, 139, 0.1)';
                 ?>
@@ -484,16 +450,16 @@ $menuItems = [
                 
                 <?php elseif ($item['type'] === 'dropdown'): ?>
                     <?php 
-                        // Check Active State (Level 2 & Level 3)
+
                         $isActive = false;
                         if(isset($item['submenu'])) {
                             foreach($item['submenu'] as $sub) {
-                                // Cek Level 2
+                               
                                 if(strpos($currentPath, $sub['url']) === 0 && $sub['url'] !== '#') { 
                                     $isActive = true; 
                                     break; 
                                 }
-                                // Cek Level 3
+                                
                                 if(isset($sub['submenu'])) {
                                     foreach($sub['submenu'] as $subLevel3) {
                                         if(strpos($currentPath, $subLevel3['url']) === 0) { 
@@ -520,7 +486,7 @@ $menuItems = [
                                     <?php if (in_array($role, $subItem['roles'])): ?>
                                         
                                         <?php if(isset($subItem['submenu'])): 
-                                            // Ada Level 3, cek aktif
+                                    
                                             $isLevel3Active = false;
                                             foreach($subItem['submenu'] as $l3) {
                                                 if(strpos($currentPath, $l3['url']) === 0) { 
@@ -529,7 +495,7 @@ $menuItems = [
                                                 }
                                             }
                                         ?>
-                                            <!-- Sub Item dengan Children (Level 3) -->
+                                       
                                             <li class="sub-item-with-children <?= $isLevel3Active ? 'open' : '' ?>">
                                                 <a href="javascript:void(0)" class="sub-link" onclick="toggleLevel3(this, event)">
                                                     <?= $subItem['title'] ?>
@@ -549,7 +515,7 @@ $menuItems = [
                                                 </ul>
                                             </li>
                                         <?php else: ?>
-                                            <!-- Sub Item Biasa (Level 2) -->
+                                
                                             <li>
                                                 <a href="<?= $subItem['url'] ?>" 
                                                    class="sub-link <?= ($currentPath === $subItem['url']) ? 'active' : '' ?>">
@@ -589,17 +555,14 @@ $menuItems = [
 </nav>
 
 <script>
-    // Toggle Dropdown Level 1
     function toggleMenu(element) {
         const parent = element.parentElement;
-        // Tutup yang lain
         document.querySelectorAll('.nav-item.open').forEach(item => {
             if (item !== parent) item.classList.remove('open');
         });
         parent.classList.toggle('open');
     }
 
-    // Toggle Dropdown Level 3 (untuk nested submenu)
     function toggleLevel3(element, event) {
         event.stopPropagation(); 
         event.preventDefault();  
@@ -608,9 +571,7 @@ $menuItems = [
         if (parentListItem) {
             parentListItem.classList.toggle('open');
         }
-    }
 
-    // Mobile Toggle
     function toggleSidebar() {
         const sb = document.getElementById('sidebar');
         const ov = document.getElementById('overlay');
@@ -618,18 +579,15 @@ $menuItems = [
         sb.classList.contains('mobile-open') ? ov.classList.add('show') : ov.classList.remove('show');
     }
 
-    // Auto Scroll & Open Active
     document.addEventListener("DOMContentLoaded", function() {
         const activeLink = document.querySelector('.sub-link-level-3.active') || 
                           document.querySelector('.sub-link.active') || 
                           document.querySelector('.nav-link.active');
         
         if (activeLink) {
-            // Buka parent level 3 jika ada
             const level3Parent = activeLink.closest('.sub-item-with-children');
             if(level3Parent) level3Parent.classList.add('open');
 
-            // Buka parent level 1
             const mainParent = activeLink.closest('.nav-item');
             if(mainParent) mainParent.classList.add('open');
             
