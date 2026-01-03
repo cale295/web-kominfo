@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <?php
-// --- SETUP AWAL & SESSION ---
+
 $session  = session();
 $role     = $session->get('role') ?? 'superadmin'; 
 $fullName = $session->get('full_name') ?? 'Guest User';
@@ -12,23 +12,18 @@ if(count($segments) > 1) {
     $currentPath = '/' . implode('/', $segments);
 }
 
-// --- LOGIKA OTOMATIS INFORMASI PUBLIK DARI DATABASE ---
-// Pastikan Model dipanggil
 $menuModel = new \App\Models\MenuModel(); 
 
-// 1. Cari Parent Menu "Informasi Publik"
 $parentInfoPublik = $menuModel->where('menu_name', 'Informasi Publik')->first();
 $dynamicInfoPublikSubmenu = [];
 
 if ($parentInfoPublik) {
-    // 2. Ambil anak-anaknya (Level 2)
     $children = $menuModel->where('parent_id', $parentInfoPublik['id_menu'])
                           ->where('status', 'active')
                           ->orderBy('order_number', 'ASC')
                           ->findAll();
 
     foreach ($children as $child) {
-        // Parsing roles dari string "admin,editor" ke array
         $childRoles = !empty($child['allowed_roles']) 
                       ? array_map('trim', explode(',', $child['allowed_roles'])) 
                       : ['superadmin', 'admin']; // Default role jika kosong
@@ -39,7 +34,6 @@ if ($parentInfoPublik) {
             'roles' => $childRoles
         ];
 
-        // 3. Cek apakah punya anak lagi? (Level 3 - Contoh: Pengadaan Barang -> Swakelola)
         $grandChildren = $menuModel->where('parent_id', $child['id_menu'])
                                    ->where('status', 'active')
                                    ->orderBy('order_number', 'ASC')
@@ -58,7 +52,7 @@ if ($parentInfoPublik) {
                     'roles' => $gcRoles
                 ];
             }
-            // Jika ada submenu, set submenu array dan url jadi #
+   
             $menuItem['submenu'] = $grandChildItems;
             $menuItem['url'] = '#';
         }
