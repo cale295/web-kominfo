@@ -314,6 +314,7 @@ $routes->group('api', function ($routes) {
     $routes->get('footer_opd/(:num)', 'Api\ApiFooterOpdController::show/$1');
     $routes->get('program', 'Api\ApiProgramController::index');
     $routes->get('program/(:segment)', 'Api\ApiProgramController::show/$1');
+    
 
     // Kontak API
     $routes->get('kontak', 'Api\ApiKontakController::index');
@@ -334,6 +335,23 @@ $routes->group('api', function ($routes) {
     $routes->get('banner/(:num)', 'Api\ApiBannerController::show/$1');
     $routes->get('dokument', 'Api\ApiDokumentController::index');
     $routes->get('dokument/(:num)', 'Api\ApiDokumentController::show/$1');
+    $routes->get('informasi-publik', 'Api\ApiDocumentController::listCategories');
+
+    // 1.b. Get List Folder & Dokumen berdasarkan Slug Kategori
+    // Ini menangani: GET api/informasi-publik/transparansi-anggaran
+    $routes->get('informasi-publik/(:segment)', 'Api\ApiDocumentController::index/$1');
+    
+    // 2. Create Folder Baru
+    $routes->post('informasi-publik/(:segment)/folder', 'Api\ApiDocumentController::storeFolder/$1');
+    
+    // 3. Upload Dokumen
+    $routes->post('informasi-publik/(:segment)/(:segment)', 'Api\ApiDocumentController::storeDokumen/$1/$2');
+    
+    // 4. Update Dokumen
+    $routes->post('informasi-publik/(:segment)/(:num)/update', 'Api\ApiDocumentController::update/$1/$2');
+    
+    // 5. Delete Dokumen
+    $routes->delete('informasi-publik/(:segment)/(:num)', 'Api\ApiDocumentController::delete/$1/$2');
     
     // Berita
     $routes->get('berita', 'Api\ApiBeritaController::index');

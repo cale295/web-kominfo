@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Triangle, Calendar, Bell, Image, X } from "lucide-react"; // Tambah icon X
+import { Triangle, Calendar, Bell, Image, X } from "lucide-react"; 
 import "./Agenda.css";
 import api from "../../../services/api";
 
@@ -9,7 +9,7 @@ interface AnnouncementItem {
   date: string;
   content?: string;
   link_url?: string;
-  image?: string; // Field baru untuk gambar popup
+  image?: string;
 }
 
 interface ApiAgendaItem {
@@ -17,7 +17,7 @@ interface ApiAgendaItem {
   activity_name: string;
   description: string;
   start_date: string;
-  end_date: string;
+  end_date: string; // Pastikan ini ada di response API
   location: string;
   image: string;
   status: string;
@@ -124,7 +124,7 @@ export default function Agenda() {
       title: agenda.activity_name,
       date: formatAnnouncementDate(agenda.start_date),
       content: agenda.description,
-      image: agenda.image ? `uploads/agenda/${agenda.image}` : undefined, // Mapping gambar agenda
+      image: agenda.image ? `uploads/agenda/${agenda.image}` : undefined,
       link_url: "#"
     }))
     .slice(0, 7);
@@ -143,7 +143,7 @@ export default function Agenda() {
       date: formatAnnouncementDate(pengumuman.created_at),
       content: pengumuman.content,
       link_url: pengumuman.link_url,
-      image: pengumuman.featured_image, // Mapping gambar pengumuman
+      image: pengumuman.featured_image,
     }))
     .slice(0, 7);
 
@@ -151,9 +151,6 @@ export default function Agenda() {
     ? announcementFromPengumuman 
     : announcementFromAgenda;
 
-  // --- FETCHING LOGIC (Berita, Agenda, Pengumuman) TETAP SAMA SEPERTI KODE ASLI ---
-  // (Untuk menghemat tempat, saya tidak mengubah logic fetch di sini karena sudah benar)
-  
   // Fetch Berita
   useEffect(() => {
     const fetchBerita = async () => {
@@ -183,6 +180,7 @@ export default function Agenda() {
     fetchBerita();
   }, []);
 
+  // --- BAGIAN INI YANG DIMODIFIKASI UNTUK RENTANG WAKTU ---
   // Fetch Agenda
   useEffect(() => {
     const fetchAgenda = async () => {
@@ -190,28 +188,61 @@ export default function Agenda() {
         setLoadingAgenda(true);
         const res = await api.get("/agenda");
         const json = res?.data;
+        
         if (json.status && Array.isArray(json.data)) {
           const eventsMap: Record<number, CalendarEvent[]> = {};
           setAgendaData(json.data);
+
           json.data.forEach((item: ApiAgendaItem) => {
-            const start = new Date(item.start_date);
-            const day = start.getDate();
-            if (start.getMonth() + 1 === currentMonth && start.getFullYear() === currentYear) {
-              if (!eventsMap[day]) eventsMap[day] = [];
-              eventsMap[day].push({
-                date: day,
-                title: item.activity_name,
-                time: start.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
-                image: item.image,
-              });
+            // 1. Ambil Start Date
+            const startDate = new Date(item.start_date);
+            // 2. Ambil End Date, jika null/kosong gunakan Start Date
+            const endDate = item.end_date ? new Date(item.end_date) : new Date(item.start_date);
+
+            // 3. Normalisasi jam ke 00:00:00 agar loop per hari akurat
+            const loopDate = new Date(startDate);
+            loopDate.setHours(0, 0, 0, 0);
+
+            const loopEnd = new Date(endDate);
+            loopEnd.setHours(0, 0, 0, 0);
+
+            // Validasi: jika loopEnd invalid atau lebih kecil dari start, samakan dengan start
+            if (isNaN(loopEnd.getTime()) || loopEnd < loopDate) {
+               loopEnd.setTime(loopDate.getTime());
+            }
+
+            // 4. Loop dari Start sampai End
+            while (loopDate <= loopEnd) {
+              // Cek apakah tanggal loop berada di bulan & tahun yang sedang ditampilkan
+              if (
+                loopDate.getMonth() + 1 === currentMonth && 
+                loopDate.getFullYear() === currentYear
+              ) {
+                const day = loopDate.getDate();
+                if (!eventsMap[day]) eventsMap[day] = [];
+                
+                // Masukkan event ke tanggal tersebut
+                eventsMap[day].push({
+                  date: day,
+                  title: item.activity_name,
+                  // Gunakan jam asli dari start_date untuk tampilan jam
+                  time: startDate.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+                  image: item.image,
+                });
+              }
+
+              // Pindah ke hari berikutnya
+              loopDate.setDate(loopDate.getDate() + 1);
             }
           });
+
           setCalendarEvents(eventsMap);
         } else { setErrorAgenda("Format data tidak sesuai."); }
       } catch (error) { setErrorAgenda("Gagal memuat data agenda."); } finally { setLoadingAgenda(false); }
     };
     fetchAgenda();
   }, [currentMonth, currentYear]);
+  // --- AKHIR MODIFIKASI AGENDA ---
 
   // Fetch Pengumuman
   useEffect(() => {
@@ -260,7 +291,6 @@ export default function Agenda() {
   const firstEvent = selectedEvents[0];
   const currentNews = beritaUtamaList[currentNewsIndex];
 
-  // Helper untuk membersihkan path gambar
   const cleanImagePath = (path: string | undefined) => {
     if (!path) return "";
     return `${ROOT}/${path.replace(/^\/+/, "")}`;
@@ -277,14 +307,13 @@ export default function Agenda() {
             zIndex: 9999,
             backdropFilter: 'blur(4px)'
           }}
-          onClick={() => setSelectedAnnouncement(null)} // Tutup jika klik di luar
+          onClick={() => setSelectedAnnouncement(null)} 
         >
           <div 
             className="card border-0 shadow-lg rounded-4 overflow-hidden position-relative animate-pop"
             style={{ maxWidth: '500px', width: '90%', margin: '20px' }}
-            onClick={(e) => e.stopPropagation()} // Mencegah penutupan jika klik di dalam card
+            onClick={(e) => e.stopPropagation()} 
           >
-            {/* Tombol Close */}
             <button 
               className="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm z-3"
               onClick={() => setSelectedAnnouncement(null)}
@@ -293,7 +322,6 @@ export default function Agenda() {
               <X size={18} />
             </button>
 
-            {/* Wrapper A HREF sesuai permintaan */}
             <a 
               href={selectedAnnouncement.link_url || "#"} 
               target={selectedAnnouncement.link_url && selectedAnnouncement.link_url !== "#" ? "_blank" : "_self"}
@@ -301,7 +329,6 @@ export default function Agenda() {
               className="text-decoration-none text-dark"
               style={{ display: 'block' }}
             >
-              {/* Gambar */}
               <div className="bg-light d-flex align-items-center justify-content-center" style={{ minHeight: '200px', maxHeight: '300px', overflow: 'hidden' }}>
                 {selectedAnnouncement.image ? (
                   <img 
@@ -317,7 +344,6 @@ export default function Agenda() {
                 )}
               </div>
 
-              {/* Konten */}
               <div className="p-4">
                 <span className="badge bg-primary mb-2">Pengumuman</span>
                 <h4 className="fw-bold text-blue mb-2">{selectedAnnouncement.title}</h4>
@@ -346,7 +372,6 @@ export default function Agenda() {
           {/* News Section */}
           <div className="col">
             <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
-            {/* ... (Code Berita tetap sama) ... */}
             <div className=" news-card position-relative overflow-hidden">
               {loadingBerita ? (
                 <div className="text-center p-5"><p className="text-muted">Memuat berita utama...</p></div>
@@ -385,7 +410,6 @@ export default function Agenda() {
             </div>
 
             {activeTab === "agenda" ? (
-              // ... (Code Agenda Tetap Sama) ...
               <div className="card border-0 shadow rounded-4 bg-light overflow-hidden">
                 <div className="row g-0 h-100">
                   <div className="col-md-5 d-flex ">
@@ -446,7 +470,6 @@ export default function Agenda() {
                 </div>
               </div>
             ) : (
-              // --- PENGUMUMAN LIST ---
               <div className="card border-0 shadow rounded-4">
                 {(loadingAgenda || loadingPengumuman) ? (
                   <div className="text-center p-4"><p className="text-muted">Memuat pengumuman...</p></div>
@@ -457,8 +480,8 @@ export default function Agenda() {
                     {announcementData.map((a) => (
                       <div
                         key={a.id}
-                        onClick={() => setSelectedAnnouncement(a)} // TRIGGER POPUP DISINI
-                        className="p-3 border-bottom hover-bg-light cursor-pointer" // Tambah cursor-pointer (bisa add di css)
+                        onClick={() => setSelectedAnnouncement(a)} 
+                        className="p-3 border-bottom hover-bg-light cursor-pointer" 
                         style={{ cursor: 'pointer', transition: 'background 0.2s' }}
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f8f9fa')}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -469,7 +492,7 @@ export default function Agenda() {
                               <h6 className="mb-0 fw-semibold">{a.title}</h6>
                               {a.content && (
                                 <small className="text-muted d-block mt-1">
-                                  {a.content.replace(/<[^>]*>/g, '').substring(0, 100)}... {/* Strip HTML tags simple */}
+                                  {a.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
                                 </small>
                               )}
                             </div>

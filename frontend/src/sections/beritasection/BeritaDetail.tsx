@@ -2,11 +2,17 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./css/beritadetail.css";
 import api from "../../services/api";
-import { ArrowLeft, Calendar, Eye, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, Eye, Share2, Triangle } from "lucide-react";
 
 interface AdditionalImage {
   url: string;
   caption: string;
+}
+
+interface Tag {
+  id_tags: string;
+  nama_tag: string;
+  slug: string;
 }
 
 const parseAdditionalImages = (imagesData: any): AdditionalImage[] => {
@@ -134,6 +140,7 @@ interface BeritaTerkait {
   intro: string;
   feat_image: string;
   created_at: string;
+  hit?: string;
 }
 
 // Komponen BeritaTerkaitSisipan Sederhana
@@ -168,6 +175,8 @@ const BeritaDetail: React.FC = () => {
   const [beritaTerkaitSisipan1, setBeritaTerkaitSisipan1] = useState<BeritaTerkait | null>(null);
   const [beritaTerkaitSisipan2, setBeritaTerkaitSisipan2] = useState<BeritaTerkait | null>(null);
   const [beritaTerkaitSidebar, setBeritaTerkaitSidebar] = useState<BeritaTerkait[]>([]);
+  const [beritaPopuler, setBeritaPopuler] = useState<BeritaTerkait[]>([]);
+  const [tagPopuler, setTagPopuler] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -301,6 +310,7 @@ const BeritaDetail: React.FC = () => {
         ]);
 
         const data = resDetail?.data?.data;
+        const allData = resAll?.data?.data;
 
         if (data) {
           setBerita(data);
@@ -308,7 +318,7 @@ const BeritaDetail: React.FC = () => {
           console.log("ID Berita Terkait 1:", data.id_berita_terkait);
           console.log("ID Berita Terkait 2:", data.id_berita_terkait2);
 
-          const allBerita = resAll?.data?.data?.berita || [];
+          const allBerita = allData?.berita || [];
           
           // 1. Ambil berita terkait sisipan (manual berdasarkan id)
           if (data.id_berita_terkait) {
@@ -340,9 +350,22 @@ const BeritaDetail: React.FC = () => {
 
           setBeritaTerkaitSidebar(terkaitSidebar);
 
+          // 3. Setup Berita Populer
+          const populer = [...allBerita]
+            .sort((a: BeritaTerkait, b: BeritaTerkait) => Number(b.hit || 0) - Number(a.hit || 0))
+            .slice(0, 5);
+          setBeritaPopuler(populer);
+
+          // 4. Setup Tag Populer
+          if (allData?.tag) {
+            setTagPopuler(allData.tag);
+          }
+
           console.log("Berita Terkait Sisipan 1:", beritaTerkaitSisipan1);
           console.log("Berita Terkait Sisipan 2:", beritaTerkaitSisipan2);
           console.log("Berita Terkait Sidebar:", terkaitSidebar);
+          console.log("Berita Populer:", populer);
+          console.log("Tag Populer:", allData?.tag);
         } else {
           setError("Berita tidak ditemukan");
         }
@@ -377,6 +400,10 @@ const BeritaDetail: React.FC = () => {
   const handleBeritaTerkaitClick = (slug: string) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     navigate(`/berita/${slug}`);
+  };
+
+  const handleTagClick = (tag: Tag) => {
+    navigate(`/berita?search=${encodeURIComponent(tag.nama_tag)}`);
   };
 
   if (loading) {
@@ -521,47 +548,73 @@ const BeritaDetail: React.FC = () => {
 
         <div className="col-lg-4">
           <div className="sidebar-sticky">
-            {/* Bagian Berita Terkait untuk Sidebar */}
-            <h5 className="sidebar-title">Berita Terkait Lainnya</h5>
-
-            {beritaTerkaitSidebar.length > 0 ? (
-              <div className="berita-terkait-list">
-                {beritaTerkaitSidebar.map((item) => (
-                  <div
-                    key={item.id_berita}
-                    className="berita-terkait-item"
-                    onClick={() => handleBeritaTerkaitClick(item.slug)}
-                  >
-                    {item.feat_image ? (
-                      <img
-                        src={getImageUrl(item.feat_image) || ""}
-                        alt={item.judul}
-                        className="terkait-image"
-                        onError={(e) => {
-                          console.error(
-                            "Terkait image failed to load:",
-                            item.feat_image
-                          );
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div className="terkait-image-placeholder">
-                        <span>No Image</span>
-                      </div>
-                    )}
-                    <div className="terkait-content">
-                      <h6 className="terkait-title">{item.judul}</h6>
-                      <p className="terkait-date">
-                        {formatDateShort(item.created_at)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+            {/* Berita Populer */}
+            <div className="mb-4">
+              <h5 className="sidebar-title">
+                <Triangle className="icon-triangle" size={16} /> Berita Populer
+              </h5>
+              <div className="berita-populer-card">
+                <ul className="list-unstyled berita-populer-list">
+                  {beritaPopuler.length > 0 ? (
+                    beritaPopuler.map((item, index) => (
+                      <li key={item.id_berita} className="berita-populer-item">
+                        <div
+                          onClick={() => handleBeritaTerkaitClick(item.slug)}
+                          className="berita-populer-link text-decoration-none"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <span className="berita-number">{index + 1}#</span>
+                          <div className="berita-content">
+                            <span className="berita-title text-break">
+                              {item.judul}
+                            </span>
+                            <span className="berita-date">
+                              dibaca {item.hit || 0} kali
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-muted">Tidak ada data</li>
+                  )}
+                </ul>
               </div>
-            ) : (
-              <p className="text-muted">Tidak ada berita terkait lainnya</p>
-            )}
+            </div>
+
+            {/* Tag Paling Dicari */}
+            <div className="mb-4">
+              <h5 className="sidebar-title">
+                <Triangle className="icon-triangle" size={16} /> Tag Paling Dicari
+              </h5>
+              <div className="tag-populer-card">
+                <ul className="list-unstyled tag-populer-list">
+                  {tagPopuler.length > 0 ? (
+                    tagPopuler.map((tag, index) => (
+                      <li key={tag.id_tags} className="tag-populer-item">
+                        <button
+                          onClick={() => handleTagClick(tag)}
+                          className="tag-populer-link"
+                          style={{
+                            background: "none",
+                            border: "none",
+                            width: "100%",
+                            textAlign: "left",
+                            cursor: "pointer",
+                            padding: "0.5rem",
+                          }}
+                        >
+                          <span className="tag-number">#{index + 1}</span>
+                          <span className="tag-name">{tag.nama_tag}</span>
+                        </button>
+                      </li>
+                    ))
+                  ) : (
+                    <p className="text-muted small">Tidak ada tag</p>
+                  )}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>

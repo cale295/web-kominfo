@@ -35,6 +35,7 @@ import AjukanPermohonan from "../sections/ppidsection/ajukanpermohonan/AjukanPer
 import CheckStatus from "../sections/ppidsection/lacakpermohonan/LacakPermohonan";
 import PendidikanPelatihan from "../sections/informasipubliksection/pendidikanpelatihan/PendidikanPelatihan";
 import KerjasamaDaerah from "../sections/informasipubliksection/kerjasamadaerah/KerjasamaDaerah";
+import DokumenPublik from "../sections/informasipubliksection/informasipublik/DokumenPublik";
 
 const HomePage: React.FC = () => {
   return (
@@ -109,6 +110,14 @@ const CekStatusPage: React.FC = () => {
   )
 }
 
+const DokumenPublikPage: React.FC = () => {
+  return (
+    <div style={{ backgroundColor: "#f8f9fa", minHeight: "80vh" }}>
+      <DokumenPublik />
+    </div>
+  )
+}
+
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
@@ -133,6 +142,9 @@ const AppRouter: React.FC = () => {
         <Route path="/kerjasama_daerah" element={<KerjasamaDaerah />} />
         <Route path="/permohonan_informasi" element={<PermohonanInformasi />} />
         <Route path="/ajukan_permohonan" element={<AjukanPermohonan />} />
+         <Route path="/informasi-publik" element={<DokumenPublikPage />} />
+        <Route path="/informasi-publik/:slug" element={<DokumenPublikPage />} />
+        
         
         {/* 3. TAMBAHKAN ROUTE DI SINI */}
         <Route path="/cek_status_permohonan" element={<CekStatusPage />} />
