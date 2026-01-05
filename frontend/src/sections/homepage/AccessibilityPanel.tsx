@@ -67,9 +67,11 @@ const AccessibilityPanel: React.FC = () => {
         onClick: decreaseFontSize,
     },
     {
-      icon: <Palette size={18} />,
-      label: language === 'id' ? 'Skala Abu-Abu' : 'Grayscale',
-    },
+  icon: <Palette size={18} />,
+  label: language === 'id' ? 'Skala Abu-Abu' : 'Grayscale',
+  onClick: () => setColorScheme('grayscale'),
+},
+
     {
       icon: <Contrast size={18} />,
       label: language === 'id' ? 'Kontras Tinggi' : 'High Contrast',

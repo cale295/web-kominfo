@@ -98,3 +98,11 @@
   background: #2563eb;
   color: white;
 }
+
+.program-table td:nth-child(2) {
+  text-align: center;
+}
+
+.program-table td:nth-child(3) {
+  text-align: center;
+}

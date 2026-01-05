@@ -67,6 +67,29 @@ export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({ child
     };
   }, [textToSpeechEnabled, language]);
 
+  useEffect(() => {
+  const root = document.documentElement;
+
+  switch (colorScheme) {
+    case 'grayscale':
+      root.style.filter = 'grayscale(100%)';
+      break;
+
+    case 'high-contrast':
+      root.style.filter = 'contrast(150%)';
+      break;
+
+    case 'dark':
+      root.style.filter = 'invert(1) hue-rotate(180deg)';
+      break;
+
+    default:
+      root.style.filter = 'none';
+      break;
+  }
+}, [colorScheme]);
+
+
   return (
     <AccessibilityContext.Provider
       value={{

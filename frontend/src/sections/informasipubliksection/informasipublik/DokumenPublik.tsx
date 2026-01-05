@@ -9,9 +9,6 @@ import {
 import "./dokumenpublik.css";
 import api from "../../../services/api";
 
-/* =======================
-   INTERFACES (SESUI API)
-======================= */
 interface Category {
   id_kategori: string;
   nama_kategori: string;

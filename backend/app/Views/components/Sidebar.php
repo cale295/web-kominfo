@@ -29,10 +29,13 @@ if ($parentInfoPublik) {
                       : ['superadmin', 'admin']; // Default role jika kosong
 
         $menuItem = [
-            'title' => $child['menu_name'],
-            'url'   => $child['menu_url'] ?: '#',
-            'roles' => $childRoles
-        ];
+    'title' => $child['menu_name'],
+    'url'   => $child['menu_url'] 
+                ? site_url($child['menu_url']) 
+                : '#',
+    'roles' => $childRoles
+];
+
 
         $grandChildren = $menuModel->where('parent_id', $child['id_menu'])
                                    ->where('status', 'active')
@@ -47,10 +50,11 @@ if ($parentInfoPublik) {
                            : ['superadmin', 'admin'];
 
                 $grandChildItems[] = [
-                    'title' => $gc['menu_name'],
-                    'url'   => $gc['menu_url'],
-                    'roles' => $gcRoles
-                ];
+    'title' => $gc['menu_name'],
+    'url'   => site_url($gc['menu_url']),
+    'roles' => $gcRoles
+];
+
             }
    
             $menuItem['submenu'] = $grandChildItems;

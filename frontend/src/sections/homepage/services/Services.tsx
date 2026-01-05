@@ -34,10 +34,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
       <img
         src={`${BASE_URL}/${icon_image}`}
         alt={title}
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).src =
-            "https://via.placeholder.com/150";
-        }}
+        
       />
       <p className="title">{title}</p>
     </a>

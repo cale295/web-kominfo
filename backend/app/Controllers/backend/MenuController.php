@@ -149,7 +149,7 @@ class MenuController extends BaseController
             }
 
             // 3. Override/Paksa URL menjadi format dinamis agar connect ke DocumentController
-            $menuUrl = 'informasi-publik/' . $slug;
+            $menuUrl = '/informasi-publik/' . $slug;
         }
         // ----------------------------------------
 
