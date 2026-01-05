@@ -564,8 +564,8 @@ document.addEventListener('DOMContentLoaded', function() {
         renderNewPreviews();
     }
 
-    // ============================================================
-    // 4. DROPDOWN KATEGORI & TAGS (Logic tetap sama)
+// ============================================================
+    // 4. DROPDOWN KATEGORI & TAGS (MODIFIED)
     // ============================================================
     function setupDropdown(type) {
         const toggleBtn = document.getElementById(type + '-toggle');
@@ -578,6 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const badgeContainer = document.getElementById('selected-' + type + '-badges');
         const noResults = document.getElementById(type + '-no-results');
 
+        // Toggle dropdown
         toggleBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const isShown = dropdownMenu.classList.contains('show');
@@ -585,77 +586,109 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isShown) setTimeout(() => searchInput.focus(), 100);
         });
 
+        // Close when clicking outside
         document.addEventListener('click', (e) => {
             if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
                 dropdownMenu.classList.remove('show');
             }
         });
 
+        // Search filtering
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             let hasVisible = false;
             items.forEach(item => {
                 const text = item.getAttribute('data-name');
-                if (text.includes(term)) { item.style.display = 'flex'; hasVisible = true; } 
-                else { item.style.display = 'none'; }
+                if (text.includes(term)) {
+                    item.style.display = 'flex';
+                    hasVisible = true;
+                } else {
+                    item.style.display = 'none';
+                }
             });
             noResults.style.display = hasVisible ? 'none' : 'block';
         });
 
-        function updateSelection() {
-            const selectedIds = [];
-            const selectedNames = [];
-            checkboxes.forEach(cb => {
-                if (cb.checked) {
-                    selectedIds.push(cb.value);
-                    selectedNames.push(cb.nextElementSibling.innerText.trim());
-                    cb.closest('.' + type + '-item').style.backgroundColor = '#eff6ff';
-                } else {
-                    cb.closest('.' + type + '-item').style.backgroundColor = '';
+        // ------------------------------------------------------------
+        // --- BARU: LOGIKA ENTER UNTUK SELECT OTOMATIS ---
+        // ------------------------------------------------------------
+        searchInput.addEventListener('keydown', (e) => {
+            // Cek jika tombol yang ditekan adalah ENTER (key code 13)
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Mencegah form tersubmit secara tidak sengaja
+
+                // Cari item pertama yang terlihat (visible) berdasarkan hasil search
+                const firstVisibleItem = items.find(item => item.style.display !== 'none');
+
+                if (firstVisibleItem) {
+                    const checkbox = firstVisibleItem.querySelector('input[type="checkbox"]');
+                    
+                    // Trigger klik pada checkbox tersebut
+                    // Ini otomatis akan menjalankan logika update badges di bawah
+                    if (checkbox) {
+                        // Opsional: Cek jika belum terpilih, baru klik. 
+                        // Jika ingin bisa toggle (hapus/tambah) pakai enter, hapus "if (!checkbox.checked)"
+                        if (!checkbox.checked) { 
+                             checkbox.click();
+                        }
+                        
+                        // Opsional: Kosongkan search agar bisa cari tag lain
+                        searchInput.value = '';
+                        searchInput.dispatchEvent(new Event('input')); // Reset filter list
+                    }
                 }
-            });
-            hiddenInput.value = selectedIds.join(',');
+            }
+        });
+        // ------------------------------------------------------------
+
+        // Update logic (Checkboxes change)
+        checkboxes.forEach(chk => {
+            chk.addEventListener('change', updateBadges);
+        });
+
+        function updateBadges() {
+            const selected = Array.from(checkboxes).filter(c => c.checked);
+            const ids = selected.map(c => c.value);
+            hiddenInput.value = ids.join(',');
+
             badgeContainer.innerHTML = '';
-            selectedNames.forEach((name, idx) => {
-                const badge = document.createElement('div');
+            selected.forEach(c => {
+                const label = c.nextElementSibling.innerText;
+                const badge = document.createElement('span');
                 badge.className = 'selected-badge';
-                badge.innerHTML = `<span>${name}</span><i class="bi bi-x ms-2 remove-badge" data-id="${selectedIds[idx]}"></i>`;
+                badge.innerHTML = `${label} <i class="bi bi-x" data-id="${c.value}"></i>`;
                 badgeContainer.appendChild(badge);
-            });
-            
-            // Re-bind remove events
-            badgeContainer.querySelectorAll('.remove-badge').forEach(icon => {
-                icon.addEventListener('click', function() {
-                    const idToRemove = this.getAttribute('data-id');
-                    const cbToUncheck = document.getElementById((type === 'kategori' ? 'kat-' : 'tag-') + idToRemove);
-                    if(cbToUncheck) { cbToUncheck.checked = false; updateSelection(); }
+                
+                badge.querySelector('i').addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    const targetChk = document.getElementById(type + '-' + id); // pastikan ID checkbox sesuai format html (kat-ID atau tag-ID)
+                    if(targetChk) {
+                        targetChk.checked = false;
+                        updateBadges(); // Panggil fungsi ini lagi secara rekursif
+                    }
                 });
             });
 
-            if (selectedNames.length > 0) {
-                placeholder.textContent = `${selectedNames.length} ${type === 'kategori' ? 'Kategori' : 'Tag'} Dipilih`;
-                placeholder.classList.add('text-primary', 'fw-bold');
+            // Update Text Toggle Button
+            if (selected.length > 0) {
+                toggleBtn.classList.add('text-primary');
+                // Optional: Tampilkan jumlah
+                // placeholder.innerText = selected.length + ' dipilih';
             } else {
-                placeholder.textContent = type === 'kategori' ? 'Pilih minimal 1 kategori' : 'Pilih tags (opsional)';
-                placeholder.classList.remove('text-primary', 'fw-bold');
+                toggleBtn.classList.remove('text-primary');
+                // Reset placeholder text based on type if needed
             }
         }
 
-        items.forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (e.target !== this.querySelector('input')) {
-                    const cb = this.querySelector('input');
-                    cb.checked = !cb.checked;
-                }
-                updateSelection();
-            });
-        });
-        
-        updateSelection(); // Init on load
+        // Init badges on load (untuk data old input)
+        updateBadges();
     }
 
+    // Panggil fungsi setup
     setupDropdown('kategori');
     setupDropdown('tags');
-});
+
+}); // End DOMContentLoaded
+</script>
 </script>
 <?= $this->endSection() ?>
