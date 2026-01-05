@@ -1,4 +1,5 @@
 <?= $this->extend('layouts/main') ?>
+
 <?= $this->section('styles') ?>
 <style>
     :root {
@@ -206,6 +207,8 @@
         gap: 6px;
         cursor: pointer;
         transition: opacity 0.3s;
+        justify-content: center; /* Center alignment */
+        width: 100%;
     }
     
     .status-btn .switch {
@@ -319,6 +322,8 @@
 
 <?= $this->section('content') ?>
 
+<input type="hidden" class="txt_csrfname" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+
 <div class="gov-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
@@ -406,7 +411,6 @@
                             <tr class="data-row">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
-                                <!-- Cover Image -->
                                 <td class="text-center">
                                     <?php if (!empty($row['feat_image'])): ?>
                                         <img src="<?= base_url($row['feat_image']) ?>" alt="Cover" class="img-thumbnail">
@@ -415,7 +419,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Additional Images -->
                                 <td class="text-center">
                                     <?php
                                     $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
@@ -441,7 +444,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Title -->
                                 <td style="min-width: 180px;">
                                     <strong class="searchable"><?= esc($row['judul']) ?></strong>
                                     <?php if (!empty($row['hit'])): ?>
@@ -451,17 +453,14 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Topic -->
                                 <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
 
-                                <!-- Content Preview -->
                                 <td>
                                     <div class="content-preview" title="<?= strip_tags($row['content']) ?>">
                                         <?= strip_tags(mb_substr($row['content'], 0, 100)) ?>...
                                     </div>
                                 </td>
 
-                                <!-- Categories -->
                                 <td style="min-width: 120px;">
                                     <?php if (!empty($row['kategori'])): ?>
                                         <?php 
@@ -481,7 +480,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Publish Status -->
                                 <td class="text-center">
                                     <?php if ($row['status'] == '1'): ?>
                                         <span class="badge bg-success">Tayang</span>
@@ -492,7 +490,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- News Status -->
                                 <td class="text-center">
                                     <?php
                                     $statusBerita = [
@@ -507,23 +504,20 @@
                                     <span class="badge <?= $class ?>"><?= $text ?></span>
                                 </td>
 
-                                <!-- Created Date -->
                                 <td class="text-center compact-date">
                                     <?= !empty($row['created_at']) ? date('d/m/y', strtotime($row['created_at'])) : '-' ?>
                                 </td>
                                 
-                                <!-- Status Toggle -->
                                 <td class="text-center">
-                                    <button type="button" class="status-btn" 
+                                    <button type="button" 
+                                            class="status-btn" 
                                             data-id="<?= $row['id_berita'] ?>" 
-                                            data-url="<?= site_url('berita/toggle-status') ?>"
-                                            <?= !$isLayakTayang ? 'disabled title="Status belum Layak Tayang"' : '' ?>>
-                                        <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
-                                        <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
+                                            data-url="<?= site_url('berita/toggle-status') ?>">
+                                        <div class="switch <?= $row['status'] == '1' ? 'active' : '' ?>"></div>
+                                        <span class="switch-label ms-1"><?= $row['status'] == '1' ? 'Aktif' : 'Non-Aktif' ?></span>
                                     </button>
                                 </td>
-                                
-                                <!-- Actions -->
+
                                 <td class="text-center" style="min-width: 110px;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
@@ -561,7 +555,6 @@
             </table>
         </div>
         
-        <!-- Pagination Controls -->
         <div class="pagination-container">
             <div class="pagination-info">
                 Menampilkan <span id="showingStart">0</span> - <span id="showingEnd">0</span> dari <span id="totalData">0</span> data
@@ -590,9 +583,11 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Elements
+    // Elements for Search & Pagination
     const searchInput = document.getElementById('searchInput');
     const limitSelect = document.getElementById('limitSelect');
     const tableBody = document.getElementById('tableBody');
@@ -618,185 +613,170 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalFilteredRows = 0;
     let totalPages = 1;
     
-    // Initialize
-    initTable();
+    // Initialize Table
+    if(rows.length > 0) {
+        initTable();
+    }
     
-    // Event Listeners
-    searchInput.addEventListener('input', function() {
-        currentSearch = this.value.toLowerCase();
-        currentPage = 1;
-        currentPageInput.value = 1;
-        filterAndPaginate();
-    });
-    
-    limitSelect.addEventListener('change', function() {
-        currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
-        currentPage = 1;
-        currentPageInput.value = 1;
-        filterAndPaginate();
-    });
-    
-    // Pagination button events
-    firstPageBtn.addEventListener('click', function() {
-        if (currentPage > 1) {
+    // Event Listeners for Search/Pagination
+    if(searchInput) {
+        searchInput.addEventListener('input', function() {
+            currentSearch = this.value.toLowerCase();
             currentPage = 1;
             currentPageInput.value = 1;
             filterAndPaginate();
-        }
-    });
+        });
+    }
     
-    prevPageBtn.addEventListener('click', function() {
-        if (currentPage > 1) {
-            currentPage--;
-            currentPageInput.value = currentPage;
+    if(limitSelect) {
+        limitSelect.addEventListener('change', function() {
+            currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
+            currentPage = 1;
+            currentPageInput.value = 1;
             filterAndPaginate();
-        }
-    });
+        });
+    }
     
-    nextPageBtn.addEventListener('click', function() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            currentPageInput.value = currentPage;
-            filterAndPaginate();
-        }
-    });
+    // Pagination button events
+    if(firstPageBtn) firstPageBtn.addEventListener('click', () => changePage(1));
+    if(prevPageBtn) prevPageBtn.addEventListener('click', () => changePage(currentPage - 1));
+    if(nextPageBtn) nextPageBtn.addEventListener('click', () => changePage(currentPage + 1));
+    if(lastPageBtn) lastPageBtn.addEventListener('click', () => changePage(totalPages));
     
-    lastPageBtn.addEventListener('click', function() {
-        if (currentPage < totalPages) {
-            currentPage = totalPages;
-            currentPageInput.value = currentPage;
-            filterAndPaginate();
-        }
-    });
-    
-    currentPageInput.addEventListener('change', function() {
-        let page = parseInt(this.value);
+    if(currentPageInput) {
+        currentPageInput.addEventListener('change', function() {
+            changePage(parseInt(this.value));
+        });
+    }
+
+    function changePage(page) {
         if (page < 1) page = 1;
         if (page > totalPages) page = totalPages;
-        
         currentPage = page;
-        this.value = page;
+        if(currentPageInput) currentPageInput.value = page;
         filterAndPaginate();
-    });
+    }
     
-    // Functions
     function initTable() {
-        // Set default limit
         limitSelect.value = '10';
         currentLimit = 10;
-        
-        // Show all rows initially
         rows.forEach((row, index) => {
             row.style.display = '';
             row.dataset.index = index;
         });
-        
         filterAndPaginate();
     }
     
     function filterAndPaginate() {
-        // Filter rows based on search
         const filteredRows = rows.filter(row => {
             if (currentSearch === '') return true;
-            
             const textContent = row.textContent.toLowerCase();
             return textContent.includes(currentSearch);
         });
         
         totalFilteredRows = filteredRows.length;
         
-        // Calculate pagination
         if (currentLimit === -1) {
             totalPages = 1;
             currentPage = 1;
         } else {
             totalPages = Math.ceil(totalFilteredRows / currentLimit);
-            if (currentPage > totalPages && totalPages > 0) {
+            if(totalPages === 0) totalPages = 1;
+            if (currentPage > totalPages) {
                 currentPage = totalPages;
-                currentPageInput.value = currentPage;
+                if(currentPageInput) currentPageInput.value = currentPage;
             }
         }
         
-        // Update UI
         updatePaginationInfo();
         updatePaginationButtons();
         
-        // Show/hide rows
-        rows.forEach(row => {
-            row.style.display = 'none';
-        });
+        // Hide all rows first
+        rows.forEach(row => row.style.display = 'none');
         
+        // Show relevant rows
         if (currentLimit === -1) {
-            // Show all filtered rows
             filteredRows.forEach((row, index) => {
                 row.style.display = '';
                 updateRowNumber(row, index + 1);
             });
         } else {
-            // Show only rows for current page
             const startIndex = (currentPage - 1) * currentLimit;
             const endIndex = startIndex + currentLimit;
-            
             filteredRows.slice(startIndex, endIndex).forEach((row, index) => {
                 row.style.display = '';
                 updateRowNumber(row, startIndex + index + 1);
             });
         }
-        
-        // Show no data message if needed
+
+        // Show/Hide No Data message
         const noDataRow = tableBody.querySelector('tr:not(.data-row)');
         if (noDataRow) {
-            noDataRow.style.display = totalFilteredRows === 0 ? '' : 'none';
+            // Jika ada data tapi hasil filter 0, tampilkan pesan no data (opsional)
+            // Di sini kita biarkan hidden jika aslinya ada data
         }
     }
     
     function updateRowNumber(row, number) {
         const rowNumberCell = row.querySelector('.row-number');
-        if (rowNumberCell) {
-            rowNumberCell.textContent = number;
-        }
+        if (rowNumberCell) rowNumberCell.textContent = number;
     }
     
     function updatePaginationInfo() {
         if (totalFilteredRows === 0) {
-            showingStartSpan.textContent = '0';
-            showingEndSpan.textContent = '0';
-            totalDataSpan.textContent = '0';
-            totalPagesSpan.textContent = '1';
+            if(showingStartSpan) showingStartSpan.textContent = '0';
+            if(showingEndSpan) showingEndSpan.textContent = '0';
+            if(totalDataSpan) totalDataSpan.textContent = '0';
+            if(totalPagesSpan) totalPagesSpan.textContent = '1';
             return;
         }
         
         if (currentLimit === -1) {
-            showingStartSpan.textContent = '1';
-            showingEndSpan.textContent = totalFilteredRows;
+            if(showingStartSpan) showingStartSpan.textContent = '1';
+            if(showingEndSpan) showingEndSpan.textContent = totalFilteredRows;
         } else {
             const start = (currentPage - 1) * currentLimit + 1;
             const end = Math.min(currentPage * currentLimit, totalFilteredRows);
-            showingStartSpan.textContent = start;
-            showingEndSpan.textContent = end;
+            if(showingStartSpan) showingStartSpan.textContent = start;
+            if(showingEndSpan) showingEndSpan.textContent = end;
         }
         
-        totalDataSpan.textContent = totalFilteredRows;
-        totalPagesSpan.textContent = totalPages;
+        if(totalDataSpan) totalDataSpan.textContent = totalFilteredRows;
+        if(totalPagesSpan) totalPagesSpan.textContent = totalPages;
     }
     
     function updatePaginationButtons() {
+        if(!firstPageBtn) return;
         firstPageBtn.disabled = currentPage <= 1;
         prevPageBtn.disabled = currentPage <= 1;
         nextPageBtn.disabled = currentPage >= totalPages;
         lastPageBtn.disabled = currentPage >= totalPages;
     }
-    
-    // --- Script Toggle Status ---
-    $(document).on('click', '.status-btn:not(:disabled)', function () {
+});
+
+// FIX 3: SCRIPT TOGGLE (Diperbaiki untuk CI4 CSRF dan jQuery)
+$(document).ready(function() {
+    // Gunakan event delegation 'body' agar aman saat pagination berubah
+    $('body').on('click', '.status-btn:not(:disabled)', function (e) {
+        e.preventDefault();
+
         let btn = $(this);
         let id = btn.data('id');
         let url = btn.data('url'); 
         let switchEl = btn.find('.switch');
         let labelEl = btn.find('.switch-label');
-        let csrfName = '<?= csrf_token() ?>';
-        let csrfHash = $('input[name="'+csrfName+'"]').val(); 
+        
+        // Ambil token CSRF dari input global yang kita buat di atas
+        let csrfInput = $('.txt_csrfname');
+        let csrfName = csrfInput.attr('name'); // biasanya 'csrf_test_name'
+        let csrfHash = csrfInput.val();
 
+        if (!url) {
+            alert("URL tidak valid");
+            return;
+        }
+
+        // Disable tombol sementara loading
         btn.prop('disabled', true);
         btn.css('opacity', '0.5');
 
@@ -809,9 +789,17 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             dataType: "json",
             success: function(res) {
+                // Update CSRF token untuk request berikutnya (SANGAT PENTING DI CI4)
+                if(res.token) {
+                    $('.txt_csrfname').val(res.token);
+                    $('input[name="'+csrfName+'"]').val(res.token); 
+                }
+
                 btn.prop('disabled', false);
                 btn.css('opacity', '1');
+
                 if (res.status === 'success') {
+                    // Update tampilan Switch secara real-time
                     if (res.newStatus == 1) {
                         switchEl.addClass('active'); 
                         labelEl.text('Aktif');
@@ -819,23 +807,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         switchEl.removeClass('active'); 
                         labelEl.text('Non-Aktif');
                     }
-                    $('input[name="'+csrfName+'"]').val(res.token);
                     
-                    // Refresh page setelah 1 detik
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
+                    // Opsional: Reload halaman jika ingin refresh data lain
+                    // location.reload(); 
                 } else {
-                    alert('Gagal: ' + res.message);
-                    if(res.token) {
-                        $('input[name="'+csrfName+'"]').val(res.token);
-                    }
+                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
                 btn.prop('disabled', false); 
                 btn.css('opacity', '1');
-                alert('Terjadi kesalahan koneksi ke server.');
+                console.error("Error Details:", xhr.responseText);
+                alert('Terjadi kesalahan koneksi. Cek console browser.');
             }
         });
     });
