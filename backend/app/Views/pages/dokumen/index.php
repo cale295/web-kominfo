@@ -373,10 +373,6 @@
 <script>
 function toggleFolder(id) {
     const el = document.getElementById(id);
-    // Tutup yang lain jika ingin (optional, currently independent toggles)
-    // document.querySelectorAll('.folder-card').forEach(c => {
-    //     if(c.id !== id) c.classList.remove('active');
-    // });
     
     el.classList.toggle('active');
 }
