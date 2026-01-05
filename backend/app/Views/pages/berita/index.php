@@ -592,11 +592,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // 1. BAGIAN PAGINATION & SEARCH (KODE ASLI)
+    // ==========================================
+    
     // Elements
     const searchInput = document.getElementById('searchInput');
     const limitSelect = document.getElementById('limitSelect');
     const tableBody = document.getElementById('tableBody');
-    const rows = Array.from(tableBody.querySelectorAll('tr.data-row'));
+    // Menggunakan Array.from agar aman jika element null
+    const rows = tableBody ? Array.from(tableBody.querySelectorAll('tr.data-row')) : [];
     
     // Pagination elements
     const showingStartSpan = document.getElementById('showingStart');
@@ -618,146 +623,118 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalFilteredRows = 0;
     let totalPages = 1;
     
-    // Initialize
-    initTable();
-    
-    // Event Listeners
-    searchInput.addEventListener('input', function() {
-        currentSearch = this.value.toLowerCase();
-        currentPage = 1;
-        currentPageInput.value = 1;
-        filterAndPaginate();
-    });
-    
-    limitSelect.addEventListener('change', function() {
-        currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
-        currentPage = 1;
-        currentPageInput.value = 1;
-        filterAndPaginate();
-    });
-    
-    // Pagination button events
-    firstPageBtn.addEventListener('click', function() {
-        if (currentPage > 1) {
+    // Hanya jalankan init jika tabel ada datanya
+    if(rows.length > 0) {
+        initTable();
+    }
+
+    // Event Listeners untuk Search & Limit
+    if(searchInput) {
+        searchInput.addEventListener('input', function() {
+            currentSearch = this.value.toLowerCase();
             currentPage = 1;
-            currentPageInput.value = 1;
+            if(currentPageInput) currentPageInput.value = 1;
             filterAndPaginate();
-        }
-    });
+        });
+    }
     
-    prevPageBtn.addEventListener('click', function() {
-        if (currentPage > 1) {
-            currentPage--;
-            currentPageInput.value = currentPage;
+    if(limitSelect) {
+        limitSelect.addEventListener('change', function() {
+            currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
+            currentPage = 1;
+            if(currentPageInput) currentPageInput.value = 1;
             filterAndPaginate();
-        }
-    });
+        });
+    }
     
-    nextPageBtn.addEventListener('click', function() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            currentPageInput.value = currentPage;
-            filterAndPaginate();
-        }
-    });
+    // Helper function untuk event listener tombol pagination
+    function addClick(elem, fn) {
+        if(elem) elem.addEventListener('click', fn);
+    }
+
+    addClick(firstPageBtn, () => changePage(1));
+    addClick(prevPageBtn, () => changePage(currentPage - 1));
+    addClick(nextPageBtn, () => changePage(currentPage + 1));
+    addClick(lastPageBtn, () => changePage(totalPages));
     
-    lastPageBtn.addEventListener('click', function() {
-        if (currentPage < totalPages) {
-            currentPage = totalPages;
-            currentPageInput.value = currentPage;
-            filterAndPaginate();
-        }
-    });
-    
-    currentPageInput.addEventListener('change', function() {
-        let page = parseInt(this.value);
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        
-        currentPage = page;
-        this.value = page;
+    if(currentPageInput) {
+        currentPageInput.addEventListener('change', function() {
+            let page = parseInt(this.value);
+            changePage(page);
+        });
+    }
+
+    function changePage(newPage) {
+        if (newPage < 1) newPage = 1;
+        if (newPage > totalPages) newPage = totalPages;
+        currentPage = newPage;
+        if(currentPageInput) currentPageInput.value = newPage;
         filterAndPaginate();
-    });
+    }
     
-    // Functions
+    // Functions Logika Pagination
     function initTable() {
-        // Set default limit
         limitSelect.value = '10';
         currentLimit = 10;
-        
-        // Show all rows initially
         rows.forEach((row, index) => {
             row.style.display = '';
             row.dataset.index = index;
         });
-        
         filterAndPaginate();
     }
     
     function filterAndPaginate() {
-        // Filter rows based on search
         const filteredRows = rows.filter(row => {
             if (currentSearch === '') return true;
-            
             const textContent = row.textContent.toLowerCase();
             return textContent.includes(currentSearch);
         });
         
         totalFilteredRows = filteredRows.length;
         
-        // Calculate pagination
         if (currentLimit === -1) {
             totalPages = 1;
             currentPage = 1;
         } else {
             totalPages = Math.ceil(totalFilteredRows / currentLimit);
-            if (currentPage > totalPages && totalPages > 0) {
+            if (totalPages === 0) totalPages = 1;
+            if (currentPage > totalPages) {
                 currentPage = totalPages;
-                currentPageInput.value = currentPage;
+                if(currentPageInput) currentPageInput.value = currentPage;
             }
         }
         
-        // Update UI
         updatePaginationInfo();
         updatePaginationButtons();
         
-        // Show/hide rows
-        rows.forEach(row => {
-            row.style.display = 'none';
-        });
+        rows.forEach(row => row.style.display = 'none');
         
+        let displayRows = [];
         if (currentLimit === -1) {
-            // Show all filtered rows
-            filteredRows.forEach((row, index) => {
-                row.style.display = '';
-                updateRowNumber(row, index + 1);
-            });
+            displayRows = filteredRows;
         } else {
-            // Show only rows for current page
             const startIndex = (currentPage - 1) * currentLimit;
             const endIndex = startIndex + currentLimit;
-            
-            filteredRows.slice(startIndex, endIndex).forEach((row, index) => {
-                row.style.display = '';
-                updateRowNumber(row, startIndex + index + 1);
-            });
+            displayRows = filteredRows.slice(startIndex, endIndex);
         }
+
+        displayRows.forEach((row, index) => {
+            row.style.display = '';
+            // Update nomor urut agar dinamis sesuai filter
+            const rowNum = (currentLimit === -1) ? (index + 1) : ((currentPage - 1) * currentLimit + index + 1);
+            const rowNumberCell = row.querySelector('.row-number');
+            if (rowNumberCell) rowNumberCell.textContent = rowNum;
+        });
         
-        // Show no data message if needed
         const noDataRow = tableBody.querySelector('tr:not(.data-row)');
         if (noDataRow) {
             noDataRow.style.display = totalFilteredRows === 0 ? '' : 'none';
         }
     }
     
-    function updateRowNumber(row, number) {
-        const rowNumberCell = row.querySelector('.row-number');
-        if (rowNumberCell) {
-            rowNumberCell.textContent = number;
-        }
-    }
-    
     function updatePaginationInfo() {
+        if(!showingStartSpan) return; // Guard clause
+
         if (totalFilteredRows === 0) {
             showingStartSpan.textContent = '0';
             showingEndSpan.textContent = '0';
@@ -766,77 +743,124 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        let start, end;
         if (currentLimit === -1) {
-            showingStartSpan.textContent = '1';
-            showingEndSpan.textContent = totalFilteredRows;
+            start = 1;
+            end = totalFilteredRows;
         } else {
-            const start = (currentPage - 1) * currentLimit + 1;
-            const end = Math.min(currentPage * currentLimit, totalFilteredRows);
-            showingStartSpan.textContent = start;
-            showingEndSpan.textContent = end;
+            start = (currentPage - 1) * currentLimit + 1;
+            end = Math.min(currentPage * currentLimit, totalFilteredRows);
         }
         
+        showingStartSpan.textContent = start;
+        showingEndSpan.textContent = end;
         totalDataSpan.textContent = totalFilteredRows;
         totalPagesSpan.textContent = totalPages;
     }
     
     function updatePaginationButtons() {
+        if(!firstPageBtn) return;
         firstPageBtn.disabled = currentPage <= 1;
         prevPageBtn.disabled = currentPage <= 1;
         nextPageBtn.disabled = currentPage >= totalPages;
         lastPageBtn.disabled = currentPage >= totalPages;
     }
+
+
+    // ==========================================
+    // 2. BAGIAN TOGGLE STATUS (FIX - FETCH API)
+    // ==========================================
     
-    // --- Script Toggle Status ---
-    $(document).on('click', '.status-btn:not(:disabled)', function () {
-        let btn = $(this);
-        let id = btn.data('id');
-        let url = btn.data('url'); 
-        let switchEl = btn.find('.switch');
-        let labelEl = btn.find('.switch-label');
-        let csrfName = '<?= csrf_token() ?>';
-        let csrfHash = $('input[name="'+csrfName+'"]').val(); 
+    // Menggunakan Event Delegation pada document body
+    document.body.addEventListener('click', function(e) {
+        // Cari tombol terdekat dari elemen yang diklik
+        const btn = e.target.closest('.status-btn');
+        
+        // Jika yang diklik bukan tombol status atau tombol sedang disabled, stop.
+        if (!btn || btn.disabled) return;
 
-        btn.prop('disabled', true);
-        btn.css('opacity', '0.5');
+        // Cegah aksi default
+        e.preventDefault();
 
-        $.ajax({
-            url: url, 
-            type: "POST",
-            data: { 
-                id: id, 
-                [csrfName]: csrfHash 
-            },
-            dataType: "json",
-            success: function(res) {
-                btn.prop('disabled', false);
-                btn.css('opacity', '1');
-                if (res.status === 'success') {
-                    if (res.newStatus == 1) {
-                        switchEl.addClass('active'); 
-                        labelEl.text('Aktif');
-                    } else {
-                        switchEl.removeClass('active'); 
-                        labelEl.text('Non-Aktif');
-                    }
-                    $('input[name="'+csrfName+'"]').val(res.token);
-                    
-                    // Refresh page setelah 1 detik
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    alert('Gagal: ' + res.message);
-                    if(res.token) {
-                        $('input[name="'+csrfName+'"]').val(res.token);
-                    }
-                }
-            },
-            error: function() {
-                btn.prop('disabled', false); 
-                btn.css('opacity', '1');
-                alert('Terjadi kesalahan koneksi ke server.');
+        const id = btn.getAttribute('data-id');
+        const url = btn.getAttribute('data-url');
+        const switchEl = btn.querySelector('.switch');
+        const labelEl = btn.querySelector('.switch-label');
+        
+        // Ambil CSRF Token
+        const csrfName = '<?= csrf_token() ?>';
+        // Cari input CSRF yang ada di halaman (biasanya dari form delete yang sudah ada)
+        const csrfInput = document.querySelector('input[name="' + csrfName + '"]');
+        const csrfHash = csrfInput ? csrfInput.value : '';
+
+        if(!csrfHash) {
+            alert("Error: CSRF Token tidak ditemukan. Refresh halaman.");
+            return;
+        }
+
+        // UI Feedback: Loading state
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'wait';
+
+        // Siapkan Data
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append(csrfName, csrfHash);
+
+        // Kirim Request dengan Fetch
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest' // Header penting untuk CI4 detect AJAX
             }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(res => {
+            // Kembalikan UI state
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+
+            if (res.status === 'success') {
+                // Update Tampilan Toggle secara langsung
+                if (res.newStatus == 1) {
+                    switchEl.classList.add('active');
+                    labelEl.textContent = 'Aktif';
+                } else {
+                    switchEl.classList.remove('active');
+                    labelEl.textContent = 'Non-Aktif';
+                }
+
+                // Update CSRF Token untuk request selanjutnya (PENTING di CI4)
+                if (res.token) {
+                    document.querySelectorAll('input[name="' + csrfName + '"]').forEach(el => {
+                        el.value = res.token;
+                    });
+                }
+                
+                // Opsional: Reload halaman jika ingin me-refresh tabel sepenuhnya
+                // location.reload(); 
+            } else {
+                alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
+                // Update token jika ada error
+                if (res.token) {
+                    document.querySelectorAll('input[name="' + csrfName + '"]').forEach(el => {
+                        el.value = res.token;
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            alert('Terjadi kesalahan koneksi ke server.');
         });
     });
 });
