@@ -2,13 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   FolderOpen,
-  FileText,
-  Download,
-  Eye,
-  Calendar,
-  ArrowLeft,
   ChevronRight,
   Home,
+  ArrowLeft,
 } from "lucide-react";
 import "./dokumenpublik.css";
 import api from "../../../services/api";
@@ -47,10 +43,10 @@ const DokumenPublik: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [folders, setFolders] = useState<Folder[]>([]);
-  const [documents, setDocuments] = useState<Dokumen[]>([]);
-  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [openFolder, setOpenFolder] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
 
@@ -64,20 +60,8 @@ const DokumenPublik: React.FC = () => {
       year: "numeric",
     });
 
-  const getFileIcon = (fileName: string) => {
-    const ext = fileName.split(".").pop()?.toLowerCase();
-    switch (ext) {
-      case "pdf":
-        return "📄";
-      case "doc":
-      case "docx":
-        return "📝";
-      case "xls":
-      case "xlsx":
-        return "📊";
-      default:
-        return "📎";
-    }
+  const toggleAccordion = (folderName: string) => {
+    setOpenFolder((prev) => (prev === folderName ? null : folderName));
   };
 
   /* =======================
@@ -106,17 +90,6 @@ const DokumenPublik: React.FC = () => {
 
       setSelectedCategory(data.kategori);
       setFolders(data.folders || []);
-
-      // 🔥 FLATTEN dokumen dari folder
-      const allDocs: Dokumen[] = (data.folders || []).flatMap(
-        (folder: Folder) =>
-          folder.dokumen.map((doc) => ({
-            ...doc,
-            nama_folder: folder.nama_folder,
-          }))
-      );
-
-      setDocuments(allDocs);
     } catch (err) {
       console.error(err);
       setError("Gagal memuat data dokumen");
@@ -132,11 +105,10 @@ const DokumenPublik: React.FC = () => {
     window.open(`${ROOT}/uploads/dokumen/${doc.file_path}`, "_blank");
   };
 
-  const handleView = handleDownload;
-
   const handleBackToCategories = () => {
     navigate("/informasi-publik");
-    setSelectedFolder(null);
+    setOpenFolder(null);
+    setSearchTerm("");
   };
 
   /* =======================
@@ -153,33 +125,52 @@ const DokumenPublik: React.FC = () => {
       setLoading(false);
       setSelectedCategory(null);
       setFolders([]);
-      setDocuments([]);
     }
   }, [slug]);
 
   /* =======================
      FILTER DOKUMEN
   ======================= */
-  const filteredDocuments = selectedFolder
-    ? documents.filter((doc) => doc.nama_folder === selectedFolder.nama_folder)
-    : documents;
+  const filteredFolders = folders.filter((folder) => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const folderMatch = folder.nama_folder.toLowerCase().includes(searchLower);
+    const docMatch = folder.dokumen.some(doc => 
+      doc.nama_dokumen.toLowerCase().includes(searchLower)
+    );
+    
+    return folderMatch || docMatch;
+  });
+
+  const totalDokumen = folders.reduce((acc, folder) => acc + folder.dokumen.length, 0);
 
   /* =======================
      LOADING & ERROR
   ======================= */
   if (loading) {
     return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-primary" />
-        <p className="mt-3">Memuat dokumen publik…</p>
+      <div className="container-fluid px-3 py-3">
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status" />
+          <p className="mt-2">Memuat dokumen publik…</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container my-5">
-        <div className="alert alert-danger">{error}</div>
+      <div className="program-container">
+        <div className="alert alert-danger mb-3" role="alert">
+          {error}
+          <button 
+            className="btn btn-sm btn-outline-danger ms-3" 
+            onClick={() => slug && fetchCategoryData(slug)}
+          >
+            Coba Lagi
+          </button>
+        </div>
         <button className="btn btn-primary" onClick={handleBackToCategories}>
           <ArrowLeft size={16} className="me-2" /> Kembali
         </button>
@@ -216,70 +207,135 @@ const DokumenPublik: React.FC = () => {
   }
 
   /* =======================
-     DETAIL KATEGORI
+     DETAIL KATEGORI (TABLE STYLE)
   ======================= */
   return (
-    <div className="container my-5">
+    <div className="program-container">
       {/* Breadcrumb */}
-      <nav className="mb-4">
+      <nav className="mb-3">
         <button className="btn btn-link p-0" onClick={handleBackToCategories}>
           <Home size={16} className="me-1" /> Dokumen Publik
         </button>
         {selectedCategory && ` / ${selectedCategory.nama_kategori}`}
-        {selectedFolder && ` / ${selectedFolder.nama_folder}`}
       </nav>
 
-      <h3 className="mb-4">
-        {selectedFolder
-          ? selectedFolder.nama_folder
-          : selectedCategory?.nama_kategori}
-      </h3>
+      <h2 className="program-title">{selectedCategory?.nama_kategori}</h2>
 
-      {/* Folder */}
-      {!selectedFolder && folders.length > 0 && (
-        <div className="row g-3 mb-5">
-          {folders.map((folder) => (
-            <div key={folder.nama_folder} className="col-md-4">
-              <div
-                className="folder-card"
-                onClick={() => setSelectedFolder(folder)}
-              >
-                <FolderOpen size={32} />
-                <span className="ms-2">{folder.nama_folder}</span>
-              </div>
-            </div>
-          ))}
+      <div className="table-toolbar">
+        <div>
+          Show
+          <select disabled={folders.length === 0}>
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select>
+          entries
         </div>
-      )}
 
-      {/* Dokumen */}
-      {filteredDocuments.length > 0 ? (
-        filteredDocuments.map((doc) => (
-          <div key={doc.id_document} className="document-card">
-            <span>{getFileIcon(doc.nama_dokumen)}</span>
-            <div className="ms-3 flex-grow-1">
-              <h6>{doc.nama_dokumen}</h6>
-              <small>
-                <Calendar size={14} /> {formatDate(doc.created_at)}
-              </small>
-            </div>
-            <button
-              className="btn btn-sm btn-outline-primary me-2"
-              onClick={() => handleView(doc)}
-            >
-              <Eye size={16} />
-            </button>
-            <button
-              className="btn btn-sm btn-primary"
-              onClick={() => handleDownload(doc)}
-            >
-              <Download size={16} />
-            </button>
-          </div>
-        ))
-      ) : (
-        <div className="alert alert-info">Belum ada dokumen.</div>
-      )}
+        <div className="search-box">
+          Search: 
+          <input 
+            type="text" 
+            placeholder="Cari dokumen..." 
+            disabled={folders.length === 0}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="table-responsive">
+        <table className="program-table">
+          <thead>
+            <tr>
+              <th>Informasi</th>
+              <th>Tanggal Upload</th>
+              <th>File</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredFolders.length > 0 ? (
+              filteredFolders.map((folder) => {
+                const isOpen = openFolder === folder.nama_folder;
+                const totalItems = folder.dokumen.length;
+
+                return (
+                  <React.Fragment key={folder.nama_folder}>
+                    {/* === HEADER FOLDER === */}
+                    <tr
+                      className="category-row"
+                      onClick={() => toggleAccordion(folder.nama_folder)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <td>
+                        <span className="toggle-icon">{isOpen ? "▾" : "▸"}</span>
+                        📁 <strong>{folder.nama_folder}</strong>
+                      </td>
+                      <td className="text-center">{totalItems} dokumen</td>
+                      <td></td>
+                    </tr>
+
+                    {/* === DOKUMEN DALAM FOLDER === */}
+                    {isOpen &&
+                      folder.dokumen.map((doc) => (
+                        <tr key={doc.id_document} className="file-row">
+                          <td className="file-name">
+                            <span className="file-indent" />
+                            📄 {doc.nama_dokumen}
+                          </td>
+                          <td className="text-center">
+                            {formatDate(doc.created_at)}
+                          </td>
+                          <td className="text-center">
+                            <a
+                              href={`${ROOT}/uploads/dokumen/${doc.file_path}`}
+                              className="btn-unduh"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              download
+                            >
+                              Unduh
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                  </React.Fragment>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={3} className="text-center py-4">
+                  {searchTerm ? "Tidak ada dokumen yang sesuai dengan pencarian" : "Belum ada dokumen"}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="table-footer">
+        <div>
+          Showing {filteredFolders.length > 0 ? 1 : 0} to {filteredFolders.length} of {folders.length} folder ({totalDokumen} dokumen)
+        </div>
+
+        <ul className="pagination">
+          <li>
+            <button disabled={folders.length === 0}>Previous</button>
+          </li>
+          <li className={folders.length > 0 ? "active" : ""}>
+            <button disabled={folders.length === 0}>1</button>
+          </li>
+          <li>
+            <button disabled={folders.length === 0}>2</button>
+          </li>
+          <li>
+            <button disabled={folders.length === 0}>3</button>
+          </li>
+          <li>
+            <button disabled={folders.length === 0}>Next</button>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 };

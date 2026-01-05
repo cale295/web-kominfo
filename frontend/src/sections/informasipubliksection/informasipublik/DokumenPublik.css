@@ -1,375 +1,156 @@
-/* ========================================
-   DOKUMEN PUBLIK - MAIN CONTAINER
-   ======================================== */
-.dokumen-publik-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+/* dokumenpublik.css */
+
+.program-container {
+  padding: 30px 50px;
+  background: #fff;
 }
 
-/* ========================================
-   PAGE TITLE
-   ======================================== */
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a1a1a;
+.program-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* === TOOLBAR (Search & Show Entries) === */
+.table-toolbar {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #333;
 }
 
-/* ========================================
-   BREADCRUMB
-   ======================================== */
-.breadcrumb {
-  background: transparent;
-  padding: 0;
-  margin-bottom: 1.5rem;
+.table-toolbar select {
+  padding: 4px 8px;
+  margin: 0 5px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
-  content: ">";
-  color: #6c757d;
+.search-box input {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  outline: none;
 }
 
-.breadcrumb .btn-link {
-  color: #0d6efd;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
+/* === TABLE === */
+.program-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #b3c7ff;
 }
 
-.breadcrumb .btn-link:hover {
-  color: #0a58ca;
-  text-decoration: underline;
+.program-table th {
+  padding: 14px;
+  text-align: left;
+  font-weight: bold;
+  background: #f9fafb;
+  border-bottom: 2px solid #b3c7ff;
+  border-right: 1px dotted #cbd5e1;
+  color: #1e293b;
 }
 
-/* ========================================
-   BACK BUTTON
-   ======================================== */
-.back-button {
-  color: #6c757d;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  padding: 0;
-  font-size: 0.95rem;
-  transition: color 0.3s ease;
+.program-table td {
+  padding: 14px;
+  border-bottom: 1px dotted #cbd5e1;
+  border-right: 1px dotted #cbd5e1;
+  vertical-align: middle;
 }
 
-.back-button:hover {
-  color: #0d6efd;
-  text-decoration: none;
-}
-
-/* ========================================
-   CATEGORY CARDS
-   ======================================== */
-.category-card {
-  background: #ffffff;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
+/* KATEGORI (Induk) */
+.category-row {
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  background: #ffffff;
+  font-weight: 600;
+  color: #1e293b;
+  transition: background 0.2s;
+}
+
+.category-row:hover {
+  background: #f1f5f9;
+}
+
+/* FILE (Anak) */
+.file-row {
+  background: #fdfdfd;
+}
+
+.file-name-cell {
+  padding-left: 40px !important; /* Indentasi biar menjorok ke dalam */
+  color: #475569;
+}
+
+/* FOLDER BADGE (Supaya folder terlihat jelas) */
+.folder-badge {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  margin-right: 8px;
+  font-weight: 600;
+}
+
+/* TOMBOL AKSI */
+.btn-unduh {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.category-card:hover {
-  border-color: #0d6efd;
-  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.15);
-  transform: translateY(-5px);
-}
-
-.category-icon {
-  color: #0d6efd;
-  margin-bottom: 1rem;
-}
-
-.category-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 0.5rem;
-}
-
-.category-description {
-  font-size: 0.9rem;
-  color: #6c757d;
-  margin-bottom: 1rem;
-  line-height: 1.5;
-}
-
-.category-arrow {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #0d6efd;
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.category-card:hover .category-arrow {
-  opacity: 1;
-  transform: translateY(-50%) translateX(5px);
-}
-
-/* ========================================
-   SECTION TITLE
-   ======================================== */
-.section-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e9ecef;
-}
-
-/* ========================================
-   FOLDER CARDS
-   ======================================== */
-.folder-card {
-  background: #ffffff;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  padding: 1.25rem;
+  padding: 6px 12px;
+  background: #2563eb;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: .2s;
+}
+
+.btn-unduh:hover {
+  background: #1d4ed8;
+}
+
+.btn-unduh.view {
+  background: #10b981;
+  margin-right: 5px;
+}
+
+.btn-unduh.view:hover {
+  background: #059669;
+}
+
+/* PAGINATION */
+.table-footer {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  position: relative;
+  margin-top: 20px;
+  font-size: 14px;
 }
 
-.folder-card:hover {
-  border-color: #ffc107;
-  box-shadow: 0 6px 15px rgba(255, 193, 7, 0.2);
-  transform: translateY(-3px);
-}
-
-.folder-icon {
-  color: #ffc107;
-  flex-shrink: 0;
-}
-
-.folder-info {
-  flex: 1;
-}
-
-.folder-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 0.25rem;
-}
-
-.folder-count {
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-
-.folder-arrow {
-  color: #ffc107;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-}
-
-.folder-card:hover .folder-arrow {
-  transform: translateX(5px);
-}
-
-/* ========================================
-   DOCUMENTS LIST
-   ======================================== */
-.documents-list {
+.pagination {
+  list-style: none;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  gap: 5px;
+  padding: 0;
+  margin: 0;
 }
 
-.document-card {
-  background: #ffffff;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
-  padding: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: all 0.3s ease;
+.pagination li button {
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #64748b;
 }
 
-.document-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-color: #dee2e6;
-}
-
-.document-icon {
-  flex-shrink: 0;
-}
-
-.file-icon {
-  font-size: 2rem;
-}
-
-.document-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.document-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 0.5rem;
-  word-wrap: break-word;
-}
-
-.document-description {
-  font-size: 0.9rem;
-  color: #6c757d;
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
-
-.document-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-
-.meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.document-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-/* ========================================
-   BUTTONS
-   ======================================== */
-.btn-outline-primary {
-  border-color: #0d6efd;
-  color: #0d6efd;
-}
-
-.btn-outline-primary:hover {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-  color: #ffffff;
-}
-
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.btn-primary:hover {
-  background-color: #0a58ca;
-  border-color: #0a58ca;
-}
-
-/* ========================================
-   ALERTS
-   ======================================== */
-.alert {
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-}
-
-.alert-info {
-  background-color: #e7f3ff;
-  border-color: #b6d9f7;
-  color: #084298;
-}
-
-.alert-danger {
-  background-color: #f8d7da;
-  border-color: #f5c2c7;
-  color: #842029;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-@media (max-width: 768px) {
-  .page-title {
-    font-size: 1.5rem;
-  }
-
-  .category-card {
-    padding: 1.5rem;
-  }
-
-  .document-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .document-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .folder-card {
-    flex-wrap: wrap;
-  }
-
-  .category-arrow {
-    display: none;
-  }
-}
-
-@media (max-width: 576px) {
-  .dokumen-publik-container {
-    padding: 1rem 0.5rem;
-  }
-
-  .page-title {
-    font-size: 1.25rem;
-  }
-
-  .section-title {
-    font-size: 1.1rem;
-  }
-
-  .document-meta {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
-
-/* ========================================
-   LOADING & ERROR STATES
-   ======================================== */
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.py-5 {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+.pagination li.active button {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
 }
