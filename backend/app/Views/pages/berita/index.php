@@ -1,5 +1,4 @@
 <?= $this->extend('layouts/main') ?>
-
 <?= $this->section('styles') ?>
 <style>
     :root {
@@ -207,8 +206,6 @@
         gap: 6px;
         cursor: pointer;
         transition: opacity 0.3s;
-        justify-content: center; /* Center alignment */
-        width: 100%;
     }
     
     .status-btn .switch {
@@ -322,8 +319,6 @@
 
 <?= $this->section('content') ?>
 
-<input type="hidden" class="txt_csrfname" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
-
 <div class="gov-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
@@ -411,6 +406,7 @@
                             <tr class="data-row">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
+                                <!-- Cover Image -->
                                 <td class="text-center">
                                     <?php if (!empty($row['feat_image'])): ?>
                                         <img src="<?= base_url($row['feat_image']) ?>" alt="Cover" class="img-thumbnail">
@@ -419,6 +415,7 @@
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- Additional Images -->
                                 <td class="text-center">
                                     <?php
                                     $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
@@ -444,6 +441,7 @@
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- Title -->
                                 <td style="min-width: 180px;">
                                     <strong class="searchable"><?= esc($row['judul']) ?></strong>
                                     <?php if (!empty($row['hit'])): ?>
@@ -453,14 +451,17 @@
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- Topic -->
                                 <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
 
+                                <!-- Content Preview -->
                                 <td>
                                     <div class="content-preview" title="<?= strip_tags($row['content']) ?>">
                                         <?= strip_tags(mb_substr($row['content'], 0, 100)) ?>...
                                     </div>
                                 </td>
 
+                                <!-- Categories -->
                                 <td style="min-width: 120px;">
                                     <?php if (!empty($row['kategori'])): ?>
                                         <?php 
@@ -480,6 +481,7 @@
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- Publish Status -->
                                 <td class="text-center">
                                     <?php if ($row['status'] == '1'): ?>
                                         <span class="badge bg-success">Tayang</span>
@@ -490,6 +492,7 @@
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- News Status -->
                                 <td class="text-center">
                                     <?php
                                     $statusBerita = [
@@ -504,20 +507,23 @@
                                     <span class="badge <?= $class ?>"><?= $text ?></span>
                                 </td>
 
+                                <!-- Created Date -->
                                 <td class="text-center compact-date">
                                     <?= !empty($row['created_at']) ? date('d/m/y', strtotime($row['created_at'])) : '-' ?>
                                 </td>
                                 
+                                <!-- Status Toggle -->
                                 <td class="text-center">
-                                    <button type="button" 
-                                            class="status-btn" 
+                                    <button type="button" class="status-btn" 
                                             data-id="<?= $row['id_berita'] ?>" 
-                                            data-url="<?= site_url('berita/toggle-status') ?>">
-                                        <div class="switch <?= $row['status'] == '1' ? 'active' : '' ?>"></div>
-                                        <span class="switch-label ms-1"><?= $row['status'] == '1' ? 'Aktif' : 'Non-Aktif' ?></span>
+                                            data-url="<?= site_url('berita/toggle-status') ?>"
+                                            <?= !$isLayakTayang ? 'disabled title="Status belum Layak Tayang"' : '' ?>>
+                                        <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
+                                        <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
                                     </button>
                                 </td>
-
+                                
+                                <!-- Actions -->
                                 <td class="text-center" style="min-width: 110px;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
@@ -555,6 +561,7 @@
             </table>
         </div>
         
+        <!-- Pagination Controls -->
         <div class="pagination-container">
             <div class="pagination-info">
                 Menampilkan <span id="showingStart">0</span> - <span id="showingEnd">0</span> dari <span id="totalData">0</span> data
@@ -583,15 +590,18 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Elements for Search & Pagination
+    // ==========================================
+    // 1. BAGIAN PAGINATION & SEARCH (KODE ASLI)
+    // ==========================================
+    
+    // Elements
     const searchInput = document.getElementById('searchInput');
     const limitSelect = document.getElementById('limitSelect');
     const tableBody = document.getElementById('tableBody');
-    const rows = Array.from(tableBody.querySelectorAll('tr.data-row'));
+    // Menggunakan Array.from agar aman jika element null
+    const rows = tableBody ? Array.from(tableBody.querySelectorAll('tr.data-row')) : [];
     
     // Pagination elements
     const showingStartSpan = document.getElementById('showingStart');
@@ -613,17 +623,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalFilteredRows = 0;
     let totalPages = 1;
     
-    // Initialize Table
+    // Hanya jalankan init jika tabel ada datanya
     if(rows.length > 0) {
         initTable();
     }
-    
-    // Event Listeners for Search/Pagination
+
+    // Event Listeners untuk Search & Limit
     if(searchInput) {
         searchInput.addEventListener('input', function() {
             currentSearch = this.value.toLowerCase();
             currentPage = 1;
-            currentPageInput.value = 1;
+            if(currentPageInput) currentPageInput.value = 1;
             filterAndPaginate();
         });
     }
@@ -632,31 +642,37 @@ document.addEventListener('DOMContentLoaded', function() {
         limitSelect.addEventListener('change', function() {
             currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
             currentPage = 1;
-            currentPageInput.value = 1;
+            if(currentPageInput) currentPageInput.value = 1;
             filterAndPaginate();
         });
     }
     
-    // Pagination button events
-    if(firstPageBtn) firstPageBtn.addEventListener('click', () => changePage(1));
-    if(prevPageBtn) prevPageBtn.addEventListener('click', () => changePage(currentPage - 1));
-    if(nextPageBtn) nextPageBtn.addEventListener('click', () => changePage(currentPage + 1));
-    if(lastPageBtn) lastPageBtn.addEventListener('click', () => changePage(totalPages));
+    // Helper function untuk event listener tombol pagination
+    function addClick(elem, fn) {
+        if(elem) elem.addEventListener('click', fn);
+    }
+
+    addClick(firstPageBtn, () => changePage(1));
+    addClick(prevPageBtn, () => changePage(currentPage - 1));
+    addClick(nextPageBtn, () => changePage(currentPage + 1));
+    addClick(lastPageBtn, () => changePage(totalPages));
     
     if(currentPageInput) {
         currentPageInput.addEventListener('change', function() {
-            changePage(parseInt(this.value));
+            let page = parseInt(this.value);
+            changePage(page);
         });
     }
 
-    function changePage(page) {
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        currentPage = page;
-        if(currentPageInput) currentPageInput.value = page;
+    function changePage(newPage) {
+        if (newPage < 1) newPage = 1;
+        if (newPage > totalPages) newPage = totalPages;
+        currentPage = newPage;
+        if(currentPageInput) currentPageInput.value = newPage;
         filterAndPaginate();
     }
     
+    // Functions Logika Pagination
     function initTable() {
         limitSelect.value = '10';
         currentLimit = 10;
@@ -681,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentPage = 1;
         } else {
             totalPages = Math.ceil(totalFilteredRows / currentLimit);
-            if(totalPages === 0) totalPages = 1;
+            if (totalPages === 0) totalPages = 1;
             if (currentPage > totalPages) {
                 currentPage = totalPages;
                 if(currentPageInput) currentPageInput.value = currentPage;
@@ -691,58 +707,55 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePaginationInfo();
         updatePaginationButtons();
         
-        // Hide all rows first
         rows.forEach(row => row.style.display = 'none');
         
-        // Show relevant rows
+        let displayRows = [];
         if (currentLimit === -1) {
-            filteredRows.forEach((row, index) => {
-                row.style.display = '';
-                updateRowNumber(row, index + 1);
-            });
+            displayRows = filteredRows;
         } else {
             const startIndex = (currentPage - 1) * currentLimit;
             const endIndex = startIndex + currentLimit;
-            filteredRows.slice(startIndex, endIndex).forEach((row, index) => {
-                row.style.display = '';
-                updateRowNumber(row, startIndex + index + 1);
-            });
+            displayRows = filteredRows.slice(startIndex, endIndex);
         }
 
-        // Show/Hide No Data message
+        displayRows.forEach((row, index) => {
+            row.style.display = '';
+            // Update nomor urut agar dinamis sesuai filter
+            const rowNum = (currentLimit === -1) ? (index + 1) : ((currentPage - 1) * currentLimit + index + 1);
+            const rowNumberCell = row.querySelector('.row-number');
+            if (rowNumberCell) rowNumberCell.textContent = rowNum;
+        });
+        
         const noDataRow = tableBody.querySelector('tr:not(.data-row)');
         if (noDataRow) {
-            // Jika ada data tapi hasil filter 0, tampilkan pesan no data (opsional)
-            // Di sini kita biarkan hidden jika aslinya ada data
+            noDataRow.style.display = totalFilteredRows === 0 ? '' : 'none';
         }
-    }
-    
-    function updateRowNumber(row, number) {
-        const rowNumberCell = row.querySelector('.row-number');
-        if (rowNumberCell) rowNumberCell.textContent = number;
     }
     
     function updatePaginationInfo() {
+        if(!showingStartSpan) return; // Guard clause
+
         if (totalFilteredRows === 0) {
-            if(showingStartSpan) showingStartSpan.textContent = '0';
-            if(showingEndSpan) showingEndSpan.textContent = '0';
-            if(totalDataSpan) totalDataSpan.textContent = '0';
-            if(totalPagesSpan) totalPagesSpan.textContent = '1';
+            showingStartSpan.textContent = '0';
+            showingEndSpan.textContent = '0';
+            totalDataSpan.textContent = '0';
+            totalPagesSpan.textContent = '1';
             return;
         }
         
+        let start, end;
         if (currentLimit === -1) {
-            if(showingStartSpan) showingStartSpan.textContent = '1';
-            if(showingEndSpan) showingEndSpan.textContent = totalFilteredRows;
+            start = 1;
+            end = totalFilteredRows;
         } else {
-            const start = (currentPage - 1) * currentLimit + 1;
-            const end = Math.min(currentPage * currentLimit, totalFilteredRows);
-            if(showingStartSpan) showingStartSpan.textContent = start;
-            if(showingEndSpan) showingEndSpan.textContent = end;
+            start = (currentPage - 1) * currentLimit + 1;
+            end = Math.min(currentPage * currentLimit, totalFilteredRows);
         }
         
-        if(totalDataSpan) totalDataSpan.textContent = totalFilteredRows;
-        if(totalPagesSpan) totalPagesSpan.textContent = totalPages;
+        showingStartSpan.textContent = start;
+        showingEndSpan.textContent = end;
+        totalDataSpan.textContent = totalFilteredRows;
+        totalPagesSpan.textContent = totalPages;
     }
     
     function updatePaginationButtons() {
@@ -752,74 +765,102 @@ document.addEventListener('DOMContentLoaded', function() {
         nextPageBtn.disabled = currentPage >= totalPages;
         lastPageBtn.disabled = currentPage >= totalPages;
     }
-});
 
-// FIX 3: SCRIPT TOGGLE (Diperbaiki untuk CI4 CSRF dan jQuery)
-$(document).ready(function() {
-    // Gunakan event delegation 'body' agar aman saat pagination berubah
-    $('body').on('click', '.status-btn:not(:disabled)', function (e) {
+
+    // ==========================================
+    // 2. BAGIAN TOGGLE STATUS (FIX - FETCH API)
+    // ==========================================
+    
+    // Menggunakan Event Delegation pada document body
+    document.body.addEventListener('click', function(e) {
+        // Cari tombol terdekat dari elemen yang diklik
+        const btn = e.target.closest('.status-btn');
+        
+        // Jika yang diklik bukan tombol status atau tombol sedang disabled, stop.
+        if (!btn || btn.disabled) return;
+
+        // Cegah aksi default
         e.preventDefault();
 
-        let btn = $(this);
-        let id = btn.data('id');
-        let url = btn.data('url'); 
-        let switchEl = btn.find('.switch');
-        let labelEl = btn.find('.switch-label');
+        const id = btn.getAttribute('data-id');
+        const url = btn.getAttribute('data-url');
+        const switchEl = btn.querySelector('.switch');
+        const labelEl = btn.querySelector('.switch-label');
         
-        // Ambil token CSRF dari input global yang kita buat di atas
-        let csrfInput = $('.txt_csrfname');
-        let csrfName = csrfInput.attr('name'); // biasanya 'csrf_test_name'
-        let csrfHash = csrfInput.val();
+        // Ambil CSRF Token
+        const csrfName = '<?= csrf_token() ?>';
+        // Cari input CSRF yang ada di halaman (biasanya dari form delete yang sudah ada)
+        const csrfInput = document.querySelector('input[name="' + csrfName + '"]');
+        const csrfHash = csrfInput ? csrfInput.value : '';
 
-        if (!url) {
-            alert("URL tidak valid");
+        if(!csrfHash) {
+            alert("Error: CSRF Token tidak ditemukan. Refresh halaman.");
             return;
         }
 
-        // Disable tombol sementara loading
-        btn.prop('disabled', true);
-        btn.css('opacity', '0.5');
+        // UI Feedback: Loading state
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'wait';
 
-        $.ajax({
-            url: url, 
-            type: "POST",
-            data: { 
-                id: id, 
-                [csrfName]: csrfHash 
-            },
-            dataType: "json",
-            success: function(res) {
-                // Update CSRF token untuk request berikutnya (SANGAT PENTING DI CI4)
-                if(res.token) {
-                    $('.txt_csrfname').val(res.token);
-                    $('input[name="'+csrfName+'"]').val(res.token); 
-                }
+        // Siapkan Data
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append(csrfName, csrfHash);
 
-                btn.prop('disabled', false);
-                btn.css('opacity', '1');
-
-                if (res.status === 'success') {
-                    // Update tampilan Switch secara real-time
-                    if (res.newStatus == 1) {
-                        switchEl.addClass('active'); 
-                        labelEl.text('Aktif');
-                    } else {
-                        switchEl.removeClass('active'); 
-                        labelEl.text('Non-Aktif');
-                    }
-                    
-                    // Opsional: Reload halaman jika ingin refresh data lain
-                    // location.reload(); 
-                } else {
-                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
-                }
-            },
-            error: function(xhr, status, error) {
-                btn.prop('disabled', false); 
-                btn.css('opacity', '1');
-                console.error("Error Details:", xhr.responseText);
-                alert('Terjadi kesalahan koneksi. Cek console browser.');
+        // Kirim Request dengan Fetch
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest' // Header penting untuk CI4 detect AJAX
             }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(res => {
+            // Kembalikan UI state
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+
+            if (res.status === 'success') {
+                // Update Tampilan Toggle secara langsung
+                if (res.newStatus == 1) {
+                    switchEl.classList.add('active');
+                    labelEl.textContent = 'Aktif';
+                } else {
+                    switchEl.classList.remove('active');
+                    labelEl.textContent = 'Non-Aktif';
+                }
+
+                // Update CSRF Token untuk request selanjutnya (PENTING di CI4)
+                if (res.token) {
+                    document.querySelectorAll('input[name="' + csrfName + '"]').forEach(el => {
+                        el.value = res.token;
+                    });
+                }
+                
+                // Opsional: Reload halaman jika ingin me-refresh tabel sepenuhnya
+                // location.reload(); 
+            } else {
+                alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
+                // Update token jika ada error
+                if (res.token) {
+                    document.querySelectorAll('input[name="' + csrfName + '"]').forEach(el => {
+                        el.value = res.token;
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            alert('Terjadi kesalahan koneksi ke server.');
         });
     });
 });
