@@ -70,14 +70,6 @@ class FooterOpdModel extends Model
             'rules'  => 'required|max_length[50]|numeric', // Sesuaikan jika boleh ada tanda + atau -
             'label'  => 'Nomor Telepon'
         ],
-        'logo_cominfo' => [
-            'rules'  => 'required|max_length[255]',
-            'label'  => 'Logo Kominfo'
-        ],
-        'election_badge' => [
-            'rules'  => 'required|max_length[255]',
-            'label'  => 'Badge Pemilu'
-        ],
     ];
 
     // Custom Pesan Error (Bahasa Indonesia)

@@ -217,7 +217,6 @@ class FooterOpdController extends BaseController
             'address'        => $this->request->getPost('address'),
             'email'          => $this->request->getPost('email'),
             'phone'          => $this->request->getPost('phone'),
-            'is_active'      => $this->request->getPost('is_active') ?? 0,
             'updated_by'     => session()->get('id_user'),
         ];
 

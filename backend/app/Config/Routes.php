@@ -111,6 +111,7 @@ $routes->post('kontak_social/toggle-status', 'frontend\KontakSocialController::t
 // Footer OPD
 $routes->resource('footer_opd', ['controller' => 'frontend\FooterOpdController', 'except' => ['show']]);
 $routes->post('footer_opd/toggle-status', 'frontend\FooterOpdController::toggleStatus');
+$routes->get('footer_opd/cekinfo', 'frontend\FooterOpdController::cekinfo');
 
 // Footer Social
 $routes->resource('footer_social', ['controller' => 'frontend\FooterSocialController', 'except' => ['show']]);
