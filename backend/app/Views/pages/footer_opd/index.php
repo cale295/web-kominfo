@@ -201,9 +201,6 @@ footer opd
                                             
                                             echo $renderImg($item['logo_cominfo'], 'Logo Kominfo');
                                             if (!empty($item['logo_cominfo']) && file_exists($item['logo_cominfo'])) $hasImage = true;
-
-                                            echo $renderImg($item['election_badge'], 'Badge Pemilu');
-                                            if (!empty($item['election_badge']) && file_exists($item['election_badge'])) $hasImage = true;
                                             ?>
                                             <?php if (!$hasImage): ?>
                                                 <span class="badge bg-light text-secondary border rounded-pill px-3">Kosong</span>

@@ -72,29 +72,7 @@
                         <input class="form-control" type="file" id="logo_cominfo" name="logo_cominfo" accept="image/*" onchange="previewImage(this, 'preview_logo', 'logo_placeholder')">
                         <div class="form-text">Biarkan kosong jika tidak ingin mengubah logo.</div>
                     </div>
-
-                    <!-- Election Badge -->
-                    <div class="col-md-6">
-                        <label for="election_badge" class="form-label">Badge Pemilu / Lainnya</label>
-                        <div class="mb-2 p-2 border rounded bg-light d-inline-block">
-                            <?php 
-                                $badgeSrc = (!empty($footer_opd['election_badge']) && file_exists($footer_opd['election_badge'])) 
-                                    ? base_url($footer_opd['election_badge']) 
-                                    : '#';
-                                $badgeClass = ($badgeSrc == '#') ? 'd-none' : '';
-                            ?>
-                            <img id="preview_badge" src="<?= $badgeSrc ?>" alt="Preview Badge" class="img-fluid <?= $badgeClass ?>" style="height: 80px; object-fit: contain;">
-                            <?php if($badgeSrc == '#'): ?>
-                                <span id="badge_placeholder" class="text-muted small fst-italic">Belum ada badge</span>
-                            <?php endif; ?>
-                        </div>
-                        <input class="form-control" type="file" id="election_badge" name="election_badge" accept="image/*" onchange="previewImage(this, 'preview_badge', 'badge_placeholder')">
-                        <div class="form-text">Biarkan kosong jika tidak ingin mengubah badge.</div>
-                    </div>
                 </div>
-
-              
-
                 <div class="d-flex justify-content-end gap-2">
                     <a href="/footer_opd" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Update Data</button>
