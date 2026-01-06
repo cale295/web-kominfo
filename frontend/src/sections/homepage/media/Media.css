@@ -1,42 +1,84 @@
-.media-section {
-  padding: 2rem 1rem;
-  background-color: #f1f5f9;
-  border: 2px dashed #cbd5e1;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  margin-top: 12px;
+/* CSS untuk komponen Media */
+.media-full-height {
+  min-height: 100vh; /* Minimal tinggi viewport */
 }
-.media-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+
+.video-container-main {
+  height: 70vh; /* Video utama mengambil 70% tinggi layar */
+  min-height: 400px; /* Tinggi minimum untuk video utama */
+}
+
+.video-container-secondary {
+  height: 30vh; /* Video lainnya mengambil 30% tinggi layar */
+  min-height: 200px; /* Tinggi minimum untuk video lainnya */
+}
+
+/* Untuk layar kecil, atur ulang tinggi */
+@media (max-width: 768px) {
+  .video-container-main {
+    height: 50vh;
+    min-height: 300px;
+  }
+  
+  .video-container-secondary {
+    height: auto;
+    min-height: 150px;
+  }
+}
+
+/* Tambahan styling untuk iframe */
+.video-iframe {
+  border-radius: 20px;
+  border: none;
+}
+
+.video-card {
   transition: transform 0.3s ease;
 }
-.media-card:hover {
+
+.video-card:hover {
   transform: translateY(-5px);
 }
-.media-card img {
-  width: 100%;
-  height: auto;
+/* Media.css */
+@media (max-height: 600px) {
+  /* Untuk layar pendek, kurangi tinggi video utama */
+  .container-fluid .row > .col-12:first-child {
+    height: 50% !important;
+  }
+  
+  .container-fluid .row > .col-12:last-child {
+    height: 50% !important;
+  }
 }
-.media-card-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 12px 0;
+
+@media (max-width: 768px) {
+  /* Untuk mobile, tumpuk vertikal full height */
+  .container-fluid .row {
+    flex-direction: column;
+  }
+  
+  .container-fluid .row > .col-12 {
+    height: auto !important;
+    min-height: 50vh;
+  }
 }
-.media-card-description {
-  font-size: 0.9rem;
-  color: #475569;
-  margin-bottom: 12px;
+/* Media.css */
+/* Untuk layar kecil, kurangi tinggi video utama */
+@media (max-height: 700px) {
+  .col-12[style*="height: 70vh"] {
+    height: 60vh !important;
+  }
 }
-.media-card-link {
-  text-decoration: none;
-  color: #3b82f6;
-  font-weight: 500;
+
+@media (max-height: 500px) {
+  .col-12[style*="height: 70vh"] {
+    height: 50vh !important;
+  }
 }
-.media-card-link:hover {
-  text-decoration: underline;
+
+/* Fixed height untuk video lainnya di mobile */
+@media (max-width: 768px) {
+  .col-12.col-md-6.col-lg-4.col-xl-3 > div[style*="height: 250px"] {
+    height: 200px !important;
+  }
 }

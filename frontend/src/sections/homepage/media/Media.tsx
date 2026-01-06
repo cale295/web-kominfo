@@ -15,10 +15,8 @@ const Media: React.FC = () => {
   const [otherVideos, setOtherVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Convert youtube link to embed link
   const convertToEmbedUrl = (url: string) => {
     if (!url) return "";
-    // Regex yang lebih tangguh untuk berbagai format URL YouTube
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|\w\/\w\/|watch\?.*v=))([^&]+)/;
     const match = url.match(regex);
     const videoId = match ? match[1] : url.split("v=")[1]?.split("&")[0];
@@ -33,11 +31,8 @@ const Media: React.FC = () => {
 
         if (res.data?.data) {
           const allVideos: Video[] = res.data.data;
-
-          // 1. Filter hanya yang aktif
           const activeVideos = allVideos.filter((v: Video) => v.is_active === "1");
 
-          // 2. Cari Video Utama (featured = 1)
           const featuredVideos = activeVideos
             .filter((v: Video) => v.is_featured === "1")
             .sort((a: Video, b: Video) => Number(a.sorting) - Number(b.sorting));
@@ -46,21 +41,16 @@ const Media: React.FC = () => {
 
           setMainVideo(primaryVideo);
 
-          // 3. Tentukan Video Lainnya
           let remainingVideos: Video[];
           if (primaryVideo) {
-            // Kecualikan video utama dari daftar video lainnya
             remainingVideos = activeVideos.filter(
               (v: Video) => v.id_video_layanan !== primaryVideo.id_video_layanan
             );
           } else {
-            // Jika tidak ada video featured, semua video aktif adalah 'otherVideos'
             remainingVideos = activeVideos;
           }
           
-          // Urutkan video lainnya berdasarkan sorting
           remainingVideos.sort((a: Video, b: Video) => Number(a.sorting) - Number(b.sorting));
-
           setOtherVideos(remainingVideos);
         }
       } catch (error) {
@@ -73,50 +63,67 @@ const Media: React.FC = () => {
     fetchVideos();
   }, []);
 
-
   return (
-    <div className="container my-5">
-      {loading && <p className="text-center">Loading video...</p>}
-      
-      {!loading && mainVideo === null && otherVideos.length === 0 && (
-        <p className="text-center">Tidak ada video yang tersedia saat ini.</p>
-      )}
-
-      {/* VIDEO UTAMA (hanya tampil jika mainVideo ada) */}
-      {mainVideo && (
-        <div className="row mb-4">
-          <div className="col-12">
-            <div className="ratio ratio-16x9">
-              <iframe
-                src={convertToEmbedUrl(mainVideo.youtube_url)}
-                title={mainVideo.title}
-                allowFullScreen
-                style={{ borderRadius: "20px" }}
-              />
-            </div>
+    <div className="container-fluid min-vh-100 p-3 p-md-5">
+      {loading && (
+        <div className="d-flex justify-content-center align-items-center min-vh-100">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       )}
 
-      {/* VIDEO LAINNYA (hanya tampil jika ada otherVideos) */}
-      {otherVideos.length > 0 && (
-        <div className="row">
-          {otherVideos.map((vid) => (
-            <div
-              key={vid.id_video_layanan}
-              className="col-12 col-md-4 mb-4"
-            >
-              <div className="ratio ratio-16x9">
-                <iframe
-                  src={convertToEmbedUrl(vid.youtube_url)}
-                  title={vid.title}
-                  allowFullScreen
-                  style={{ borderRadius: "15px" }}
-                />
+      {!loading && mainVideo === null && otherVideos.length === 0 && (
+        <div className="d-flex justify-content-center align-items-center min-vh-100">
+          <p>Tidak ada video yang tersedia saat ini.</p>
+        </div>
+      )}
+
+      {!loading && (mainVideo || otherVideos.length > 0) && (
+        <div className="row g-4 h-100">
+          {/* VIDEO UTAMA - Besar, 70% layar */}
+          {mainVideo && (
+            <div className="col-12" style={{ height: "60vh" }}>
+              <div className="h-100">
+                <div className="ratio ratio-16x9 h-100">
+                  <iframe
+                    src={convertToEmbedUrl(mainVideo.youtube_url)}
+                    title={mainVideo.title}
+                    allowFullScreen
+                    style={{ borderRadius: "10px" }}
+                    className="w-100 h-100"
+                  />
+                </div>
               </div>
-              <p className="mt-2 text-center">{vid.title}</p>
             </div>
-          ))}
+          )}
+
+          {/* VIDEO LAINNYA - Kecil, height fix */}
+          {otherVideos.length > 0 && (
+            <div className="col-12 mt-4">
+              <div className="row g-4">
+                {otherVideos.map((vid) => (
+                  <div
+                    key={vid.id_video_layanan}
+                    className="col-12 col-md-6 col-lg-4 col-xl-3"
+                  >
+                    <div style={{ height: "250px" }}> {/* Fixed height */}
+                      <div className="ratio ratio-16x9 h-100">
+                        <iframe
+                          src={convertToEmbedUrl(vid.youtube_url)}
+                          title={vid.title}
+                          allowFullScreen
+                          style={{ borderRadius: "8px" }}
+                          className="w-100 h-100"
+                        />
+                      </div>
+                      <p className="mt-2 text-center small">{vid.title}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
