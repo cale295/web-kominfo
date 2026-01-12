@@ -1,5 +1,3 @@
-footer opd
-
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
@@ -74,15 +72,31 @@ footer opd
         border-radius: 50%;
         margin-right: 8px;
     }
+
+    /* Styling Tambahan untuk Tabs */
+    .nav-pills .nav-link {
+        border-radius: 0.75rem;
+        transition: all 0.2s;
+        font-weight: 500;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #4f46e5; /* Sesuaikan dengan tema primary */
+        color: white;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+    .nav-pills .nav-link:hover:not(.active) {
+        background-color: var(--primary-soft);
+        color: var(--primary-text);
+    }
 </style>
 
 <div class="container-fluid px-4 pb-5">
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between my-4 py-2">
         <div class="mb-3 mb-md-0">
-            <h1 class="h3 fw-bolder mb-1 text-gradient">Manajemen Footer OPD</h1>
+            <h1 class="h3 fw-bolder mb-1 text-gradient">Manajemen Footer</h1>
             <p class="text-muted small mb-0">
                 <i class="fas fa-info-circle me-1 text-primary"></i> 
-                Pusat kendali informasi identitas, kontak, dan aset visual footer website.
+                Pusat kendali informasi identitas, sosial media, dan statistik footer.
             </p>
         </div>
         <nav aria-label="breadcrumb">
@@ -108,11 +122,12 @@ footer opd
         </div>
     <?php endif; ?>
 
+    <?= $this->include('components/footer_tabs') ?>
     <div class="card card-modern">
         <div class="card-header bg-white py-4 border-0 d-flex flex-wrap justify-content-between align-items-center">
             <div>
-                <h5 class="fw-bold text-dark mb-0">Daftar Informasi</h5>
-                <span class="text-muted small">Kelola data footer yang tampil di halaman depan</span>
+                <h5 class="fw-bold text-dark mb-0">Daftar Informasi OPD</h5>
+                <span class="text-muted small">Kelola data identitas dinas/instansi</span>
             </div>
             
             <?php if ($can_create): ?>
@@ -213,7 +228,6 @@ footer opd
                                             <div class="mb-1">
                                                 <?= btn_toggle($item['id_opd_info'], $item['is_active'], 'footer_opd/toggle-status') ?>
                                             </div>
-                                           
                                         </div>
                                     </td>
 
