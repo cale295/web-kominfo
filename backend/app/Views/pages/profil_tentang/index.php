@@ -40,7 +40,6 @@
                     <thead class="bg-light text-secondary text-uppercase small fw-bold">
                         <tr>
                             <th class="text-center py-3" width="5%">No</th>
-                            <th class="text-center py-3 d-none d-md-table-cell" width="10%">Gambar</th>
                             <th class="py-3" width="45%">Judul & Konten</th>
                             <th class="text-center py-3 d-none d-lg-table-cell" width="10%">Status</th>
                             <th class="text-center py-3 d-none d-lg-table-cell" width="10%">Urutan</th>
@@ -50,7 +49,7 @@
                     <tbody>
                         <?php if (empty($profils)) : ?>
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="5" class="text-center py-5">
                                     <div class="text-muted opacity-50 mb-2">
                                         <i class="fas fa-file-alt fa-3x"></i>
                                     </div>
@@ -62,15 +61,6 @@
                             <?php foreach ($profils as $index => $item) : ?>
                                 <tr>
                                     <td class="text-center fw-bold text-secondary"><?= $index + 1 ?></td>
-                                    <td class="text-center d-none d-md-table-cell">
-                                        <?php if (!empty($item['image_url']) && file_exists($item['image_url'])): ?>
-                                            <div class="position-relative d-inline-block rounded overflow-hidden shadow-sm border bg-light">
-                                                <img src="<?= base_url($item['image_url']) ?>" alt="Img" style="height: 50px; width: 80px; object-fit: cover;">
-                                            </div>
-                                        <?php else: ?>
-                                            <span class="badge bg-light text-muted border">No Img</span>
-                                        <?php endif; ?>
-                                    </td>
                                     <td>
                                         <div class="fw-bold text-dark mb-1"><?= esc($item['title']) ?></div>
                                         <div class="small text-muted text-truncate" style="max-width: 350px;">
@@ -132,7 +122,7 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/profil_tentang" method="post" enctype="multipart/form-data" id="formCreate">
+            <form action="/profil_tentang" method="post" id="formCreate">
                 <?= csrf_field() ?>
                 <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
                     <div class="row g-4">
@@ -168,20 +158,6 @@
                                     <i class="fas fa-cog me-2"></i>Pengaturan
                                 </h6>
 
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">
-                                        Kategori / Section <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select" name="section" required>
-                                        <option value="">-- Pilih Kategori --</option>
-                                        <option value="profil">Profil</option>
-                                        <option value="visi_misi">Visi Misi</option>
-                                        <option value="ruang_lingkup">Ruang Lingkup</option>
-                                        <option value="susunan_organisasi">Susunan Organisasi</option>
-                                    </select>
-                                    <div class="form-text">Tentukan kategori konten</div>
-                                </div>
-
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label fw-semibold">Urutan</label>
@@ -200,24 +176,6 @@
                                             </label>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="mb-0">
-                                    <label class="form-label fw-semibold">Gambar Pendukung</label>
-                                    <div class="position-relative bg-light rounded border d-flex align-items-center justify-content-center overflow-hidden mb-2" 
-                                         style="height: 180px;">
-                                        <img id="img-preview-create" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
-                                        <div id="img-placeholder-create" class="text-center text-muted p-3">
-                                            <i class="fas fa-cloud-upload-alt fa-3x mb-2 opacity-50"></i><br>
-                                            <small class="fw-semibold">Upload gambar</small>
-                                        </div>
-                                    </div>
-                                    <input class="form-control" type="file" id="image-create" name="image_url" 
-                                           accept="image/jpeg,image/png,image/jpg" onchange="previewImageCreate(this)">
-                                    <div class="form-text">JPG/PNG, maks 2MB</div>
-                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2 d-none" id="btn-clear-create" onclick="clearImageCreate()">
-                                        <i class="fas fa-times me-1"></i>Hapus Gambar
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -282,20 +240,6 @@
                                     <i class="fas fa-cog me-2"></i>Pengaturan
                                 </h6>
 
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">
-                                        Kategori / Section <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select" name="section" id="edit_section" required>
-                                        <option value="">-- Pilih Kategori --</option>
-                                        <option value="profil">Profil</option>
-                                        <option value="visi_misi">Visi Misi</option>
-                                        <option value="ruang_lingkup">Ruang Lingkup</option>
-                                        <option value="susunan_organisasi">Susunan Organisasi</option>
-                                    </select>
-                                    <div class="form-text">Tentukan kategori konten</div>
-                                </div>
-
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label fw-semibold">Urutan</label>
@@ -314,24 +258,6 @@
                                             </label>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="mb-0">
-                                    <label class="form-label fw-semibold">Gambar Pendukung</label>
-                                    <div class="position-relative bg-light rounded border d-flex align-items-center justify-content-center overflow-hidden mb-2" 
-                                         style="height: 180px;">
-                                        <img id="img-preview-edit" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
-                                        <div id="img-placeholder-edit" class="text-center text-muted p-3">
-                                            <i class="fas fa-image fa-3x mb-2 opacity-50"></i><br>
-                                            <small class="fw-semibold">Belum ada gambar</small>
-                                        </div>
-                                    </div>
-                                    <input class="form-control" type="file" id="image-edit" name="image_url" 
-                                           accept="image/jpeg,image/png,image/jpg" onchange="previewImageEdit(this)">
-                                    <div class="form-text">Biarkan kosong jika tidak mengubah gambar</div>
-                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2 d-none" id="btn-clear-edit" onclick="clearImageEdit()">
-                                        <i class="fas fa-times me-1"></i>Hapus Gambar
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -448,104 +374,10 @@
         // Reset create form when modal is closed
         document.getElementById('modalCreate').addEventListener('hidden.bs.modal', function () {
             document.getElementById('formCreate').reset();
-            clearImageCreate();
         });
     });
 
-    // Preview image for create modal
-    function previewImageCreate(input) {
-        const preview = document.getElementById('img-preview-create');
-        const placeholder = document.getElementById('img-placeholder-create');
-        const btnClear = document.getElementById('btn-clear-create');
-        
-        if (input.files && input.files[0]) {
-            // Validate file size (2MB = 2 * 1024 * 1024 bytes)
-            if (input.files[0].size > 2 * 1024 * 1024) {
-                alert('Ukuran file terlalu besar! Maksimal 2MB.');
-                input.value = '';
-                return;
-            }
-
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-            if (!allowedTypes.includes(input.files[0].type)) {
-                alert('Format file tidak didukung! Gunakan JPG atau PNG.');
-                input.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.classList.remove('d-none');
-                placeholder.classList.add('d-none');
-                btnClear.classList.remove('d-none');
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    // Clear image create
-    function clearImageCreate() {
-        const preview = document.getElementById('img-preview-create');
-        const placeholder = document.getElementById('img-placeholder-create');
-        const input = document.getElementById('image-create');
-        const btnClear = document.getElementById('btn-clear-create');
-        
-        preview.src = '#';
-        preview.classList.add('d-none');
-        placeholder.classList.remove('d-none');
-        input.value = '';
-        btnClear.classList.add('d-none');
-    }
-
-    // Preview image for edit modal
-    function previewImageEdit(input) {
-        const preview = document.getElementById('img-preview-edit');
-        const placeholder = document.getElementById('img-placeholder-edit');
-        const btnClear = document.getElementById('btn-clear-edit');
-        
-        if (input.files && input.files[0]) {
-            // Validate file size
-            if (input.files[0].size > 2 * 1024 * 1024) {
-                alert('Ukuran file terlalu besar! Maksimal 2MB.');
-                input.value = '';
-                return;
-            }
-
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-            if (!allowedTypes.includes(input.files[0].type)) {
-                alert('Format file tidak didukung! Gunakan JPG atau PNG.');
-                input.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.classList.remove('d-none');
-                placeholder.classList.add('d-none');
-                btnClear.classList.remove('d-none');
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    // Clear image edit
-    function clearImageEdit() {
-        const preview = document.getElementById('img-preview-edit');
-        const placeholder = document.getElementById('img-placeholder-edit');
-        const input = document.getElementById('image-edit');
-        const btnClear = document.getElementById('btn-clear-edit');
-        
-        preview.src = '#';
-        preview.classList.add('d-none');
-        placeholder.classList.remove('d-none');
-        input.value = '';
-        btnClear.classList.add('d-none');
-    }
-
+   
     // Open edit modal and populate data
     function openEditModal(item) {
         // Set form action
@@ -553,7 +385,6 @@
         
         // Populate form fields
         document.getElementById('edit_title').value = item.title || '';
-        document.getElementById('edit_section').value = item.section || '';
         document.getElementById('edit_sorting').value = item.sorting || 0;
         document.getElementById('edit_content').value = item.content || '';
         
@@ -569,27 +400,7 @@
             badge.textContent = 'Nonaktif';
         }
         
-        // Handle image preview
-        const preview = document.getElementById('img-preview-edit');
-        const placeholder = document.getElementById('img-placeholder-edit');
-        const btnClear = document.getElementById('btn-clear-edit');
-        
-        if (item.image_url) {
-            preview.src = '<?= base_url() ?>/' + item.image_url;
-            preview.classList.remove('d-none');
-            placeholder.classList.add('d-none');
-            btnClear.classList.remove('d-none');
-            placeholder.innerHTML = '<i class="fas fa-image fa-3x mb-2 opacity-50"></i><br><small class="fw-semibold">Ganti gambar</small>';
-        } else {
-            preview.classList.add('d-none');
-            placeholder.classList.remove('d-none');
-            btnClear.classList.add('d-none');
-            placeholder.innerHTML = '<i class="fas fa-image fa-3x mb-2 opacity-50"></i><br><small class="fw-semibold">Belum ada gambar</small>';
-        }
-        
-        // Clear file input
-        document.getElementById('image-edit').value = '';
-        
+    
         // Show modal
         var modal = new bootstrap.Modal(document.getElementById('modalEdit'));
         modal.show();
