@@ -65,7 +65,7 @@
     }
     .icon-box:hover { transform: scale(1.1); }
 
-    /* Styling Tambahan untuk Tabs (jika belum ada di main layout) */
+    /* Styling Tambahan untuk Tabs */
     .nav-pills .nav-link {
         border-radius: 0.75rem;
         transition: all 0.2s;
@@ -115,6 +115,7 @@
     <?php endif; ?>
 
     <?= $this->include('components/footer_tabs') ?>
+    
     <div class="card card-modern">
         <div class="card-header bg-white py-4 border-0 d-flex flex-wrap justify-content-between align-items-center">
             <div>
@@ -123,9 +124,9 @@
             </div>
             
             <?php if ($can_create): ?>
-                <a href="/footer_social/new" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0 hover-scale">
+                <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0 hover-scale" data-bs-toggle="modal" data-bs-target="#createModal">
                     <i class="fas fa-plus-circle me-2"></i>Tambah Akun
-                </a>
+                </button>
             <?php endif; ?>
         </div>
 
@@ -202,12 +203,20 @@
                                     <td class="text-center">
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>
-                                                <a href="/footer_social/<?= $item['id_footer_social'] ?>/edit" 
-                                                   class="btn btn-soft-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
-                                                   style="width: 32px; height: 32px;"
-                                                   data-bs-toggle="tooltip" title="Edit Akun">
+                                                <button type="button" 
+                                                    class="btn btn-soft-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center btn-edit" 
+                                                    style="width: 32px; height: 32px;"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editModal"
+                                                    data-id="<?= $item['id_footer_social'] ?>"
+                                                    data-platform="<?= esc($item['platform_name']) ?>"
+                                                    data-icon="<?= esc($item['platform_icon']) ?>"
+                                                    data-account="<?= esc($item['account_name']) ?>"
+                                                    data-url="<?= esc($item['account_url']) ?>"
+                                                    data-sorting="<?= esc($item['sorting']) ?>"
+                                                    title="Edit Akun">
                                                     <i class="fas fa-pen fa-xs"></i>
-                                                </a>
+                                                </button>
                                             <?php endif; ?>
 
                                             <?php if ($can_delete): ?>
@@ -241,13 +250,227 @@
     </div>
 </div>
 
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-bottom-0">
+                <h5 class="modal-title fw-bold text-primary" id="createModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Akun Sosial Media
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/footer_social" method="post">
+                <div class="modal-body p-4">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Platform <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="platform_name" placeholder="Contoh: Instagram" value="<?= old('platform_name') ?>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Pilih Icon <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i id="icon-preview-create" class="fab fa-instagram fs-5"></i></span>
+                                    <select class="form-select" name="platform_icon" id="platform_icon_create" required onchange="updateIconPreview('create')">
+                                        <option value="instagram" <?= old('platform_icon') == 'instagram' ? 'selected' : '' ?>>Instagram</option>
+                                        <option value="facebook" <?= old('platform_icon') == 'facebook' ? 'selected' : '' ?>>Facebook</option>
+                                        <option value="twitter" <?= old('platform_icon') == 'twitter' ? 'selected' : '' ?>>Twitter / X</option>
+                                        <option value="youtube" <?= old('platform_icon') == 'youtube' ? 'selected' : '' ?>>YouTube</option>
+                                        <option value="tiktok" <?= old('platform_icon') == 'tiktok' ? 'selected' : '' ?>>TikTok</option>
+                                        <option value="linkedin" <?= old('platform_icon') == 'linkedin' ? 'selected' : '' ?>>LinkedIn</option>
+                                        <option value="whatsapp" <?= old('platform_icon') == 'whatsapp' ? 'selected' : '' ?>>WhatsApp</option>
+                                        <option value="telegram" <?= old('platform_icon') == 'telegram' ? 'selected' : '' ?>>Telegram</option>
+                                        <option value="globe" <?= old('platform_icon') == 'globe' ? 'selected' : '' ?>>Website (Globe)</option>
+                                    </select>
+                                </div>
+                                <div class="form-text small">Icon menggunakan FontAwesome Brand Icons.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Nama Akun <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text text-muted">@</span>
+                                    <input type="text" class="form-control" name="account_name" placeholder="username" value="<?= old('account_name') ?>" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Link URL <span class="text-danger">*</span></label>
+                                <input type="url" class="form-control" name="account_url" placeholder="https://instagram.com/username" value="<?= old('account_url') ?>" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mt-2">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Urutan</label>
+                                <input type="number" class="form-control" name="sorting" value="<?= old('sorting', 0) ?>">
+                                <div class="form-text small">Angka kecil tampil lebih dulu.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch p-3 bg-light rounded border">
+                                <input type="hidden" name="is_active" value="0">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" id="is_active" name="is_active" value="1" <?= old('is_active', 1) == 1 ? 'checked' : '' ?>>
+                                <label class="form-check-label fw-bold" for="is_active">Status Aktif</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-bottom-0">
+                <h5 class="modal-title fw-bold text-primary" id="editModalLabel">
+                    <i class="fas fa-edit me-2"></i>Edit Akun Sosial Media
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="#" method="post" id="form-edit">
+                <div class="modal-body p-4">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="_method" value="PUT">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Platform <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="platform_name" id="edit_platform_name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Pilih Icon <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i id="icon-preview-edit" class="fab fa-instagram fs-5"></i></span>
+                                    <select class="form-select" name="platform_icon" id="platform_icon_edit" required onchange="updateIconPreview('edit')">
+                                        <option value="instagram">Instagram</option>
+                                        <option value="facebook">Facebook</option>
+                                        <option value="twitter">Twitter / X</option>
+                                        <option value="youtube">YouTube</option>
+                                        <option value="tiktok">TikTok</option>
+                                        <option value="linkedin">LinkedIn</option>
+                                        <option value="whatsapp">WhatsApp</option>
+                                        <option value="telegram">Telegram</option>
+                                        <option value="globe">Website (Globe)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Nama Akun <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text text-muted">@</span>
+                                    <input type="text" class="form-control" name="account_name" id="edit_account_name" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Link URL <span class="text-danger">*</span></label>
+                                <input type="url" class="form-control" name="account_url" id="edit_account_url" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mt-2">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Urutan</label>
+                                <input type="number" class="form-control" name="sorting" id="edit_sorting">
+                                <div class="form-text small">Angka kecil tampil lebih dulu.</div>
+                            </div>
+                        </div>
+                         </div>
+                </div>
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Update Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Fungsi Preview Icon yang Dinamis (Bisa untuk Create maupun Edit)
+    function updateIconPreview(type) {
+        const select = document.getElementById(type === 'create' ? 'platform_icon_create' : 'platform_icon_edit');
+        const preview = document.getElementById(type === 'create' ? 'icon-preview-create' : 'icon-preview-edit');
+        const iconClass = select.value;
+        
+        // Reset class
+        preview.className = '';
+        
+        // Handle 'globe' as fas (solid), others as fab (brands)
+        if(iconClass === 'globe' || iconClass === 'envelope' || iconClass === 'phone') {
+            preview.className = `fas fa-${iconClass} fs-5`;
+        } else {
+            preview.className = `fab fa-${iconClass} fs-5`;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize Tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+
+        // Initialize Icon Preview untuk Create
+        updateIconPreview('create');
+
+        // Logic untuk Mengisi Modal Edit secara Dinamis
+        const editButtons = document.querySelectorAll('.btn-edit');
+        const editForm = document.getElementById('form-edit');
+        const editPlatform = document.getElementById('edit_platform_name');
+        const editIcon = document.getElementById('platform_icon_edit');
+        const editAccount = document.getElementById('edit_account_name');
+        const editUrl = document.getElementById('edit_account_url');
+        const editSorting = document.getElementById('edit_sorting');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Ambil data dari atribut tombol
+                const id = this.getAttribute('data-id');
+                const platform = this.getAttribute('data-platform');
+                const icon = this.getAttribute('data-icon');
+                const account = this.getAttribute('data-account');
+                const url = this.getAttribute('data-url');
+                const sorting = this.getAttribute('data-sorting');
+
+                // Isi nilai ke dalam form modal edit
+                editForm.action = '/footer_social/' + id; // Update action URL
+                editPlatform.value = platform;
+                editIcon.value = icon;
+                editAccount.value = account;
+                editUrl.value = url;
+                editSorting.value = sorting;
+
+                // Update preview icon di modal edit
+                updateIconPreview('edit');
+            });
+        });
+
+        // Tampilkan Modal Create jika terjadi error validasi saat create (Session flash)
+        <?php if(session()->has('errors') && !session()->has('edit_error')) : ?>
+            var createModal = new bootstrap.Modal(document.getElementById('createModal'));
+            createModal.show();
+        <?php endif; ?>
     });
 </script>
 

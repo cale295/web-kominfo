@@ -57,7 +57,7 @@
         background-color: #f9fafb;
     }
 
-    /* Styling Tabs (jika belum global) */
+    /* Styling Tabs */
     .nav-pills .nav-link {
         border-radius: 0.75rem;
         transition: all 0.2s;
@@ -71,6 +71,18 @@
     .nav-pills .nav-link:hover:not(.active) {
         background-color: var(--primary-soft);
         color: var(--primary-text);
+    }
+
+    /* Modal Styling Fix */
+    .modal-content {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    }
+    .modal-header {
+        border-bottom: 1px solid #f3f4f6;
+        background-color: #fff;
+        border-radius: 1rem 1rem 0 0;
     }
 </style>
 
@@ -92,6 +104,7 @@
     </div>
 
     <?= $this->include('components/footer_tabs') ?>
+
     <div class="card card-modern">
         <div class="card-header bg-white py-4 border-0 d-flex flex-wrap justify-content-between align-items-center">
             <div>
@@ -100,9 +113,9 @@
             </div>
             
             <?php if ($can_create): ?>
-                <a href="<?= base_url('footer_statistics/new') ?>" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0 hover-scale">
+                <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0 hover-scale" data-bs-toggle="modal" data-bs-target="#modalTambahStatistik">
                     <i class="fas fa-plus-circle me-2"></i>Tambah Data
-                </a>
+                </button>
             <?php endif; ?>
         </div>
 
@@ -155,12 +168,21 @@
                                     <td class="text-center">
                                         <div class="d-flex gap-2 justify-content-center">
                                             <?php if ($can_update): ?>
-                                                <a href="<?= base_url('footer_statistics/' . $row['id_footer_statis'] . '/edit') ?>" 
-                                                   class="btn btn-soft-warning btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
+                                                <button type="button" 
+                                                   class="btn btn-soft-warning btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center btn-edit" 
                                                    style="width: 32px; height: 32px;"
-                                                   data-bs-toggle="tooltip" title="Edit Data">
+                                                   data-bs-toggle="modal" 
+                                                   data-bs-target="#modalEditStatistik"
+                                                   data-id="<?= $row['id_footer_statis'] ?>"
+                                                   data-label="<?= esc($row['stat_label']) ?>"
+                                                   data-value="<?= esc($row['stat_value']) ?>"
+                                                   data-type="<?= esc($row['stat_type']) ?>"
+                                                   data-sorting="<?= esc($row['sorting']) ?>"
+                                                   data-autoupdate="<?= $row['auto_update'] ?>"
+                                                   data-active="<?= $row['is_active'] ?>"
+                                                   title="Edit Data">
                                                     <i class="fas fa-pen fa-xs"></i>
-                                                </a>
+                                                </button>
                                             <?php endif; ?>
                                             
                                             <?php if ($can_delete): ?>
@@ -199,8 +221,159 @@
         <div class="card-footer bg-white border-top-0 py-3">
             <div class="d-flex align-items-center text-muted small">
                 <i class="fas fa-info-circle me-2 text-primary"></i>
-                <span>Gunakan tipe <strong>Dynamic</strong> jika data diambil otomatis, atau <strong>Static</strong> untuk input manual.</span>
+                <span>Gunakan tipe <strong>Dynamic</strong> jika data diambil otomatis, atau <strong>Static/Manual</strong> untuk input manual.</span>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTambahStatistik" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-gray-800" id="modalTambahLabel">
+                    <i class="fas fa-plus-circle text-primary me-2"></i>Tambah Statistik Baru
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form action="<?= base_url('footer_statistics') ?>" method="post">
+                <div class="modal-body p-4">
+                    <?= csrf_field() ?>
+
+                    <?php if (session()->has('errors')) : ?>
+                        <div class="alert alert-danger">
+                            <ul>
+                            <?php foreach (session('errors') as $error) : ?>
+                                <li><?= $error ?></li>
+                            <?php endforeach ?>
+                            </ul>
+                        </div>
+                    <?php endif ?>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="stat_label" class="form-label fw-bold small text-uppercase text-muted">Label Statistik <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="stat_label" name="stat_label" value="<?= old('stat_label') ?>" placeholder="Contoh: Klien Puas" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="stat_value" class="form-label fw-bold small text-uppercase text-muted">Nilai (Value) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="stat_value" name="stat_value" value="<?= old('stat_value') ?>" placeholder="Contoh: 150+" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="stat_type" class="form-label fw-bold small text-uppercase text-muted">Tipe Statistik</label>
+                            <select class="form-select form-control" id="stat_type" name="stat_type">
+                                <option value="today_visitors" <?= old('stat_type') == 'today_visitors' ? 'selected' : '' ?>>Visitor (Hari Ini)</option>
+                                <option value="online_visitors" <?= old('stat_type') == 'online_visitors' ? 'selected' : '' ?>>Online Visitor</option>
+                                <option value="total_visitors" <?= old('stat_type') == 'total_visitors' ? 'selected' : '' ?>>Total Visitor</option>
+                                <option value="manual" <?= old('stat_type') == 'manual' ? 'selected' : '' ?>>Manual Input</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="sorting" class="form-label fw-bold small text-uppercase text-muted">Urutan (Sorting)</label>
+                            <input type="number" class="form-control" id="sorting" name="sorting" value="<?= old('sorting', 0) ?>">
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-12 d-flex align-items-center bg-light p-3 rounded">
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="checkbox" id="auto_update" name="auto_update" value="1" <?= old('auto_update') ? 'checked' : '' ?>>
+                                <label class="form-check-label fw-bold text-dark" for="auto_update">
+                                    Auto Update Count
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <?= old('is_active', 1) ? 'checked' : '' ?>>
+                                <label class="form-check-label fw-bold text-dark" for="is_active">
+                                    Aktifkan Data
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer bg-light border-0 rounded-bottom">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEditStatistik" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-gray-800" id="modalEditLabel">
+                    <i class="fas fa-edit text-warning me-2"></i>Edit Statistik
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form id="formEditStatistik" action="" method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="_method" value="PUT">
+
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_stat_label" class="form-label fw-bold small text-uppercase text-muted">Label Statistik <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_stat_label" name="stat_label" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_stat_value" class="form-label fw-bold small text-uppercase text-muted">Nilai (Value) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_stat_value" name="stat_value" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_stat_type" class="form-label fw-bold small text-uppercase text-muted">Tipe Statistik</label>
+                            <select class="form-select form-control" id="edit_stat_type" name="stat_type">
+                                <option value="today_visitors">Visitor (Hari Ini)</option>
+                                <option value="online_visitors">Online Visitor</option>
+                                <option value="total_visitors">Total Visitor</option>
+                                <option value="manual">Manual Input</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_sorting" class="form-label fw-bold small text-uppercase text-muted">Urutan (Sorting)</label>
+                            <input type="number" class="form-control" id="edit_sorting" name="sorting">
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-12 d-flex align-items-center bg-light p-3 rounded">
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="checkbox" id="edit_auto_update" name="auto_update" value="1">
+                                <label class="form-check-label fw-bold text-dark" for="edit_auto_update">
+                                    Auto Update Count
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="edit_is_active" name="is_active" value="1">
+                                <label class="form-check-label fw-bold text-dark" for="edit_is_active">
+                                    Aktifkan Data
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer bg-light border-0 rounded-bottom">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-warning"><i class="fas fa-save me-1"></i> Perbarui Data</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -211,6 +384,42 @@
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Script untuk Re-open Modal Tambah jika ada error validasi
+        <?php if (session()->has('errors')) : ?>
+            var myModal = new bootstrap.Modal(document.getElementById('modalTambahStatistik'));
+            myModal.show();
+        <?php endif; ?>
+
+        // Script untuk Menghandle Modal Edit (Populating Data)
+        var modalEdit = document.getElementById('modalEditStatistik');
+        modalEdit.addEventListener('show.bs.modal', function (event) {
+            // Button yang men-trigger modal
+            var button = event.relatedTarget;
+            
+            // Ambil data dari atribut data-*
+            var id = button.getAttribute('data-id');
+            var label = button.getAttribute('data-label');
+            var value = button.getAttribute('data-value');
+            var type = button.getAttribute('data-type');
+            var sorting = button.getAttribute('data-sorting');
+            var autoUpdate = button.getAttribute('data-autoupdate');
+            var isActive = button.getAttribute('data-active');
+
+            // Update Action URL pada Form Edit
+            var form = document.getElementById('formEditStatistik');
+            form.action = '<?= base_url('footer_statistics') ?>/' + id;
+
+            // Isi input value di dalam modal
+            document.getElementById('edit_stat_label').value = label;
+            document.getElementById('edit_stat_value').value = value;
+            document.getElementById('edit_stat_type').value = type;
+            document.getElementById('edit_sorting').value = sorting;
+
+            // Handle Checkbox
+            document.getElementById('edit_auto_update').checked = (autoUpdate == 1);
+            document.getElementById('edit_is_active').checked = (isActive == 1);
         });
     });
 </script>
