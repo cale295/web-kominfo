@@ -28,7 +28,7 @@ function App() {
     };
   }, [textToSpeechEnabled]);
   return (
-    <div className='min-h-screen px-10 py-10 md:px-10 md:py-10' style={{ fontSize: `${fontSize}rem` }}>
+    <div className='min-h-screen px-10 py-10 md:px-10 md:py-10' style={{ fontSize: `${fontSize}rem`, backgroundColor: '#ededed' }}>
       <AppRouter />
     </div>
   )

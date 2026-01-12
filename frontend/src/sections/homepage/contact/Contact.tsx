@@ -197,7 +197,7 @@ export default function HubungiKami() {
   const currentPetaData = petaData || defaultPetaData;
 
   return (
-    <div className="py-12" id='kontak'>
+    <div className="py-12 background-white" id='kontak'>
       <div className="container px-4">
         <h1 className="fs-1 fs-md-1 fw-bold text-blue-800 text-center mb-10 mb-md-12">
           Hubungi Kami

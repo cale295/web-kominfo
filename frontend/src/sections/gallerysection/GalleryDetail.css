@@ -1,0 +1,291 @@
+/* GalleryDetail.css */
+
+:root {
+  --primary-dark: #1a1a2e;
+  --text-dark: #1f2937;
+  --text-muted: #6b7280;
+  --bg-light: #f5f5f5;
+  --white: #ffffff;
+  --border-color: #e5e7eb;
+}
+
+.gallery-detail-wrapper {
+  min-height: 100vh;
+  background-color: var(--white);
+  padding-top: 20px;
+}
+
+/* Header */
+.detail-header {
+  margin-bottom: 30px;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 20px;
+  transition: color 0.2s ease;
+}
+
+.btn-back:hover {
+  color: var(--text-dark);
+}
+
+.header-info {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.detail-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.detail-meta {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Main Photo Container */
+.main-photo-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  background: var(--bg-light);
+  border: 2px solid var(--border-color);
+}
+
+.main-photo {
+  width: 100%;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+}
+
+.main-photo img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Navigation Arrows */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.nav-arrow:hover:not(:disabled) {
+  background: var(--white);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nav-arrow-left {
+  left: 20px;
+}
+
+.nav-arrow-right {
+  right: 20px;
+}
+
+/* Photo Caption */
+.photo-caption-box {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  padding: 0 20px;
+}
+
+.caption-text {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  line-height: 1.6;
+  margin: 0;
+  text-align: center;
+}
+
+/* Thumbnail Gallery */
+.thumbnail-gallery {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 0;
+  border-top: 2px solid var(--border-color);
+}
+
+.thumbnail-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 10px 20px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.thumbnail-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-track {
+  background: var(--bg-light);
+  border-radius: 4px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.thumbnail-item {
+  flex: 0 0 auto;
+  width: 180px;
+  height: 120px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  background: var(--bg-light);
+}
+
+.thumbnail-item:hover {
+  border-color: #cbd5e1;
+}
+
+.thumbnail-item.active {
+  border-color: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.2);
+}
+
+.thumbnail-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .detail-title {
+    font-size: 1.75rem;
+  }
+
+  .main-photo {
+    height: 500px;
+  }
+
+  .nav-arrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .nav-arrow-left {
+    left: 10px;
+  }
+
+  .nav-arrow-right {
+    right: 10px;
+  }
+
+  .thumbnail-item {
+    width: 150px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-title {
+    font-size: 1.5rem;
+  }
+
+  .detail-meta {
+    font-size: 0.85rem;
+  }
+
+  .main-photo {
+    height: 400px;
+  }
+
+  .nav-arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .nav-arrow svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .thumbnail-item {
+    width: 120px;
+    height: 80px;
+  }
+
+  .caption-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .detail-title {
+    font-size: 1.25rem;
+  }
+
+  .main-photo {
+    height: 300px;
+  }
+
+  .nav-arrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nav-arrow-left {
+    left: 5px;
+  }
+
+  .nav-arrow-right {
+    right: 5px;
+  }
+
+  .thumbnail-item {
+    width: 100px;
+    height: 70px;
+  }
+}

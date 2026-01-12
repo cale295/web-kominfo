@@ -1,4 +1,7 @@
 /* Custom styles for TangerangNewsApp */
+.background-white{
+  background-color: #f5f5f5;
+}
 
 .news-card {
   height: 400px;

@@ -1,84 +1,187 @@
-/* CSS untuk komponen Media */
-.media-full-height {
-  min-height: 100vh; /* Minimal tinggi viewport */
+/* Media.css - Styles for Media Component */
+
+/* Container utama */
+.media-container {
+  max-width: 2000px;
+  margin: 0 auto;
+  padding: 1.5rem !important;
 }
 
-.video-container-main {
-  height: 70vh; /* Video utama mengambil 70% tinggi layar */
-  min-height: 400px; /* Tinggi minimum untuk video utama */
+/* Wrapper untuk konten video */
+.media-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.video-container-secondary {
-  height: 30vh; /* Video lainnya mengambil 30% tinggi layar */
-  min-height: 200px; /* Tinggi minimum untuk video lainnya */
+/* Section video utama */
+.main-video-section {
+  width: 100%;
 }
 
-/* Untuk layar kecil, atur ulang tinggi */
-@media (max-width: 768px) {
-  .video-container-main {
-    height: 50vh;
-    min-height: 300px;
-  }
-  
-  .video-container-secondary {
-    height: auto;
-    min-height: 150px;
-  }
+.main-video-container {
+  width: 100%;
+  max-width: 1100px;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
 }
 
-/* Tambahan styling untuk iframe */
+
+/* Styling untuk iframe video */
 .video-iframe {
-  border-radius: 20px;
+  border-radius: 12px;
   border: none;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+/* Styling untuk judul video utama */
+.video-title-main {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.4;
+  text-align: left;
+  margin-top: 1rem;
+}
+
+/* Section video lainnya */
+.other-videos-section {
+  width: 100%;
+  margin: 0 auto;
+}
+
 
 .video-card {
-  transition: transform 0.3s ease;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.video-card:hover {
-  transform: translateY(-5px);
+
+.video-card .ratio {
+  border-radius: 8px;
+  overflow: hidden;
 }
-/* Media.css */
-@media (max-height: 600px) {
-  /* Untuk layar pendek, kurangi tinggi video utama */
-  .container-fluid .row > .col-12:first-child {
-    height: 50% !important;
+
+.video-card .video-iframe {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Styling untuk judul video lainnya */
+.video-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.3;
+  text-align: left;
+  padding: 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.6em;
+}
+
+/* Media Queries untuk Responsivitas */
+
+/* Desktop Large (1200px+) */
+@media (min-width: 1200px) {
+  .media-container {
+    padding: 2rem !important;
   }
   
-  .container-fluid .row > .col-12:last-child {
-    height: 50% !important;
-  }
+  
 }
 
-@media (max-width: 768px) {
-  /* Untuk mobile, tumpuk vertikal full height */
-  .container-fluid .row {
-    flex-direction: column;
+/* Tablet (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .media-container {
+    padding: 1.5rem !important;
   }
   
-  .container-fluid .row > .col-12 {
-    height: auto !important;
-    min-height: 50vh;
+  .video-title-main {
+    font-size: 1.1rem;
   }
-}
-/* Media.css */
-/* Untuk layar kecil, kurangi tinggi video utama */
-@media (max-height: 700px) {
-  .col-12[style*="height: 70vh"] {
-    height: 60vh !important;
+  
+  .video-title {
+    font-size: 0.9rem;
   }
 }
 
-@media (max-height: 500px) {
-  .col-12[style*="height: 70vh"] {
-    height: 50vh !important;
+/* Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+  .media-container {
+    padding: 1rem !important;
+  }
+  
+  .media-content-wrapper {
+    gap: 1.5rem;
+  }
+  
+  .video-title-main {
+    font-size: 1rem;
+    margin-top: 0.75rem;
+  }
+  
+  .video-title {
+    font-size: 0.85rem;
+    padding: 0.25rem 0;
   }
 }
 
-/* Fixed height untuk video lainnya di mobile */
-@media (max-width: 768px) {
-  .col-12.col-md-6.col-lg-4.col-xl-3 > div[style*="height: 250px"] {
-    height: 200px !important;
+/* Small Mobile (max-width: 576px) */
+@media (max-width: 576px) {
+  .media-container {
+    padding: 0.75rem !important;
+  }
+  
+  .media-content-wrapper {
+    gap: 1.25rem;
+  }
+  
+  .video-iframe {
+    border-radius: 8px;
+  }
+  
+  .video-title-main {
+    font-size: 0.95rem;
+  }
+  
+  .video-title {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 3;
+    min-height: 3.9em;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .main-video-container {
+    max-width: 80%;
+  }
+}
+
+/* Print styles */
+@media print {
+  .video-iframe {
+    border: 1px solid #ddd;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .video-card {
+    transition: none;
+  }
+  
+  .video-card:hover {
+    transform: none;
   }
 }

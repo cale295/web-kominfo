@@ -1,309 +1,227 @@
-/* Gallery.css - Simpel dan Profesional untuk Web Pemerintahan */
+/* Gallery.css - News Card Style */
 
 :root {
-  --primary: #1a5fb4;
-  --primary-dark: #0d4b8d;
-  --secondary: #5d6d7e;
-  --background: #f9fafb;
-  --surface: #ffffff;
-  --border: #e5e7eb;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  --primary-dark: #1a1a2e;
+  --primary-blue: #1e40af;
+  --text-dark: #1f2937;
+  --text-muted: #6b7280;
+  --bg-light: #f5f5f5;
+  --white: #ffffff;
+  --border-color: #e5e7eb;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.5;
-  color: var(--text-primary);
-  background-color: var(--background);
+  background-color: var(--bg-light);
 }
 
-/* Main Container */
-.gallery-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px;
+.gallery-wrapper {
+  min-height: 100vh;
+  background-color: var(--bg-light);
 }
 
-/* Header */
-.gallery-header {
-  margin-bottom: 40px;
-  text-align: center;
+/* Header Styles */
+.gallery-main-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
 }
 
-.gallery-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+.gallery-main-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+  font-weight: 400;
 }
 
-.gallery-subtitle {
-  color: var(--text-secondary);
-  font-size: 1rem;
-}
-
-/* Album Selector */
-.album-selector {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 30px;
-}
-
-.selector-header {
-  margin-bottom: 15px;
-}
-
-.selector-header h3 {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.album-select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 1rem;
-  color: var(--text-primary);
-  background: var(--surface);
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.album-select:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-/* Album Content */
-.album-content {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+/* Album Card - News Style */
+.album-card {
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 0;
   overflow: hidden;
-}
-
-.album-info {
+  transition: all 0.3s ease;
+  height: 100%;
   display: flex;
-  padding: 30px;
-  border-bottom: 1px solid var(--border);
-  background: #f8f9fa;
+  flex-direction: column;
+  cursor: pointer;
 }
 
-.album-cover-container {
-  flex-shrink: 0;
-  margin-right: 30px;
+.album-card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.1);
 }
 
+/* Album Cover */
 .album-cover {
-  width: 180px;
-  height: 135px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-}
-
-.album-details {
-  flex: 1;
-}
-
-.album-details h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-}
-
-.album-description {
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 15px;
-  max-width: 800px;
-}
-
-.album-meta {
-  margin-top: 15px;
-}
-
-.photo-count {
-  font-size: 0.9rem;
-  color: var(--secondary);
-}
-
-/* Photos Section */
-.photos-section {
-  padding: 30px;
-}
-
-.section-header {
-  margin-bottom: 25px;
-}
-
-.section-header h3 {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-/* Photo Grid */
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 25px;
-}
-
-.photo-card {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-  transition: border-color 0.2s;
-}
-
-.photo-card:hover {
-  border-color: var(--primary);
-}
-
-.photo-image-container {
   width: 100%;
-  height: 180px;
+  height: 400px;
   overflow: hidden;
-  background: #f1f3f5;
+  background: #f3f4f6;
+  position: relative;
+  border-bottom: 2px solid var(--border-color);
 }
 
-.photo-image {
+.album-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.photo-card:hover .photo-image {
-  transform: scale(1.02);
+.album-card:hover .album-cover img {
+  transform: scale(1.03);
 }
 
-.photo-info {
-  padding: 15px;
+/* Placeholder when no image */
+.album-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  background: #f9fafb;
 }
 
-.photo-title {
-  font-size: 0.95rem;
-  color: var(--text-primary);
+/* Album Overlay - Photo Count Badge */
+.album-overlay {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  opacity: 1;
+}
+
+.photo-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--white);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.photo-count svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Album Info */
+.album-info {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.album-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-blue);
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* No Photos */
-.no-photos {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-secondary);
+.album-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.no-photos p {
-  font-size: 1rem;
+/* Album Meta - Date Style */
+.album-meta {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.album-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 /* Loading State */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: var(--text-secondary);
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
 }
 
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 15px;
+/* Responsive */
+@media (max-width: 992px) {
+  .gallery-main-title {
+    font-size: 2rem;
+  }
+
+  .album-cover {
+    height: 350px;
+  }
+
+  .album-title {
+    font-size: 1.15rem;
+  }
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 80px 20px;
-  color: var(--text-secondary);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-.empty-state h3 {
-  color: var(--text-primary);
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.empty-state p {
-  font-size: 1rem;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
-  .gallery-container {
-    padding: 20px 15px;
+  .gallery-main-title {
+    font-size: 1.75rem;
   }
-  
-  .gallery-title {
-    font-size: 1.6rem;
+
+  .gallery-main-subtitle {
+    font-size: 0.85rem;
   }
-  
+
+  .album-cover {
+    height: 300px;
+  }
+
   .album-info {
-    flex-direction: column;
     padding: 20px;
   }
-  
-  .album-cover-container {
-    margin-right: 0;
-    margin-bottom: 20px;
-    text-align: center;
+
+  .album-title {
+    font-size: 1.1rem;
   }
-  
-  .album-cover {
-    width: 100%;
-    max-width: 300px;
-    height: 150px;
-  }
-  
-  .photo-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-  }
-  
-  .photo-image-container {
-    height: 160px;
+
+  .album-description {
+    font-size: 0.85rem;
   }
 }
 
-@media (max-width: 480px) {
-  .gallery-title {
-    font-size: 1.4rem;
+@media (max-width: 576px) {
+  .gallery-main-title {
+    font-size: 1.5rem;
   }
-  
-  .photo-grid {
-    grid-template-columns: 1fr;
+
+  .album-cover {
+    height: 250px;
   }
-  
-  .album-selector,
-  .album-content {
-    padding: 15px;
+
+  .album-info {
+    padding: 16px;
+  }
+
+  .photo-count {
+    font-size: 0.8rem;
+    padding: 6px 12px;
   }
 }

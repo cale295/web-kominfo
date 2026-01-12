@@ -297,7 +297,7 @@ export default function Agenda() {
   };
 
   return (
-    <div className="container-fluid py-5 position-relative">
+    <div className="container-fluid py-5 position-relative background-white">
       {/* --- POPUP MODAL START --- */}
       {selectedAnnouncement && (
         <div 
