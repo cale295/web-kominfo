@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <?php
 // --- SETUP AWAL & SESSION ---
 $session  = session();
@@ -124,6 +123,7 @@ $menuItems = [
     ['type' => 'item', 'title' => 'Profil Saya', 'icon' => 'bi-person-fill', 'url' => '/profile', 'roles' => ['superadmin', 'admin', 'editor'], 'color' => '#a855f7'],
 ];
 ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
@@ -134,13 +134,15 @@ $menuItems = [
         width: 260px;
         height: 100vh;
         position: fixed;
-        top: 0; left: 0;
+        top: 0; 
+        left: 0;
         background: #fff;
         border-right: 1px solid #e5e7eb;
         z-index: 1040;
         display: flex; 
         flex-direction: column;
         font-family: 'Inter', sans-serif;
+        transition: transform 0.3s ease;
     }
 
     /* Brand */
@@ -150,6 +152,7 @@ $menuItems = [
         align-items: center;
         padding: 0 1.25rem;
         border-bottom: 1px solid #e5e7eb;
+        flex-shrink: 0;
     }
     .sidebar-brand i { 
         font-size: 1.4rem; 
@@ -159,7 +162,8 @@ $menuItems = [
     .sidebar-brand span { 
         font-weight: 600; 
         font-size: 1rem; 
-        color: #111827; 
+        color: #111827;
+        white-space: nowrap;
     }
 
     /* User */
@@ -168,20 +172,26 @@ $menuItems = [
         border-bottom: 1px solid #e5e7eb;
         display: flex; 
         align-items: center;
+        flex-shrink: 0;
     }
     .user-avatar { 
         width: 40px; 
         height: 40px; 
-        border-radius: 8px; 
+        border-radius: 8px;
+        flex-shrink: 0;
     }
     .user-info { 
         margin-left: 10px; 
         flex: 1;
+        min-width: 0;
     }
     .user-name { 
         font-weight: 600; 
         color: #111827; 
-        font-size: 0.85rem; 
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .user-role { 
         font-size: 0.7rem; 
@@ -193,6 +203,7 @@ $menuItems = [
     .sidebar-menu { 
         flex: 1; 
         overflow-y: auto; 
+        overflow-x: hidden;
         padding: 0.5rem 0; 
     }
     .sidebar-menu::-webkit-scrollbar { width: 4px; }
@@ -211,12 +222,19 @@ $menuItems = [
         font-size: 0.85rem;
         transition: all 0.2s;
         cursor: pointer;
+        word-wrap: break-word;
     }
 
     .menu-link i.menu-icon {
         font-size: 1.1rem;
         margin-right: 10px;
         width: 18px;
+        flex-shrink: 0;
+    }
+
+    .menu-link span {
+        flex: 1;
+        min-width: 0;
     }
 
     .menu-link:hover { 
@@ -234,7 +252,8 @@ $menuItems = [
         margin-left: auto; 
         font-size: 0.7rem; 
         transition: transform 0.2s; 
-        color: #9ca3af; 
+        color: #9ca3af;
+        flex-shrink: 0;
     }
     .has-submenu.open > .menu-link .arrow { 
         transform: rotate(180deg); 
@@ -259,6 +278,7 @@ $menuItems = [
         font-weight: 500;
         transition: all 0.2s;
         position: relative;
+        word-wrap: break-word;
     }
 
     .submenu-link::before {
@@ -304,6 +324,7 @@ $menuItems = [
         font-size: 0.75rem; 
         font-weight: 500;
         transition: all 0.2s;
+        word-wrap: break-word;
     }
     .submenu-link-level-3:hover { 
         color: #111827; 
@@ -317,7 +338,8 @@ $menuItems = [
     /* Footer */
     .sidebar-footer { 
         padding: 1rem 1.25rem; 
-        border-top: 1px solid #e5e7eb; 
+        border-top: 1px solid #e5e7eb;
+        flex-shrink: 0;
     }
     .logout-btn { 
         background: #fef2f2;
@@ -339,20 +361,82 @@ $menuItems = [
         background: #fee2e2;
     }
 
-    /* Mobile */
+    /* Overlay untuk mobile */
     .sidebar-overlay { 
         display: none; 
         position: fixed; 
-        top: 0; left: 0; 
-        width: 100%; height: 100%; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
         background: rgba(0,0,0,0.5); 
-        z-index: 1030; 
+        z-index: 1030;
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
     
-    @media (max-width: 768px) {
-        #sidebar { transform: translateX(-100%); transition: transform 0.3s; }
-        #sidebar.mobile-open { transform: translateX(0); }
-        .sidebar-overlay.show { display: block; }
+    .sidebar-overlay.show { 
+        display: block;
+        opacity: 1;
+    }
+    
+    /* Responsive untuk Tablet dan Mobile */
+    @media (max-width: 992px) {
+        #sidebar {
+            transform: translateX(-100%);
+        }
+        
+        #sidebar.mobile-open {
+            transform: translateX(0);
+        }
+    }
+
+    /* Penyesuaian untuk layar sangat kecil */
+    @media (max-width: 576px) {
+        #sidebar {
+            width: 280px;
+        }
+        
+        .sidebar-brand {
+            height: 56px;
+            padding: 0 1rem;
+        }
+        
+        .sidebar-brand i {
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-brand span {
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-user {
+            padding: 0.75rem 1rem;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .menu-link {
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .submenu-link {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .submenu-link::before {
+            left: 1.5rem;
+        }
+        
+        .submenu-link-level-3 {
+            padding: 0.45rem 1rem 0.45rem 3.5rem;
+            font-size: 0.7rem;
+        }
     }
 </style>
 
@@ -487,13 +571,16 @@ function toggleLevel3(element, event) {
 function openSidebar() {
     document.getElementById('sidebar').classList.add('mobile-open');
     document.getElementById('sidebarOverlay').classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
 }
 
 function closeSidebar() {
     document.getElementById('sidebar').classList.remove('mobile-open');
     document.getElementById('sidebarOverlay').classList.remove('show');
+    document.body.style.overflow = ''; // Restore scroll
 }
 
+// Close sidebar when clicking on a link (mobile)
 document.addEventListener("DOMContentLoaded", function() {
     const activeItem = document.querySelector('.submenu-link.active') || 
                        document.querySelector('.menu-link.active') || 
@@ -510,5 +597,26 @@ document.addEventListener("DOMContentLoaded", function() {
             activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 200);
     }
+
+    // Auto close sidebar on mobile when clicking menu items
+    if (window.innerWidth <= 992) {
+        const menuLinks = document.querySelectorAll('.menu-link:not([href="#"]):not([href="javascript:void(0)"]), .submenu-link:not([href="#"]):not([href="javascript:void(0)"]), .submenu-link-level-3');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                closeSidebar();
+            });
+        });
+    }
+});
+
+// Handle window resize
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+        if (window.innerWidth > 992) {
+            closeSidebar();
+        }
+    }, 250);
 });
 </script>

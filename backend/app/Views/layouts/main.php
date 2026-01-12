@@ -9,22 +9,106 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- STYLE TOGGLE (DIPERBAGUS) --- */
-        .status-btn { background: 0 0; border: none; padding: 0; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all .3s; }
-        .status-btn:hover { transform: scale(1.05); } /* Efek zoom dikit saat hover */
+        /* --- GENERAL RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        /* --- LAYOUT --- */
+        .layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - 260px);
+        }
+
+        /* --- MOBILE HEADER (Toggle Button) --- */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            z-index: 1020;
+            align-items: center;
+            padding: 0 1rem;
+            gap: 1rem;
+        }
+
+        .mobile-header .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6366f1;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            border-radius: 6px;
+        }
+
+        .mobile-header .toggle-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .mobile-header .header-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #111827;
+            flex: 1;
+        }
+
+        /* --- STATUS TOGGLE BUTTON --- */
+        .status-btn { 
+            background: 0 0; 
+            border: none; 
+            padding: 0; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            cursor: pointer; 
+            transition: all .3s; 
+        }
+        .status-btn:hover { transform: scale(1.05); }
         .status-btn:disabled { cursor: not-allowed; opacity: .6; filter: grayscale(100%); }
         
         .status-btn .switch {
-            position: relative; width: 44px; height: 24px;
-            background-color: #cbd5e1; border-radius: 20px;
+            position: relative; 
+            width: 44px; 
+            height: 24px;
+            background-color: #cbd5e1; 
+            border-radius: 20px;
             transition: all .3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
         
         .status-btn .switch::after {
-            content: ''; position: absolute; width: 20px; height: 20px;
-            background-color: #fff; border-radius: 50%;
-            top: 2px; left: 2px;
+            content: ''; 
+            position: absolute; 
+            width: 20px; 
+            height: 20px;
+            background-color: #fff; 
+            border-radius: 50%;
+            top: 2px; 
+            left: 2px;
             transition: all .3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
@@ -33,64 +117,170 @@
         .status-btn .switch.active::after { left: 22px; }
         
         .status-btn .switch-label {
-            font-size: 0.8rem; font-weight: 600; color: #334155;
-            min-width: 65px; text-align: left; transition: color 0.3s;
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            color: #334155;
+            min-width: 65px; 
+            text-align: left; 
+            transition: color 0.3s;
+            white-space: nowrap;
         }
 
-        /* --- TOAST NOTIFICATION (PEMBERITAHUAN MELAYANG) --- */
+        /* --- TOAST NOTIFICATION --- */
         #custom-toast-container {
-            position: fixed; top: 20px; right: 20px; z-index: 9999;
-            display: flex; flex-direction: column; gap: 10px;
+            position: fixed; 
+            top: 80px; 
+            right: 20px; 
+            z-index: 9999;
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px;
+            max-width: calc(100vw - 40px);
         }
         
         .custom-toast {
-            background: white; border-left: 4px solid #059669;
-            padding: 12px 20px; border-radius: 4px;
+            background: white; 
+            border-left: 4px solid #059669;
+            padding: 12px 20px; 
+            border-radius: 4px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            display: flex; align-items: center; gap: 10px;
-            min-width: 250px; transform: translateX(120%);
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            min-width: 250px;
+            max-width: 100%;
+            transform: translateX(120%);
             transition: transform 0.3s ease-out;
-            font-size: 0.9rem; font-weight: 500; color: #333;
+            font-size: 0.9rem; 
+            font-weight: 500; 
+            color: #333;
         }
         
         .custom-toast.show { transform: translateX(0); }
         .custom-toast.error { border-left-color: #dc2626; }
-        .custom-toast i { font-size: 1.2rem; }
+        .custom-toast i { 
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
         .custom-toast.success i { color: #059669; }
         .custom-toast.error i { color: #dc2626; }
 
-        /* --- LAYOUT UTAMA --- */
-        body { margin: 0; padding: 0; overflow-x: hidden; background-color: #f8fafc; }
-        
-        .sidebar {
-            position: fixed; top: 0; left: 0; height: 100vh; width: 250px;
-            background-color: #212529; overflow-y: auto; z-index: 1000;
-            transition: transform 0.3s ease;
+        .custom-toast span {
+            flex: 1;
+            word-wrap: break-word;
         }
+
+        /* --- RESPONSIVE BREAKPOINTS --- */
         
-        .main-content {
-            margin-left: 265px; min-height: 100vh; padding: 20px;
-            width: calc(100% - 250px);
-            transition: margin-left 0.3s ease, width 0.3s ease;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; width: 100%; }
-            .toggle-sidebar {
-                display: block !important; position: fixed; top: 15px; left: 15px; z-index: 999;
-                background-color: #212529; color: white; border: none;
-                padding: 10px 15px; border-radius: 5px; cursor: pointer;
+        /* Tablet dan Mobile */
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding-top: 80px;
+            }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            #custom-toast-container {
+                top: 70px;
+                right: 10px;
+                left: 10px;
+            }
+
+            .custom-toast {
+                min-width: auto;
+                width: 100%;
             }
         }
-        .toggle-sidebar { display: none; }
-        
-        /* Scrollbar Cantik */
-        .sidebar::-webkit-scrollbar { width: 6px; }
-        .sidebar::-webkit-scrollbar-track { background: #2c3034; }
-        .sidebar::-webkit-scrollbar-thumb { background: #495057; border-radius: 3px; }
-        .sidebar::-webkit-scrollbar-thumb:hover { background: #6c757d; }
+
+        /* Mobile Small */
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 1rem;
+                padding-top: 70px;
+            }
+
+            .mobile-header {
+                height: 56px;
+            }
+
+            .mobile-header .header-title {
+                font-size: 0.9rem;
+            }
+
+            .status-btn .switch {
+                width: 40px;
+                height: 22px;
+            }
+
+            .status-btn .switch::after {
+                width: 18px;
+                height: 18px;
+            }
+
+            .status-btn .switch.active::after {
+                left: 20px;
+            }
+
+            .status-btn .switch-label {
+                font-size: 0.75rem;
+                min-width: 60px;
+            }
+
+            #custom-toast-container {
+                top: 66px;
+            }
+
+            .custom-toast {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+
+            .custom-toast i {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Extra Small Devices */
+        @media (max-width: 400px) {
+            .main-content {
+                padding: 0.75rem;
+            }
+
+            .status-btn {
+                gap: 6px;
+            }
+
+            .custom-toast {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                min-width: auto;
+            }
+        }
+
+        /* Tablet Landscape */
+        @media (min-width: 768px) and (max-width: 992px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .mobile-header,
+            .status-btn,
+            #custom-toast-container {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+            }
+        }
     </style>
     <?= $this->renderSection('styles') ?>
 </head>
@@ -98,7 +288,15 @@
     
     <div id="custom-toast-container"></div>
 
-    <div class="d-flex">
+    <!-- Mobile Header with Toggle Button -->
+    <div class="mobile-header">
+        <button class="toggle-btn" onclick="openSidebar()" aria-label="Toggle Menu">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="header-title">Admin Panel</div>
+    </div>
+
+    <div class="layout-wrapper">
         <?= view('components/sidebar') ?>
         
         <div class="main-content">
@@ -152,7 +350,7 @@
                 data: { id: btn.data('id'), [csrfName]: csrfHash },
                 dataType: "json",
                 success: function(res) {
-                    btn.prop('disabled', false); // Aktifkan lagi
+                    btn.prop('disabled', false);
                     
                     if (res.status === 'success') {
                         // Update Tampilan Switch
@@ -163,14 +361,11 @@
                         } else {
                             switchEl.removeClass('active'); 
                             labelEl.text('Non-Aktif');
-                            showToast('Status dinonaktifkan', 'success'); // Toast Abu/Success
+                            showToast('Status dinonaktifkan', 'success');
                         }
 
                         // Update Token CSRF
                         $('input[name="'+csrfName+'"]').val(res.token);
-
-                        // OPSI: Jika ANDA TETAP INGIN SCROLL KE ATAS (Hapus tanda // di bawah ini)
-                        // window.scrollTo({ top: 0, behavior: 'smooth' });
 
                     } else {
                         showToast(res.message, 'error');
@@ -183,25 +378,24 @@
                 }
             });
         });
-    </script>
 
-    <script>
-        const toggleBtn = document.getElementById('toggleSidebar');
-        const sidebar = document.querySelector('.sidebar');
-        
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('active');
-            });
-            
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768) {
-                    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-                        sidebar.classList.remove('active');
-                    }
+        // Prevent body scroll when sidebar is open on mobile
+        function updateBodyScroll() {
+            if (window.innerWidth <= 992) {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar && sidebar.classList.contains('mobile-open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
                 }
-            });
+            } else {
+                document.body.style.overflow = '';
+            }
         }
+
+        // Call on load and resize
+        window.addEventListener('load', updateBodyScroll);
+        window.addEventListener('resize', updateBodyScroll);
     </script>
 
     <?= $this->renderSection('scripts') ?>

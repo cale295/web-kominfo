@@ -844,7 +844,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Opsional: Reload halaman jika ingin me-refresh tabel sepenuhnya
-                // location.reload(); 
+                location.reload(); 
             } else {
                 alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
                 // Update token jika ada error
