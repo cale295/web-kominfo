@@ -48,6 +48,7 @@ class FooterStatisticsController extends BaseController
 
         $data = [
             'statistics' => $stats,
+            'active_tab' => 'footer_statistics', // <--- TAMBAHKAN INI
             'can_create' => $access['can_create'],
             'can_update' => $access['can_update'],
             'can_delete' => $access['can_delete'],

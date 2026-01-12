@@ -44,6 +44,7 @@ class FooterOpdController extends BaseController
 
         $data = [
             'footer_opd' => $footer_opd,
+            'active_tab' => 'footer_opd', // <--- TAMBAHKAN INI
             'can_create' => $access['can_create'],
             'can_update' => $access['can_update'],
             'can_delete' => $access['can_delete'],

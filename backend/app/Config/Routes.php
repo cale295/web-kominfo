@@ -188,6 +188,38 @@ $routes->resource('pengumuman', ['controller' => 'frontend\PengumumanController'
 $routes->post('pengumuman/toggle-status', 'frontend\PengumumanController::toggleStatus');
 
 
+// Pastikan namespace mengarah ke folder 'frontend'
+$routes->group('footer_opd', ['namespace' => 'App\Controllers\frontend'], function($routes) {
+    
+    // Halaman Utama
+    $routes->get('/', 'FooterOpdController::index');
+    
+    // AJAX Switch Status
+    $routes->post('toggle_status', 'FooterOpdController::toggleStatus');
+
+    // --------------------------------------------------------
+    // TAB 1: IDENTITAS OPD
+    // --------------------------------------------------------
+    // Perhatikan nama method: createOpd, updateOpd, deleteOpd
+    $routes->post('createOpd', 'FooterOpdController::createOpd');
+    $routes->put('updateOpd/(:num)', 'FooterOpdController::updateOpd/$1');
+    $routes->delete('deleteOpd/(:num)', 'FooterOpdController::deleteOpd/$1');
+
+    // --------------------------------------------------------
+    // TAB 2: SOCIAL MEDIA
+    // --------------------------------------------------------
+    $routes->post('createSocial', 'FooterOpdController::createSocial');
+    $routes->put('updateSocial/(:num)', 'FooterOpdController::updateSocial/$1');
+    $routes->delete('deleteSocial/(:num)', 'FooterOpdController::deleteSocial/$1');
+
+    // --------------------------------------------------------
+    // TAB 3: STATISTICS
+    // --------------------------------------------------------
+    $routes->post('createStats', 'FooterOpdController::createStats');
+    $routes->put('updateStats/(:num)', 'FooterOpdController::updateStats/$1');
+    $routes->delete('deleteStats/(:num)', 'FooterOpdController::deleteStats/$1');
+});
+
 // =========================================================================
 // BERITA & DOKUMEN (BACKEND)
 // =========================================================================

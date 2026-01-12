@@ -46,6 +46,7 @@ class FooterSocialController extends BaseController
 
         $data = [
             'social_media' => $socials,
+            'active_tab' => 'footer_social', // <--- TAMBAHKAN INI
             'can_create'   => $access['can_create'],
             'can_update'   => $access['can_update'],
             'can_delete'   => $access['can_delete'],

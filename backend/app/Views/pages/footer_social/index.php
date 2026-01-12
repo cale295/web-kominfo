@@ -1,5 +1,3 @@
-
-
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
@@ -66,6 +64,22 @@
         transition: transform 0.2s;
     }
     .icon-box:hover { transform: scale(1.1); }
+
+    /* Styling Tambahan untuk Tabs (jika belum ada di main layout) */
+    .nav-pills .nav-link {
+        border-radius: 0.75rem;
+        transition: all 0.2s;
+        font-weight: 500;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #4f46e5;
+        color: white;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+    .nav-pills .nav-link:hover:not(.active) {
+        background-color: var(--primary-soft);
+        color: var(--primary-text);
+    }
 </style>
 
 <div class="container-fluid px-4 pb-5">
@@ -100,6 +114,7 @@
         </div>
     <?php endif; ?>
 
+    <?= $this->include('components/footer_tabs') ?>
     <div class="card card-modern">
         <div class="card-header bg-white py-4 border-0 d-flex flex-wrap justify-content-between align-items-center">
             <div>
