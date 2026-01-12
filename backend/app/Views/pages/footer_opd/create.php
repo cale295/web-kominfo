@@ -44,6 +44,10 @@
                         <label for="phone" class="form-label">Nomor Telepon</label>
                         <input type="text" class="form-control" id="phone" name="phone" value="<?= old('phone') ?>">
                     </div>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Link Url Logo</label>
+                        <input type="text" class="form-control" id="link_url_logo" name="link_url_logo" value="<?= old('link_url_logo') ?>">
+                    </div>
                 </div>
 
                 <div class="row mb-3">

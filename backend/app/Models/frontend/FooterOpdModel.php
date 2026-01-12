@@ -22,6 +22,7 @@ class FooterOpdModel extends Model
         'email',
         'phone',
         'logo_cominfo',   // Menyimpan path string
+        'link_url_logo',
         'election_badge', // Menyimpan path string
         'is_active',
         'created_by',
@@ -70,6 +71,18 @@ class FooterOpdModel extends Model
             'rules'  => 'required|max_length[50]|numeric', // Sesuaikan jika boleh ada tanda + atau -
             'label'  => 'Nomor Telepon'
         ],
+        'link_url_logo' => [
+            'rules'  => 'required|max_length[255]',
+            'label'  => 'Link URL Logo'
+        ],
+        'logo_cominfo' => [
+            'rules'  => 'required|max_length[255]',
+            'label'  => 'Logo Kominfo'
+        ],
+        'election_badge' => [
+            'rules'  => 'required|max_length[255]',
+            'label'  => 'Badge Pemilu'
+        ],
     ];
 
     // Custom Pesan Error (Bahasa Indonesia)
@@ -84,6 +97,10 @@ class FooterOpdModel extends Model
         ],
         'address' => [
             'required' => '{field} wajib diisi.'
+        ],
+        'link_url_logo' => [
+            'required'   => '{field} wajib diisi.',
+            'max_length' => '{field} maksimal 255 karakter.'
         ],
         'email' => [
             'valid_email' => 'Format email tidak valid.',

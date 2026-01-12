@@ -145,6 +145,7 @@ class FooterOpdController extends BaseController
             'official_title' => $this->request->getPost('official_title'),
             'address'        => $this->request->getPost('address'),
             'email'          => $this->request->getPost('email'),
+            'link_url_logo'  => $this->request->getPost('link_url_logo'),
             'phone'          => $this->request->getPost('phone'),
             'created_by'     => session()->get('id_user'), // Asumsi session user ID ada
         ];
@@ -216,6 +217,7 @@ class FooterOpdController extends BaseController
             'official_title' => $this->request->getPost('official_title'),
             'address'        => $this->request->getPost('address'),
             'email'          => $this->request->getPost('email'),
+            'link_url_logo'  => $this->request->getPost('link_url_logo'),
             'phone'          => $this->request->getPost('phone'),
             'updated_by'     => session()->get('id_user'),
         ];
