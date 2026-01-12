@@ -156,7 +156,7 @@ class MenuController extends BaseController
         $data = [
             'menu_name'     => $namaMenu,
             'menu_url'      => $menuUrl, // Gunakan URL yang sudah diproses
-            'admin_url'     => $this->request->getPost('admin_url'),
+            'admin_url'     => $menuUrl,
             'menu_icon'     => $this->request->getPost('menu_icon'),
             'parent_id'     => $parentId,
             'order_number'  => $this->request->getPost('order_number') ?: 0,

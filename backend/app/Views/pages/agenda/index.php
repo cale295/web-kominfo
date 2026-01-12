@@ -308,7 +308,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('edit_description').value = button.getAttribute('data-description');
         document.getElementById('edit_start_date').value = button.getAttribute('data-start');
         document.getElementById('edit_end_date').value = button.getAttribute('data-end');
-        document.getElementById('edit_status').value = button.getAttribute('data-status');
 
         // Image Preview Logic
         var image = button.getAttribute('data-image');
@@ -391,6 +390,58 @@ function toggleStatus(id) {
         console.error('Error:', error);
     });
 }
+
+function setupDateValidation(startInput, endInput) {
+    if (!startInput || !endInput) return;
+
+    // Set min saat awal
+    if (startInput.value) {
+        endInput.min = startInput.value;
+    }
+
+    startInput.addEventListener('change', function () {
+        endInput.min = startInput.value;
+
+        if (endInput.value && endInput.value < startInput.value) {
+            endInput.value = startInput.value;
+        }
+    });
+
+    endInput.addEventListener('change', function () {
+        if (startInput.value && endInput.value < startInput.value) {
+            alert('Tanggal selesai tidak boleh lebih awal dari tanggal mulai!');
+            endInput.value = startInput.value;
+        }
+    });
+
+    // Validasi submit
+    const form = startInput.closest('form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            if (startInput.value && endInput.value && endInput.value < startInput.value) {
+                e.preventDefault();
+                alert('Tanggal selesai tidak boleh lebih awal dari tanggal mulai!');
+                endInput.value = startInput.value;
+            }
+        });
+    }
+}
+
+// TAMBAH AGENDA
+document.addEventListener('DOMContentLoaded', function () {
+    setupDateValidation(
+        document.querySelector('input[name="start_date"]'),
+        document.querySelector('input[name="end_date"]')
+    );
+});
+
+// EDIT AGENDA → PENTING
+document.getElementById('modalEditAgenda').addEventListener('shown.bs.modal', function () {
+    setupDateValidation(
+        document.getElementById('edit_start_date'),
+        document.getElementById('edit_end_date')
+    );
+});
 </script>
 
 <?= $this->endSection() ?>

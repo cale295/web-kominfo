@@ -82,9 +82,13 @@ const Tugas: React.FC = () => {
       <div className="tugas-box">
         {tugasData.length > 0 ? (
           tugasData.map((item) => (
-            <p key={item.id_tugas} className="tugas-text">
-              {item.description}
-            </p>
+            <div
+              key={item.id_tugas}
+              className="tugas-text"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(item.description),
+              }}
+            />
           ))
         ) : (
           <p className="tugas-text">
@@ -110,7 +114,9 @@ const Tugas: React.FC = () => {
           ))
         ) : (
           <ol>
-            <li>Perumusan kebijakan teknis bidang komunikasi dan informatika</li>
+            <li>
+              Perumusan kebijakan teknis bidang komunikasi dan informatika
+            </li>
             <li>Perumusan kebijakan teknis bidang persandian</li>
             <li>Perumusan kebijakan teknis bidang statistik</li>
             <li>Dukungan penyelenggaraan urusan komunikasi dan informatika</li>
