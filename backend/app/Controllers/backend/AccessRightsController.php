@@ -64,6 +64,37 @@ class AccessRightsController extends BaseController
     return view('pages/access_rights/index', $data);
     }
     
+    // ======== CREATE / STORE (Data Baru) ========
+    // Ini fungsi baru untuk menangani Modal Tambah
+    public function store()
+    {
+        $session = session();
+        if ($session->get('role') !== 'superadmin') {
+            return redirect()->to('/dashboard');
+        }
+
+        // Validasi input sederhana
+        if (!$this->validate([
+            'role'        => 'required',
+            'module_name' => 'required'
+        ])) {
+            return redirect()->back()->withInput()->with('error', 'Role dan Nama Module wajib diisi.');
+        }
+
+        $data = [
+            'role'        => $this->request->getPost('role'),
+            'module_name' => $this->request->getPost('module_name'), // Input Text
+            'can_create'  => $this->request->getPost('can_create') ? 1 : 0,
+            'can_read'    => $this->request->getPost('can_read') ? 1 : 0,
+            'can_update'  => $this->request->getPost('can_update') ? 1 : 0,
+            'can_delete'  => $this->request->getPost('can_delete') ? 1 : 0,
+            'can_publish' => $this->request->getPost('can_publish') ? 1 : 0,
+        ];
+
+        $this->accessModel->insert($data);
+
+        return redirect()->to('/access_rights')->with('success', 'Hak akses baru berhasil ditambahkan.');
+    }
 
     // ======== FORM EDIT ========
     public function edit($id)

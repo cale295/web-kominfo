@@ -250,6 +250,8 @@ $routes->get('menu/(:num)/edit', 'backend\MenuController::edit/$1');
 $routes->get('access_rights', 'backend\AccessRightsController::index', ['filter' => 'roleauth:superadmin']);
 $routes->get('access_rights/edit/(:num)', 'backend\AccessRightsController::edit/$1', ['filter' => 'roleauth:superadmin']);
 $routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::update/$1', ['filter' => 'roleauth:superadmin']);
+$routes->post('access_rights/store', 'backend\AccessRightsController::store');
+$routes->put('access_rights/update/(:num)', 'backend\AccessRightsController::update/$1');
 
 // =========================================================================
 // INFORMASI PUBLIK (DOCUMENT FOLDER STRUCTURE)
