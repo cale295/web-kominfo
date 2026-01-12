@@ -598,29 +598,51 @@
     document.addEventListener("DOMContentLoaded", function() {
         const parentSelect = document.getElementById('parent_id');
         const urlInput = document.getElementById('menu_url');
+        const adminUrlInput = document.getElementById('admin_url');
         const urlHelper = document.getElementById('url-helper-text');
         
-        // Fungsi untuk mengecek parent yang dipilih
         function checkParentType() {
-            const selectedOption = parentSelect.options[parentSelect.selectedIndex];
-            const isInfoPublik = selectedOption.getAttribute('data-is-infopublik') === 'true';
+    const selectedOption = parentSelect.options[parentSelect.selectedIndex];
+    const isInfoPublik = selectedOption.getAttribute('data-is-infopublik') === 'true';
 
-            if (isInfoPublik) {
-                // Jika Informasi Publik, matikan input URL
-                urlInput.value = "Akan digenerate otomatis";
-                urlInput.setAttribute('readonly', true);
-                urlInput.style.backgroundColor = "#eff6ff"; // Light blue bg
-                urlHelper.innerHTML = '<i class="bi bi-info-circle-fill text-primary"></i> <span class="text-primary fw-bold">URL akan otomatis dibuat berdasarkan Nama Menu (Kategori Dokumen).</span>';
-            } else {
-                // Jika bukan, kembalikan ke normal
-                if(urlInput.value === "Akan digenerate otomatis") {
-                    urlInput.value = "";
-                }
-                urlInput.removeAttribute('readonly');
-                urlInput.style.backgroundColor = ""; // Reset bg
-                urlHelper.innerHTML = '<i class="bi bi-lightbulb-fill"></i> <span>Kosongkan jika menu ini memiliki submenu.</span>';
-            }
+    if (isInfoPublik) {
+        // ===== MENU URL =====
+        urlInput.value = "Akan digenerate otomatis";
+        urlInput.setAttribute('readonly', true);
+        urlInput.style.backgroundColor = "#eff6ff";
+        urlHelper.innerHTML = `
+            <i class="bi bi-info-circle-fill text-primary"></i>
+            <span class="text-primary fw-bold">
+                URL akan otomatis dibuat berdasarkan Nama Menu (Kategori Dokumen).
+            </span>
+        `;
+
+        // ===== ADMIN URL (SAMAIN) =====
+        adminUrlInput.value = "Akan digenerate otomatis";
+        adminUrlInput.setAttribute('readonly', true);
+        adminUrlInput.style.backgroundColor = "#eff6ff";
+
+    } else {
+        // ===== RESET MENU URL =====
+        if (urlInput.value === "Akan digenerate otomatis") {
+            urlInput.value = "";
         }
+        urlInput.removeAttribute('readonly');
+        urlInput.style.backgroundColor = "";
+        urlHelper.innerHTML = `
+            <i class="bi bi-lightbulb-fill"></i>
+            <span>Kosongkan jika menu ini memiliki submenu.</span>
+        `;
+
+        // ===== RESET ADMIN URL =====
+        if (adminUrlInput.value === "Akan digenerate otomatis") {
+            adminUrlInput.value = "";
+        }
+        adminUrlInput.removeAttribute('readonly');
+        adminUrlInput.style.backgroundColor = "";
+    }
+}
+
 
         // Jalankan saat pertama load (jika user kembali dari error validation)
         checkParentType();

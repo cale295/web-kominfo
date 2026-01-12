@@ -2,9 +2,10 @@
 
 <?= $this->section('styles') ?>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* ===============================
-   DASHBOARD BAPAK-BAPAK KOMINFO
-   Simpel • Jelas • Resmi
+   DESIGN SYSTEM (Selaras dengan Sidebar)
 ================================ */
 
 * {
@@ -14,20 +15,50 @@
 }
 
 :root {
-    --primary: #1d4ed8;      /* Biru pemerintah */
-    --secondary: #374151;    /* Abu tua */
-    --text-main: #111827;
-    --text-muted: #6b7280;
-    --bg-body: #f3f4f6;
+    /* Primary Colors - Sama dengan sidebar */
+    --primary: #6366f1;      /* Indigo */
+    --primary-light: #eef2ff;
+    --primary-dark: #4f46e5;
+    
+    /* Neutral Colors */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Semantic Colors */
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --info: #06b6d4;
+    --info-light: #cffafe;
+    
+    /* Surface */
+    --bg-body: #f9fafb;
     --card-bg: #ffffff;
-    --border: #d1d5db;
+    --border: #e5e7eb;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-body);
-    color: var(--text-main);
-    font-size: 17px;
+    color: var(--gray-900);
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 /* ===============================
@@ -37,119 +68,173 @@ body {
 .dashboard-wrapper {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 2rem;
 }
+
 
 /* ===============================
-   HEADER
-================================ */
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-}
-
-.header-title h1 {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.header-title p {
-    margin-top: 4px;
-    color: var(--secondary);
-}
-
-.user-badge {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 2px solid var(--border);
-    padding: 12px 16px;
-    background: #fff;
-}
-
-.role-tag {
-    margin-top: 4px;
-    display: inline-block;
-    background: var(--primary);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 8px;
-}
-
-/* ===============================
-   STAT CARDS
+   STAT CARDS (Modern Grid)
 ================================ */
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-.card {
+.stat-card {
     background: var(--card-bg);
-    border: 2px solid var(--border);
-    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--primary);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+}
+
+.card-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
 }
 
 .card-icon-wrapper {
-    width: 60px;
-    height: 60px;
-    background: #e0e7ff;
-    color: var(--primary);
-    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    font-size: 1.5rem;
+    background: var(--primary-light);
+    color: var(--primary);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover .card-icon-wrapper {
+    transform: scale(1.1);
+}
+
+.card-trend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.card-trend.up {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.card-trend.down {
+    background: var(--danger-light);
+    color: var(--danger);
 }
 
 .card-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--secondary);
-    margin-bottom: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .card-value {
-    font-size: 36px;
-    font-weight: 800;
-    margin-bottom: 12px;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1;
+    margin-bottom: 1rem;
 }
 
 .card-footer {
-    font-size: 15px;
-    color: var(--secondary);
-    border-top: 2px solid var(--border);
-    padding-top: 10px;
-}
-
-/* ===============================
-   ACTIVITY
-================================ */
-
-.table-card {
-    background: #fff;
-    border: 2px solid var(--border);
-}
-
-.card-header {
-    padding: 16px 20px;
-    border-bottom: 2px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--gray-500);
 }
 
-.card-header h3 {
-    font-size: 18px;
-    font-weight: 700;
+.card-footer strong {
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+/* Variasi warna untuk card icons */
+.stat-card:nth-child(1) .card-icon-wrapper {
+    background: #eef2ff;
+    color: #6366f1;
+}
+
+.stat-card:nth-child(2) .card-icon-wrapper {
+    background: #fef3c7;
+    color: #f59e0b;
+}
+
+.stat-card:nth-child(3) .card-icon-wrapper {
+    background: #d1fae5;
+    color: #10b981;
+}
+
+.stat-card:nth-child(4) .card-icon-wrapper {
+    background: #cffafe;
+    color: #06b6d4;
+}
+
+/* ===============================
+   ACTIVITY TABLE CARD
+================================ */
+
+.table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.table-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--gray-50);
+}
+
+.table-card-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.table-card-header h3 i {
+    color: var(--primary);
 }
 
 .activity-list {
@@ -158,56 +243,129 @@ body {
 
 .activity-item {
     display: flex;
-    gap: 16px;
-    padding: 16px 20px;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
 }
 
 .activity-item:last-child {
     border-bottom: none;
 }
 
+.activity-item:hover {
+    background: var(--gray-50);
+}
+
 .activity-icon-box {
     width: 44px;
     height: 44px;
-    background: #e5e7eb;
+    min-width: 44px;
+    background: var(--primary-light);
+    border-radius: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 1.125rem;
+    color: var(--primary);
+}
+
+.activity-details {
+    flex: 1;
 }
 
 .activity-details h5 {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
 }
 
 .activity-meta {
-    margin-top: 4px;
-    font-size: 14px;
-    color: var(--text-muted);
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.activity-meta i {
+    font-size: 0.75rem;
+}
+
+.activity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    background: var(--gray-100);
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--gray-600);
 }
 
 /* ===============================
-   FOOTER
+   EMPTY STATE
 ================================ */
 
-.footer {
-    margin-top: 40px;
+.empty-state {
     text-align: center;
-    font-size: 14px;
-    color: var(--text-muted);
+    padding: 3rem 1.5rem;
 }
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--gray-300);
+    margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+}
+
 
 /* ===============================
    RESPONSIVE
 ================================ */
 
 @media (max-width: 768px) {
-    .page-header {
+    .dashboard-wrapper {
+        padding: 1.5rem 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .card-value {
+        font-size: 1.875rem;
+    }
+
+    .header-title h1 {
+        font-size: 1.5rem;
+    }
+
+    .activity-meta {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: 0.25rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 </style>
@@ -217,52 +375,83 @@ body {
 <?= $this->section('content') ?>
 <div class="dashboard-wrapper">
 
-
-    <!-- STAT -->
+    <!-- STATISTICS GRID -->
     <div class="stats-grid">
 
-        <div class="card">
-            <div class="card-icon-wrapper"><i class="bi bi-newspaper"></i></div>
+        <div class="stat-card">
+            <div class="card-header-section">
+                <div class="card-icon-wrapper">
+                    <i class="bi bi-newspaper"></i>
+                </div>
+                <span class="card-trend up">
+                    <i class="bi bi-arrow-up"></i> 12%
+                </span>
+            </div>
             <div class="card-title">Total Berita</div>
             <div class="card-value"><?= $total_berita ?? 0 ?></div>
             <div class="card-footer">
-                Terbit: <?= $publish_berita ?? 0 ?> | Draft: <?= $draft_berita ?? 0 ?>
+                <span><strong><?= $publish_berita ?? 0 ?></strong> Terbit</span>
+                <span><strong><?= $draft_berita ?? 0 ?></strong> Draft</span>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-icon-wrapper"><i class="bi bi-calendar-check"></i></div>
+        <div class="stat-card">
+            <div class="card-header-section">
+                <div class="card-icon-wrapper">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <span class="card-trend up">
+                    <i class="bi bi-arrow-up"></i> 8%
+                </span>
+            </div>
             <div class="card-title">Agenda</div>
             <div class="card-value"><?= $agenda_total ?? 0 ?></div>
             <div class="card-footer">
-                Akan datang: <?= $agenda_upcoming ?? 0 ?>
+                <span><strong><?= $agenda_upcoming ?? 0 ?></strong> Akan Datang</span>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-icon-wrapper"><i class="bi bi-images"></i></div>
+        <div class="stat-card">
+            <div class="card-header-section">
+                <div class="card-icon-wrapper">
+                    <i class="bi bi-images"></i>
+                </div>
+                <span class="card-trend up">
+                    <i class="bi bi-arrow-up"></i> 5%
+                </span>
+            </div>
             <div class="card-title">Galeri Foto</div>
             <div class="card-value"><?= $gallery_total ?? 0 ?></div>
             <div class="card-footer">
-                Total album tersimpan
+                <span>Album Tersimpan</span>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-icon-wrapper"><i class="bi bi-file-earmark-text"></i></div>
+        <div class="stat-card">
+            <div class="card-header-section">
+                <div class="card-icon-wrapper">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <span class="card-trend down">
+                    <i class="bi bi-arrow-down"></i> 3%
+                </span>
+            </div>
             <div class="card-title">Dokumen</div>
             <div class="card-value"><?= $document_total ?? 0 ?></div>
             <div class="card-footer">
-                Baru bulan ini: <?= $document_new ?? 0 ?>
+                <span><strong><?= $document_new ?? 0 ?></strong> Bulan Ini</span>
             </div>
         </div>
 
     </div>
 
-    <!-- ACTIVITY -->
+    <!-- RECENT ACTIVITY -->
     <div class="table-card">
-        <div class="card-header">
-            <h3>Aktivitas Terakhir</h3>
+        <div class="table-card-header">
+            <h3>
+                <i class="bi bi-clock-history"></i>
+                Aktivitas Terakhir
+            </h3>
         </div>
 
         <ul class="activity-list">
@@ -270,30 +459,33 @@ body {
                 <?php foreach ($last_logs as $log): ?>
                     <li class="activity-item">
                         <div class="activity-icon-box">
-                            <i class="bi bi-clock"></i>
+                            <i class="bi bi-activity"></i>
                         </div>
                         <div class="activity-details">
                             <h5><?= esc($log['keterangan']) ?></h5>
                             <div class="activity-meta">
-                                <?= date('d M Y H:i', strtotime($log['created_date'])) ?> —
-                                <?= esc($log['username'] ?? 'System') ?>
+                                <span>
+                                    <i class="bi bi-clock"></i>
+                                    <?= date('d M Y, H:i', strtotime($log['created_date'])) ?>
+                                </span>
+                                <span class="activity-badge">
+                                    <i class="bi bi-person"></i>
+                                    <?= esc($log['username'] ?? 'System') ?>
+                                </span>
                             </div>
                         </div>
                     </li>
                 <?php endforeach ?>
             <?php else: ?>
                 <li class="activity-item">
-                    <div class="activity-details">
-                        <h5>Belum ada aktivitas</h5>
+                    <div class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <h5>Belum Ada Aktivitas</h5>
+                        <p>Aktivitas sistem akan muncul di sini</p>
                     </div>
                 </li>
             <?php endif ?>
         </ul>
     </div>
-
-    <div class="footer">
-        &copy; <?= date('Y') ?> Sistem Administrasi Pemerintah
-    </div>
-
 </div>
 <?= $this->endSection() ?>

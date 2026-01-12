@@ -2,284 +2,526 @@
 
 <?= $this->section('styles') ?>
 <style>
-    /* Simple Clean Styling */
-    :root {
-        --primary-color: #2563eb;
-        --border-color: #e5e7eb;
-        --text-primary: #111827;
-        --text-secondary: #6b7280;
-        --bg-hover: #f9fafb;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    .cursor-pointer { cursor: pointer; }
+/* ===============================
+   DESIGN SYSTEM (Selaras dengan Sidebar & Dashboard)
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Primary Colors - Sama dengan sidebar & dashboard */
+    --primary: #6366f1;
+    --primary-light: #eef2ff;
+    --primary-dark: #4f46e5;
     
-    /* Header Section - Minimal */
+    /* Neutral Colors */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Semantic Colors */
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --info: #06b6d4;
+    --info-light: #cffafe;
+    
+    /* Surface */
+    --bg-body: #f9fafb;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-body);
+    color: var(--gray-900);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cursor-pointer { cursor: pointer; }
+
+/* ===============================
+   PAGE HEADER
+================================ */
+
+.page-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.page-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-header h2 i {
+    color: var(--primary);
+}
+
+.page-header p {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+/* ===============================
+   BUTTONS
+================================ */
+
+.btn-primary-custom {
+    background: var(--primary);
+    border: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary-custom:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: white;
+}
+
+.btn-action {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--gray-600);
+    transition: all 0.2s;
+    font-size: 0.875rem;
+}
+
+.btn-action:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    color: var(--gray-900);
+    transform: translateY(-1px);
+}
+
+.btn-action.btn-delete:hover {
+    background: var(--danger-light);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+/* ===============================
+   CARD
+================================ */
+
+.menu-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ===============================
+   TABLE
+================================ */
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--border);
+}
+
+.table thead th {
+    border: none;
+    padding: 0.875rem 1rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===============================
+   PARENT ROW
+================================ */
+
+.parent-row {
+    transition: background-color 0.2s;
+}
+
+.parent-row:hover {
+    background-color: var(--gray-50);
+}
+
+.parent-row.expanded {
+    background-color: var(--gray-50);
+}
+
+/* ===============================
+   CHILD ROW
+================================ */
+
+.child-row {
+    background: var(--gray-50);
+    display: none;
+}
+
+.child-row:hover {
+    background: var(--gray-100);
+}
+
+.child-row.show {
+    display: table-row;
+    animation: fadeInRow 0.3s ease;
+}
+
+@keyframes fadeInRow {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===============================
+   TOGGLE ICON
+================================ */
+
+.toggle-icon {
+    transition: transform 0.2s;
+    display: inline-block;
+    font-size: 0.875rem;
+    color: var(--gray-400);
+}
+
+.parent-row.expanded .toggle-icon {
+    transform: rotate(90deg);
+    color: var(--primary);
+}
+
+/* ===============================
+   MENU ICON
+================================ */
+
+.menu-icon-box {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-light);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.menu-icon-small {
+    width: 32px;
+    height: 32px;
+    background: var(--gray-100);
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+/* ===============================
+   TREE LINE
+================================ */
+
+.tree-line {
+    position: relative;
+    padding-left: 28px;
+    margin-left: 16px;
+}
+
+.tree-line::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 20px;
+    height: 1px;
+    background: var(--gray-300);
+}
+
+.tree-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -100%;
+    width: 1px;
+    height: 200%;
+    background: var(--gray-300);
+}
+
+/* ===============================
+   TOGGLE SWITCH
+================================ */
+
+.form-switch .form-check-input {
+    width: 2.75rem;
+    height: 1.5rem;
+    cursor: pointer;
+    border: 2px solid var(--gray-300);
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.form-switch .form-check-input:focus {
+    box-shadow: 0 0 0 3px var(--primary-light);
+    border-color: var(--primary);
+}
+
+.form-switch .form-check-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.status-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-label.active {
+    color: var(--primary);
+}
+
+/* ===============================
+   BADGES
+================================ */
+
+.badge-custom {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-primary-custom {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.badge-secondary-custom {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+.badge-number {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.submenu-count {
+    background: var(--gray-200);
+    color: var(--gray-600);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* ===============================
+   CODE/URL DISPLAY
+================================ */
+
+code {
+    background: var(--gray-100);
+    color: var(--gray-900);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+    border: 1px solid var(--gray-200);
+}
+
+/* ===============================
+   EMPTY STATE
+================================ */
+
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--gray-400);
+}
+
+.empty-state h5 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ===============================
+   MENU NAME SECTION
+================================ */
+
+.menu-name-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.menu-name-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.menu-name-title {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.9375rem;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
     .page-header {
-        background: white;
-        border-bottom: 2px solid var(--border-color);
-        padding: 1.5rem 0;
-        margin-bottom: 2rem;
+        padding: 1rem 0;
     }
-    
+
     .page-header h2 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 0.25rem;
-    }
-    
-    .page-header p {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        margin-bottom: 0;
+        font-size: 1.25rem;
     }
 
-    /* Card - Simple */
-    .menu-card {
-        background: white;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    /* Table Styling - Minimal */
-    .table thead {
-        background: #f9fafb;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    .table thead th {
-        border: none;
-        padding: 0.75rem 1rem;
-        font-weight: 600;
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
+    .table thead th,
     .table tbody td {
-        padding: 1rem;
-        border-bottom: 1px solid #f3f4f6;
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8125rem;
     }
 
-    /* Parent Row */
-    .parent-row {
-        transition: background-color 0.2s;
-    }
-    
-    .parent-row:hover {
-        background-color: var(--bg-hover);
+    .btn-primary-custom {
+        padding: 0.5rem 1rem;
+        font-size: 0.8125rem;
     }
 
-    /* Child Row */
-    .child-row {
-        background: #fafbfc;
-        display: none;
-    }
-    
-    .child-row:hover {
-        background: #f5f6f7;
-    }
-    
-    .child-row.show {
-        display: table-row;
+    .menu-icon-box {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9375rem;
     }
 
-    /* Toggle Icon */
-    .toggle-icon {
-        transition: transform 0.2s;
-        display: inline-block;
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-    }
-    
-    .parent-row.expanded .toggle-icon {
-        transform: rotate(90deg);
-    }
-
-    /* Menu Icon - Simple */
-    .menu-icon {
-        width: 32px;
-        height: 32px;
-        background: #f3f4f6;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-    }
-
-    /* Tree Line - Simple */
     .tree-line {
-        position: relative;
-        padding-left: 24px;
+        padding-left: 20px;
         margin-left: 12px;
     }
-    
-    .tree-line::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        width: 16px;
-        height: 1px;
-        background: var(--border-color);
-    }
-    
-    .tree-line::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: -100%;
-        width: 1px;
-        height: 200%;
-        background: var(--border-color);
-    }
+}
 
-    /* Toggle Switch - Simple */
-    .form-switch .form-check-input {
-        width: 2.75rem;
-        height: 1.5rem;
-        cursor: pointer;
-        border: 2px solid #d1d5db;
-        background-color: white;
-        transition: all 0.2s;
-    }
-    
-    .form-switch .form-check-input:checked {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-    
-    .form-switch .form-check-input:focus {
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
+/* ===============================
+   CONTAINER
+================================ */
 
-    /* Status Label */
-    .status-label {
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-        margin-left: 0.5rem;
-    }
-    
-    .status-label.active {
-        color: var(--primary-color);
-    }
+.container-fluid {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
 
-    /* Badge - Simple */
-    .badge-simple {
-        display: inline-block;
-        padding: 0.25rem 0.625rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 500;
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
-
-    .badge-primary {
-        background: #eff6ff;
-        color: var(--primary-color);
-    }
-
-    .badge-secondary {
-        background: #f3f4f6;
-        color: var(--text-secondary);
-    }
-
-    /* URL Code - Simple */
-    code {
-        background: #f3f4f6;
-        color: var(--text-primary);
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.8125rem;
-        font-family: 'Courier New', monospace;
-    }
-
-    /* Action Buttons - Simple */
-    .btn-action {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--border-color);
-        background: white;
-        color: var(--text-secondary);
-        transition: all 0.2s;
-    }
-    
-    .btn-action:hover {
-        background: var(--bg-hover);
-        border-color: var(--text-secondary);
-    }
-    
-    .btn-action.btn-delete:hover {
-        background: #fef2f2;
-        border-color: #ef4444;
-        color: #ef4444;
-    }
-
-    /* Primary Button - Simple */
-    .btn-primary-simple {
-        background: var(--primary-color);
-        border: none;
-        padding: 0.625rem 1.25rem;
-        border-radius: 6px;
-        color: white;
-        font-weight: 500;
-        font-size: 0.875rem;
-        transition: background 0.2s;
-    }
-    
-    .btn-primary-simple:hover {
-        background: #1d4ed8;
-    }
-
-    /* Empty State - Simple */
-    .empty-state {
-        padding: 3rem 2rem;
-        text-align: center;
-    }
-    
-    .empty-state-icon {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 1.5rem;
-        background: #f3f4f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        color: var(--text-secondary);
-    }
-
-    /* Submenu Badge */
-    .submenu-count {
-        background: #f3f4f6;
-        color: var(--text-secondary);
-        padding: 0.125rem 0.5rem;
-        border-radius: 10px;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .page-header {
-            padding: 1rem 0;
-        }
-        
-        .table thead th,
-        .table tbody td {
-            padding: 0.75rem 0.5rem;
-        }
-    }
+}
 </style>
 <?= $this->endSection() ?>
 
@@ -287,35 +529,37 @@
 <?= $this->include('layouts/alerts') ?>
 
 <div class="container-fluid py-4">
-    <!-- Simple Header -->
+    <!-- Page Header -->
     <div class="page-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
                 <h2>
-                    <i class="bi bi-list-ul me-2"></i><?= esc($title) ?>
+                    <i class="bi bi-list-ul"></i>
+                    <?= esc($title) ?>
                 </h2>
-                <p><?= count($menus) ?> total menu</p>
+                <p><?= count($menus) ?> total menu dalam sistem</p>
             </div>
             <?php if ($can_create): ?>
-                <a href="<?= site_url('menu/new') ?>" class="btn btn-primary-simple">
-                    <i class="bi bi-plus-lg me-1"></i>Tambah Menu
+                <a href="<?= site_url('menu/new') ?>" class="btn-primary-custom">
+                    <i class="bi bi-plus-lg"></i>
+                    Tambah Menu
                 </a>
             <?php endif; ?>
         </div>
     </div>
 
-    <!-- Simple Card -->
+    <!-- Menu Card -->
     <div class="menu-card">
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle">
                 <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="40%">Nama Menu</th>
-                        <th width="25%">URL / Route</th>
-                        <th width="10%">Admin Url</th>
-                        <th width="15%" class="text-center">Status</th>
-                        <th width="15%" class="text-center">Aksi</th>
+                        <th width="35%">Nama Menu</th>
+                        <th width="20%">URL / Route</th>
+                        <th width="15%">Admin URL</th>
+                        <th width="12%" class="text-center">Status</th>
+                        <th width="13%" class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -334,16 +578,17 @@
 
                     if (empty($parents)): ?>
                         <tr>
-                            <td colspan="5" class="p-0">
+                            <td colspan="6" class="p-0">
                                 <div class="empty-state">
                                     <div class="empty-state-icon">
                                         <i class="bi bi-inbox"></i>
                                     </div>
-                                    <h5 class="fw-semibold mb-2">Belum Ada Menu</h5>
-                                    <p class="text-muted mb-3">Mulai dengan menambahkan menu pertama</p>
+                                    <h5>Belum Ada Menu</h5>
+                                    <p>Mulai dengan menambahkan menu pertama untuk sistem Anda</p>
                                     <?php if ($can_create): ?>
-                                        <a href="<?= site_url('menu/new') ?>" class="btn btn-primary-simple">
-                                            <i class="bi bi-plus-lg me-1"></i>Tambah Menu
+                                        <a href="<?= site_url('menu/new') ?>" class="btn-primary-custom">
+                                            <i class="bi bi-plus-lg"></i>
+                                            Tambah Menu
                                         </a>
                                     <?php endif; ?>
                                 </div>
@@ -358,21 +603,26 @@
                             <?= $hasChild ? 'onclick="toggleRows('.$parent['id_menu'].', this)"' : '' ?>>
                             
                             <td>
-                                <span class="badge-simple badge-secondary"><?= $counter++ ?></span>
+                                <span class="badge-number"><?= $counter++ ?></span>
                             </td>
                             
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <div style="width: 20px;" class="me-2">
+                                <div class="menu-name-section">
+                                    <div style="width: 20px;">
                                         <?php if ($hasChild): ?>
                                             <i class="bi bi-chevron-right toggle-icon"></i>
                                         <?php endif; ?>
                                     </div>
 
-                                    <div>
-                                        <div class="fw-semibold text-dark"><?= esc($parent['menu_name']) ?></div>
+                                    <div class="menu-icon-box">
+                                        <i class="<?= esc($parent['menu_icon'] ?: 'bi bi-circle') ?>"></i>
+                                    </div>
+
+                                    <div class="menu-name-text">
+                                        <div class="menu-name-title"><?= esc($parent['menu_name']) ?></div>
                                         <?php if($hasChild): ?>
-                                            <span class="submenu-count mt-1 d-inline-block">
+                                            <span class="submenu-count">
+                                                <i class="bi bi-diagram-3" style="font-size: 0.65rem;"></i>
                                                 <?= count($groupedChildren[$parent['id_menu']]) ?> submenu
                                             </span>
                                         <?php endif; ?>
@@ -384,15 +634,15 @@
                                 <?php if(!empty($parent['menu_url']) && $parent['menu_url'] != '#'): ?>
                                     <code><?= esc($parent['menu_url']) ?></code>
                                 <?php else: ?>
-                                    <span class="text-muted">—</span>
+                                    <span style="color: var(--gray-400);">—</span>
                                 <?php endif; ?>
                             </td>
 
-                               <td>
+                            <td>
                                 <?php if(!empty($parent['admin_url']) && $parent['admin_url'] != '#'): ?>
                                     <code><?= esc($parent['admin_url']) ?></code>
                                 <?php else: ?>
-                                    <span class="text-muted">—</span>
+                                    <span style="color: var(--gray-400);">—</span>
                                 <?php endif; ?>
                             </td>
                             
@@ -407,11 +657,11 @@
                                                    <?= ($parent['status'] === 'active') ? 'checked' : '' ?>>
                                         </div>
                                         <label for="toggle-<?= $parent['id_menu'] ?>" class="status-label <?= ($parent['status'] === 'active') ? 'active' : '' ?>" style="cursor: pointer;">
-                                            <?= ($parent['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
+                                            <?= ($parent['status'] === 'active') ? 'Aktif' : 'Off' ?>
                                         </label>
                                     </div>
                                 <?php else: ?>
-                                    <span class="badge-simple <?= ($parent['status'] === 'active') ? 'badge-primary' : 'badge-secondary' ?>">
+                                    <span class="badge-custom <?= ($parent['status'] === 'active') ? 'badge-primary-custom' : 'badge-secondary-custom' ?>">
                                         <?= ($parent['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
                                     </span>
                                 <?php endif; ?>
@@ -422,18 +672,18 @@
                                     <?php if ($can_update): ?>
                                         <a href="<?= site_url('menu/' . $parent['id_menu'].'/edit') ?>" 
                                            class="btn-action" 
-                                           data-bs-toggle="tooltip" title="Edit">
+                                           data-bs-toggle="tooltip" title="Edit Menu">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     <?php endif; ?>
 
                                     <?php if ($can_delete): ?>
                                         <form action="<?= site_url('menu/' . $parent['id_menu']) ?>" method="post" class="d-inline"
-                                              onsubmit="return confirm('Hapus menu ini? Submenu akan ikut terhapus.');">
+                                              onsubmit="return confirm('Hapus menu ini? Semua submenu akan ikut terhapus.');">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="_method" value="DELETE">
                                             <button type="submit" class="btn-action btn-delete" 
-                                                    data-bs-toggle="tooltip" title="Hapus">
+                                                    data-bs-toggle="tooltip" title="Hapus Menu">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -450,22 +700,29 @@
                                 <td>
                                     <div class="d-flex align-items-center ps-4">
                                         <div class="tree-line">
-                                            <div class="menu-icon me-3" style="width: 28px; height: 28px; font-size: 0.8rem;">
-                                                <i class="<?= esc($child['menu_icon']) ?>"></i>
+                                            <div class="menu-icon-small me-3">
+                                                <i class="<?= esc($child['menu_icon'] ?: 'bi bi-circle') ?>"></i>
                                             </div>
-                                            <span class="text-secondary"><?= esc($child['menu_name']) ?></span>
+                                            <span style="color: var(--gray-700); font-weight: 500;">
+                                                <?= esc($child['menu_name']) ?>
+                                            </span>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <code><?= esc($child['menu_url']) ?: '—' ?></code>
+                                    <?php if(!empty($child['menu_url']) && $child['menu_url'] != '#'): ?>
+                                        <code><?= esc($child['menu_url']) ?></code>
+                                    <?php else: ?>
+                                        <span style="color: var(--gray-400);">—</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
-        <?= !empty($child['admin_url'])
-            ? '<code>'.esc($child['admin_url']).'</code>'
-            : '<span class="text-muted">—</span>' ?>
-    </td>
-
+                                    <?php if(!empty($child['admin_url']) && $child['admin_url'] != '#'): ?>
+                                        <code><?= esc($child['admin_url']) ?></code>
+                                    <?php else: ?>
+                                        <span style="color: var(--gray-400);">—</span>
+                                    <?php endif; ?>
+                                </td>
                                 
                                 <td class="text-center">
                                     <?php if ($can_update): ?>
@@ -478,11 +735,11 @@
                                                        <?= ($child['status'] === 'active') ? 'checked' : '' ?>>
                                             </div>
                                             <label for="toggle-child-<?= $child['id_menu'] ?>" class="status-label <?= ($child['status'] === 'active') ? 'active' : '' ?>" style="cursor: pointer;">
-                                                <?= ($child['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
+                                                <?= ($child['status'] === 'active') ? 'Aktif' : 'Off' ?>
                                             </label>
                                         </div>
                                     <?php else: ?>
-                                        <span class="badge-simple <?= ($child['status'] === 'active') ? 'badge-primary' : 'badge-secondary' ?>">
+                                        <span class="badge-custom <?= ($child['status'] === 'active') ? 'badge-primary-custom' : 'badge-secondary-custom' ?>">
                                             <?= ($child['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
                                         </span>
                                     <?php endif; ?>
@@ -493,7 +750,7 @@
                                         <?php if ($can_update): ?>
                                             <a href="<?= site_url('menu/' . $child['id_menu'].'/edit') ?>" 
                                                class="btn-action" 
-                                               data-bs-toggle="tooltip" title="Edit">
+                                               data-bs-toggle="tooltip" title="Edit Submenu">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                         <?php endif; ?>
@@ -504,7 +761,7 @@
                                                 <?= csrf_field() ?>
                                                 <input type="hidden" name="_method" value="DELETE">
                                                 <button type="submit" class="btn-action btn-delete" 
-                                                        data-bs-toggle="tooltip" title="Hapus">
+                                                        data-bs-toggle="tooltip" title="Hapus Submenu">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -535,7 +792,7 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
 
-        // Toggle Status
+        // Toggle Status dengan feedback visual yang lebih baik
         const toggles = document.querySelectorAll('.toggle-status');
         
         toggles.forEach(toggle => {
@@ -544,7 +801,11 @@
                 const label = this.parentElement.nextElementSibling;
                 const isChecked = this.checked;
 
+                // Disable saat loading
                 this.disabled = true;
+                
+                // Visual feedback
+                label.style.opacity = '0.5';
 
                 fetch(url, {
                     method: 'POST',
@@ -557,20 +818,29 @@
                 .then(response => response.json())
                 .then(data => {
                     if(data.success) {
-                        if(isChecked) {
-                            label.textContent = 'Aktif';
-                            label.classList.add('active');
-                        } else {
-                            label.textContent = 'Nonaktif';
-                            label.classList.remove('active');
-                        }
+                        // Update label dengan smooth transition
+                        setTimeout(() => {
+                            if(isChecked) {
+                                label.textContent = 'Aktif';
+                                label.classList.add('active');
+                            } else {
+                                label.textContent = 'Off';
+                                label.classList.remove('active');
+                            }
+                            label.style.opacity = '1';
+                        }, 150);
                     } else {
+                        // Rollback jika gagal
                         this.checked = !isChecked;
+                        label.style.opacity = '1';
+                        alert('Gagal mengubah status menu');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     this.checked = !isChecked;
+                    label.style.opacity = '1';
+                    alert('Terjadi kesalahan saat mengubah status');
                 })
                 .finally(() => {
                     this.disabled = false;
@@ -579,7 +849,7 @@
         });
     });
 
-    // Toggle Accordion
+    // Toggle Accordion dengan smooth animation
     function toggleRows(parentId, element) {
         element.classList.toggle('expanded');
         const childRows = document.querySelectorAll(`.child-of-${parentId}`);

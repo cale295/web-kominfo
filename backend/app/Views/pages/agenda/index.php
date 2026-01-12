@@ -308,7 +308,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('edit_description').value = button.getAttribute('data-description');
         document.getElementById('edit_start_date').value = button.getAttribute('data-start');
         document.getElementById('edit_end_date').value = button.getAttribute('data-end');
-        document.getElementById('edit_status').value = button.getAttribute('data-status');
 
         // Image Preview Logic
         var image = button.getAttribute('data-image');
