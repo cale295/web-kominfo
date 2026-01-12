@@ -31,9 +31,9 @@
                 </div>
                 
                 <?php if ($can_create ?? true): ?>
-                    <a href="<?= site_url('berita_tag/new') ?>" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale">
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#modalCreate">
                         <i class="fas fa-plus me-1"></i> Tambah Tag
-                    </a>
+                    </button>
                 <?php endif; ?>
             </div>
 
@@ -89,12 +89,13 @@
 
                                         <td class="text-center">
                                             <div class="d-flex gap-2 justify-content-center">
-                                                <a href="<?= site_url('berita_tag/'.$tag['id_tags'].'/edit') ?>" 
+                                                <button type="button"
                                                    class="btn btn-outline-warning btn-sm rounded-circle shadow-sm"
                                                    data-bs-toggle="tooltip" 
-                                                   title="Edit">
+                                                   title="Edit"
+                                                   onclick="openEditModal(<?= $tag['id_tags'] ?>, '<?= esc($tag['nama_tag']) ?>')">
                                                     <i class="fas fa-pencil-alt"></i>
-                                                </a>
+                                                </button>
 
                                                 <button type="button" 
                                                         class="btn btn-outline-danger btn-sm rounded-circle shadow-sm" 
@@ -126,6 +127,76 @@
     </form>
 </div>
 
+<!-- Modal Create -->
+<div class="modal fade" id="modalCreate" tabindex="-1" aria-labelledby="modalCreateLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalCreateLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Tag Baru
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<?= site_url('berita_tag') ?>" method="post">
+                <?= csrf_field() ?>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-bold">
+                            Nama Tag <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="name" id="name" class="form-control" placeholder="Contoh: Teknologi, Olahraga, Politik" required autofocus>
+                        <small class="text-muted">Masukkan nama tag yang akan digunakan untuk mengkategorikan berita.</small>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit -->
+<div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalEditLabel">
+                    <i class="fas fa-edit me-2"></i>Edit Tag
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEdit" method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="_method" value="PUT">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label fw-bold">
+                            Nama Tag <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="name" id="edit_name" class="form-control" required>
+                        <small class="text-muted">Update nama tag sesuai kebutuhan.</small>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-1"></i>Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Form untuk delete satuan -->
 <form id="deleteForm" action="" method="post" style="display: none;">
     <?= csrf_field() ?>
     <input type="hidden" name="_method" value="DELETE">
@@ -134,8 +205,27 @@
 <style>
     .hover-scale { transition: transform 0.2s; }
     .hover-scale:hover { transform: scale(1.05); }
-    /* Agar checkbox terlihat lebih jelas */
     .form-check-input { cursor: pointer; }
+    
+    /* Modal animations */
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        border-top: none;
+        padding: 1rem 1.5rem;
+    }
 </style>
 
 <script>
@@ -188,16 +278,46 @@
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         });
+
+        // 3. Auto-show modal jika ada error validation
+        <?php if (session()->get('errors') || session()->getFlashdata('error')): ?>
+            <?php if (isset($tag)): ?>
+                // Jika ada data tag, berarti dari edit
+                openEditModal(<?= $tag['id_tags'] ?? 0 ?>, '<?= esc($tag['nama_tag'] ?? '') ?>');
+            <?php else: ?>
+                // Jika tidak ada data tag, berarti dari create
+                var modalCreate = new bootstrap.Modal(document.getElementById('modalCreate'));
+                modalCreate.show();
+            <?php endif; ?>
+        <?php endif; ?>
     });
 
-    // 3. Helper Delete Satuan
+    // 3. Function untuk membuka modal edit
+    function openEditModal(id, name) {
+        document.getElementById('edit_name').value = name;
+        document.getElementById('formEdit').action = '<?= site_url('berita_tag/') ?>' + id;
+        
+        var modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
+        modalEdit.show();
+    }
+
+    // 4. Helper Delete Satuan
     function confirmDelete(url) {
-        if(confirm('Apakah Anda yakin ingin menghapus tema ini?')) {
+        if(confirm('Apakah Anda yakin ingin menghapus tag ini?')) {
             const form = document.getElementById('deleteForm');
             form.action = url;
             form.submit();
         }
     }
+
+    // 5. Reset form ketika modal ditutup
+    document.getElementById('modalCreate').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('name').value = '';
+    });
+
+    document.getElementById('modalEdit').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('edit_name').value = '';
+    });
 </script>
 
 <?= $this->endSection() ?>

@@ -30,9 +30,9 @@
                     </button>
                 </div>
                 
-                <a href="<?= site_url('kategori/new') ?>" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#modalCreate">
                     <i class="fas fa-plus me-1"></i> Tambah Kategori
-                </a>
+                </button>
             </div>
 
             <div class="card-body p-0">
@@ -108,12 +108,13 @@
 
                                         <td>
                                             <div class="d-flex gap-2 justify-content-center">
-                                                <a href="<?= site_url('kategori/' . $row['id_kategori'] . '/edit') ?>" 
+                                                <button type="button"
                                                    class="btn btn-outline-warning btn-sm rounded-circle shadow-sm" 
                                                    data-bs-toggle="tooltip" 
-                                                   title="Edit">
+                                                   title="Edit"
+                                                   onclick='openEditModal(<?= json_encode($row) ?>)'>
                                                     <i class="fas fa-pencil-alt"></i>
-                                                </a>
+                                                </button>
 
                                                 <button type="button" 
                                                         class="btn btn-outline-danger btn-sm rounded-circle shadow-sm" 
@@ -145,6 +146,132 @@
     </form>
 </div>
 
+<!-- Modal Create -->
+<div class="modal fade" id="modalCreate" tabindex="-1" aria-labelledby="modalCreateLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalCreateLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Kategori Baru
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<?= site_url('kategori') ?>" method="post">
+                <?= csrf_field() ?>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                Nama Kategori <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="kategori" class="form-control" placeholder="Contoh: Politik, Ekonomi, Olahraga" required autofocus>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="1" selected>Aktif</option>
+                                <option value="0">Nonaktif</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">Keterangan</label>
+                            <textarea name="keterangan" class="form-control" rows="3" placeholder="Deskripsi singkat kategori (opsional)"></textarea>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tampilkan di Navigasi?</label>
+                            <select name="is_show_nav" class="form-select">
+                                <option value="0" selected>Tidak</option>
+                                <option value="1">Ya</option>
+                            </select>
+                            <small class="text-muted">Apakah kategori ini ditampilkan di menu navigasi?</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Urutan Navigasi</label>
+                            <input type="number" name="sorting_nav" class="form-control" placeholder="Contoh: 1, 2, 3" min="0">
+                            <small class="text-muted">Urutan tampilan di menu (angka kecil = lebih dulu)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit -->
+<div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalEditLabel">
+                    <i class="fas fa-edit me-2"></i>Edit Kategori
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEdit" method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="_method" value="PUT">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                Nama Kategori <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="kategori" id="edit_kategori" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Status</label>
+                            <select name="status" id="edit_status" class="form-select">
+                                <option value="1">Aktif</option>
+                                <option value="0">Nonaktif</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">Keterangan</label>
+                            <textarea name="keterangan" id="edit_keterangan" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tampilkan di Navigasi?</label>
+                            <select name="is_show_nav" id="edit_is_show_nav" class="form-select">
+                                <option value="0">Tidak</option>
+                                <option value="1">Ya</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Urutan Navigasi</label>
+                            <input type="number" name="sorting_nav" id="edit_sorting_nav" class="form-control" min="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-1"></i>Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Form untuk delete satuan -->
 <form id="deleteSingleForm" action="" method="post" style="display: none;">
     <?= csrf_field() ?>
     <input type="hidden" name="_method" value="DELETE">
@@ -153,8 +280,27 @@
 <style>
     .hover-scale { transition: transform 0.2s; }
     .hover-scale:hover { transform: scale(1.05); }
-    /* Cursor pointer untuk checkbox */
     .form-check-input { cursor: pointer; }
+    
+    /* Modal animations */
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        border-top: none;
+        padding: 1rem 1.5rem;
+    }
 </style>
 
 <script>
@@ -204,7 +350,6 @@
             toggle.addEventListener('change', function() {
                 const id = this.dataset.id;
                 const url = this.dataset.url;
-                // Sesuaikan logika value (1/0) atau ('aktif'/'nonaktif')
                 const isChecked = this.checked ? 1 : 0; 
                 
                 const csrfName = '<?= csrf_token() ?>';
@@ -235,9 +380,35 @@
                 });
             });
         });
+
+        // --- 4. AUTO-SHOW MODAL JIKA ADA ERROR ---
+        <?php if (session()->get('errors') || session()->getFlashdata('error')): ?>
+            <?php if (isset($kategori) && isset($kategori['id_kategori'])): ?>
+                // Jika ada data kategori, berarti dari edit
+                openEditModal(<?= json_encode($kategori) ?>);
+            <?php else: ?>
+                // Jika tidak ada data kategori, berarti dari create
+                var modalCreate = new bootstrap.Modal(document.getElementById('modalCreate'));
+                modalCreate.show();
+            <?php endif; ?>
+        <?php endif; ?>
     });
 
-    // --- 4. HELPER DELETE SATUAN ---
+    // --- 5. FUNCTION OPEN EDIT MODAL ---
+    function openEditModal(data) {
+        document.getElementById('edit_kategori').value = data.kategori || '';
+        document.getElementById('edit_keterangan').value = data.keterangan || '';
+        document.getElementById('edit_status').value = data.status || '1';
+        document.getElementById('edit_is_show_nav').value = data.is_show_nav || '0';
+        document.getElementById('edit_sorting_nav').value = data.sorting_nav || '';
+        
+        document.getElementById('formEdit').action = '<?= site_url('kategori/') ?>' + data.id_kategori;
+        
+        var modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
+        modalEdit.show();
+    }
+
+    // --- 6. HELPER DELETE SATUAN ---
     function confirmDelete(url) {
         if(confirm('Apakah Anda yakin ingin menghapus kategori ini?')) {
             const form = document.getElementById('deleteSingleForm');
@@ -245,6 +416,15 @@
             form.submit();
         }
     }
+
+    // --- 7. RESET FORM KETIKA MODAL DITUTUP ---
+    document.getElementById('modalCreate').addEventListener('hidden.bs.modal', function () {
+        this.querySelector('form').reset();
+    });
+
+    document.getElementById('modalEdit').addEventListener('hidden.bs.modal', function () {
+        this.querySelector('form').reset();
+    });
 </script>
 
 <?= $this->endSection() ?>
