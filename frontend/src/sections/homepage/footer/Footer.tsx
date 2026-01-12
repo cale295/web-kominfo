@@ -9,6 +9,7 @@ interface opd {
   adress: string;
   email: string;
   logo_cominfo: string;
+  link_url_logo: string;
 }
 
 interface kanal {
@@ -225,13 +226,19 @@ const Footer: React.FC = () => {
                 {opdInfo.email}
               </p>
 
-              {opdInfo.logo_cominfo && (
-                <img
-                  src={opdInfo.logo_cominfo}
-                  alt={opdInfo.website_name}
-                  className="flag-logo"
-                />
-              )}
+              <a
+                href={opdInfo.link_url_logo || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {opdInfo.logo_cominfo && (
+                  <img
+                    src={opdInfo.logo_cominfo}
+                    alt={opdInfo.website_name}
+                    className="flag-logo"
+                  />
+                )}
+              </a>
             </>
           ) : (
             <p className="p-text">Data OPD tidak tersedia</p>
