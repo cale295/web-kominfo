@@ -22,7 +22,7 @@ class BeritaUtamaController extends BaseController
     }
 
     // ============================
-    // Daftar berita utama
+    // Daftar berita utama dengan modal popup
     // ============================
     public function index()
     {
@@ -33,16 +33,37 @@ class BeritaUtamaController extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita utama.');
         }
 
-        $data['beritaUtama'] = $this->utamaModel
+        // Ambil data berita utama dengan join
+        $beritaUtama = $this->utamaModel
             ->select('t_berita_utama.*, t_berita.judul, t_berita.slug, t_berita.feat_image, t_berita.created_at')
             ->join('t_berita', 't_berita.id_berita = t_berita_utama.id_berita')
             ->orderBy('t_berita_utama.created_date', 'DESC')
             ->findAll();
 
-        $data['can_create'] = $access['can_create'];
-        $data['can_update'] = $access['can_update'];
-        $data['can_delete'] = $access['can_delete'];
-        $data['title'] = 'Manajemen Berita Utama';
+        // Ambil semua berita untuk dropdown
+        $semuaBerita = $this->beritaModel
+            ->where('trash', '0')
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
+
+        // Filter berita yang belum jadi berita utama (untuk create modal)
+        $beritaSudahUtama = array_column($beritaUtama, 'id_berita');
+        $beritas = array_filter($semuaBerita, function($berita) use ($beritaSudahUtama) {
+            return !in_array($berita['id_berita'], $beritaSudahUtama);
+        });
+
+        // Untuk edit modal, kita butuh semua berita termasuk yang sudah dipilih
+        $beritaList = $semuaBerita;
+
+        $data = [
+            'beritaUtama' => $beritaUtama,
+            'beritas' => $beritas, // Untuk create modal (hanya berita yang belum jadi utama)
+            'beritaList' => $beritaList, // Untuk edit modal (semua berita)
+            'can_create' => $access['can_create'],
+            'can_update' => $access['can_update'],
+            'can_delete' => $access['can_delete'],
+            'title' => 'Manajemen Berita Utama'
+        ];
 
         return view('pages/berita_utama/index', $data);
     }
@@ -55,7 +76,6 @@ class BeritaUtamaController extends BaseController
         }
 
         // 2. CEK HAK AKSES
-        // Pastikan Controller punya property $this->accessRightsModel & fungsi getAccess()
         $role = session()->get('role');
         $access = $this->getAccess($role);
 
@@ -67,13 +87,8 @@ class BeritaUtamaController extends BaseController
             ]);
         }
 
-        // 3. LOAD MODEL & AMBIL DATA
-        // ==================================================
-        $model = new \App\Models\BeritaUtamaModel(); // <--- GANTI INI SESUAI MODUL
-        // ==================================================
-
         $id = $this->request->getPost('id');
-        $data = $model->find($id);
+        $data = $this->utamaModel->find($id);
 
         if ($data) {
             // Logic Toggle (1 -> 0, 0 -> 1)
@@ -87,12 +102,12 @@ class BeritaUtamaController extends BaseController
                 'updated_by_name'   => session()->get('username'),
             ];
 
-            if ($model->update($id, $updateData)) {
+            if ($this->utamaModel->update($id, $updateData)) {
                 return $this->response->setJSON([
                     'status'    => 'success',
                     'message'   => 'Status berhasil diperbarui',
                     'newStatus' => $newStatus,
-                    'token'     => csrf_hash() // Kirim token baru
+                    'token'     => csrf_hash()
                 ]);
             }
         }
@@ -103,133 +118,246 @@ class BeritaUtamaController extends BaseController
             'token'   => csrf_hash()
         ]);
     }
-    // ============================
-    // Form tambah berita utama
-    // ============================
-    public function new()
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_create']) {
-            return redirect()->to('/berita-utama')->with('error', 'Kamu tidak punya izin menambah berita utama.');
-        }
-
-        $beritas = $this->beritaModel->where('trash', '0')->findAll();
-
-        return view('pages/berita_utama/create', [
-            'title' => 'Tambah Berita Utama',
-            'beritas' => $beritas,
-            'can_create' => $access['can_create'],
-        ]);
-    }
 
     // ============================
-    // Simpan berita utama baru
+    // Simpan berita utama baru (untuk modal)
     // ============================
     public function create()
     {
-        $access = $this->getAccess(session()->get('role'));
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+        
         if (!$access || !$access['can_create']) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Kamu tidak punya izin menyimpan berita utama.',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->to('/berita-utama')->with('error', 'Kamu tidak punya izin menyimpan berita utama.');
         }
 
         $id_berita = $this->request->getPost('id_berita');
+        
         if (!$id_berita) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Silakan pilih berita terlebih dahulu.',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->back()->with('error', 'Silakan pilih berita terlebih dahulu.');
         }
 
+        // Cek apakah berita sudah menjadi berita utama
         if ($this->utamaModel->where('id_berita', $id_berita)->first()) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Berita ini sudah menjadi berita utama.',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->back()->with('error', 'Berita ini sudah menjadi berita utama.');
         }
 
+        // Cek batas maksimal berita utama aktif
         $jumlahUtama = $this->utamaModel->where('status', 1)->countAllResults();
-        if ($jumlahUtama >= 6) {
+        $status = $this->request->getPost('status');
+        
+        if ($status == 1 && $jumlahUtama >= 6) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Berita utama sudah mencapai batas maksimal (6).',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->back()->with('error', 'Berita utama sudah mencapai batas maksimal (6).');
         }
 
-        $this->utamaModel->insert([
+        // Simpan data
+        $data = [
             'id_berita' => $id_berita,
-            'jenis' => $this->request->getPost('jenis'),
+            'jenis' => $this->request->getPost('jenis') ?: null,
             'content' => $this->request->getPost('content'),
             'content2' => $this->request->getPost('content2'),
-            'status' => $this->request->getPost('status'),
+            'status' => $status,
             'created_date' => date('Y-m-d H:i:s'),
             'created_by_id' => session()->get('id_user'),
             'created_by_name' => session()->get('username'),
-        ]);
+        ];
 
-        return redirect()->to('/berita-utama')->with('success', 'Berita utama berhasil ditambahkan.');
+        if ($this->utamaModel->insert($data)) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Berita utama berhasil ditambahkan.',
+                    'redirect' => site_url('berita-utama'),
+                    'token' => csrf_hash()
+                ]);
+            }
+            return redirect()->to('/berita-utama')->with('success', 'Berita utama berhasil ditambahkan.');
+        } else {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal menyimpan berita utama.',
+                    'token' => csrf_hash()
+                ]);
+            }
+            return redirect()->back()->with('error', 'Gagal menyimpan berita utama.');
+        }
     }
 
     // ============================
-    // Edit berita utama
-    // ============================
-    public function edit($id)
-    {
-        $access = $this->getAccess(session()->get('role'));
-        if (!$access || !$access['can_update']) {
-            return redirect()->to('/berita-utama')->with('error', 'Kamu tidak punya izin mengedit berita utama.');
-        }
-
-        $utama = $this->utamaModel
-            ->select('t_berita_utama.*, t_berita.judul, t_berita.feat_image, t_berita.id_berita')
-            ->join('t_berita', 't_berita.id_berita = t_berita_utama.id_berita')
-            ->where('t_berita_utama.id_berita_utama', $id)
-            ->first();
-
-        if (!$utama) {
-            return redirect()->to('/berita-utama')->with('error', 'Data tidak ditemukan.');
-        }
-
-        $beritaList = $this->beritaModel->where('trash', '0')->orderBy('created_at', 'DESC')->findAll();
-
-        return view('pages/berita_utama/edit', [
-            'title' => 'Edit Berita Utama',
-            'utama' => $utama,
-            'beritaList' => $beritaList,
-            'can_update' => $access['can_update'],
-        ]);
-    }
-
-    // ============================
-    // Update berita utama
+    // Update berita utama (untuk modal)
     // ============================
     public function update($id)
     {
-        $access = $this->getAccess(session()->get('role'));
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+        
         if (!$access || !$access['can_update']) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Kamu tidak punya izin memperbarui berita utama.',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->to('/berita-utama')->with('error', 'Kamu tidak punya izin memperbarui berita utama.');
         }
 
         $utama = $this->utamaModel->find($id);
         if (!$utama) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Data tidak ditemukan.',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->to('/berita-utama')->with('error', 'Data tidak ditemukan.');
         }
 
-        $this->utamaModel->update($id, [
-            'id_berita' => $this->request->getPost('id_berita'),
-            'jenis' => $this->request->getPost('jenis'),
-        ]);
+        $id_berita = $this->request->getPost('id_berita');
+        
+        // Cek jika id_berita berubah, pastikan tidak duplikat
+        if ($id_berita != $utama['id_berita']) {
+            $existing = $this->utamaModel->where('id_berita', $id_berita)->first();
+            if ($existing) {
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'status' => 'error',
+                        'message' => 'Berita ini sudah menjadi berita utama.',
+                        'token' => csrf_hash()
+                    ]);
+                }
+                return redirect()->back()->with('error', 'Berita ini sudah menjadi berita utama.');
+            }
+        }
 
-        return redirect()->to('/berita-utama')->with('success', 'Berita utama berhasil diperbarui.');
+        // Cek batas maksimal berita utama aktif jika status diubah menjadi aktif
+        $status = $this->request->getPost('status');
+        if ($status == 1 && $utama['status'] == 0) {
+            $jumlahUtama = $this->utamaModel->where('status', 1)->countAllResults();
+            if ($jumlahUtama >= 6) {
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'status' => 'error',
+                        'message' => 'Berita utama sudah mencapai batas maksimal (6).',
+                        'token' => csrf_hash()
+                    ]);
+                }
+                return redirect()->back()->with('error', 'Berita utama sudah mencapai batas maksimal (6).');
+            }
+        }
+
+        // Update data
+        $updateData = [
+            'id_berita' => $id_berita,
+            'jenis' => $this->request->getPost('jenis') ?: null,
+            'status' => $status,
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updated_by_id' => session()->get('id_user'),
+            'updated_by_name' => session()->get('username'),
+        ];
+
+        if ($this->utamaModel->update($id, $updateData)) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Berita utama berhasil diperbarui.',
+                    'redirect' => site_url('berita-utama'),
+                    'token' => csrf_hash()
+                ]);
+            }
+            return redirect()->to('/berita-utama')->with('success', 'Berita utama berhasil diperbarui.');
+        } else {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal memperbarui berita utama.',
+                    'token' => csrf_hash()
+                ]);
+            }
+            return redirect()->back()->with('error', 'Gagal memperbarui berita utama.');
+        }
     }
 
     // ============================
-    // Hapus berita utama
+    // Hapus berita utama (AJAX support)
     // ============================
     public function delete($id)
     {
-        $access = $this->getAccess(session()->get('role'));
+        $role = session()->get('role');
+        $access = $this->getAccess($role);
+        
         if (!$access || !$access['can_delete']) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Kamu tidak punya izin menghapus berita utama.',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->back()->with('error', 'Kamu tidak punya izin menghapus berita utama.');
         }
 
         $utama = $this->utamaModel->find($id);
         if (!$utama) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Data tidak ditemukan.',
+                    'token' => csrf_hash()
+                ]);
+            }
             return redirect()->back()->with('error', 'Data tidak ditemukan.');
         }
 
-        $this->utamaModel->delete($id);
-        return redirect()->back()->with('success', 'Berita utama berhasil dihapus.');
+        if ($this->utamaModel->delete($id)) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Berita utama berhasil dihapus.',
+                    'token' => csrf_hash()
+                ]);
+            }
+            return redirect()->back()->with('success', 'Berita utama berhasil dihapus.');
+        } else {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal menghapus berita utama.',
+                    'token' => csrf_hash()
+                ]);
+            }
+            return redirect()->back()->with('error', 'Gagal menghapus berita utama.');
+        }
     }
 
     // ============================
@@ -250,5 +378,20 @@ class BeritaUtamaController extends BaseController
             'can_update' => (bool)$access['can_update'],
             'can_delete' => (bool)$access['can_delete'],
         ];
+    }
+
+    // ============================
+    // Redirect untuk method new() dan edit() ke index (karena sekarang pakai modal)
+    // ============================
+    public function new()
+    {
+        // Redirect ke index karena create sudah di-handle di modal
+        return redirect()->to('berita-utama');
+    }
+
+    public function edit($id)
+    {
+        // Redirect ke index karena edit sudah di-handle di modal
+        return redirect()->to('berita-utama');
     }
 }

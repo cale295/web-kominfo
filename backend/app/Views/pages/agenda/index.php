@@ -190,7 +190,7 @@
                         </div>
                     </div>
                     <div class="form-group-row align-items-start">
-                        <label class="form-label-custom" style="padding-top:8px">Deskripsi</label>
+                        <label class="form-label-custom" style="padding-top:8px">Deskripsi <span class="required-star">*)</span></label>
                         <div class="form-input-container">
                             <textarea class="form-control" name="description" rows="3"></textarea>
                         </div>
