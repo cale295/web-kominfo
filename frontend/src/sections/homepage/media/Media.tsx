@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../services/api";
+import "./Media.css";
 
 interface Video {
   id_video_layanan: string;
@@ -64,7 +65,7 @@ const Media: React.FC = () => {
   }, []);
 
   return (
-    <div className="container-fluid min-vh-100 p-3 p-md-5">
+    <div className="media-container container-fluid p-3 p-md-4 background-white">
       {loading && (
         <div className="d-flex justify-content-center align-items-center min-vh-100">
           <div className="spinner-border" role="status">
@@ -75,49 +76,49 @@ const Media: React.FC = () => {
 
       {!loading && mainVideo === null && otherVideos.length === 0 && (
         <div className="d-flex justify-content-center align-items-center min-vh-100">
-          <p>Tidak ada video yang tersedia saat ini.</p>
+          <p className="text-muted">Tidak ada video yang tersedia saat ini.</p>
         </div>
       )}
 
       {!loading && (mainVideo || otherVideos.length > 0) && (
-        <div className="row g-4 h-100">
-          {/* VIDEO UTAMA - Besar, 70% layar */}
+        <div className="media-content-wrapper">
+          {/* Video Utama */}
           {mainVideo && (
-            <div className="col-12" style={{ height: "60vh" }}>
-              <div className="h-100">
-                <div className="ratio ratio-16x9 h-100">
+            <div className="main-video-section ">
+              <div className="main-video-container">
+                <div className="ratio ratio-16x9">
                   <iframe
                     src={convertToEmbedUrl(mainVideo.youtube_url)}
                     title={mainVideo.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    style={{ borderRadius: "10px" }}
-                    className="w-100 h-100"
+                    className="video-iframe"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* VIDEO LAINNYA - Kecil, height fix */}
+          {/* Video Lainnya */}
           {otherVideos.length > 0 && (
-            <div className="col-12 mt-4">
-              <div className="row g-4">
+            <div className="other-videos-section">
+              <div className="row justify-content-center g-3">
                 {otherVideos.map((vid) => (
                   <div
                     key={vid.id_video_layanan}
-                    className="col-12 col-md-6 col-lg-4 col-xl-3"
+                    className="col-12 col-sm-6 col-lg-3"
                   >
-                    <div style={{ height: "250px" }}> {/* Fixed height */}
-                      <div className="ratio ratio-16x9 h-100">
+                    <div className="video-card">
+                      <div className="ratio ratio-16x9">
                         <iframe
                           src={convertToEmbedUrl(vid.youtube_url)}
                           title={vid.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
-                          style={{ borderRadius: "8px" }}
-                          className="w-100 h-100"
+                          className="video-iframe"
                         />
                       </div>
-                      <p className="mt-2 text-center small">{vid.title}</p>
+                      <h6 className="video-title mt-2 mb-0">{vid.title}</h6>
                     </div>
                   </div>
                 ))}

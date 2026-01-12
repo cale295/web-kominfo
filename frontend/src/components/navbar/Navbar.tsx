@@ -250,7 +250,7 @@ function Navbar() {
             className="d-flex flex-column align-items-center gap-3 header-row"
           >
             {isLoading ? (
-              <div className="hero-banner-loading">
+              <div className="">
                 <p>Memuat banner...</p>
               </div>
             ) : heroBanner ? (

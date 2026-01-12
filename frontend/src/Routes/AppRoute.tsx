@@ -21,6 +21,7 @@ import DaftarPejabat from "../sections/profilsection/daftarpejabat/DaftarPejabat
 import Program from "../sections/programsection/Program";
 import ModalProfil from "../sections/profilsection/modalprofil/ModalProfil";
 import Gallery from "../sections/gallerysection/Gallery";
+import GalleryDetail from "../sections/gallerysection/GalleryDetail";
 import Perencanaan from "../sections/informasipubliksection/perencanaan/Perencanaan";
 import Keuangan from "../sections/informasipubliksection/laporankeuangan/LaporanKeuangan";
 import Kinerja from "../sections/informasipubliksection/laporankinerja/LaporanKinerja";
@@ -30,8 +31,6 @@ import DaftarInformasiPublik from "../sections/informasipubliksection/daftarinfo
 import PermohonanInformasi from "../sections/informasipubliksection/permohonaninformasi/PermohonanInformasi";
 import PengadaanBarangJasa from "../sections/informasipubliksection/pengadaanbarangjasa/PengadaanBarangJasa";
 import AjukanPermohonan from "../sections/ppidsection/ajukanpermohonan/AjukanPermohonan";
-
-// 1. IMPORT COMPONENT CEK STATUS (Sesuaikan path foldernya)
 import CheckStatus from "../sections/ppidsection/lacakpermohonan/LacakPermohonan";
 import PendidikanPelatihan from "../sections/informasipubliksection/pendidikanpelatihan/PendidikanPelatihan";
 import KerjasamaDaerah from "../sections/informasipubliksection/kerjasamadaerah/KerjasamaDaerah";
@@ -96,7 +95,14 @@ const GalleryPage: React.FC = () => {
   )
 }
 
-// 2. BUAT PAGE WRAPPER (Agar tampilan rapi ada background & padding)
+const GalleryDetailPage: React.FC = () => {
+  return(
+    <>
+      <GalleryDetail />
+    </>
+  )
+}
+
 const CekStatusPage: React.FC = () => {
   return (
     <div style={{ 
@@ -122,7 +128,6 @@ const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Navbar />
-
       <BannerPopupComponent />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -133,6 +138,7 @@ const AppRouter: React.FC = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/program" element={<ProgramPage />} />
         <Route path="/gallery" element={<GalleryPage />} />
+        <Route path="/gallery/:id" element={<GalleryDetailPage />} />
         <Route path="/perencanaan" element={<Perencanaan />} />
         <Route path="/pengadaan_barang_jasa" element={<PengadaanBarangJasa />} />
         <Route path="/laporan_keuangan" element={<Keuangan />} />
@@ -142,13 +148,9 @@ const AppRouter: React.FC = () => {
         <Route path="/kerjasama_daerah" element={<KerjasamaDaerah />} />
         <Route path="/permohonan_informasi" element={<PermohonanInformasi />} />
         <Route path="/ajukan_permohonan" element={<AjukanPermohonan />} />
-         <Route path="/informasi-publik" element={<DokumenPublikPage />} />
+        <Route path="/informasi-publik" element={<DokumenPublikPage />} />
         <Route path="/informasi-publik/:slug" element={<DokumenPublikPage />} />
-        
-        
-        {/* 3. TAMBAHKAN ROUTE DI SINI */}
         <Route path="/cek_status_permohonan" element={<CekStatusPage />} />
-
       </Routes>
       <Footer />
       <AccessibilityPanel />
