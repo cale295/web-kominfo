@@ -385,13 +385,11 @@ class BeritaUtamaController extends BaseController
     // ============================
     public function new()
     {
-        // Redirect ke index karena create sudah di-handle di modal
         return redirect()->to('berita-utama');
     }
 
     public function edit($id)
     {
-        // Redirect ke index karena edit sudah di-handle di modal
         return redirect()->to('berita-utama');
     }
 }
