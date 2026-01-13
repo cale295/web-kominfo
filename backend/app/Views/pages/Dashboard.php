@@ -383,9 +383,6 @@ body {
                 <div class="card-icon-wrapper">
                     <i class="bi bi-newspaper"></i>
                 </div>
-                <span class="card-trend up">
-                    <i class="bi bi-arrow-up"></i> 12%
-                </span>
             </div>
             <div class="card-title">Total Berita</div>
             <div class="card-value"><?= $total_berita ?? 0 ?></div>
@@ -400,9 +397,6 @@ body {
                 <div class="card-icon-wrapper">
                     <i class="bi bi-calendar-check"></i>
                 </div>
-                <span class="card-trend up">
-                    <i class="bi bi-arrow-up"></i> 8%
-                </span>
             </div>
             <div class="card-title">Agenda</div>
             <div class="card-value"><?= $agenda_total ?? 0 ?></div>
@@ -416,9 +410,6 @@ body {
                 <div class="card-icon-wrapper">
                     <i class="bi bi-images"></i>
                 </div>
-                <span class="card-trend up">
-                    <i class="bi bi-arrow-up"></i> 5%
-                </span>
             </div>
             <div class="card-title">Galeri Foto</div>
             <div class="card-value"><?= $gallery_total ?? 0 ?></div>
@@ -432,9 +423,6 @@ body {
                 <div class="card-icon-wrapper">
                     <i class="bi bi-file-earmark-text"></i>
                 </div>
-                <span class="card-trend down">
-                    <i class="bi bi-arrow-down"></i> 3%
-                </span>
             </div>
             <div class="card-title">Dokumen</div>
             <div class="card-value"><?= $document_total ?? 0 ?></div>

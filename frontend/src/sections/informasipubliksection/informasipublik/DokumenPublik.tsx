@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  FolderOpen,
-  ChevronRight,
-  Home,
-  ArrowLeft,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import "./dokumenpublik.css";
 import api from "../../../services/api";
 
@@ -37,7 +32,6 @@ const DokumenPublik: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +42,7 @@ const DokumenPublik: React.FC = () => {
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
 
   /* =======================
-     UTIL
+      UTIL
   ======================= */
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("id-ID", {
@@ -58,25 +52,11 @@ const DokumenPublik: React.FC = () => {
     });
 
   const toggleAccordion = (folderName: string) => {
+    // Jika sedang search, toggle tidak perlu berfungsi atau bisa dimatikan
+    // Tapi di sini kita biarkan user menutup folder jika mau
     setOpenFolder((prev) => (prev === folderName ? null : folderName));
   };
 
-  /* =======================
-     FETCH LIST KATEGORI
-  ======================= */
-  const fetchCategories = async () => {
-    try {
-      const res = await api.get("/informasi-publik");
-      setCategories(res.data.data || []);
-    } catch (err) {
-      console.error(err);
-      setError("Gagal memuat kategori dokumen");
-    }
-  };
-
-  /* =======================
-     FETCH DETAIL KATEGORI
-  ======================= */
   const fetchCategoryData = async (categorySlug: string) => {
     setLoading(true);
     setError("");
@@ -96,38 +76,29 @@ const DokumenPublik: React.FC = () => {
   };
 
   /* =======================
-     HANDLER
+      HANDLER
   ======================= */
-  const handleDownload = (doc: Dokumen) => {
-    window.open(`${ROOT}/uploads/dokumen/${doc.file_path}`, "_blank");
-  };
-
   const handleBackToCategories = () => {
-    navigate("/informasi-publik");
+    navigate("/");
     setOpenFolder(null);
     setSearchTerm("");
   };
 
-  /* =======================
-     EFFECT
-  ======================= */
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    if (slug) {
-      fetchCategoryData(slug);
-    } else {
+    if (!slug) {
+      setError("Kategori tidak ditemukan");
       setLoading(false);
-      setSelectedCategory(null);
-      setFolders([]);
+      return;
     }
+
+    fetchCategoryData(slug);
   }, [slug]);
 
   /* =======================
-     FILTER DOKUMEN
+      FILTER LOGIC (DIPERBAIKI)
   ======================= */
+  
+  // 1. Filter Folder: Menentukan folder mana yang harus muncul
   const filteredFolders = folders.filter((folder) => {
     if (!searchTerm) return true;
     
@@ -143,7 +114,7 @@ const DokumenPublik: React.FC = () => {
   const totalDokumen = folders.reduce((acc, folder) => acc + folder.dokumen.length, 0);
 
   /* =======================
-     LOADING & ERROR
+      RENDER
   ======================= */
   if (loading) {
     return (
@@ -175,47 +146,8 @@ const DokumenPublik: React.FC = () => {
     );
   }
 
-  /* =======================
-     LIST KATEGORI
-  ======================= */
-  if (!slug) {
-    return (
-      <div className="container my-5">
-        <h2 className="mb-4">Dokumen Publik</h2>
-
-        <div className="row g-4">
-          {categories.map((cat) => (
-            <div key={cat.id_kategori} className="col-md-4">
-              <div
-                className="category-card"
-                onClick={() =>
-                  navigate(`/informasi-publik/${cat.slug_kategori}`)
-                }
-              >
-                <FolderOpen size={40} />
-                <h5 className="mt-3">{cat.nama_kategori}</h5>
-                <ChevronRight />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  /* =======================
-     DETAIL KATEGORI (TABLE STYLE)
-  ======================= */
   return (
     <div className="program-container">
-      {/* Breadcrumb */}
-      <nav className="mb-3">
-        <button className="btn btn-link p-0" onClick={handleBackToCategories}>
-          <Home size={16} className="me-1" /> Dokumen Publik
-        </button>
-        {selectedCategory && ` / ${selectedCategory.nama_kategori}`}
-      </nav>
-
       <h2 className="program-title">{selectedCategory?.nama_kategori}</h2>
 
       <div className="table-toolbar">
@@ -253,7 +185,24 @@ const DokumenPublik: React.FC = () => {
           <tbody>
             {filteredFolders.length > 0 ? (
               filteredFolders.map((folder) => {
-                const isOpen = openFolder === folder.nama_folder;
+                // LOGIKA BARU:
+                // Folder terbuka jika:
+                // 1. User mengklik folder tersebut (openFolder match)
+                // 2. ATAU User sedang melakukan pencarian (searchTerm ada isinya)
+                const isSearching = searchTerm.length > 0;
+                const isOpen = openFolder === folder.nama_folder || isSearching;
+                
+                // LOGIKA DISPLAY FILE:
+                // Jika sedang search, kita filter lagi file di dalamnya agar lebih rapi.
+                // Jika nama folder cocok dengan search, tampilkan SEMUA file.
+                // Jika tidak, tampilkan HANYA file yang cocok.
+                const folderNameMatch = folder.nama_folder.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                const displayedDocs = isSearching && !folderNameMatch
+                  ? folder.dokumen.filter(doc => doc.nama_dokumen.toLowerCase().includes(searchTerm.toLowerCase()))
+                  : folder.dokumen;
+
+                // Hitung total items (bisa asli atau hasil filter)
                 const totalItems = folder.dokumen.length;
 
                 return (
@@ -274,7 +223,7 @@ const DokumenPublik: React.FC = () => {
 
                     {/* === DOKUMEN DALAM FOLDER === */}
                     {isOpen &&
-                      folder.dokumen.map((doc) => (
+                      displayedDocs.map((doc) => (
                         <tr key={doc.id_document} className="file-row">
                           <td className="file-name">
                             <span className="file-indent" />
@@ -296,6 +245,11 @@ const DokumenPublik: React.FC = () => {
                           </td>
                         </tr>
                       ))}
+                      
+                      {/* Optional: Pesan jika folder match tapi dokumen terfilter habis (jarang terjadi dgn logika di atas) */}
+                      {isOpen && displayedDocs.length === 0 && (
+                        <tr><td colSpan={3} className="text-muted text-center italic">Tidak ada dokumen yang cocok dalam folder ini</td></tr>
+                      )}
                   </React.Fragment>
                 );
               })
@@ -315,22 +269,11 @@ const DokumenPublik: React.FC = () => {
           Showing {filteredFolders.length > 0 ? 1 : 0} to {filteredFolders.length} of {folders.length} folder ({totalDokumen} dokumen)
         </div>
 
+        {/* Pagination UI Only (Logic belum diimplementasi di state) */}
         <ul className="pagination">
-          <li>
-            <button disabled={folders.length === 0}>Previous</button>
-          </li>
-          <li className={folders.length > 0 ? "active" : ""}>
-            <button disabled={folders.length === 0}>1</button>
-          </li>
-          <li>
-            <button disabled={folders.length === 0}>2</button>
-          </li>
-          <li>
-            <button disabled={folders.length === 0}>3</button>
-          </li>
-          <li>
-            <button disabled={folders.length === 0}>Next</button>
-          </li>
+          <li><button disabled>Previous</button></li>
+          <li className="active"><button>1</button></li>
+          <li><button disabled>Next</button></li>
         </ul>
       </div>
     </div>
