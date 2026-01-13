@@ -2,851 +2,1211 @@
 
 <?= $this->section('styles') ?>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    /* ===============================
+   DESIGN SYSTEM (Selaras dengan Sidebar & Dashboard)
+================================ */
 
-:root {
-    --primary-soft: #eef2ff;
-    --primary-text: #4f46e5;
-    --primary-dark: #4338ca;
-    --success-soft: #ecfdf5;
-    --success-text: #059669;
-    --danger-soft: #fef2f2;
-    --danger-text: #dc2626;
-    --warning-soft: #fffbeb;
-    --warning-text: #d97706;
-    --info-soft: #eff6ff;
-    --info-text: #3b82f6;
-    
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-500: #6b7280;
-    --gray-700: #374151;
-    --gray-900: #111827;
-}
-
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--gray-50);
-    color: var(--gray-900);
-}
-
-/* Gradient Title */
-.text-gradient {
-    background: linear-gradient(45deg, #4e73df, #224abe);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Modern Card */
-.card-modern {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
-}
-
-/* Soft Buttons */
-.btn-soft-primary { 
-    background-color: var(--primary-soft); 
-    color: var(--primary-text); 
-    border: none; 
-}
-.btn-soft-primary:hover { 
-    background-color: #4f46e5; 
-    color: white; 
-}
-
-.btn-soft-danger { 
-    background-color: var(--danger-soft); 
-    color: var(--danger-text); 
-    border: none; 
-}
-.btn-soft-danger:hover { 
-    background-color: #dc2626; 
-    color: white; 
-}
-
-/* Table Styling */
-.table thead th {
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    color: var(--gray-500);
-    border-bottom: 2px solid var(--gray-100);
-    text-transform: uppercase;
-    font-weight: 600;
-    padding: 1rem 0.75rem;
-}
-
-.table tbody tr td {
-    vertical-align: middle;
-    padding: 1rem 0.75rem;
-    border-bottom: 1px solid var(--gray-100);
-}
-
-.table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.table-hover tbody tr:hover {
-    background-color: var(--gray-50);
-}
-
-/* Parent Row */
-.parent-row {
-    transition: background-color 0.2s;
-}
-
-.parent-row:hover {
-    background-color: var(--gray-50);
-}
-
-.parent-row.expanded {
-    background-color: var(--gray-50);
-}
-
-.parent-row.cursor-pointer {
-    cursor: pointer;
-}
-
-/* Child Row */
-.child-row {
-    background: var(--gray-50);
-    display: none;
-}
-
-.child-row:hover {
-    background: var(--gray-100);
-}
-
-.child-row.show {
-    display: table-row;
-    animation: fadeInRow 0.3s ease;
-}
-
-@keyframes fadeInRow {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    :root {
+        /* Primary Colors */
+        --primary: #6366f1;
+        --primary-light: #eef2ff;
+        --primary-dark: #4f46e5;
+
+        /* Neutral Colors */
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+
+        /* Semantic Colors */
+        --success: #10b981;
+        --success-light: #d1fae5;
+        --warning: #f59e0b;
+        --warning-light: #fef3c7;
+        --danger: #ef4444;
+        --danger-light: #fee2e2;
+        --info: #06b6d4;
+        --info-light: #cffafe;
+
+        /* Surface */
+        --bg-body: #f9fafb;
+        --card-bg: #ffffff;
+        --border: #e5e7eb;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
-}
 
-/* Toggle Icon */
-.toggle-icon {
-    transition: transform 0.2s;
-    display: inline-block;
-    font-size: 0.875rem;
-    color: var(--gray-500);
-}
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg-body);
+        color: var(--gray-900);
+        font-size: 14px;
+        line-height: 1.5;
+    }
 
-.parent-row.expanded .toggle-icon {
-    transform: rotate(90deg);
-    color: var(--primary-text);
-}
+    .cursor-pointer {
+        cursor: pointer;
+    }
 
-/* Menu Icon Box */
-.menu-icon-box {
-    width: 45px;
-    height: 45px;
-    background: white;
-    border-radius: 10px;
-    border: 1px solid var(--gray-200);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-text);
-    font-size: 1rem;
-    flex-shrink: 0;
-}
+    /* ===============================
+   PAGE HEADER
+================================ */
 
-.menu-icon-small {
-    width: 32px;
-    height: 32px;
-    background: var(--gray-100);
-    border-radius: 0.375rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gray-700);
-    font-size: 0.875rem;
-}
+    .page-header {
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
 
-/* Tree Line */
-.tree-line {
-    position: relative;
-    padding-left: 28px;
-    margin-left: 16px;
-}
+    .page-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
-.tree-line::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 20px;
-    height: 1px;
-    background: var(--gray-300);
-}
+    .page-header h2 i {
+        color: var(--primary);
+    }
 
-.tree-line::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: -100%;
-    width: 1px;
-    height: 200%;
-    background: var(--gray-300);
-}
+    .page-header p {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
 
-/* Badges */
-.badge-number {
-    background: var(--gray-100);
-    color: var(--gray-700);
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
+    /* ===============================
+   BUTTONS
+================================ */
 
-.submenu-count {
-    background: var(--gray-200);
-    color: var(--gray-700);
-    padding: 0.125rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.7rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-}
+    .btn-primary-custom {
+        background: var(--primary);
+        border: none;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        color: white;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow-sm);
+    }
 
-/* Code Display */
-code {
-    background: var(--gray-100);
-    color: var(--gray-900);
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
-    font-size: 0.8125rem;
-    font-family: 'Courier New', monospace;
-    font-weight: 500;
-    border: 1px solid var(--gray-200);
-}
+    .btn-primary-custom:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+        color: white;
+    }
 
-/* Modal Styling */
-.modal-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 1rem 1rem 0 0;
-    border: none;
-    padding: 1.5rem;
-}
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        background: white;
+        color: var(--gray-600);
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
 
-.modal-content {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
+    .btn-action:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+        color: var(--gray-900);
+        transform: translateY(-1px);
+    }
 
-.modal-header .modal-title {
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
+    .btn-action.btn-delete:hover {
+        background: var(--danger-light);
+        border-color: var(--danger);
+        color: var(--danger);
+    }
 
-.modal-header .btn-close {
-    filter: brightness(0) invert(1);
-    opacity: 0.8;
-}
+    /* ===============================
+   CARD
+================================ */
 
-.modal-header .btn-close:hover {
-    opacity: 1;
-}
+    .menu-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
 
-.modal-body {
-    padding: 2rem;
-}
+    /* ===============================
+   TABLE
+================================ */
 
-.modal-footer {
-    padding: 1.5rem 2rem;
-    border-top: 1px solid var(--gray-200);
-    background: var(--gray-50);
-}
+    .table {
+        margin-bottom: 0;
+    }
 
-/* Form Labels */
-.form-label-modal {
-    font-weight: 600;
-    color: var(--gray-700);
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
-}
+    .table thead {
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--border);
+    }
 
-.required {
-    color: var(--danger-text);
-}
+    .table thead th {
+        border: none;
+        padding: 0.875rem 1rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-/* Empty State */
-.empty-state {
-    padding: 4rem 2rem;
-    text-align: center;
-}
-
-.empty-state-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1.5rem;
-    background: var(--gray-100);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: var(--gray-500);
-}
-
-/* Icon Preview in Modal */
-.icon-preview-modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    background: var(--primary-soft);
-    border-radius: 0.5rem;
-    color: var(--primary-text);
-    font-size: 1.75rem;
-}
-
-/* Input Group Enhancement */
-.input-group-text {
-    background-color: var(--gray-100);
-    border-color: var(--gray-300);
-    color: var(--gray-600);
-}
-
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--primary-text);
-    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.15);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .table thead th,
     .table tbody td {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.8125rem;
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
     }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* ===============================
+   PARENT ROW
+================================ */
+
+    .parent-row {
+        transition: background-color 0.2s;
+    }
+
+    .parent-row:hover {
+        background-color: var(--gray-50);
+    }
+
+    .parent-row.expanded {
+        background-color: var(--gray-50);
+    }
+
+    /* ===============================
+   CHILD ROW
+================================ */
+
+    .child-row {
+        background: var(--gray-50);
+        display: none;
+    }
+
+    .child-row:hover {
+        background: var(--gray-100);
+    }
+
+    .child-row.show {
+        display: table-row;
+        animation: fadeInRow 0.3s ease;
+    }
+
+    @keyframes fadeInRow {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ===============================
+   TOGGLE ICON
+================================ */
+
+    .toggle-icon {
+        transition: transform 0.2s;
+        display: inline-block;
+        font-size: 0.875rem;
+        color: var(--gray-400);
+    }
+
+    .parent-row.expanded .toggle-icon {
+        transform: rotate(90deg);
+        color: var(--primary);
+    }
+
+    /* ===============================
+   MENU ICON
+================================ */
 
     .menu-icon-box {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        background: var(--primary-light);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .menu-icon-small {
+        width: 32px;
+        height: 32px;
+        background: var(--gray-100);
+        border-radius: 0.375rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    /* ===============================
+   TREE LINE
+================================ */
+
+    .tree-line {
+        position: relative;
+        padding-left: 28px;
+        margin-left: 16px;
+    }
+
+    .tree-line::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 20px;
+        height: 1px;
+        background: var(--gray-300);
+    }
+
+    .tree-line::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -100%;
+        width: 1px;
+        height: 200%;
+        background: var(--gray-300);
+    }
+
+    /* ===============================
+   TOGGLE SWITCH
+================================ */
+
+    .form-switch .form-check-input {
+        width: 2.75rem;
+        height: 1.5rem;
+        cursor: pointer;
+        border: 2px solid var(--gray-300);
+        background-color: white;
+        transition: all 0.2s;
+    }
+
+    .form-switch .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .form-switch .form-check-input:focus {
+        box-shadow: 0 0 0 3px var(--primary-light);
+        border-color: var(--primary);
+    }
+
+    .form-switch .form-check-input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .status-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        margin-left: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .status-label.active {
+        color: var(--primary);
+    }
+
+    /* ===============================
+   BADGES
+================================ */
+
+    .badge-custom {
+        display: inline-block;
+        padding: 0.25rem 0.625rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-primary-custom {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .badge-secondary-custom {
+        background: var(--gray-100);
+        color: var(--gray-600);
+    }
+
+    .badge-number {
+        background: var(--gray-100);
+        color: var(--gray-700);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .submenu-count {
+        background: var(--gray-200);
+        color: var(--gray-600);
+        padding: 0.125rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* ===============================
+   CODE/URL DISPLAY
+================================ */
+
+    code {
+        background: var(--gray-100);
+        color: var(--gray-900);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.8125rem;
+        font-family: 'Courier New', monospace;
+        font-weight: 500;
+        border: 1px solid var(--gray-200);
+    }
+
+    /* ===============================
+   EMPTY STATE
+================================ */
+
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: var(--gray-100);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: var(--gray-400);
+    }
+
+    .empty-state h5 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ===============================
+   MENU NAME SECTION
+================================ */
+
+    .menu-name-section {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .menu-name-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .menu-name-title {
+        font-weight: 600;
+        color: var(--gray-900);
         font-size: 0.9375rem;
     }
-    
-    .modal-body {
-        padding: 1.5rem;
+
+    /* ===============================
+   MODAL STYLES
+================================ */
+
+    .modal-content {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
-}
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        border-radius: 1rem 1rem 0 0;
+        padding: 1.5rem;
+        border: none;
+    }
+
+    .modal-header .modal-title {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
+    }
+
+    .modal-header .btn-close:hover {
+        opacity: 1;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem;
+        border-top: 1px solid var(--border);
+    }
+
+    /* Form Styles in Modal */
+    .form-label-modal {
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label-modal i {
+        color: var(--primary);
+    }
+
+    .required {
+        color: var(--danger);
+    }
+
+    .input-group-modal {
+        position: relative;
+    }
+
+    .input-icon-modal {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        z-index: 10;
+    }
+
+    .form-control-modal,
+    .form-select-modal {
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .form-control-modal:focus,
+    .form-select-modal:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-control-modal[readonly] {
+        background-color: var(--gray-50);
+        color: var(--gray-500);
+        cursor: not-allowed;
+    }
+
+    .form-text-modal {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .icon-preview-modal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background: var(--primary-light);
+        border-radius: 0.5rem;
+        color: var(--primary);
+        font-size: 1.75rem;
+    }
+
+    /* Modal Buttons */
+    .btn-modal-cancel {
+        background: var(--gray-100);
+        border: 1px solid var(--gray-300);
+        color: var(--gray-700);
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .btn-modal-cancel:hover {
+        background: var(--gray-200);
+        border-color: var(--gray-400);
+    }
+
+    .btn-modal-submit {
+        background: var(--primary);
+        border: none;
+        color: white;
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s;
+    }
+
+    .btn-modal-submit:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-modal-delete {
+        background: var(--danger);
+        border: none;
+        color: white;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .btn-modal-delete:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    /* ===============================
+   MODAL SCROLLABLE FIX
+================================ */
+
+    .modal-dialog-scrollable .modal-content {
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-dialog-scrollable .modal-body {
+        overflow-y: auto;
+        flex: 1;
+        max-height: calc(90vh - 120px);
+        /* Tinggi total dikurangi header & footer */
+    }
+
+    /* Pastikan modal responsive */
+    .modal-dialog {
+        max-width: 90%;
+        margin: 1rem auto;
+    }
+
+    @media (max-width: 768px) {
+        .modal-dialog {
+            max-width: 95%;
+            margin: 0.5rem auto;
+        }
+
+        .modal-dialog-scrollable .modal-body {
+            max-height: calc(80vh - 120px);
+        }
+    }
+
+    /* ===============================
+   RESPONSIVE
+================================ */
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 0;
+        }
+
+        .page-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.8125rem;
+        }
+
+        .btn-primary-custom {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .menu-icon-box {
+            width: 36px;
+            height: 36px;
+            font-size: 0.9375rem;
+        }
+
+        .tree-line {
+            padding-left: 20px;
+            margin-left: 12px;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+    }
+
+    /* ===============================
+   CONTAINER
+================================ */
+
+    .container-fluid {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <?= $this->include('layouts/alerts') ?>
 
-<div class="container-fluid px-4 pb-5">
+<div class="container-fluid py-4">
     <!-- Page Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between my-4 py-2">
-        <div class="mb-3 mb-md-0">
-            <h1 class="h3 fw-bolder mb-1 text-gradient"><?= esc($title) ?></h1>
-            <p class="text-muted small mb-0">
-                <i class="fas fa-list-ul me-1 text-primary"></i> 
-                <?= count($menus) ?> total menu dalam sistem
-            </p>
-        </div>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm mb-0 border">
-                <li class="breadcrumb-item">
-                    <a href="/dashboard" class="text-decoration-none fw-bold text-primary small">
-                        <i class="fas fa-home"></i>
-                    </a>
-                </li>
-                <li class="breadcrumb-item active small" aria-current="page">Menu Management</li>
-            </ol>
-        </nav>
-    </div>
-
-    <!-- Alert Success -->
-    <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success border-0 shadow-sm border-start border-4 border-success rounded-3 fade show mb-4" role="alert">
-            <div class="d-flex align-items-center">
-                <div class="d-flex align-items-center justify-content-center bg-white text-success me-3 shadow-sm rounded-circle" style="width: 32px; height: 32px;">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-0">Berhasil!</h6>
-                    <small><?= session()->getFlashdata('success') ?></small>
-                </div>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <!-- Alert Error -->
-    <?php if (session()->getFlashdata('error')): ?>
-        <div class="alert alert-danger border-0 shadow-sm border-start border-4 border-danger rounded-3 fade show mb-4" role="alert">
-            <div class="d-flex align-items-center">
-                <div class="d-flex align-items-center justify-content-center bg-white text-danger me-3 shadow-sm rounded-circle" style="width: 32px; height: 32px;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-0">Terjadi Kesalahan!</h6>
-                    <small><?= session()->getFlashdata('error') ?></small>
-                </div>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <!-- Main Card -->
-    <div class="card card-modern">
-        <div class="card-header bg-white py-4 border-0 d-flex flex-wrap justify-content-between align-items-center">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h5 class="fw-bold text-dark mb-0">Daftar Menu</h5>
-                <span class="text-muted small">Kelola struktur menu navigasi sistem</span>
+                <h2>
+                    <i class="bi bi-list-ul"></i>
+                    <?= esc($title) ?>
+                </h2>
+                <p><?= count($menus) ?> total menu dalam sistem</p>
             </div>
-            
             <?php if ($can_create): ?>
-                <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0" 
-                        data-bs-toggle="modal" data-bs-target="#menuModal" onclick="openCreateModal()">
-                    <i class="fas fa-plus-circle me-2"></i>Tambah Menu
+                <button type="button" class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#menuModal" onclick="openCreateModal()">
+                    <i class="bi bi-plus-lg"></i>
+                    Tambah Menu
                 </button>
             <?php endif; ?>
         </div>
+    </div>
 
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
+    <!-- Menu Card -->
+    <div class="menu-card">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="35%">Nama Menu</th>
+                        <th width="20%">URL / Route</th>
+                        <th width="15%">Admin URL</th>
+                        <th width="12%" class="text-center">Status</th>
+                        <th width="13%" class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $parents = array_filter($menus, fn($m) => $m['parent_id'] == 0 || empty($m['parent_id']));
+                    $allChildren = array_filter($menus, fn($m) => !empty($m['parent_id']) && $m['parent_id'] != 0);
+
+                    $groupedChildren = [];
+                    foreach ($allChildren as $child) {
+                        $groupedChildren[$child['parent_id']][] = $child;
+                    }
+
+                    $counter = 1;
+
+                    if (empty($parents)): ?>
                         <tr>
-                            <th class="text-center py-3" width="5%">#</th>
-                            <th class="py-3" width="35%">Nama Menu</th>
-                            <th class="py-3" width="20%">URL / Route</th>
-                            <th class="py-3" width="15%">Admin URL</th>
-                            <th class="text-center py-3" width="12%">Status</th>
-                            <th class="text-center py-3" width="13%">Aksi</th>
+                            <td colspan="6" class="p-0">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="bi bi-inbox"></i>
+                                    </div>
+                                    <h5>Belum Ada Menu</h5>
+                                    <p>Mulai dengan menambahkan menu pertama untuk sistem Anda</p>
+                                    <?php if ($can_create): ?>
+                                        <button type="button" class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#menuModal" onclick="openCreateModal()">
+                                            <i class="bi bi-plus-lg"></i>
+                                            Tambah Menu
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $parents = array_filter($menus, fn($m) => $m['parent_id'] == 0 || empty($m['parent_id']));
-                        $allChildren = array_filter($menus, fn($m) => !empty($m['parent_id']) && $m['parent_id'] != 0);
-                        
-                        $groupedChildren = [];
-                        foreach ($allChildren as $child) {
-                            $groupedChildren[$child['parent_id']][] = $child;
-                        }
+                    <?php endif;
 
-                        $counter = 1;
+                    foreach ($parents as $parent):
+                        $hasChild = isset($groupedChildren[$parent['id_menu']]);
+                    ?>
+                        <tr class="parent-row <?= $hasChild ? 'cursor-pointer' : '' ?>"
+                            <?= $hasChild ? 'onclick="toggleRows(' . $parent['id_menu'] . ', this)"' : '' ?>>
 
-                        if (empty($parents)): ?>
-                            <tr>
-                                <td colspan="6" class="p-0">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon">
-                                            <i class="fas fa-inbox"></i>
-                                        </div>
-                                        <h5>Belum Ada Menu</h5>
-                                        <p>Mulai dengan menambahkan menu pertama untuk sistem Anda</p>
-                                        <?php if ($can_create): ?>
-                                            <button type="button" class="btn btn-primary rounded-pill px-4" 
-                                                    data-bs-toggle="modal" data-bs-target="#menuModal" onclick="openCreateModal()">
-                                                <i class="fas fa-plus-circle me-2"></i>Tambah Menu
-                                            </button>
+                            <td>
+                                <span class="badge-number"><?= $counter++ ?></span>
+                            </td>
+
+                            <td>
+                                <div class="menu-name-section">
+                                    <div style="width: 20px;">
+                                        <?php if ($hasChild): ?>
+                                            <i class="bi bi-chevron-right toggle-icon"></i>
                                         <?php endif; ?>
                                     </div>
-                                </td>
-                            </tr>
-                        <?php endif;
 
-                        foreach ($parents as $parent):
-                            $hasChild = isset($groupedChildren[$parent['id_menu']]);
-                        ?>
-                            <tr class="parent-row <?= $hasChild ? 'cursor-pointer' : '' ?>" 
-                                <?= $hasChild ? 'onclick="toggleRows('.$parent['id_menu'].', this)"' : '' ?>>
-                                
-                                <td class="text-center">
-                                    <span class="badge-number"><?= $counter++ ?></span>
-                                </td>
-                                
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div style="width: 20px;">
-                                            <?php if ($hasChild): ?>
-                                                <i class="bi bi-chevron-right toggle-icon"></i>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <div class="menu-icon-box">
-                                            <i class="<?= esc($parent['menu_icon'] ?: 'bi bi-circle') ?>"></i>
-                                        </div>
-
-                                        <div>
-                                            <div class="fw-bold text-dark"><?= esc($parent['menu_name']) ?></div>
-                                            <?php if($hasChild): ?>
-                                                <span class="submenu-count">
-                                                    <i class="bi bi-diagram-3" style="font-size: 0.65rem;"></i>
-                                                    <?= count($groupedChildren[$parent['id_menu']]) ?> submenu
-                                                </span>
-                                            <?php endif; ?>
-                                        </div>
+                                    <div class="menu-icon-box">
+                                        <i class="<?= esc($parent['menu_icon'] ?: 'bi bi-circle') ?>"></i>
                                     </div>
-                                </td>
-                                
-                                <td>
-                                    <?php if(!empty($parent['menu_url']) && $parent['menu_url'] != '#'): ?>
-                                        <code><?= esc($parent['menu_url']) ?></code>
-                                    <?php else: ?>
-                                        <span class="text-muted small fst-italic">—</span>
-                                    <?php endif; ?>
-                                </td>
 
-                                <td>
-                                    <?php if(!empty($parent['admin_url']) && $parent['admin_url'] != '#'): ?>
-                                        <code><?= esc($parent['admin_url']) ?></code>
-                                    <?php else: ?>
-                                        <span class="text-muted small fst-italic">—</span>
-                                    <?php endif; ?>
-                                </td>
-                                
-                                <td class="text-center" onclick="event.stopPropagation()">
+                                    <div class="menu-name-text">
+                                        <div class="menu-name-title"><?= esc($parent['menu_name']) ?></div>
+                                        <?php if ($hasChild): ?>
+                                            <span class="submenu-count">
+                                                <i class="bi bi-diagram-3" style="font-size: 0.65rem;"></i>
+                                                <?= count($groupedChildren[$parent['id_menu']]) ?> submenu
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <?php if (!empty($parent['menu_url']) && $parent['menu_url'] != '#'): ?>
+                                    <code><?= esc($parent['menu_url']) ?></code>
+                                <?php else: ?>
+                                    <span style="color: var(--gray-400);">—</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td>
+                                <?php if (!empty($parent['admin_url']) && $parent['admin_url'] != '#'): ?>
+                                    <code><?= esc($parent['admin_url']) ?></code>
+                                <?php else: ?>
+                                    <span style="color: var(--gray-400);">—</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td class="text-center" onclick="event.stopPropagation()">
+                                <?php if ($can_update): ?>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input toggle-status" type="checkbox" role="switch"
+                                                data-id="<?= $parent['id_menu'] ?>"
+                                                data-url="<?= site_url('menu/toggleStatus/' . $parent['id_menu']) ?>"
+                                                id="toggle-<?= $parent['id_menu'] ?>"
+                                                <?= ($parent['status'] === 'active') ? 'checked' : '' ?>>
+                                        </div>
+                                        <label for="toggle-<?= $parent['id_menu'] ?>" class="status-label <?= ($parent['status'] === 'active') ? 'active' : '' ?>" style="cursor: pointer;">
+                                            <?= ($parent['status'] === 'active') ? 'Aktif' : 'Off' ?>
+                                        </label>
+                                    </div>
+                                <?php else: ?>
+                                    <span class="badge-custom <?= ($parent['status'] === 'active') ? 'badge-primary-custom' : 'badge-secondary-custom' ?>">
+                                        <?= ($parent['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td class="text-center" onclick="event.stopPropagation()">
+                                <div class="d-flex justify-content-center gap-2">
                                     <?php if ($can_update): ?>
-                                        <div class="d-flex justify-content-center" data-bs-toggle="tooltip" title="Klik untuk mengubah status">
-                                            <?= btn_toggle($parent['id_menu'], $parent['status'] === 'active' ? 1 : 0, 'menu/toggleStatus') ?>
-                                        </div>
-                                    <?php else: ?>
-                                        <span class="badge <?= ($parent['status'] === 'active') ? 'bg-success' : 'bg-secondary' ?> px-3 py-2">
-                                            <?= ($parent['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
-                                        </span>
+                                        <button type="button" class="btn-action"
+                                            data-bs-toggle="tooltip" title="Edit Menu"
+                                            onclick="openEditModal(<?= htmlspecialchars(json_encode($parent)) ?>)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                     <?php endif; ?>
-                                </td>
-                                
-                                <td class="text-center" onclick="event.stopPropagation()">
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <?php if ($can_update): ?>
-                                            <button type="button" 
-                                                    class="btn btn-soft-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
-                                                    style="width: 32px; height: 32px;"
-                                                    data-bs-toggle="tooltip" title="Edit Menu"
-                                                    onclick="openEditModal(<?= htmlspecialchars(json_encode($parent)) ?>)">
-                                                <i class="fas fa-pen fa-xs"></i>
-                                            </button>
-                                        <?php endif; ?>
 
-                                        <?php if ($can_delete): ?>
-                                            <button type="button" 
-                                                    class="btn btn-soft-danger btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
-                                                    style="width: 32px; height: 32px;"
-                                                    data-bs-toggle="tooltip" title="Hapus Menu"
-                                                    onclick="deleteMenu(<?= $parent['id_menu'] ?>, '<?= esc($parent['menu_name']) ?>')">
-                                                <i class="fas fa-trash-alt fa-xs"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
+                                    <?php if ($can_delete): ?>
+                                        <button type="button" class="btn-action btn-delete"
+                                            data-bs-toggle="tooltip" title="Hapus Menu"
+                                            onclick="deleteMenu(<?= $parent['id_menu'] ?>, '<?= esc($parent['menu_name']) ?>')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
 
-                            <?php if ($hasChild): 
-                                foreach ($groupedChildren[$parent['id_menu']] as $child):
-                            ?>
+                        <?php if ($hasChild):
+                            foreach ($groupedChildren[$parent['id_menu']] as $child):
+                        ?>
                                 <tr class="child-row child-of-<?= $parent['id_menu'] ?>">
                                     <td></td>
                                     <td>
                                         <div class="d-flex align-items-center ps-4">
                                             <div class="tree-line">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <div class="menu-icon-small">
-                                                        <i class="<?= esc($child['menu_icon'] ?: 'bi bi-circle') ?>"></i>
-                                                    </div>
-                                                    <span class="fw-bold text-dark"><?= esc($child['menu_name']) ?></span>
+                                                <div class="menu-icon-small me-3">
+                                                    <i class="<?= esc($child['menu_icon'] ?: 'bi bi-circle') ?>"></i>
                                                 </div>
+                                                <span style="color: var(--gray-700); font-weight: 500;">
+                                                    <?= esc($child['menu_name']) ?>
+                                                </span>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <?php if(!empty($child['menu_url']) && $child['menu_url'] != '#'): ?>
+                                        <?php if (!empty($child['menu_url']) && $child['menu_url'] != '#'): ?>
                                             <code><?= esc($child['menu_url']) ?></code>
                                         <?php else: ?>
-                                            <span class="text-muted small fst-italic">—</span>
+                                            <span style="color: var(--gray-400);">—</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <?php if(!empty($child['admin_url']) && $child['admin_url'] != '#'): ?>
+                                        <?php if (!empty($child['admin_url']) && $child['admin_url'] != '#'): ?>
                                             <code><?= esc($child['admin_url']) ?></code>
                                         <?php else: ?>
-                                            <span class="text-muted small fst-italic">—</span>
+                                            <span style="color: var(--gray-400);">—</span>
                                         <?php endif; ?>
                                     </td>
-                                    
+
                                     <td class="text-center">
                                         <?php if ($can_update): ?>
-                                            <div class="d-flex justify-content-center" data-bs-toggle="tooltip" title="Klik untuk mengubah status">
-                                                <?= btn_toggle($child['id_menu'], $child['status'] === 'active' ? 1 : 0, 'menu/toggleStatus') ?>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input toggle-status" type="checkbox" role="switch"
+                                                        data-id="<?= $child['id_menu'] ?>"
+                                                        data-url="<?= site_url('menu/toggleStatus/' . $child['id_menu']) ?>"
+                                                        id="toggle-child-<?= $child['id_menu'] ?>"
+                                                        <?= ($child['status'] === 'active') ? 'checked' : '' ?>>
+                                                </div>
+                                                <label for="toggle-child-<?= $child['id_menu'] ?>" class="status-label <?= ($child['status'] === 'active') ? 'active' : '' ?>" style="cursor: pointer;">
+                                                    <?= ($child['status'] === 'active') ? 'Aktif' : 'Off' ?>
+                                                </label>
                                             </div>
                                         <?php else: ?>
-                                            <span class="badge <?= ($child['status'] === 'active') ? 'bg-success' : 'bg-secondary' ?> px-3 py-2">
+                                            <span class="badge-custom <?= ($child['status'] === 'active') ? 'badge-primary-custom' : 'badge-secondary-custom' ?>">
                                                 <?= ($child['status'] === 'active') ? 'Aktif' : 'Nonaktif' ?>
                                             </span>
                                         <?php endif; ?>
                                     </td>
-                                    
+
                                     <td class="text-center">
-                                        <div class="d-flex gap-2 justify-content-center">
+                                        <div class="d-flex justify-content-center gap-2">
                                             <?php if ($can_update): ?>
-                                                <button type="button" 
-                                                        class="btn btn-soft-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
-                                                        style="width: 32px; height: 32px;"
-                                                        data-bs-toggle="tooltip" title="Edit Submenu"
-                                                        onclick="openEditModal(<?= htmlspecialchars(json_encode($child)) ?>)">
-                                                    <i class="fas fa-pen fa-xs"></i>
+                                                <button type="button" class="btn-action"
+                                                    data-bs-toggle="tooltip" title="Edit Submenu"
+                                                    onclick="openEditModal(<?= htmlspecialchars(json_encode($child)) ?>)">
+                                                    <i class="bi bi-pencil"></i>
                                                 </button>
                                             <?php endif; ?>
 
                                             <?php if ($can_delete): ?>
-                                                <button type="button" 
-                                                        class="btn btn-soft-danger btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" 
-                                                        style="width: 32px; height: 32px;"
-                                                        data-bs-toggle="tooltip" title="Hapus Submenu"
-                                                        onclick="deleteMenu(<?= $child['id_menu'] ?>, '<?= esc($child['menu_name']) ?>')">
-                                                    <i class="fas fa-trash-alt fa-xs"></i>
+                                                <button type="button" class="btn-action btn-delete"
+                                                    data-bs-toggle="tooltip" title="Hapus Submenu"
+                                                    onclick="deleteMenu(<?= $child['id_menu'] ?>, '<?= esc($child['menu_name']) ?>')">
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>
-                            <?php 
-                                endforeach; 
-                            endif; ?>
+                        <?php
+                            endforeach;
+                        endif; ?>
 
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <div class="card-footer bg-white border-top-0 py-3">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="d-flex align-items-center text-muted small">
-                    <i class="fas fa-info-circle me-2 text-primary"></i>
-                    <span>Gunakan kolom <strong>Status</strong> untuk mengaktifkan/menonaktifkan menu.</span>
-                </div>
-                <div class="d-flex align-items-center">
-                    <span class="badge bg-info px-3 py-2">
-                        <i class="fas fa-list-ul me-1"></i>
-                        Total Menu: <?= count($menus) ?>
-                    </span>
-                </div>
-            </div>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<!-- Modal Tambah/Edit Menu -->
 <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="menuModalLabel">
-                    <i class="fas fa-plus-square me-2"></i>
+                <h5 class="modal-title" id="menuModalLabel">
+                    <i class="bi bi-plus-square"></i>
                     <span id="modalTitle">Tambah Menu Baru</span>
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            
-            <form id="menuForm" method="post">
-                <?= csrf_field() ?>
-                <input type="hidden" name="_method" id="formMethod" value="POST">
-                <input type="hidden" name="id_menu" id="id_menu" value="">
-                
-                <div class="modal-body" style="overflow-y: auto; max-height: 70vh;">
-                    <!-- Informasi Dasar -->
+
+            <!-- Modal Body dengan scrollable area -->
+            <div class="modal-body" style="overflow-y: auto; max-height: 70vh;">
+                <form id="menuForm" method="post">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="_method" id="formMethod" value="POST">
+                    <input type="hidden" name="id_menu" id="id_menu" value="">
+
+                    <!-- Konten form Anda tetap sama di sini -->
                     <div class="mb-4">
                         <h6 class="text-primary fw-bold mb-3">
-                            <i class="fas fa-info-circle me-2"></i>Informasi Dasar
+                            <i class="bi bi-info-circle"></i> Informasi Dasar
                         </h6>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="menu_name" class="form-label-modal">
-                                    <i class="fas fa-tag me-1"></i>
+                                    <i class="bi bi-tag-fill"></i>
                                     Nama Menu <span class="required">*</span>
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                    <input type="text" class="form-control" id="menu_name" name="menu_name" 
-                                           placeholder="Contoh: Dashboard, Berita, Produk" required>
+                                <div class="input-group-modal">
+                                    <i class="bi bi-card-text input-icon-modal"></i>
+                                    <input type="text" class="form-control form-control-modal"
+                                        id="menu_name" name="menu_name"
+                                        placeholder="Contoh: Dashboard, Berita, Produk" required>
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="menu_icon" class="form-label-modal">
-                                    <i class="fas fa-icons me-1"></i>Icon Menu
+                                    <i class="bi bi-emoji-smile"></i>
+                                    Icon Menu
                                 </label>
                                 <div class="d-flex gap-2">
                                     <div class="flex-grow-1">
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-star"></i></span>
-                                            <input type="text" class="form-control" id="menu_icon" name="menu_icon" 
-                                                   placeholder="bi-house, bi-gear, fas fa-home...">
+                                        <div class="input-group-modal">
+                                            <i class="bi bi-grid input-icon-modal"></i>
+
+                                            <select class="form-select form-select-modal" id="menu_icon" name="menu_icon" required>
+                                                <option value="" selected disabled>Pilih Icon...</option>
+
+                                                <optgroup label="Dashboard & Home">
+                                                    <option value="bi-house">bi-house (Home)</option>
+                                                    <option value="bi-speedometer2">bi-speedometer2 (Dashboard)</option>
+                                                    <option value="bi-grid">bi-grid (App)</option>
+                                                    <option value="bi-window">bi-window (Interface)</option>
+                                                </optgroup>
+
+                                                <optgroup label="User & Management">
+                                                    <option value="bi-person">bi-person (User)</option>
+                                                    <option value="bi-people">bi-people (Users/Group)</option>
+                                                    <option value="bi-person-badge">bi-person-badge (Staff)</option>
+                                                    <option value="bi-shield-lock">bi-shield-lock (Security)</option>
+                                                    <option value="bi-key">bi-key (Password/Access)</option>
+                                                </optgroup>
+
+                                                <optgroup label="Data & Laporan">
+                                                    <option value="bi-file-earmark-text">bi-file-text (Dokumen)</option>
+                                                    <option value="bi-folder">bi-folder (Arsip)</option>
+                                                    <option value="bi-bar-chart">bi-bar-chart (Grafik)</option>
+                                                    <option value="bi-table">bi-table (Tabel)</option>
+                                                    <option value="bi-printer">bi-printer (Cetak)</option>
+                                                    <option value="bi-clipboard-data">bi-clipboard-data (Laporan)</option>
+                                                </optgroup>
+
+                                                <optgroup label="Bisnis & Produk">
+                                                    <option value="bi-cart">bi-cart (Keranjang)</option>
+                                                    <option value="bi-bag">bi-bag (Produk)</option>
+                                                    <option value="bi-shop">bi-shop (Toko)</option>
+                                                    <option value="bi-cash-coin">bi-cash-coin (Keuangan)</option>
+                                                    <option value="bi-tag">bi-tag (Kategori/Tag)</option>
+                                                    <option value="bi-box-seam">bi-box-seam (Stok/Inventory)</option>
+                                                </optgroup>
+
+                                                <optgroup label="Pengaturan">
+                                                    <option value="bi-gear">bi-gear (Setting)</option>
+                                                    <option value="bi-sliders">bi-sliders (Konfigurasi)</option>
+                                                    <option value="bi-bell">bi-bell (Notifikasi)</option>
+                                                    <option value="bi-envelope">bi-envelope (Pesan)</option>
+                                                    <option value="bi-globe">bi-globe (Website)</option>
+                                                </optgroup>
+                                            </select>
                                         </div>
                                     </div>
+
                                     <div class="icon-preview-modal" id="iconPreview">
                                         <i class="bi bi-question-circle"></i>
                                     </div>
-                                </div>
-                                <div class="form-text">
-                                    <i class="fas fa-lightbulb text-warning me-1"></i>
-                                    Gunakan Bootstrap Icons (bi-*) atau Font Awesome (fas fa-*)
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="parent_id" class="form-label-modal">
-                                <i class="fas fa-sitemap me-1"></i>
+                                <i class="bi bi-folder-symlink-fill"></i>
                                 Parent Menu (Menu Induk)
                             </label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-folder-tree"></i></span>
-                                <select class="form-select" id="parent_id" name="parent_id">
+                            <div class="input-group-modal">
+                                <i class="bi bi-diagram-3 input-icon-modal"></i>
+                                <select class="form-select form-select-modal" id="parent_id" name="parent_id">
                                     <option value="0">📌 Menu Utama (Tanpa Parent)</option>
-                                    <?php foreach ($parents as $p): ?>
-                                        <option value="<?= $p['id_menu'] ?>">
-                                            <?= esc($p['menu_name']) ?>
-                                        </option>
+                                    <?php foreach ($menus as $m): ?>
+                                        <?php if ($m['parent_id'] == 0): ?>
+                                            <option value="<?= $m['id_menu'] ?>"
+                                                data-is-infopublik="<?= (strtolower($m['menu_name']) === 'informasi publik') ? 'true' : 'false' ?>">
+                                                📁 <?= esc($m['menu_name']) ?>
+                                            </option>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="form-text">
-                                <i class="fas fa-info-circle text-info me-1"></i>
-                                Pilih menu induk jika ingin membuat submenu
+                            <div class="form-text-modal" id="urlHelperText">
+                                <i class="bi bi-lightbulb-fill text-warning"></i>
+                                <span>Pilih "Informasi Publik" untuk otomatis membuat kategori dokumen.</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- URL & Route -->
+                    <!-- URL & Routing -->
                     <div class="mb-4">
                         <h6 class="text-primary fw-bold mb-3">
-                            <i class="fas fa-link me-2"></i>URL & Route
+                            <i class="bi bi-link-45deg"></i> URL & Routing
                         </h6>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="menu_url" class="form-label-modal">
-                                    <i class="fas fa-external-link-alt me-1"></i>
-                                    URL Menu (Frontend)
+                                    <i class="bi bi-link-45deg"></i>
+                                    URL / Route
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                    <input type="text" class="form-control" id="menu_url" name="menu_url" 
-                                           placeholder="/home, /about, /products">
-                                </div>
-                                <div class="form-text">
-                                    Gunakan '#' untuk menu tanpa link atau sebagai parent
+                                <div class="input-group-modal">
+                                    <i class="bi bi-globe2 input-icon-modal"></i>
+                                    <input type="text" class="form-control form-control-modal"
+                                        id="menu_url" name="menu_url"
+                                        placeholder="/api/dashboard atau https://example.com">
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="admin_url" class="form-label-modal">
-                                    <i class="fas fa-user-shield me-1"></i>
-                                    Admin URL (Backend)
+                                    <i class="bi bi-shield-lock-fill"></i>
+                                    URL Admin
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                    <input type="text" class="form-control" id="admin_url" name="admin_url" 
-                                           placeholder="/admin/dashboard, /admin/users">
-                                </div>
-                                <div class="form-text">
-                                    URL untuk akses admin/backend (opsional)
+                                <div class="input-group-modal">
+                                    <i class="bi bi-lock input-icon-modal"></i>
+                                    <input type="text" class="form-control form-control-modal"
+                                        id="admin_url" name="admin_url"
+                                        placeholder="/dashboard">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Pengaturan Tambahan -->
+                    <!-- Konfigurasi -->
                     <div class="mb-4">
                         <h6 class="text-primary fw-bold mb-3">
-                            <i class="fas fa-cog me-2"></i>Pengaturan Tambahan
+                            <i class="bi bi-gear-fill"></i> Konfigurasi
                         </h6>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="menu_order" class="form-label-modal">
-                                    <i class="fas fa-sort-numeric-down me-1"></i>
-                                    Urutan Menu
+                                <label for="allowed_roles" class="form-label-modal">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                    Hak Akses (Roles)
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-sort"></i></span>
-                                    <input type="number" class="form-control" id="menu_order" name="menu_order" 
-                                           value="0" min="0" placeholder="0">
+                                <div class="input-group-modal">
+                                    <i class="bi bi-people-fill input-icon-modal"></i>
+                                    <input type="text" class="form-control form-control-modal"
+                                        id="allowed_roles" name="allowed_roles"
+                                        placeholder="superadmin, admin, editor">
                                 </div>
-                                <div class="form-text">
-                                    Semakin kecil angka, semakin atas posisinya
+                                <div class="form-text-modal">
+                                    <i class="bi bi-info-circle"></i>
+                                    Pisahkan dengan koma. Kosongkan untuk akses publik.
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="status" class="form-label-modal">
-                                    <i class="fas fa-toggle-on me-1"></i>
-                                    Status Menu
+                                <label for="order_number" class="form-label-modal">
+                                    <i class="bi bi-sort-numeric-down"></i>
+                                    Urutan Menu <span class="required">*</span>
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-power-off"></i></span>
-                                    <select class="form-select" id="status" name="status">
-                                        <option value="active" selected>✅ Aktif</option>
-                                        <option value="inactive">❌ Nonaktif</option>
+                                <div class="input-group-modal">
+                                    <i class="bi bi-list-ol input-icon-modal"></i>
+                                    <input type="number" class="form-control form-control-modal"
+                                        id="order_number" name="order_number"
+                                        value="1" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label-modal">
+                                    <i class="bi bi-toggle2-on"></i>
+                                    Status Menu <span class="required">*</span>
+                                </label>
+                                <div class="input-group-modal">
+                                    <i class="bi bi-toggle-on input-icon-modal"></i>
+                                    <select class="form-select form-select-modal" id="status" name="status" required>
+                                        <option value="active">✅ Aktif - Menu akan ditampilkan</option>
+                                        <option value="inactive">⛔ Nonaktif - Menu disembunyikan</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                     </div>
+            </div>
 
-                    <!-- Catatan -->
-                    <div class="alert alert-info border-0 d-flex align-items-start">
-                        <i class="fas fa-info-circle me-2 mt-1"></i>
-                        <div>
-                            <strong>Tips:</strong>
-                            <ul class="mb-0 mt-2 ps-3">
-                                <li>Field bertanda <span class="text-danger">*</span> wajib diisi</li>
-                                <li>Icon harus menggunakan class yang valid (Bootstrap Icons atau Font Awesome)</li>
-                                <li>URL bisa diisi '#' jika menu hanya sebagai parent/kategori</li>
-                                <li>Urutan menu dimulai dari 0 (paling atas)</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Batal
-                    </button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="fas fa-save me-2"></i>
-                        <span id="submitBtnText">Simpan Menu</span>
-                    </button>
-                </div>
-            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Batal
+                </button>
+                <button type="button" class="btn btn-modal-delete d-none" id="btnDeleteModal" onclick="deleteMenuFromModal()">
+                    <i class="bi bi-trash me-2"></i>Hapus Menu
+                </button>
+                <button type="submit" form="menuForm" class="btn btn-modal-submit">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span id="submitBtnText">Simpan Menu</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -854,111 +1214,319 @@ code {
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-// Initialize tooltips
-document.addEventListener('DOMContentLoaded', function() {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-});
+    document.addEventListener("DOMContentLoaded", function() {
 
-// Toggle child rows
-function toggleRows(parentId, row) {
-    const children = document.querySelectorAll('.child-of-' + parentId);
-    const isExpanded = row.classList.contains('expanded');
-    
-    if (isExpanded) {
-        row.classList.remove('expanded');
-        children.forEach(child => {
-            child.classList.remove('show');
+        // Initialize Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-    } else {
-        row.classList.add('expanded');
-        children.forEach(child => {
-            child.classList.add('show');
+
+        // Toggle Status
+        const toggles = document.querySelectorAll('.toggle-status');
+
+        toggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const url = this.getAttribute('data-url');
+                const label = this.parentElement.nextElementSibling;
+                const isChecked = this.checked;
+
+                this.disabled = true;
+                label.style.opacity = '0.5';
+
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            setTimeout(() => {
+                                if (isChecked) {
+                                    label.textContent = 'Aktif';
+                                    label.classList.add('active');
+                                } else {
+                                    label.textContent = 'Off';
+                                    label.classList.remove('active');
+                                }
+                                label.style.opacity = '1';
+                            }, 150);
+                        } else {
+                            this.checked = !isChecked;
+                            label.style.opacity = '1';
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: 'Gagal mengubah status menu',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.checked = !isChecked;
+                        label.style.opacity = '1';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat mengubah status',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    })
+                    .finally(() => {
+                        this.disabled = false;
+                    });
+            });
+        });
+
+        // Icon Preview
+        const iconInput = document.getElementById('menu_icon');
+        const iconPreview = document.getElementById('iconPreview');
+
+        iconInput.addEventListener('input', function() {
+            const iconClass = this.value.trim();
+            iconPreview.innerHTML = `<i class="${iconClass || 'bi bi-question-circle'}"></i>`;
+        });
+
+        // Parent Select Handler
+        const parentSelect = document.getElementById('parent_id');
+        const urlInput = document.getElementById('menu_url');
+        const adminUrlInput = document.getElementById('admin_url');
+        const urlHelper = document.getElementById('urlHelperText');
+
+        function checkParentType() {
+            const selectedOption = parentSelect.options[parentSelect.selectedIndex];
+            const isInfoPublik = selectedOption.getAttribute('data-is-infopublik') === 'true';
+
+            if (isInfoPublik) {
+                urlInput.value = "Akan digenerate otomatis";
+                urlInput.setAttribute('readonly', true);
+                urlInput.style.backgroundColor = "#eff6ff";
+
+                adminUrlInput.value = "Akan digenerate otomatis";
+                adminUrlInput.setAttribute('readonly', true);
+                adminUrlInput.style.backgroundColor = "#eff6ff";
+
+                urlHelper.innerHTML = `
+                <i class="bi bi-info-circle text-primary"></i>
+                <span class="text-primary fw-bold">
+                    URL akan otomatis dibuat berdasarkan Nama Menu.
+                </span>
+            `;
+            } else {
+                if (urlInput.value === "Akan digenerate otomatis") {
+                    urlInput.value = "";
+                }
+                urlInput.removeAttribute('readonly');
+                urlInput.style.backgroundColor = "";
+
+                if (adminUrlInput.value === "Akan digenerate otomatis") {
+                    adminUrlInput.value = "";
+                }
+                adminUrlInput.removeAttribute('readonly');
+                adminUrlInput.style.backgroundColor = "";
+
+                urlHelper.innerHTML = `
+                <i class="bi bi-lightbulb-fill text-warning"></i>
+                <span>Pilih "Informasi Publik" untuk otomatis membuat kategori dokumen.</span>
+            `;
+            }
+        }
+
+        parentSelect.addEventListener('change', checkParentType);
+
+        // Form Submit Handler
+        const menuForm = document.getElementById('menuForm');
+        menuForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const method = document.getElementById('formMethod').value;
+            const idMenu = document.getElementById('id_menu').value;
+
+            let url = '<?= site_url('menu') ?>';
+            if (method === 'PUT') {
+                url = '<?= site_url('menu') ?>/' + idMenu;
+            }
+
+            // Show loading
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Menyimpan...';
+
+            fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message || 'Menu berhasil disimpan',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: data.message || 'Terjadi kesalahan',
+                            confirmButtonColor: '#6366f1'
+                        });
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan saat menyimpan data',
+                        confirmButtonColor: '#6366f1'
+                    });
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+        });
+    });
+
+    // Toggle Accordion
+    function toggleRows(parentId, element) {
+        element.classList.toggle('expanded');
+        const childRows = document.querySelectorAll(`.child-of-${parentId}`);
+
+        childRows.forEach(row => {
+            row.classList.toggle('show');
         });
     }
-}
 
-// Icon preview
-document.getElementById('menu_icon')?.addEventListener('input', function() {
-    const iconClass = this.value.trim();
-    const preview = document.getElementById('iconPreview');
-    
-    if (iconClass) {
-        preview.innerHTML = '<i class="' + iconClass + '"></i>';
-    } else {
-        preview.innerHTML = '<i class="bi bi-question-circle"></i>';
+    // Open Create Modal
+    function openCreateModal() {
+        document.getElementById('menuModalLabel').innerHTML = '<i class="bi bi-plus-square"></i> <span>Tambah Menu Baru</span>';
+        document.getElementById('formMethod').value = 'POST';
+        document.getElementById('id_menu').value = '';
+        document.getElementById('submitBtnText').textContent = 'Simpan Menu';
+        document.getElementById('btnDeleteModal').classList.add('d-none');
+
+        // Reset form
+        document.getElementById('menuForm').reset();
+        document.getElementById('menu_name').value = '';
+        document.getElementById('menu_icon').value = '';
+        document.getElementById('parent_id').value = '0';
+        document.getElementById('menu_url').value = '';
+        document.getElementById('admin_url').value = '';
+        document.getElementById('allowed_roles').value = '';
+        document.getElementById('order_number').value = '1';
+        document.getElementById('status').value = 'active';
+
+        // Reset icon preview
+        document.getElementById('iconPreview').innerHTML = '<i class="bi bi-question-circle"></i>';
+
+        // Reset readonly states
+        document.getElementById('menu_url').removeAttribute('readonly');
+        document.getElementById('menu_url').style.backgroundColor = '';
+        document.getElementById('admin_url').removeAttribute('readonly');
+        document.getElementById('admin_url').style.backgroundColor = '';
     }
-});
 
-// Open create modal
-function openCreateModal() {
-    document.getElementById('menuModalLabel').innerHTML = '<i class="fas fa-plus-square me-2"></i>Tambah Menu Baru';
-    document.getElementById('modalTitle').textContent = 'Tambah Menu Baru';
-    document.getElementById('submitBtnText').textContent = 'Simpan Menu';
-    document.getElementById('formMethod').value = 'POST';
-    document.getElementById('menuForm').action = '<?= base_url('menu/store') ?>';
-    document.getElementById('menuForm').reset();
-    document.getElementById('id_menu').value = '';
-    document.getElementById('status').value = 'active';
-    document.getElementById('menu_order').value = '0';
-    document.getElementById('parent_id').value = '0';
-    document.getElementById('iconPreview').innerHTML = '<i class="bi bi-question-circle"></i>';
-}
+    // Open Edit Modal
+    function openEditModal(menuData) {
+        document.getElementById('menuModalLabel').innerHTML = '<i class="bi bi-pencil-square"></i> <span>Edit Menu</span>';
+        document.getElementById('formMethod').value = 'PUT';
+        document.getElementById('id_menu').value = menuData.id_menu;
+        document.getElementById('submitBtnText').textContent = 'Simpan Perubahan';
+        document.getElementById('btnDeleteModal').classList.remove('d-none');
 
-// Open edit modal
-function openEditModal(menu) {
-    document.getElementById('menuModalLabel').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Menu';
-    document.getElementById('modalTitle').textContent = 'Edit Menu';
-    document.getElementById('submitBtnText').textContent = 'Update Menu';
-    document.getElementById('formMethod').value = 'PUT';
-    document.getElementById('menuForm').action = '<?= base_url('menu/update') ?>/' + menu.id_menu;
-    
-    document.getElementById('id_menu').value = menu.id_menu;
-    document.getElementById('menu_name').value = menu.menu_name;
-    document.getElementById('menu_icon').value = menu.menu_icon || '';
-    document.getElementById('menu_url').value = menu.menu_url || '';
-    document.getElementById('admin_url').value = menu.admin_url || '';
-    document.getElementById('parent_id').value = menu.parent_id || '0';
-    document.getElementById('menu_order').value = menu.menu_order || '0';
-    document.getElementById('status').value = menu.status || 'active';
-    
-    // Update icon preview
-    const iconClass = menu.menu_icon || '';
-    const preview = document.getElementById('iconPreview');
-    if (iconClass) {
-        preview.innerHTML = '<i class="' + iconClass + '"></i>';
-    } else {
-        preview.innerHTML = '<i class="bi bi-question-circle"></i>';
+        // Fill form with data
+        document.getElementById('menu_name').value = menuData.menu_name || '';
+        document.getElementById('menu_icon').value = menuData.menu_icon || '';
+        document.getElementById('parent_id').value = menuData.parent_id || '0';
+        document.getElementById('menu_url').value = menuData.menu_url || '';
+        document.getElementById('admin_url').value = menuData.admin_url || '';
+        document.getElementById('allowed_roles').value = menuData.allowed_roles || '';
+        document.getElementById('order_number').value = menuData.order_number || '1';
+        document.getElementById('status').value = menuData.status || 'active';
+
+        // Update icon preview
+        const iconClass = menuData.menu_icon || 'bi bi-question-circle';
+        document.getElementById('iconPreview').innerHTML = `<i class="${iconClass}"></i>`;
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('menuModal'));
+        modal.show();
     }
-    
-    const modal = new bootstrap.Modal(document.getElementById('menuModal'));
-    modal.show();
-}
 
-// Delete menu confirmation
-function deleteMenu(id, name) {
-    Swal.fire({
-        title: 'Hapus Menu?',
-        html: `Anda yakin ingin menghapus menu <strong>${name}</strong>?<br><small class="text-muted">Menu dan semua submenu-nya akan dihapus!</small>`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: '<i class="fas fa-trash-alt me-2"></i>Ya, Hapus!',
-        cancelButtonText: '<i class="fas fa-times me-2"></i>Batal',
-        reverseButtons: true,
-        customClass: {
-            confirmButton: 'btn btn-danger rounded-pill px-4',
-            cancelButton: 'btn btn-secondary rounded-pill px-4'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = '<?= base_url('menu/delete') ?>/' + id;
-        }
-    });
-}
+    // Delete Menu
+    function deleteMenu(id, name) {
+        Swal.fire({
+            title: 'Hapus Menu?',
+            html: `Anda yakin ingin menghapus menu <strong>"${name}"</strong>?<br><small class="text-muted">Semua submenu akan ikut terhapus.</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '<?= site_url('menu') ?>/' + id;
+
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '<?= csrf_token() ?>';
+                csrfInput.value = '<?= csrf_hash() ?>';
+
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+
+                form.appendChild(csrfInput);
+                form.appendChild(methodInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+
+    // Delete from Modal
+    function deleteMenuFromModal() {
+        const idMenu = document.getElementById('id_menu').value;
+        const menuName = document.getElementById('menu_name').value;
+
+        // Close modal first
+        const modal = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
+        modal.hide();
+
+        // Then show delete confirmation
+        setTimeout(() => {
+            deleteMenu(idMenu, menuName);
+        }, 300);
+    }
 </script>
 <?= $this->endSection() ?>
