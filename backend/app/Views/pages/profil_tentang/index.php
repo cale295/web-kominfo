@@ -25,12 +25,30 @@
         </div>
     <?php endif; ?>
 
+    <!-- Alert jika sudah mencapai batas maksimal -->
+    <?php if (count($profils) >= 4): ?>
+        <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-info-circle me-2 fs-5"></i>
+                <div><strong>Perhatian:</strong> Batas maksimal 4 konten telah tercapai. Hapus konten yang ada untuk menambahkan yang baru.</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="card shadow border-0 rounded-3 mb-4">
         <div class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
-            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-book-open me-2"></i>Daftar Konten</h6>
-            <?php if ($can_create): ?>
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-book-open me-2"></i>Daftar Konten 
+                <span class="badge bg-secondary"><?= count($profils) ?>/4</span>
+            </h6>
+            <?php if ($can_create && count($profils) < 4): ?>
                 <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#modalCreate">
                     <i class="fas fa-plus me-1"></i> Tambah Konten
+                </button>
+            <?php elseif ($can_create): ?>
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" disabled>
+                    <i class="fas fa-ban me-1"></i> Batas Tercapai (4/4)
                 </button>
             <?php endif; ?>
         </div>
@@ -54,11 +72,15 @@
                                         <i class="fas fa-file-alt fa-3x"></i>
                                     </div>
                                     <h6 class="fw-bold text-secondary">Belum ada konten</h6>
-                                    <p class="small text-muted mb-0">Silakan tambahkan data baru.</p>
+                                    <p class="small text-muted mb-0">Silakan tambahkan data baru (maksimal 4 konten).</p>
                                 </td>
                             </tr>
                         <?php else : ?>
-                            <?php foreach ($profils as $index => $item) : ?>
+                            <?php 
+                            // Limit to 4 items
+                            $limitedProfils = array_slice($profils, 0, 4);
+                            foreach ($limitedProfils as $index => $item) : 
+                            ?>
                                 <tr>
                                     <td class="text-center fw-bold text-secondary"><?= $index + 1 ?></td>
                                     <td>
