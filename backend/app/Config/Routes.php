@@ -300,7 +300,7 @@ $routes->post('informasi-publik/(:segment)/dokumen/store/(:any)', 'Frontend\Docu
 $routes->get('informasi-publik/(:segment)/edit/(:num)', 'Frontend\DocumentController::edit/$1/$2');
 $routes->post('informasi-publik/(:segment)/update/(:num)', 'Frontend\DocumentController::update/$1/$2');
 $routes->get('informasi-publik/(:segment)/delete/(:num)', 'Frontend\DocumentController::delete/$1/$2');
-
+$routes->get('informasi-publik/(:segment)/folder/delete/(:any)', 'Frontend\DocumentController::deleteFolder/$1/$2');
 
 // =========================================================================
 // API ROUTES

@@ -233,4 +233,39 @@ class DocumentController extends BaseController
         return redirect()->to("informasi-publik/$slug")
             ->with('pesan', 'Dokumen berhasil dihapus');
     }
+    /* ======================
+ * HAPUS FOLDER
+ * ====================== */
+    public function deleteFolder($slug, $nama_folder)
+    {
+        $kategori = $this->getKategoriBySlug($slug);
+        $decoded_folder = urldecode($nama_folder);
+
+        // Cek apakah folder ada dan memiliki dokumen
+        $dokumenDalamFolder = $this->documentModel
+            ->where('id_kategori', $kategori['id_kategori'])
+            ->where('nama_folder', $decoded_folder)
+            ->findAll();
+
+        if (empty($dokumenDalamFolder)) {
+            return redirect()->to("informasi-publik/$slug")
+                ->with('error', 'Folder tidak ditemukan');
+        }
+
+        // Hapus semua file fisik terlebih dahulu
+        foreach ($dokumenDalamFolder as $dokumen) {
+            if ($dokumen['file_path'] && file_exists('uploads/dokumen/' . $dokumen['file_path'])) {
+                unlink('uploads/dokumen/' . $dokumen['file_path']);
+            }
+        }
+
+        // Hapus semua record dokumen dalam folder
+        $this->documentModel
+            ->where('id_kategori', $kategori['id_kategori'])
+            ->where('nama_folder', $decoded_folder)
+            ->delete();
+
+        return redirect()->to("informasi-publik/$slug")
+            ->with('pesan', 'Folder beserta semua dokumen berhasil dihapus');
+    }
 }
