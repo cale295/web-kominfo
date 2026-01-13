@@ -113,6 +113,11 @@ class KontakController extends BaseController
         if (!$access || !$access['can_create']) {
             return redirect()->to('/kontak')->with('error', 'Akses ditolak.');
         }
+
+        $count = $this->kontakModel->countAllResults();
+        if ($count >= 1) {
+            return redirect()->to('/kontak')->with('error', 'Data kontak sudah ada.');
+        }
         return view('pages/kontak/create');
     }
 

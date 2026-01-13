@@ -19,11 +19,23 @@
     <div class="card shadow border-0 rounded-3 mb-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-address-book me-2"></i>Daftar Kontak</h6>
+            
+            <?php 
+            // MODIFIKASI LOGIC DISINI:
+            // Cek apakah user boleh create
+            ?>
             <?php if ($can_create): ?>
-                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#modalTambahKontak">
-                    <i class="fas fa-plus me-1"></i> Tambah Data
-                </button>
+                <?php if (empty($kontak)): ?>
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#modalTambahKontak">
+                        <i class="fas fa-plus me-1"></i> Tambah Data
+                    </button>
+                <?php else: ?>
+                    <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">
+                        <i class="fas fa-check-circle me-1 text-success"></i> Data Maksimal (1/1)
+                    </span>
+                <?php endif; ?>
             <?php endif; ?>
+            
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -238,7 +250,8 @@
         });
 
         // 1. Logic Auto-Open Modal Tambah jika ada Error (dari create)
-        <?php if (session()->has('errors')) : ?>
+        // Tambahan: Hanya jalankan jika kontak kosong, untuk mencegah error logika
+        <?php if (session()->has('errors') && empty($kontak)) : ?>
             var myModal = new bootstrap.Modal(document.getElementById('modalTambahKontak'));
             myModal.show();
         <?php endif; ?>
