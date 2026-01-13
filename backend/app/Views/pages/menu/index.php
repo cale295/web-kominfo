@@ -1349,24 +1349,45 @@
         parentSelect.addEventListener('change', checkParentType);
 
         // Form Submit Handler
+        // Form Submit Handler
         const menuForm = document.getElementById('menuForm');
-        menuForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+menuForm.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-            const formData = new FormData(this);
-            const method = document.getElementById('formMethod').value;
-            const idMenu = document.getElementById('id_menu').value;
+    const formData = new FormData(this);
+    const method = document.getElementById('formMethod').value;
+    const idMenu = document.getElementById('id_menu').value;
 
-            let url = '<?= site_url('menu') ?>';
-            if (method === 'PUT') {
-                url = '<?= site_url('menu') ?>/' + idMenu;
-            }
+    let url = '<?= site_url('menu') ?>';
+    if (method === 'PUT') {
+        url = '<?= site_url('menu') ?>/' + idMenu;
+    }
 
-            // Show loading
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Menyimpan...';
+    // Remove readonly before submit to ensure values are included
+    const urlInput = document.getElementById('menu_url');
+    const adminUrlInput = document.getElementById('admin_url');
+    const wasUrlReadonly = urlInput.hasAttribute('readonly');
+    const wasAdminUrlReadonly = adminUrlInput.hasAttribute('readonly');
+    
+    urlInput.removeAttribute('readonly');
+    adminUrlInput.removeAttribute('readonly');
+
+    // Show loading - PERBAIKAN DI SINI
+    const submitBtn = document.querySelector('.btn-modal-submit');
+    if (!submitBtn) {
+        console.error('Submit button not found');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Tombol submit tidak ditemukan',
+            confirmButtonColor: '#6366f1'
+        });
+        return;
+    }
+    
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Menyimpan...';
 
             fetch(url, {
                     method: 'POST',
@@ -1396,6 +1417,10 @@
                         });
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = originalText;
+                        
+                        // Restore readonly state
+                        if (wasUrlReadonly) urlInput.setAttribute('readonly', true);
+                        if (wasAdminUrlReadonly) adminUrlInput.setAttribute('readonly', true);
                     }
                 })
                 .catch(error => {
@@ -1408,6 +1433,10 @@
                     });
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
+                    
+                    // Restore readonly state
+                    if (wasUrlReadonly) urlInput.setAttribute('readonly', true);
+                    if (wasAdminUrlReadonly) adminUrlInput.setAttribute('readonly', true);
                 });
         });
     });
