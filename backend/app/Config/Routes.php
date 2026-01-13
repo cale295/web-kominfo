@@ -35,37 +35,7 @@ $routes->resource('manage_user', ['controller' => 'backend\UserController']);
 $routes->resource('kategori_berita', ['controller' => 'backend\KategoriBeritaController']);
 $routes->post('kategori_berita/toggle-status', 'backend\KategoriBeritaController::toggleStatus');
 
-// -------------------------------------------------------------------------
-// PERBAIKAN: KONTAK ROUTE
-// -------------------------------------------------------------------------
-// Hapus atau comment resource bawaan agar tidak bentrok dengan Group di bawah
-// $routes->resource('kontak', ...); 
 
-$routes->group('kontak', ['namespace' => 'App\Controllers\frontend'], function($routes) {
-    
-    // 1. Index & Toggle
-    $routes->get('/', 'KontakController::index');
-    $routes->post('toggle-status', 'KontakController::toggle_status'); // Pastikan nama method di controller toggle_status atau toggleStatus
-    
-
-    // 2. CREATE & STORE (Tangkap segmen tipe: instansi/social/layanan)
-    // Contoh URL: /kontak/create/instansi
-    $routes->get('create/(:segment)', 'KontakController::create/$1'); 
-    $routes->post('store/(:segment)', 'KontakController::store/$1');
-
-    // 3. EDIT & UPDATE (Tangkap tipe dan ID)
-    // Contoh URL: /kontak/edit/instansi/5
-    $routes->get('edit/(:segment)/(:num)', 'KontakController::edit/$1/$2'); 
-    $routes->post('update/(:segment)/(:num)', 'KontakController::update/$1/$2');
-
-    // 4. DELETE (Universal untuk 3 tab)
-    // Menangkap POST dari form delete (method spoofing DELETE)
-    // Contoh URL: /kontak/delete/instansi/5
-    $routes->post('delete/(:segment)/(:num)', 'KontakController::delete/$1/$2');
-    $routes->delete('delete/(:segment)/(:num)', 'KontakController::delete/$1/$2');
-});
-// Tambahkan ini di bagian Routes
-$routes->post('kontak/status', 'frontend\KontakController::updateStatus');
 
 // Program
 $routes->resource('program', ['controller' => 'frontend\ProgramController', 'except' => ['show']]);
@@ -100,6 +70,9 @@ $routes->post('kategori/toggle-status', 'backend\KategoriController::toggleStatu
 // route resource 'kontak_layanan' & 'kontak_social' dibawah ini mungkin redundan.
 // Namun biarkan aktif jika masih dipakai oleh API atau halaman lain.
 
+//kontak
+$routes->resource('kontak', ['controller' => 'frontend\KontakController', 'except' => ['show']]);
+$routes->post('kontak/toggle-status', 'frontend\KontakController::toggleStatus');
 // Kontak Layanan
 $routes->resource('kontak_layanan', ['controller' => 'frontend\KontakLayananController', 'except' => ['show']]);
 $routes->post('kontak_layanan/toggle-status', 'frontend\KontakLayananController::toggleStatus');

@@ -43,6 +43,8 @@ class KontakLayananController extends BaseController
 
         $data = [
             'kontaklayanan' => $kontaklayanan,
+            'active_tab' => 'kontak_layanan', // <--- TAMBAHKAN INI
+            'can_read'      => $access['can_read'],
             'can_create'    => $access['can_create'],
             'can_update'    => $access['can_update'],
             'can_delete'    => $access['can_delete'],

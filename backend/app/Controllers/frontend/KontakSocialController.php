@@ -43,7 +43,9 @@ class KontakSocialController extends BaseController
         $kontak_social = $this->kontakSocialModel->orderBy('created_at', 'DESC')->findAll();
 
         $data = [
-            'kontak_social' => $kontak_social,
+            'kontak_social' => $kontak_social,                        
+            'active_tab' => 'kontak_social', // <--- TAMBAHKAN INI
+            'can_read'      => $access['can_read'],
             'can_create'    => $access['can_create'],
             'can_update'    => $access['can_update'],
             'can_delete'    => $access['can_delete'],
