@@ -4,39 +4,57 @@
 <link rel="stylesheet" href="<?= base_url('css/pages/access_rights/index.css') ?>">
 <style>
     /* Styling Custom Gov */
-    .modal-header-gov {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
+    .modal-header-gov { background-color: #f8f9fa; border-bottom: 1px solid #e9ecef; }
+    .modal-title i { color: var(--primary-gov); }
+    .header-actions { display: flex; gap: 10px; }
+    .cursor-pointer { cursor: pointer; }
+    
+    /* Style untuk Single Toggle yang diminta Boss */
+    .master-toggle-container {
+        background-color: #eef2ff;
+        border: 1px solid #c7d2fe;
+        color: #3730a3;
+        transition: all 0.3s ease;
     }
-    .modal-title i {
-        color: var(--primary-gov);
+    
+    .master-toggle-container:hover {
+        background-color: #e0e7ff;
+        border-color: #a5b4fc;
     }
-    .header-actions {
-        display: flex;
-        gap: 10px;
+    
+    /* Style untuk role badge */
+    .role-badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
     }
-    /* Hover effect untuk baris permission */
-    .permission-row:hover {
-        background-color: #f8f9fa;
-    }
-    /* Agar kursor berubah jadi jari saat hover label */
-    .cursor-pointer {
-        cursor: pointer;
-    }
+    
+    .role-superadmin { background-color: #dc3545; color: white; }
+    .role-admin { background-color: #0d6efd; color: white; }
+    .role-editor { background-color: #198754; color: white; }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 
 <?php
-// DEFINISI PERMISSION & DESKRIPSI (Dipakai untuk Modal Tambah & Edit)
+// KONFIGURASI KHUSUS (FILTER ROLE)
+$allowedRoles = ['superadmin', 'admin', 'editor'];
+
+// DEFINISI PERMISSION
 $permissions = [
-    'can_create'  => ['label' => 'Create',  'desc' => 'Izinkan membuat data', 'icon' => 'bi-plus-circle'],
-    'can_read'    => ['label' => 'Read',    'desc' => 'Izinkan melihat data', 'icon' => 'bi-eye'],
-    'can_update'  => ['label' => 'Update',  'desc' => 'Izinkan ubah data',    'icon' => 'bi-pencil'],
-    'can_delete'  => ['label' => 'Delete',  'desc' => 'Izinkan hapus data',   'icon' => 'bi-trash'],
-    'can_publish' => ['label' => 'Publish', 'desc' => 'Izinkan publikasi',    'icon' => 'bi-send']
+    'can_create'  => 'Create',
+    'can_read'    => 'Read',
+    'can_update'  => 'Update',
+    'can_delete'  => 'Delete',
+    'can_publish' => 'Publish'
 ];
+
+// Filter data berdasarkan role yang diizinkan
+$filteredAccessList = array_filter($accessList ?? [], function($item) use ($allowedRoles) {
+    return in_array(strtolower($item['role']), $allowedRoles);
+});
 ?>
 
 <div class="container-fluid py-4">
@@ -44,10 +62,9 @@ $permissions = [
     <div class="page-header-gov d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h3 class="mb-1">
-                <i class="bi bi-shield-lock-fill"></i>
-                <?= esc($title) ?>
+                <i class="bi bi-shield-lock-fill"></i> <?= esc($title) ?>
             </h3>
-            <p class="text-muted mb-0">Kelola hak akses dan permission untuk setiap role pengguna</p>
+            <p class="text-muted mb-0">Kelola hak akses untuk Admin, Editor, dan Superadmin</p>
         </div>
         <div class="header-actions">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccessModal">
@@ -57,17 +74,15 @@ $permissions = [
     </div>
 
     <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success-gov alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <?= session()->getFlashdata('success') ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> <?= session()->getFlashdata('success') ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
     
     <?php if (session()->getFlashdata('error')): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <?= session()->getFlashdata('error') ?>
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= session()->getFlashdata('error') ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
@@ -76,24 +91,25 @@ $permissions = [
         <div class="card-body">
             <form method="get" class="row g-3 align-items-end">
                 <div class="col-lg-4 col-md-6">
-                    <label for="filter" class="filter-label"><i class="bi bi-search"></i> Pencarian</label>
-                    <input type="text" class="form-control form-control-gov" name="filter" id="filter" placeholder="Cari role atau module..." value="<?= esc($filter ?? '') ?>">
+                    <label for="filter" class="filter-label"><i class="bi bi-search"></i> Cari Module</label>
+                    <input type="text" class="form-control" name="filter" id="filter" placeholder="Cari module..." value="<?= esc($filter ?? '') ?>">
                 </div>
-                <div class="col-lg-4 col-md-6">
-                    <label for="sort" class="filter-label"><i class="bi bi-sort-down"></i> Urutkan Berdasarkan</label>
-                    <select class="form-select form-select-gov" name="sort" id="sort">
-                        <option value="">-- Pilih Urutan --</option>
-                        <option value="role_asc" <?= (isset($sort) && $sort == 'role_asc') ? 'selected' : '' ?>>Role (A → Z)</option>
-                        <option value="role_desc" <?= (isset($sort) && $sort == 'role_desc') ? 'selected' : '' ?>>Role (Z → A)</option>
-                        <option value="module_asc" <?= (isset($sort) && $sort == 'module_asc') ? 'selected' : '' ?>>Module (A → Z)</option>
-                        <option value="module_desc" <?= (isset($sort) && $sort == 'module_desc') ? 'selected' : '' ?>>Module (Z → A)</option>
+                <div class="col-lg-3 col-md-6">
+                    <label for="roleFilter" class="filter-label"><i class="bi bi-person-badge"></i> Filter Role</label>
+                    <select class="form-select" name="role" id="roleFilter">
+                        <option value="">Semua Role</option>
+                        <?php foreach($allowedRoles as $role): ?>
+                            <option value="<?= $role ?>" <?= (isset($_GET['role']) && $_GET['role'] == $role) ? 'selected' : '' ?>>
+                                <?= ucfirst($role) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <button type="submit" class="btn btn-apply-filter w-100"><i class="bi bi-funnel me-1"></i> Terapkan</button>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i> Cari</button>
                 </div>
-                <div class="col-lg-2 col-md-6">
-                    <a href="/access_rights" class="btn btn-reset-filter w-100"><i class="bi bi-arrow-clockwise me-1"></i> Reset</a>
+                <div class="col-lg-3 col-md-6">
+                    <a href="/access_rights" class="btn btn-outline-secondary w-100"><i class="bi bi-arrow-clockwise me-1"></i> Reset</a>
                 </div>
             </form>
         </div>
@@ -101,88 +117,94 @@ $permissions = [
 
     <div class="card table-card-gov">
         <div class="table-card-header">
-            <i class="bi bi-table"></i>
-            <span>Daftar Hak Akses & Permission</span>
+            <i class="bi bi-table"></i> <span>Ringkasan Hak Akses per Role</span>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-gov table-hover mb-0">
+            <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Role</th>
-                        <th>Module</th>
-                        <th>Create</th>
-                        <th>Read</th>
-                        <th>Update</th>
-                        <th>Delete</th>
-                        <th>Publish</th>
-                        <th class="text-center">Aksi</th>
+                        <th style="width: 20%">Role</th>
+                        <th style="width: 25%">Jumlah Module</th>
+                        <th class="text-center" style="width: 30%">Status Permission</th>
+                        <th class="text-center" style="width: 25%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (empty($accessList)): ?>
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="empty-state text-muted">
-                                    <i class="bi bi-inbox fs-1 mb-3 d-block"></i>
-                                    <h5>Belum Ada Data Hak Akses</h5>
-                                    <p>Silakan tambahkan konfigurasi hak akses baru.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($accessList as $a): ?>
+                    <?php 
+                    // Kelompokkan data berdasarkan role
+                    $groupedByRole = [];
+                    foreach ($filteredAccessList as $item) {
+                        $groupedByRole[strtolower($item['role'])][] = $item;
+                    }
+                    
+                    // Urutkan role: superadmin, admin, editor
+                    $roleOrder = ['superadmin', 'admin', 'editor'];
+                    ?>
+                    
+                    <?php foreach ($roleOrder as $currentRole): ?>
+                        <?php if (isset($groupedByRole[$currentRole])): ?>
+                            <?php 
+                            // Ambil data pertama untuk role ini
+                            $firstItem = $groupedByRole[$currentRole][0];
+                            $totalModules = count($groupedByRole[$currentRole]);
+                            
+                            // Hitung total permission aktif untuk role ini
+                            $totalActivePermissions = 0;
+                            $totalPossiblePermissions = $totalModules * 5;
+                            
+                            foreach ($groupedByRole[$currentRole] as $item) {
+                                foreach(['can_create', 'can_read', 'can_update', 'can_delete', 'can_publish'] as $perm) {
+                                    if($item[$perm]) $totalActivePermissions++;
+                                }
+                            }
+                            
+                            $isFullAccess = ($totalActivePermissions == $totalPossiblePermissions);
+                            ?>
                             <tr>
-                                <td class="role-cell">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-light p-2 me-2 text-primary">
-                                            <i class="bi bi-person-badge"></i>
-                                        </div>
-                                        <strong><?= esc($a['role']) ?></strong>
+                                <td>
+                                    <span class="role-badge role-<?= $currentRole ?>">
+                                        <?= strtoupper($currentRole) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="badge bg-info text-dark px-3 py-2">
+                                            <i class="bi bi-folder-fill me-1"></i> <?= $totalModules ?> Module
+                                        </span>
                                     </div>
                                 </td>
-                                <td class="module-cell">
-                                    <code class="text-dark bg-light px-2 py-1 rounded border">
-                                        <?= esc($a['module_name']) ?>
-                                    </code>
-                                </td>
                                 
-                                <?php 
-                                    // Loop permission columns for table
-                                    $keys = ['can_create', 'can_read', 'can_update', 'can_delete', 'can_publish'];
-                                    foreach($keys as $key): 
-                                ?>
-                                <td>
-                                    <?php if($a[$key]): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Yes
+                                <td class="text-center">
+                                    <?php if($isFullAccess): ?>
+                                        <span class="badge bg-success px-3 py-2">
+                                            <i class="bi bi-check-all me-1"></i> Akses Penuh
                                         </span>
                                     <?php else: ?>
-                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">
-                                            <i class="bi bi-x-circle me-1"></i>No
+                                        <span class="badge bg-warning text-dark px-3 py-2">
+                                            <i class="bi bi-shield-check me-1"></i> <?= $totalActivePermissions ?>/<?= $totalPossiblePermissions ?> Permission
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <?php endforeach; ?>
                                 
                                 <td class="text-center">
-                                    <button type="button" 
-                                            class="btn btn-sm btn-outline-primary btn-edit-access" 
+                                    <button type="button" class="btn btn-sm btn-primary" 
                                             data-bs-toggle="modal" 
-                                            data-bs-target="#editAccessModal"
-                                            data-id="<?= $a['id_access'] ?>"
-                                            data-role="<?= esc($a['role']) ?>"
-                                            data-module="<?= esc($a['module_name']) ?>"
-                                            data-create="<?= $a['can_create'] ? 1 : 0 ?>"
-                                            data-read="<?= $a['can_read'] ? 1 : 0 ?>"
-                                            data-update="<?= $a['can_update'] ? 1 : 0 ?>"
-                                            data-delete="<?= $a['can_delete'] ? 1 : 0 ?>"
-                                            data-publish="<?= $a['can_publish'] ? 1 : 0 ?>">
-                                        <i class="bi bi-pencil-square me-1"></i> Edit
+                                            data-bs-target="#moduleListModal"
+                                            data-role="<?= $currentRole ?>"
+                                            data-modules='<?= json_encode($groupedByRole[$currentRole]) ?>'>
+                                        <i class="bi bi-eye"></i> Lihat Detail
                                     </button>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    
+                    <?php if (empty($filteredAccessList)): ?>
+                        <tr><td colspan="4" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            Belum ada data hak akses.
+                        </td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -190,67 +212,53 @@ $permissions = [
     </div>
 </div>
 
-<div class="modal fade" id="addAccessModal" tabindex="-1" aria-labelledby="addAccessModalLabel" aria-hidden="true">
+<!-- Modal Tambah Akses -->
+<div class="modal fade" id="addAccessModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header modal-header-gov">
-                <h5 class="modal-title" id="addAccessModalLabel">
-                    <i class="bi bi-plus-circle-fill me-2"></i>Tambah Hak Akses Baru
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"><i class="bi bi-plus-circle-fill me-2"></i>Tambah Akses Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            
             <form action="/access_rights/store" method="post">
                 <?= csrf_field() ?>
-                
                 <div class="modal-body p-4">
-                    <div class="row gy-3">
-                        
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Role Pengguna <span class="text-danger">*</span></label>
-                            <select class="form-select" name="role" required>
-                                <option value="" selected disabled>-- Pilih Role --</option>
-                                <?php if(!empty($existingRoles)): ?>
-                                    <?php foreach($existingRoles as $r): ?>
-                                        <option value="<?= esc($r) ?>"><?= esc($r) ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                                <option value="superadmin">superadmin</option>
-                                <option value="admin">admin</option>
-                                <option value="user">user</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Nama Module <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-box"></i></span>
-                                <input type="text" class="form-control" name="module_name" placeholder="Contoh: surat_masuk" required>
-                            </div>
-                        </div>
-
-                        <div class="col-12"><hr class="my-2"></div>
-
-                        <div class="col-12 mb-1"><label class="form-label fw-bold text-primary">Pengaturan Permission</label></div>
-                        <?php foreach ($permissions as $key => $perm): ?>
-                            <div class="col-12 permission-row rounded p-2 border mb-2">
-                                <div class="form-check form-switch d-flex justify-content-between align-items-center m-0">
-                                    <label class="form-check-label cursor-pointer" for="add_<?= $key ?>">
-                                        <i class="bi <?= $perm['icon'] ?> me-2 text-muted"></i> 
-                                        <span class="fw-medium"><?= $perm['label'] ?></span>
-                                        <small class="text-muted ms-2 d-none d-sm-inline">(<?= $perm['desc'] ?>)</small>
-                                    </label>
-                                    <input class="form-check-input mt-0" type="checkbox" role="switch" name="<?= $key ?>" id="add_<?= $key ?>">
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-person-badge me-1"></i> Role
+                        </label>
+                        <select class="form-select" name="role" required>
+                            <option value="" selected disabled>-- Pilih Role --</option>
+                            <?php foreach($allowedRoles as $role): ?>
+                                <option value="<?= $role ?>"><?= ucfirst($role) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-folder me-1"></i> Nama Module
+                        </label>
+                        <input type="text" class="form-control" name="module_name" placeholder="Contoh: surat_masuk" required>
+                        <small class="text-muted">Gunakan huruf kecil dan underscore (_)</small>
+                    </div>
+                    
+                    <div class="alert alert-info py-2 mb-0">
+                        <small><i class="bi bi-info-circle me-1"></i> 
+                            Secara default, akses penuh akan diberikan untuk module baru.
+                        </small>
+                    </div>
+                    
+                    <!-- Hidden inputs untuk default full access -->
+                    <?php foreach ($permissions as $key => $label): ?>
+                        <input type="hidden" name="<?= $key ?>" value="on">
+                    <?php endforeach; ?>
                 </div>
-                
                 <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Batal
+                    </button>
                     <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="bi bi-save me-1"></i> Simpan Data
+                        <i class="bi bi-check-lg me-1"></i> Simpan
                     </button>
                 </div>
             </form>
@@ -258,14 +266,51 @@ $permissions = [
     </div>
 </div>
 
-<div class="modal fade" id="editAccessModal" tabindex="-1" aria-labelledby="editAccessModalLabel" aria-hidden="true">
+<!-- Modal Daftar Module per Role -->
+<div class="modal fade" id="moduleListModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header modal-header-gov">
+                <h5 class="modal-title">
+                    <i class="bi bi-folder-fill me-2"></i>Daftar Module - <span id="moduleModalRole" class="text-uppercase fw-bold">-</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 35%">Module</th>
+                                <th class="text-center" style="width: 30%">Status</th>
+                                <th class="text-center" style="width: 30%">Akses Penuh</th>
+                            </tr>
+                        </thead>
+                        <tbody id="moduleTableBody">
+                            <!-- Akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i> Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Akses -->
+<div class="modal fade" id="editAccessModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header modal-header-gov">
-                <h5 class="modal-title" id="editAccessModalLabel">
-                    <i class="bi bi-pencil-square me-2"></i>Edit Hak Akses
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Hak Akses</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             
             <form id="formEditAccess" action="" method="post">
@@ -273,33 +318,57 @@ $permissions = [
                 <input type="hidden" name="_method" value="PUT">
                 
                 <div class="modal-body p-4">
-                    <div class="alert alert-primary bg-primary-subtle border-primary-subtle text-primary mb-4">
-                        <div class="d-flex justify-content-between">
-                            <div><small class="text-uppercase fw-bold opacity-75">Role</small><br><strong id="modalRoleName">-</strong></div>
-                            <div class="text-end"><small class="text-uppercase fw-bold opacity-75">Module</small><br><strong id="modalModuleName">-</strong></div>
+                    <!-- Header Info -->
+                    <div class="text-center mb-4 pb-3 border-bottom">
+                        <span id="modalRoleBadge" class="role-badge mb-2 d-inline-block">-</span>
+                        <p class="text-muted mb-0">
+                            <small>Module:</small> 
+                            <code id="modalModuleName" class="bg-light px-2 py-1 rounded">-</code>
+                        </p>
+                    </div>
+
+                    <!-- Single Master Toggle -->
+                    <div class="master-toggle-container p-3 rounded mb-3 cursor-pointer" onclick="document.getElementById('masterToggle').click()">
+                        <div class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input" type="checkbox" id="masterToggle" style="transform: scale(1.5);">
+                                <label class="form-check-label fw-bold ms-2" for="masterToggle" style="font-size: 1.15em;">
+                                    <i class="bi bi-shield-fill-check me-1"></i> Berikan Akses Penuh
+                                </label>
+                            </div>
+                            <div class="text-muted small mt-2">
+                                Aktifkan untuk memberikan seluruh izin:<br>
+                                <span class="badge bg-primary bg-opacity-10 text-primary mx-1">Create</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary mx-1">Read</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary mx-1">Update</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary mx-1">Delete</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary mx-1">Publish</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row gy-2">
-                        <?php foreach ($permissions as $key => $perm): ?>
-                            <div class="col-12 permission-row rounded p-2 border">
-                                <div class="form-check form-switch d-flex justify-content-between align-items-center m-0">
-                                    <label class="form-check-label cursor-pointer" for="edit_<?= $key ?>">
-                                        <i class="bi <?= $perm['icon'] ?> me-2 text-muted"></i> 
-                                        <span class="fw-medium"><?= $perm['label'] ?></span>
-                                        <small class="text-muted ms-2 d-none d-sm-inline">(<?= $perm['desc'] ?>)</small>
-                                    </label>
-                                    <input class="form-check-input mt-0" type="checkbox" role="switch" name="<?= $key ?>" id="edit_<?= $key ?>">
-                                </div>
-                            </div>
+                    <!-- Info tambahan -->
+                    <div class="alert alert-light border mb-0">
+                        <small class="text-muted">
+                            <i class="bi bi-lightbulb me-1"></i> 
+                            Toggle ini mengontrol semua permission sekaligus untuk menjaga konsistensi akses.
+                        </small>
+                    </div>
+
+                    <!-- Hidden Checkboxes untuk Submit -->
+                    <div class="d-none">
+                        <?php foreach ($permissions as $key => $label): ?>
+                            <input type="checkbox" name="<?= $key ?>" id="edit_<?= $key ?>">
                         <?php endforeach; ?>
                     </div>
                 </div>
                 
                 <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Batal
+                    </button>
                     <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="bi bi-save me-1"></i> Simpan Perubahan
+                        <i class="bi bi-check-lg me-1"></i> Simpan Perubahan
                     </button>
                 </div>
             </form>
@@ -310,59 +379,257 @@ $permissions = [
 
 <?= $this->section('scripts') ?>
 <script>
-    // 1. Script Highlight Search
-    const filterInput = document.getElementById('filter');
-    if (filterInput && filterInput.value) {
-        const searchTerm = filterInput.value.toLowerCase();
-        const rows = document.querySelectorAll('.table-gov tbody tr');
-        rows.forEach(row => {
-            if (row.textContent.toLowerCase().includes(searchTerm)) {
-                row.style.backgroundColor = '#fef3c7'; 
-                setTimeout(() => {
-                    row.style.transition = 'background-color 1s ease';
-                    row.style.backgroundColor = '';
-                }, 2000);
-            }
+    // Script untuk Modal Daftar Module
+    const moduleListModal = document.getElementById('moduleListModal');
+    
+    if (moduleListModal) {
+        moduleListModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const role = button.getAttribute('data-role');
+            const modules = JSON.parse(button.getAttribute('data-modules'));
+            
+            // Set role name
+            document.getElementById('moduleModalRole').textContent = role;
+            
+            // Build table rows
+            const tbody = document.getElementById('moduleTableBody');
+            tbody.innerHTML = '';
+            
+            modules.forEach((module, index) => {
+                const isFullAccess = (
+                    module.can_create == 1 && 
+                    module.can_read == 1 && 
+                    module.can_update == 1 && 
+                    module.can_delete == 1 && 
+                    module.can_publish == 1
+                );
+                
+                let activeCount = 0;
+                ['can_create', 'can_read', 'can_update', 'can_delete', 'can_publish'].forEach(perm => {
+                    if(module[perm] == 1) activeCount++;
+                });
+                
+                let statusBadge = '';
+                if (isFullAccess) {
+                    statusBadge = '<span class="badge bg-success"><i class="bi bi-check-all me-1"></i> Akses Penuh</span>';
+                } else if (activeCount > 0) {
+                    statusBadge = '<span class="badge bg-warning text-dark"><i class="bi bi-shield-check me-1"></i> Terbatas (' + activeCount + '/5)</span>';
+                } else {
+                    statusBadge = '<span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i> Tidak Ada Akses</span>';
+                }
+                
+                const row = `
+                    <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>
+                            <code class="text-dark bg-light px-2 py-1 rounded border">${module.module_name}</code>
+                        </td>
+                        <td class="text-center">${statusBadge}</td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input module-toggle" 
+                                       type="checkbox" 
+                                       id="toggle_${module.id_access}"
+                                       data-id="${module.id_access}"
+                                       data-role="${module.role}"
+                                       data-module="${module.module_name}"
+                                       style="transform: scale(1.3);"
+                                       ${isFullAccess ? 'checked' : ''}>
+                                <label class="form-check-label ms-2" for="toggle_${module.id_access}">
+                                    ${isFullAccess ? 'Aktif' : 'Nonaktif'}
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            
+            // Tambahkan event listener untuk setiap toggle
+            setTimeout(() => {
+                document.querySelectorAll('.module-toggle').forEach(toggle => {
+                    toggle.addEventListener('change', function() {
+                        handleToggleChange(this);
+                    });
+                });
+            }, 100);
         });
     }
 
-    // 2. Script Auto-Submit Sort
-    document.getElementById('sort').addEventListener('change', function() {
-        if (this.value) this.closest('form').submit();
-    });
+    // Fungsi untuk handle perubahan toggle
+    function handleToggleChange(toggleElement) {
+        const id = toggleElement.getAttribute('data-id');
+        const role = toggleElement.getAttribute('data-role');
+        const moduleName = toggleElement.getAttribute('data-module');
+        const isChecked = toggleElement.checked;
+        
+        // Update label
+        const label = toggleElement.nextElementSibling;
+        label.textContent = isChecked ? 'Aktif' : 'Nonaktif';
+        
+        // Kirim request untuk update
+        updatePermission(id, isChecked);
+    }
 
-    // 3. Script untuk Modal Edit
+    // Fungsi untuk update permission via AJAX
+    function updatePermission(id, isFullAccess) {
+        // Buat FormData
+        const formData = new FormData();
+        formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+        formData.append('_method', 'PUT');
+        
+        // Set semua permission sesuai toggle
+        ['can_create', 'can_read', 'can_update', 'can_delete', 'can_publish'].forEach(perm => {
+            if (isFullAccess) {
+                formData.append(perm, 'on');
+            }
+        });
+        
+        // Kirim request
+        fetch('/access_rights/update/' + id, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success notification
+                showNotification('success', 'Permission berhasil diupdate!');
+                
+                // Update status badge di table
+                updateStatusBadge(id, isFullAccess);
+            } else {
+                showNotification('error', 'Gagal mengupdate permission!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('error', 'Terjadi kesalahan!');
+        });
+    }
+
+    // Fungsi untuk update status badge di table
+    function updateStatusBadge(id, isFullAccess) {
+        const toggle = document.getElementById('toggle_' + id);
+        if (toggle) {
+            const row = toggle.closest('tr');
+            const statusCell = row.children[2];
+            
+            if (isFullAccess) {
+                statusCell.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-all me-1"></i> Akses Penuh</span>';
+            } else {
+                statusCell.innerHTML = '<span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i> Tidak Ada Akses</span>';
+            }
+        }
+    }
+
+    // Fungsi untuk show notification
+    function showNotification(type, message) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill';
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.style.minWidth = '300px';
+        alertDiv.innerHTML = `
+            <i class="bi bi-${icon} me-2"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+
+    // Script Logic untuk Single Toggle di Modal Edit (tetap ada untuk backup jika diperlukan)
     const editModal = document.getElementById('editAccessModal');
+    
     if (editModal) {
         editModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             
-            // Ambil data
+            // Tutup modal module list jika ada
+            if (button.getAttribute('data-dismiss-module-modal') === 'true') {
+                const moduleModal = bootstrap.Modal.getInstance(moduleListModal);
+                if (moduleModal) moduleModal.hide();
+            }
+            
+            // Ambil Data dari Button
             const id = button.getAttribute('data-id');
             const role = button.getAttribute('data-role');
             const moduleName = button.getAttribute('data-module');
             
-            // Set Text
-            document.getElementById('modalRoleName').textContent = role;
-            document.getElementById('modalModuleName').textContent = moduleName;
-            
-            // Set Form Action
-            const form = document.getElementById('formEditAccess');
-            form.action = '/access_rights/update/' + id; 
-            
-            // Set Checkboxes
-            const setCheck = (key) => {
-                const val = button.getAttribute('data-' + key.replace('can_', ''));
-                const checkbox = document.getElementById('edit_' + key);
-                if(checkbox) checkbox.checked = (val == "1");
+            // Data Permission (0 atau 1)
+            const permissions = {
+                create: button.getAttribute('data-create'),
+                read:   button.getAttribute('data-read'),
+                update: button.getAttribute('data-update'),
+                delete: button.getAttribute('data-delete'),
+                publish: button.getAttribute('data-publish')
             };
 
-            setCheck('can_create');
-            setCheck('can_read');
-            setCheck('can_update');
-            setCheck('can_delete');
-            setCheck('can_publish');
+            // Update UI Modal
+            const roleBadge = document.getElementById('modalRoleBadge');
+            roleBadge.textContent = role.toUpperCase();
+            roleBadge.className = 'role-badge role-' + role.toLowerCase() + ' mb-2 d-inline-block';
+            
+            document.getElementById('modalModuleName').textContent = moduleName;
+            document.getElementById('formEditAccess').action = '/access_rights/update/' + id;
+            
+            // LOGIKA MASTER TOGGLE:
+            // Jika semua permission bernilai 1, maka Master Toggle ON
+            // Jika ada satu saja yang 0, maka Master Toggle OFF
+            const isFullAccess = (
+                permissions.create == 1 && 
+                permissions.read == 1 && 
+                permissions.update == 1 && 
+                permissions.delete == 1 && 
+                permissions.publish == 1
+            );
+            
+            const masterToggle = document.getElementById('masterToggle');
+            masterToggle.checked = isFullAccess;
+
+            // Sinkronisasi checkbox tersembunyi sesuai status master toggle
+            syncHiddenCheckboxes(isFullAccess);
         });
     }
+
+    // Event Listener: Saat Master Toggle diubah oleh User
+    document.getElementById('masterToggle').addEventListener('change', function() {
+        syncHiddenCheckboxes(this.checked);
+    });
+
+    /**
+     * Fungsi untuk menyinkronkan semua checkbox permission tersembunyi
+     * dengan status Master Toggle
+     */
+    function syncHiddenCheckboxes(isChecked) {
+        const permissionKeys = ['can_create', 'can_read', 'can_update', 'can_delete', 'can_publish'];
+        
+        permissionKeys.forEach(key => {
+            const checkbox = document.getElementById('edit_' + key);
+            if (checkbox) {
+                checkbox.checked = isChecked;
+            }
+        });
+    }
+
+    // Auto-dismiss alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert-dismissible');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
 </script>
 <?= $this->endSection() ?>
