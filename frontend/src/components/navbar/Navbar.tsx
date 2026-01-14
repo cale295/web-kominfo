@@ -264,9 +264,7 @@ function Navbar() {
               style={{ width: "6rem" }}
               />
             ) : (
-              <div className="hero-banner-placeholder">
-                <p>Banner tidak tersedia</p>
-              </div>
+              <p>Banner tidak tersedia</p>
             )}
 
             <h1 className="font-bold text-lg leading-snug tracking-wide text-center text-white">

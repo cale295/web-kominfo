@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Triangle, Calendar, Bell, Image, X } from "lucide-react"; 
+import { Triangle, Calendar, Image, X } from "lucide-react";
 import "./Agenda.css";
 import api from "../../../services/api";
 
@@ -17,7 +17,7 @@ interface ApiAgendaItem {
   activity_name: string;
   description: string;
   start_date: string;
-  end_date: string; // Pastikan ini ada di response API
+  end_date: string;
   location: string;
   image: string;
   status: string;
@@ -68,6 +68,7 @@ export default function Agenda() {
   const [activeTab, setActiveTab] = useState<TabType>("agenda");
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState<number | null>(
     today.getDate()
   );
@@ -79,15 +80,12 @@ export default function Agenda() {
   const [errorAgenda, setErrorAgenda] = useState<string | null>(null);
   const [agendaData, setAgendaData] = useState<ApiAgendaItem[]>([]);
 
-  // State untuk Pengumuman
   const [pengumumanData, setPengumumanData] = useState<PengumumanItem[]>([]);
   const [loadingPengumuman, setLoadingPengumuman] = useState<boolean>(false);
   const [errorPengumuman, setErrorPengumuman] = useState<string | null>(null);
 
-  // State untuk Popup Pengumuman
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementItem | null>(null);
 
-  // State untuk Berita Utama
   const [beritaUtamaList, setBeritaUtamaList] = useState<BeritaItem[]>([]);
   const [loadingBerita, setLoadingBerita] = useState<boolean>(true);
   const [errorBerita, setErrorBerita] = useState<string | null>(null);
@@ -114,7 +112,6 @@ export default function Agenda() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  // Generate data pengumuman dari agenda (fallback)
   const announcementFromAgenda: AnnouncementItem[] = agendaData
     .filter(
       (agenda) => agenda.status === "active" || agenda.status === "published"
@@ -129,7 +126,6 @@ export default function Agenda() {
     }))
     .slice(0, 7);
 
-  // Generate data pengumuman dari API pengumuman
   const announcementFromPengumuman: AnnouncementItem[] = pengumumanData
     .filter(
       (pengumuman) =>
@@ -151,7 +147,6 @@ export default function Agenda() {
     ? announcementFromPengumuman 
     : announcementFromAgenda;
 
-  // Fetch Berita
   useEffect(() => {
     const fetchBerita = async () => {
       try {
@@ -180,8 +175,6 @@ export default function Agenda() {
     fetchBerita();
   }, []);
 
-  // --- BAGIAN INI YANG DIMODIFIKASI UNTUK RENTANG WAKTU ---
-  // Fetch Agenda
   useEffect(() => {
     const fetchAgenda = async () => {
       try {
@@ -194,26 +187,20 @@ export default function Agenda() {
           setAgendaData(json.data);
 
           json.data.forEach((item: ApiAgendaItem) => {
-            // 1. Ambil Start Date
             const startDate = new Date(item.start_date);
-            // 2. Ambil End Date, jika null/kosong gunakan Start Date
             const endDate = item.end_date ? new Date(item.end_date) : new Date(item.start_date);
 
-            // 3. Normalisasi jam ke 00:00:00 agar loop per hari akurat
             const loopDate = new Date(startDate);
             loopDate.setHours(0, 0, 0, 0);
 
             const loopEnd = new Date(endDate);
             loopEnd.setHours(0, 0, 0, 0);
 
-            // Validasi: jika loopEnd invalid atau lebih kecil dari start, samakan dengan start
             if (isNaN(loopEnd.getTime()) || loopEnd < loopDate) {
                loopEnd.setTime(loopDate.getTime());
             }
 
-            // 4. Loop dari Start sampai End
             while (loopDate <= loopEnd) {
-              // Cek apakah tanggal loop berada di bulan & tahun yang sedang ditampilkan
               if (
                 loopDate.getMonth() + 1 === currentMonth && 
                 loopDate.getFullYear() === currentYear
@@ -221,17 +208,14 @@ export default function Agenda() {
                 const day = loopDate.getDate();
                 if (!eventsMap[day]) eventsMap[day] = [];
                 
-                // Masukkan event ke tanggal tersebut
                 eventsMap[day].push({
                   date: day,
                   title: item.activity_name,
-                  // Gunakan jam asli dari start_date untuk tampilan jam
                   time: startDate.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
                   image: item.image,
                 });
               }
 
-              // Pindah ke hari berikutnya
               loopDate.setDate(loopDate.getDate() + 1);
             }
           });
@@ -242,9 +226,7 @@ export default function Agenda() {
     };
     fetchAgenda();
   }, [currentMonth, currentYear]);
-  // --- AKHIR MODIFIKASI AGENDA ---
 
-  // Fetch Pengumuman
   useEffect(() => {
     const fetchPengumuman = async () => {
       try {
@@ -268,7 +250,6 @@ export default function Agenda() {
     fetchPengumuman();
   }, []);
 
-  // --- HELPER FUNCTIONS ---
   const getDaysInMonth = (month: number, year: number) => new Date(year, month, 0).getDate();
   const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month - 1, 1).getDay();
 
@@ -288,7 +269,26 @@ export default function Agenda() {
   };
 
   const selectedEvents = selectedDate ? calendarEvents[selectedDate] ?? [] : [];
-  const firstEvent = selectedEvents[0];
+  useEffect(() => {
+    if (!selectedEvents || selectedEvents.length <= 1) {
+      setActiveImageIndex(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setActiveImageIndex((prev) =>
+        prev === selectedEvents.length - 1 ? 0 : prev + 1
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [selectedEvents]);
+
+  const activeEventImage =
+    selectedEvents[activeImageIndex]?.image
+      ? `${ROOT}/uploads/agenda/${selectedEvents[activeImageIndex].image}`
+      : "assets/agenda-default.jpg";
+
   const currentNews = beritaUtamaList[currentNewsIndex];
 
   const cleanImagePath = (path: string | undefined) => {
@@ -298,7 +298,6 @@ export default function Agenda() {
 
   return (
     <div className="container-fluid py-5 position-relative background-white">
-      {/* --- POPUP MODAL START --- */}
       {selectedAnnouncement && (
         <div 
           className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
@@ -365,11 +364,9 @@ export default function Agenda() {
           </div>
         </div>
       )}
-      {/* --- POPUP MODAL END --- */}
 
       <div className="container">
         <div className="row g-4 align-items-stretch">
-          {/* News Section */}
           <div className="col">
             <h1 className="fw-bold text-blue mb-3">Berita Utama</h1>
             <div className=" news-card position-relative overflow-hidden">
@@ -402,7 +399,6 @@ export default function Agenda() {
             </div>
           </div>
 
-          {/* Right Tabs */}
           <div className="col-lg-8">
             <div className="d-flex flex-wrap gap-3 mb-3">
               <button onClick={() => setActiveTab("agenda")} className={`tab-btn ${activeTab === "agenda" ? "active" : ""}`}>Agenda</button>
@@ -413,11 +409,14 @@ export default function Agenda() {
               <div className="card border-0 shadow rounded-4 bg-light overflow-hidden">
                 <div className="row g-0 h-100">
                   <div className="col-md-5 d-flex ">
-                    <img
-                      src={firstEvent?.image ? `${ROOT}/uploads/agenda/${firstEvent.image}` : "assets/agenda-default.jpg"}
-                      alt={firstEvent?.title || "Belum Ada Agenda"}
-                      className="img-fluid h-100 object-fit-cover rounded-start-4"
-                    />
+                    <div className="agenda-image-wrapper">
+                      <img
+                        key={activeImageIndex}
+                        src={activeEventImage}
+                        alt={selectedEvents[activeImageIndex]?.title || "Agenda"}
+                        className="img-fluid h-100 object-fit-cover rounded-start-4 agenda-fade"
+                      />
+                    </div>
                   </div>
                   <div className="col-md-7 p-4 d-flex flex-column calender-container">
                     <div className="d-flex justify-content-center align-items-center mb-3">
@@ -452,11 +451,11 @@ export default function Agenda() {
                             <h6 className="mb-0 fw-bold text-blue">Agenda Tanggal {selectedDate}</h6>
                           </div>
                           {selectedEvents && selectedEvents.length > 0 ? (
-                            <div className="d-flex flex-column gap-2">
+                            <div className="d-flex flex-column gap-2 agenda-scroll">
                               {selectedEvents.map((event, index) => (
                                 <div key={index} className="d-flex justify-content-between align-items-center border-bottom pb-1">
                                   <p className="fw-semibold mb-0 small">{event.title}</p>
-                                  <p className="fw-bold text-blue mb-0 small">{event.time}</p>
+                                  <p className="fw-bold text-blue mb-0 small text-nowrap">{event.time}</p>
                                 </div>
                               ))}
                             </div>

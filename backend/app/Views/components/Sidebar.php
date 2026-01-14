@@ -168,8 +168,8 @@ $menuItems = [
         'color'  => '#f6c23e', 
         'bg'     => 'rgba(246, 194, 62, 0.1)',
         'submenu' => [
-            ['title' => 'Album Foto', 'url' => '/album', 'roles' => ['superadmin', 'admin'], 'module' => 'album'],
-            ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['superadmin', 'admin'], 'module' => 'gallery'],
+            ['title' => 'Album Foto', 'url' => '/album', 'roles' => ['superadmin', 'admin'], 'module' => 'galeri_album'],
+            ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['superadmin', 'admin'], 'module' => 'galeri_foto'],
         ]
     ],
     [

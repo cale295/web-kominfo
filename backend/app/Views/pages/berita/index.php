@@ -385,6 +385,7 @@
                         <th class="text-center">Dibuat</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Aksi</th>
+                        
                     </tr>
                 </thead>
                 <tbody id="tableBody">

@@ -60,7 +60,7 @@ const HeroSection: React.FC = () => {
 
       <section className="hero-banner-section">
         {isLoading ? (
-          <div className="hero-banner-loading">
+          <div className="">
             <p>Memuat banner...</p>
           </div>
         ) : heroBanner ? (
@@ -87,9 +87,7 @@ const HeroSection: React.FC = () => {
             />
           )
         ) : (
-          <div className="hero-banner-placeholder">
-            <p>Banner tidak tersedia</p>
-          </div>
+          <p>Banner tidak tersedia</p>
         )}
       </section>
     </div>
