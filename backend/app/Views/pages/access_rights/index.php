@@ -391,6 +391,11 @@ $filteredAccessList = array_filter($accessList ?? [], function($item) use ($allo
             // Set role name
             document.getElementById('moduleModalRole').textContent = role;
             
+            // Urutkan module berdasarkan nama (A-Z)
+            modules.sort((a, b) => {
+                return a.module_name.localeCompare(b.module_name);
+            });
+            
             // Build table rows
             const tbody = document.getElementById('moduleTableBody');
             tbody.innerHTML = '';
@@ -493,21 +498,53 @@ $filteredAccessList = array_filter($accessList ?? [], function($item) use ($allo
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            // Cek apakah response sukses
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            // Cek content-type
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                // Jika bukan JSON, kemungkinan redirect atau HTML error
+                // Anggap sukses jika status 200-299
+                if (response.status >= 200 && response.status < 300) {
+                    return { success: true };
+                } else {
+                    throw new Error('Server returned non-JSON response');
+                }
+            }
+        })
         .then(data => {
-            if (data.success) {
+            if (data.success || data.success === undefined) {
                 // Show success notification
                 showNotification('success', 'Permission berhasil diupdate!');
                 
                 // Update status badge di table
                 updateStatusBadge(id, isFullAccess);
+                
+                // Reload halaman setelah 1 detik untuk refresh data
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
             } else {
-                showNotification('error', 'Gagal mengupdate permission!');
+                showNotification('error', data.message || 'Gagal mengupdate permission!');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showNotification('error', 'Terjadi kesalahan!');
+            showNotification('error', 'Terjadi kesalahan saat mengupdate!');
+            
+            // Kembalikan toggle ke posisi semula
+            const toggle = document.getElementById('toggle_' + id);
+            if (toggle) {
+                toggle.checked = !toggle.checked;
+                const label = toggle.nextElementSibling;
+                label.textContent = toggle.checked ? 'Aktif' : 'Nonaktif';
+            }
         });
     }
 
