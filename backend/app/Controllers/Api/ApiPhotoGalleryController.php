@@ -16,7 +16,7 @@ class ApiPhotoGalleryController extends ResourceController
      */
     public function index()
     {
-        $galleries = $this->model->orderBy('created_at', 'DESC')->findAll();
+        $galleries = $this->model->where('status', '0')->orderBy('created_at', 'DESC')->findAll();
 
         return $this->respond([
             'status'  => true,

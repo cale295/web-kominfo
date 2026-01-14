@@ -233,6 +233,7 @@ $routes->post('album/upload_store', 'backend\PhotoAlbumController::upload_store'
 $routes->post('album/toggle-status', 'backend\PhotoAlbumController::toggleStatus');
 $routes->get('album/(:num)', 'backend\PhotoAlbumController::show/$1');
 $routes->post('album/store', 'backend\PhotoAlbumController::store');
+$routes->post('photo/toggle/(:num)', 'backend\PhotoGalleryController::toggle/$1');
 $routes->delete('photo/delete/(:num)', 'backend\PhotoAlbumController::deletePhoto/$1');
 
 $routes->resource('gallery', ['controller' => 'backend\PhotoGalleryController', 'except' => ['show']]);

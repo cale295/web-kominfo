@@ -47,12 +47,27 @@
     .text-danger { color: var(--danger) !important; }
     small.text-muted { color: var(--gray-500); font-size: 0.8125rem; margin-top: 6px; display: block; }
 
-    /* --- DROPDOWN KATEGORI --- */
-    #kategori-toggle { cursor: pointer; font-size: 0.9375rem; color: var(--gray-700); }
-    #kategori-toggle:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+    /* --- DROPDOWN KATEGORI & CUSTOM --- */
+    .dropdown-toggle-custom { cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; background: white; }
+    .dropdown-toggle-custom[disabled] { background-color: var(--gray-100); cursor: not-allowed; opacity: 0.7; }
+    .dropdown-menu-custom { max-height: 300px; overflow-y: auto; overflow-x: hidden; }
+    
+    /* Style untuk Item Dropdown Berita (Gambar + Teks) */
+    .news-item-option {
+        display: flex; align-items: center; padding: 10px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background 0.2s;
+    }
+    .news-item-option:hover { background-color: var(--gray-50); }
+    .news-item-option.active { background-color: #eff6ff; border-left: 3px solid var(--primary); }
+    .news-item-img {
+        width: 60px; height: 60px; object-fit: cover; border-radius: 6px; margin-right: 12px; flex-shrink: 0; background: #eee;
+    }
+    .news-item-content { flex-grow: 1; min-width: 0; }
+    .news-item-title { font-weight: 600; font-size: 0.9rem; color: var(--gray-800); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .news-item-date { font-size: 0.75rem; color: var(--gray-500); }
+    
+    /* Kategori styles */
     .kategori-list .form-check { cursor: pointer; border-radius: 6px; margin: 2px 0; }
     .kategori-list .form-check:hover { background-color: var(--gray-50); }
-    .kategori-list .form-check-label { font-size: 0.9375rem; user-select: none; }
     .selected-badge {
         display: inline-flex; align-items: center; background: var(--primary);
         color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.8125rem;
@@ -60,7 +75,6 @@
     }
     .selected-badge i { margin-left: 6px; font-size: 0.75rem; cursor: pointer; opacity: 0.8; }
     .kategori-item { display: flex; align-items: center; }
-    .kategori-no-results { font-size: 0.875rem; }
 
     /* --- IMAGE PREVIEW & TEMP --- */
     .preview-container { margin-top: 16px; }
@@ -77,20 +91,11 @@
         width: 100%; height: 150px; object-fit: cover;
         border-radius: 8px; border: 2px solid var(--gray-200);
     }
-    .retained-image-info {
-        background-color: #e0f2fe; border-left: 4px solid #0284c7;
-        padding: 12px 16px; border-radius: 8px; margin-top: 12px;
-        font-size: 0.875rem; color: #0c4a6e; display: flex; align-items: center; gap: 8px;
-    }
-    .retained-image-info i { color: #0284c7; font-size: 1rem; }
     .temp-image-badge {
         display: inline-block; background: var(--info); color: white;
         padding: 4px 10px; border-radius: 6px; font-size: 0.75rem;
         margin-top: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .temp-image-badge i { margin-right: 4px; }
-
-    /* --- TOMBOL HAPUS GAMBAR BARU --- */
     .btn-delete-new-img {
         position: absolute; top: 5px; right: 5px;
         background: rgba(220, 38, 38, 0.9); color: white;
@@ -195,29 +200,67 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 </div>
                 <textarea name="content" id="content-hidden" style="display:none;"></textarea>
                 
-                <div class="sisipan-box">
-                    <label class="form-label d-flex align-items-center">
-                        <i class="bi bi-paperclip me-2"></i> Berita Sisipan 1 (Baca Juga)
-                    </label>
-                    <select name="id_berita_terkait" class="form-select">
-                        <option value="">-- Pilih Berita Sisipan --</option>
-                        <?php foreach ($beritaAll as $b): ?>
-                            <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait') == $b['id_berita'] ? 'selected' : '' ?>>
-                                <?= esc($b['judul']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 1.</small>
                 </div>
-            </div>
 
             <div class="d-flex align-items-center mb-3 mt-5 p-3 bg-gray-50 border rounded">
                 <div class="form-check form-switch m-0">
                     <input class="form-check-input" type="checkbox" role="switch" id="toggle-content2" 
                            <?= old('has_content2') || !empty($oldContent2) ? 'checked' : '' ?>>
-                    <label class="form-check-label fw-bold" for="toggle-content2">Tambah Halaman/Bagian Kedua (Isi Berita 2)</label>
+                    <label class="form-check-label fw-bold" for="toggle-content2">Tambah Halaman/Bagian Kedua (Isi Berita 2 & Sisipan)</label>
                 </div>
                 <input type="hidden" name="has_content2" id="has-content2-val" value="0">
+            </div>
+
+            <div class="sisipan-box mb-4" id="box-sisipan-1" style="display: none;">
+                <label class="form-label d-flex align-items-center">
+                    <i class="bi bi-paperclip me-2"></i> Berita Sisipan 1 (Baca Juga)
+                </label>
+                
+                <div class="dropdown custom-img-select" id="sisipan1-wrapper">
+                    <input type="hidden" name="id_berita_terkait" id="sisipan1-input" value="<?= old('id_berita_terkait') ?>">
+                    
+                    <button class="form-select dropdown-toggle-custom" type="button" id="sisipan1-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span id="sisipan1-label" class="text-muted">-- Pilih Berita Sisipan --</span>
+                    </button>
+                    
+                    <div class="dropdown-menu w-100 p-0 shadow border dropdown-menu-custom">
+                        <div class="p-2 border-bottom sticky-top bg-white">
+                            <input type="text" class="form-control form-control-sm" id="sisipan1-search" placeholder="Cari berita...">
+                        </div>
+                        <div id="sisipan1-list">
+                            <div class="news-item-option" onclick="selectSisipan('sisipan1', '', 'No Sisipan', '', '')">
+                                <div class="news-item-content text-center text-muted">-- Tidak Ada Sisipan --</div>
+                            </div>
+                            <?php foreach ($beritaAll as $b): 
+                                $gambarDB = $b['feat_image'];
+                                if (empty($gambarDB)) {
+                                    $imgSrc = 'https://via.placeholder.com/60?text=IMG'; 
+                                } elseif (strpos($gambarDB, 'http') === 0) {
+                                    $imgSrc = $gambarDB; 
+                                } elseif (strpos($gambarDB, 'uploads/') !== false) {
+                                    $imgSrc = base_url($gambarDB); 
+                                } else {
+                                    $imgSrc = base_url('uploads/' . $gambarDB); 
+                                }
+
+                                $tgl = isset($b['tanggal']) ? date('d M Y', strtotime($b['tanggal'])) : '-';
+                                $judulSafe = addslashes(esc($b['judul']));
+                            ?>
+                            <div class="news-item-option" data-search="<?= strtolower(esc($b['judul'])) ?>" 
+                                 onclick="selectSisipan('sisipan1', '<?= $b['id_berita'] ?>', '<?= $judulSafe ?>', '<?= $imgSrc ?>', '<?= $tgl ?>')">
+                                <img src="<?= $imgSrc ?>" class="news-item-img" onerror="this.src='https://via.placeholder.com/60?text=Error'">
+                                <div class="news-item-content">
+                                    <div class="news-item-title"><?= esc($b['judul']) ?></div>
+                                    <div class="news-item-date"><i class="bi bi-calendar3"></i> <?= $tgl ?></div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div id="sisipan1-noresult" class="p-3 text-center text-muted" style="display:none;">Tidak ditemukan</div>
+                    </div>
+                </div>
+
+                <small class="text-muted mt-2">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 1.</small>
             </div>
 
             <div id="wrapper-content2" style="display: none;">
@@ -235,15 +278,52 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                         <label class="form-label d-flex align-items-center">
                             <i class="bi bi-paperclip me-2"></i> Berita Sisipan 2 (Baca Juga)
                         </label>
-                        <select name="id_berita_terkait2" class="form-select">
-                            <option value="">-- Pilih Berita Sisipan --</option>
-                            <?php foreach ($beritaAll as $b): ?>
-                                <option value="<?= $b['id_berita'] ?>" <?= old('id_berita_terkait2') == $b['id_berita'] ? 'selected' : '' ?>>
-                                    <?= esc($b['judul']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 2.</small>
+                        
+                        <div class="dropdown custom-img-select" id="sisipan2-wrapper">
+                            <input type="hidden" name="id_berita_terkait2" id="sisipan2-input" value="<?= old('id_berita_terkait2') ?>">
+                            
+                            <button class="form-select dropdown-toggle-custom" type="button" id="sisipan2-btn" data-bs-toggle="dropdown" aria-expanded="false" disabled>
+                                <span id="sisipan2-label" class="text-muted">-- Pilih Sisipan 1 Terlebih Dahulu --</span>
+                            </button>
+                            
+                            <div class="dropdown-menu w-100 p-0 shadow border dropdown-menu-custom">
+                                <div class="p-2 border-bottom sticky-top bg-white">
+                                    <input type="text" class="form-control form-control-sm" id="sisipan2-search" placeholder="Cari berita...">
+                                </div>
+                                <div id="sisipan2-list">
+                                    <div class="news-item-option" onclick="selectSisipan('sisipan2', '', 'No Sisipan', '', '')">
+                                        <div class="news-item-content text-center text-muted">-- Tidak Ada Sisipan --</div>
+                                    </div>
+                                    <?php foreach ($beritaAll as $b): 
+                                        $gambarDB = $b['feat_image'];
+                                        if (empty($gambarDB)) {
+                                            $imgSrc = 'https://via.placeholder.com/60?text=IMG'; 
+                                        } elseif (strpos($gambarDB, 'http') === 0) {
+                                            $imgSrc = $gambarDB; 
+                                        } elseif (strpos($gambarDB, 'uploads/') !== false) {
+                                            $imgSrc = base_url($gambarDB); 
+                                        } else {
+                                            $imgSrc = base_url('uploads/' . $gambarDB); 
+                                        }
+
+                                        $tgl = isset($b['tanggal']) ? date('d M Y', strtotime($b['tanggal'])) : '-';
+                                        $judulSafe = addslashes(esc($b['judul']));
+                                    ?>
+                                    <div class="news-item-option" data-search="<?= strtolower(esc($b['judul'])) ?>" 
+                                         onclick="selectSisipan('sisipan2', '<?= $b['id_berita'] ?>', '<?= $judulSafe ?>', '<?= $imgSrc ?>', '<?= $tgl ?>')">
+                                        <img src="<?= $imgSrc ?>" class="news-item-img" onerror="this.src='https://via.placeholder.com/60?text=Error'">
+                                        <div class="news-item-content">
+                                            <div class="news-item-title"><?= esc($b['judul']) ?></div>
+                                            <div class="news-item-date"><i class="bi bi-calendar3"></i> <?= $tgl ?></div>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div id="sisipan2-noresult" class="p-3 text-center text-muted" style="display:none;">Tidak ditemukan</div>
+                            </div>
+                        </div>
+
+                        <small class="text-muted mt-2">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 2.</small>
                     </div>
                 </div>
             </div>
@@ -426,80 +506,287 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
 <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// ============================================================
+// GLOBAL FUNCTION UNTUK MEMILIH SISIPAN
+// ============================================================
+function selectSisipan(prefix, id, judul, img, tgl) {
+    // 1. Set Value ke Hidden Input
+    document.getElementById(prefix + '-input').value = id;
+    
+    // 2. Update Label Tombol Trigger
+    const label = document.getElementById(prefix + '-label');
+    if (id) {
+        label.innerHTML = `
+            <div class="d-flex align-items-center">
+                <img src="${img}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; margin-right:8px;">
+                <div class="text-truncate" style="max-width: 200px; font-weight:600;">${judul}</div>
+            </div>
+        `;
+        label.classList.remove('text-muted');
+    } else {
+        // Jika batal memilih, kembalikan text default
+        if (prefix === 'sisipan2') {
+             label.innerHTML = '-- Pilih Berita Sisipan --';
+        } else {
+             label.innerHTML = '-- Pilih Berita Sisipan --';
+        }
+        label.classList.add('text-muted');
+    }
 
-    // ============================================================
-    // 0. TOGGLE CONTENT 2 LOGIC (NEW)
-    // ============================================================
-    const toggleContent2 = document.getElementById('toggle-content2');
-    const wrapperContent2 = document.getElementById('wrapper-content2');
+    // 3. Highlight Item di List
+    const items = document.querySelectorAll(`#${prefix}-list .news-item-option`);
+    items.forEach(el => el.classList.remove('active'));
+    
+    if(id) {
+        items.forEach(el => {
+            if(el.getAttribute('onclick') && el.getAttribute('onclick').includes(`'${id}'`)) {
+                el.classList.add('active');
+            }
+        });
+    }
+
+    // 4. LOGIKA DEPENDENCY: SISIPAN 1 MENGONTROL SISIPAN 2
+    if (prefix === 'sisipan1') {
+        const sisipan2Btn = document.getElementById('sisipan2-btn');
+        const sisipan2Label = document.getElementById('sisipan2-label');
+        
+        if (id) {
+            // Jika Sisipan 1 dipilih, enable Sisipan 2
+            sisipan2Btn.removeAttribute('disabled');
+            if(sisipan2Label.innerText === '-- Pilih Sisipan 1 Terlebih Dahulu --') {
+                sisipan2Label.innerText = '-- Pilih Berita Sisipan --';
+            }
+        } else {
+            // Jika Sisipan 1 dikosongkan (pilih 'Tidak Ada Sisipan'), disable Sisipan 2
+            sisipan2Btn.setAttribute('disabled', 'true');
+            
+            // Reset juga nilai Sisipan 2 jika ada
+            selectSisipan('sisipan2', '', 'No Sisipan', '', '');
+            sisipan2Label.innerText = '-- Pilih Sisipan 1 Terlebih Dahulu --';
+        }
+    }
+}
+
+// Function Inisialisasi Pencarian Sisipan
+function initSisipanSearch(prefix) {
+    const searchInput = document.getElementById(prefix + '-search');
+    const listContainer = document.getElementById(prefix + '-list');
+    const noResult = document.getElementById(prefix + '-noresult');
+    const items = listContainer.querySelectorAll('.news-item-option');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            if(item.innerText.includes('-- Tidak Ada Sisipan --')) {
+                item.style.display = 'flex'; 
+                return;
+            }
+
+            const searchText = item.getAttribute('data-search');
+            if (searchText.includes(term)) {
+                item.style.display = 'flex';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0 && term !== '') {
+            noResult.style.display = 'block';
+        } else {
+            noResult.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Init Quill Editors
+    var quill1 = new Quill('#editor-content', {
+        theme: 'snow',
+        modules: { toolbar: '#toolbar-content' }
+    });
+    
+    var quill2 = new Quill('#editor-content2', {
+        theme: 'snow',
+        modules: { toolbar: '#toolbar-content2' }
+    });
+
+    // Load old content if exists
+    var oldContent1 = <?= json_encode($oldContent1) ?>;
+    if(oldContent1) quill1.root.innerHTML = oldContent1;
+    
+    var oldContent2 = <?= json_encode($oldContent2) ?>;
+    if(oldContent2) quill2.root.innerHTML = oldContent2;
+
+    // Sync to textarea on submit
+    var form = document.getElementById('form-berita');
+    form.onsubmit = function() {
+        document.getElementById('content-hidden').value = quill1.root.innerHTML;
+        document.getElementById('content2-hidden').value = quill2.root.innerHTML;
+    };
+
+    // 2. Init Flatpickr
+    flatpickr("#datetime-picker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        locale: "id",
+        allowInput: true
+    });
+
+    // 3. Init Sisipan Search
+    initSisipanSearch('sisipan1');
+    initSisipanSearch('sisipan2');
+
+    // 4. Toggle Content 2 & SISIPAN 1 Logic
+    const toggle = document.getElementById('toggle-content2');
+    const wrapper = document.getElementById('wrapper-content2');
+    const boxSisipan1 = document.getElementById('box-sisipan-1');
     const hasContent2Val = document.getElementById('has-content2-val');
 
-    function handleToggleContent2() {
-        if (toggleContent2.checked) {
-            wrapperContent2.style.display = 'block';
+    function updateToggleState() {
+        if (toggle.checked) {
+            wrapper.style.display = 'block';
+            boxSisipan1.style.display = 'block'; // Munculkan Sisipan 1 saat toggle ON
             hasContent2Val.value = '1';
         } else {
-            wrapperContent2.style.display = 'none';
+            wrapper.style.display = 'none';
+            boxSisipan1.style.display = 'none'; // Sembunyikan Sisipan 1 saat toggle OFF
             hasContent2Val.value = '0';
         }
     }
 
-    toggleContent2.addEventListener('change', handleToggleContent2);
-    // Run on load to set initial state (e.g. if returning from validation error)
-    handleToggleContent2();
+    toggle.addEventListener('change', updateToggleState);
+    updateToggleState(); // Run on load
 
-    // ============================================================
-    // 1. CONFIG QUILL EDITOR
-    // ============================================================
-    // Handler untuk sync data ke hidden textarea sebelum submit form
-    const formBerita = document.getElementById('form-berita');
-    const contentHidden = document.getElementById('content-hidden');
-    const content2Hidden = document.getElementById('content2-hidden');
-
-    const quillContent = new Quill('#editor-content .ql-editor', {
-        modules: { toolbar: '#toolbar-content' },
-        theme: 'snow',
-        placeholder: 'Tulis isi berita di sini...'
-    });
-
-    const quillContent2 = new Quill('#editor-content2 .ql-editor', {
-        modules: { toolbar: '#toolbar-content2' },
-        theme: 'snow',
-        placeholder: 'Tulis isi berita bagian kedua di sini...'
-    });
-
-    // Load old content if validation failed
-    const oldContent1 = <?= json_encode($oldContent1) ?>;
-    const oldContent2 = <?= json_encode($oldContent2) ?>;
-
-    if (oldContent1 && typeof oldContent1 === 'string') {
-        quillContent.clipboard.dangerouslyPasteHTML(0, oldContent1);
-    }
-    if (oldContent2 && typeof oldContent2 === 'string') {
-        quillContent2.clipboard.dangerouslyPasteHTML(0, oldContent2);
+    // 5. Check Initial Dependency State for Sisipan 2
+    // Jika saat load Sisipan 1 sudah terisi (misal dari edit/validation error), enable Sisipan 2
+    const sisipan1Val = document.getElementById('sisipan1-input').value;
+    const sisipan2Btn = document.getElementById('sisipan2-btn');
+    if (sisipan1Val) {
+        sisipan2Btn.removeAttribute('disabled');
+        // Update label sisipan 2 jika belum dipilih
+        const sisipan2Label = document.getElementById('sisipan2-label');
+        if(sisipan2Label.innerText.includes('Terlebih Dahulu')) {
+            sisipan2Label.innerText = '-- Pilih Berita Sisipan --';
+        }
     }
 
-    // Sync content saat form submit
-    formBerita.addEventListener('submit', function() {
-        contentHidden.value = quillContent.root.innerHTML;
-        content2Hidden.value = quillContent2.root.innerHTML;
-    });
+    // 6. Kategori & Tags Dropdown Logic (Standard)
+    setupDropdownSearch('kategori');
+    setupDropdownSearch('tags');
 
-    // ============================================================
-    // 2. PREVIEW COVER IMAGE
-    // ============================================================
+    function setupDropdownSearch(type) {
+        const toggleBtn = document.getElementById(type + '-toggle');
+        const dropdownMenu = toggleBtn.nextElementSibling;
+        const searchInput = document.getElementById(type + '-search');
+        const checkboxes = document.querySelectorAll('.' + type + '-checkbox');
+        const badgeContainer = document.getElementById('selected-' + type + '-badges');
+        const hiddenInput = document.getElementById(type + '-hidden');
+        const placeholder = document.getElementById(type + '-placeholder');
+        const noResults = document.getElementById(type + '-no-results');
+
+        // Toggle dropdown
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.classList.contains('show');
+            // Close all others
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            
+            if (!isOpen) {
+                dropdownMenu.classList.add('show');
+                searchInput.focus();
+            }
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            let visibleCount = 0;
+            const items = dropdownMenu.querySelectorAll('.' + type + '-item');
+            
+            items.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(term)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) noResults.style.display = 'block';
+            else noResults.style.display = 'none';
+        });
+
+        // Checkbox change & badge update
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateBadges);
+        });
+
+        function updateBadges() {
+            badgeContainer.innerHTML = '';
+            const selectedIds = [];
+            let count = 0;
+
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedIds.push(cb.value);
+                    const label = cb.nextElementSibling.innerText;
+                    
+                    const badge = document.createElement('span');
+                    badge.className = 'selected-badge';
+                    badge.innerHTML = `${label} <i class="bi bi-x" onclick="uncheck('${type}', '${cb.value}')"></i>`;
+                    badgeContainer.appendChild(badge);
+                    count++;
+                }
+            });
+
+            hiddenInput.value = selectedIds.join(',');
+            
+            if (count > 0) {
+                placeholder.innerText = count + ' ' + type + ' terpilih';
+                placeholder.classList.add('text-primary', 'fw-bold');
+            } else {
+                placeholder.innerText = type === 'kategori' ? 'Pilih minimal 1 kategori' : 'Pilih tags (opsional)';
+                placeholder.classList.remove('text-primary', 'fw-bold');
+            }
+        }
+
+        // Run once on load
+        updateBadges();
+    }
+
+    // Global function to uncheck from badge x
+    window.uncheck = function(type, id) {
+        const cb = document.getElementById((type === 'kategori' ? 'kat-' : 'tag-') + id);
+        if (cb) {
+            cb.checked = false;
+            // Trigger change event manual
+            const event = new Event('change');
+            cb.dispatchEvent(event);
+        }
+    };
+    
+    // Image Preview Logic
     const coverInput = document.getElementById('cover-image');
-    const coverPreview = document.getElementById('cover-preview');
-
     coverInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(evt) {
-                coverPreview.innerHTML = `
+            reader.onload = function(e) {
+                document.getElementById('cover-preview').innerHTML = `
                     <div class="mt-3">
-                        <img src="${evt.target.result}" class="preview-img" alt="Preview">
+                        <img src="${e.target.result}" class="preview-img">
                     </div>
                 `;
             }
@@ -507,188 +794,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- INIT FLATPICKR (TANGGAL & WAKTU) ---
-    // HAPUS minDate: "today" AGAR BISA PILIH TANGGAL LAMPAU
-    flatpickr("#datetime-picker", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        time_24hr: true,
-        locale: "id",
-        altInput: true,
-        altFormat: "j F Y, H:i",
-        // minDate: "today",  <-- INI DIHAPUS
-        defaultDate: "<?= old('tanggal') ? old('tanggal') : '' ?>"
-    });
-
-    // ============================================================
-    // 3. PREVIEW ADDITIONAL IMAGES (Logic dipersingkat)
-    // ============================================================
     const additionalInput = document.getElementById('additional-images');
-    const additionalPreviewNew = document.getElementById('additional-preview-new');
-    let dt = new DataTransfer(); 
-
     additionalInput.addEventListener('change', function(e) {
-        dt = new DataTransfer();
-        for (let i = 0; i < this.files.length; i++) dt.items.add(this.files[i]);
-        renderNewPreviews();
-    });
-
-    function renderNewPreviews() {
-        additionalPreviewNew.innerHTML = '';
-        Array.from(dt.files).forEach((file, index) => {
-            if (!file.type.startsWith('image/')) return;
+        const container = document.getElementById('additional-preview-new');
+        container.innerHTML = '';
+        Array.from(e.target.files).forEach((file, index) => {
             const reader = new FileReader();
-            reader.onload = function(evt) {
+            reader.onload = function(ev) {
                 const col = document.createElement('div');
-                col.className = 'col-md-4 mb-3 fade-in';
+                col.className = 'col-md-3 mb-3';
                 col.innerHTML = `
-                    <div class="card h-100 border-gray-200 shadow-sm preview-card-wrapper">
-                        <button type="button" class="btn-delete-new-img" data-index="${index}">✕</button>
-                        <img src="${evt.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;">
-                        <div class="card-body p-2 bg-light">
-                            <input type="text" name="caption_additional[]" class="form-control form-control-sm" placeholder="Ket. foto...">
+                    <div class="card h-100 border shadow-sm">
+                        <img src="${ev.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                        <div class="card-body p-2">
+                             <input type="text" name="caption_new[]" class="form-control form-control-sm" placeholder="Caption...">
                         </div>
-                    </div>`;
-                additionalPreviewNew.appendChild(col);
-                col.querySelector('.btn-delete-new-img').addEventListener('click', () => removeNewFile(index));
+                    </div>
+                `;
+                container.appendChild(col);
             }
             reader.readAsDataURL(file);
         });
-    }
-
-    function removeNewFile(index) {
-        const newDt = new DataTransfer();
-        Array.from(dt.files).forEach((f, i) => { if (i !== index) newDt.items.add(f); });
-        dt = newDt;
-        additionalInput.files = dt.files;
-        renderNewPreviews();
-    }
-
-// ============================================================
-    // 4. DROPDOWN KATEGORI & TAGS (MODIFIED)
-    // ============================================================
-    function setupDropdown(type) {
-        const toggleBtn = document.getElementById(type + '-toggle');
-        const dropdownMenu = toggleBtn.nextElementSibling;
-        const searchInput = document.getElementById(type + '-search');
-        const items = Array.from(document.querySelectorAll('.' + type + '-item'));
-        const checkboxes = document.querySelectorAll('.' + type + '-checkbox');
-        const hiddenInput = document.getElementById(type + '-hidden');
-        const placeholder = document.getElementById(type + '-placeholder');
-        const badgeContainer = document.getElementById('selected-' + type + '-badges');
-        const noResults = document.getElementById(type + '-no-results');
-
-        // Toggle dropdown
-        toggleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const isShown = dropdownMenu.classList.contains('show');
-            dropdownMenu.classList.toggle('show', !isShown);
-            if (!isShown) setTimeout(() => searchInput.focus(), 100);
-        });
-
-        // Close when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
-
-        // Search filtering
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            let hasVisible = false;
-            items.forEach(item => {
-                const text = item.getAttribute('data-name');
-                if (text.includes(term)) {
-                    item.style.display = 'flex';
-                    hasVisible = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            noResults.style.display = hasVisible ? 'none' : 'block';
-        });
-
-        // ------------------------------------------------------------
-        // --- BARU: LOGIKA ENTER UNTUK SELECT OTOMATIS ---
-        // ------------------------------------------------------------
-        searchInput.addEventListener('keydown', (e) => {
-            // Cek jika tombol yang ditekan adalah ENTER (key code 13)
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Mencegah form tersubmit secara tidak sengaja
-
-                // Cari item pertama yang terlihat (visible) berdasarkan hasil search
-                const firstVisibleItem = items.find(item => item.style.display !== 'none');
-
-                if (firstVisibleItem) {
-                    const checkbox = firstVisibleItem.querySelector('input[type="checkbox"]');
-                    
-                    // Trigger klik pada checkbox tersebut
-                    // Ini otomatis akan menjalankan logika update badges di bawah
-                    if (checkbox) {
-                        // Opsional: Cek jika belum terpilih, baru klik. 
-                        // Jika ingin bisa toggle (hapus/tambah) pakai enter, hapus "if (!checkbox.checked)"
-                        if (!checkbox.checked) { 
-                             checkbox.click();
-                        }
-                        
-                        // Opsional: Kosongkan search agar bisa cari tag lain
-                        searchInput.value = '';
-                        searchInput.dispatchEvent(new Event('input')); // Reset filter list
-                    }
-                }
-            }
-        });
-        // ------------------------------------------------------------
-
-        // Update logic (Checkboxes change)
-        checkboxes.forEach(chk => {
-            chk.addEventListener('change', updateBadges);
-        });
-
-        function updateBadges() {
-            const selected = Array.from(checkboxes).filter(c => c.checked);
-            const ids = selected.map(c => c.value);
-            hiddenInput.value = ids.join(',');
-
-            badgeContainer.innerHTML = '';
-            selected.forEach(c => {
-                const label = c.nextElementSibling.innerText;
-                const badge = document.createElement('span');
-                badge.className = 'selected-badge';
-                badge.innerHTML = `${label} <i class="bi bi-x" data-id="${c.value}"></i>`;
-                badgeContainer.appendChild(badge);
-                
-                badge.querySelector('i').addEventListener('click', (e) => {
-                    const id = e.target.getAttribute('data-id');
-                    const targetChk = document.getElementById(type + '-' + id); // pastikan ID checkbox sesuai format html (kat-ID atau tag-ID)
-                    if(targetChk) {
-                        targetChk.checked = false;
-                        updateBadges(); // Panggil fungsi ini lagi secara rekursif
-                    }
-                });
-            });
-
-            // Update Text Toggle Button
-            if (selected.length > 0) {
-                toggleBtn.classList.add('text-primary');
-                // Optional: Tampilkan jumlah
-                // placeholder.innerText = selected.length + ' dipilih';
-            } else {
-                toggleBtn.classList.remove('text-primary');
-                // Reset placeholder text based on type if needed
-            }
-        }
-
-        // Init badges on load (untuk data old input)
-        updateBadges();
-    }
-
-    // Panggil fungsi setup
-    setupDropdown('kategori');
-    setupDropdown('tags');
-
-}); // End DOMContentLoaded
-</script>
+    });
+});
 </script>
 <?= $this->endSection() ?>

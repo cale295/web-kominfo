@@ -37,11 +37,11 @@
         background: white;
         padding: 1rem 1.5rem;
         border-radius: var(--card-border-radius);
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-bottom: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+        margin-bottom: 1.5rem; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
         gap: 15px;
     }
     
@@ -93,6 +93,7 @@
     .search-box {
         flex: 1;
         max-width: 400px;
+        position: relative;
     }
     
     .search-box input {
@@ -107,10 +108,6 @@
     .search-box input:focus {
         border-color: #4361ee;
         box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-    }
-    
-    .search-box {
-        position: relative;
     }
     
     .search-box i {
@@ -162,9 +159,7 @@
         font-size: 3rem;
     }
     
-    .album-info {
-        padding: 1.2rem;
-    }
+    .album-info { padding: 1.2rem; }
     
     .album-title {
         font-weight: 700;
@@ -191,20 +186,11 @@
         font-size: 0.9rem;
     }
     
-    .photo-count i {
-        color: #4361ee;
-    }
+    .photo-count i { color: #4361ee; }
     
-    .album-author {
-        font-size: 0.85rem;
-        color: #6c757d;
-    }
+    .album-author { font-size: 0.85rem; color: #6c757d; }
     
-    .album-date {
-        font-size: 0.8rem;
-        color: #adb5bd;
-        margin-bottom: 1rem;
-    }
+    .album-date { font-size: 0.8rem; color: #adb5bd; margin-bottom: 1rem; }
     
     .album-actions {
         display: flex;
@@ -247,23 +233,12 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
-    .empty-state img {
-        opacity: 0.5;
-        margin-bottom: 1.5rem;
-    }
+    .empty-state img { opacity: 0.5; margin-bottom: 1.5rem; }
 
     /* --- LIST VIEW --- */
-    .album-list {
-        display: none;
-    }
-    
-    .album-list.active {
-        display: block;
-    }
-    
-    .album-grid.active {
-        display: grid;
-    }
+    .album-list { display: none; }
+    .album-list.active { display: block; }
+    .album-grid.active { display: grid; }
     
     .card-table { 
         border: none; 
@@ -298,9 +273,7 @@
         transition: transform 0.2s;
     }
     
-    .album-cover-thumb:hover { 
-        transform: scale(1.1); 
-    }
+    .album-cover-thumb:hover { transform: scale(1.1); }
     
     .table-album-cover-placeholder { 
         width: 70px; 
@@ -314,11 +287,7 @@
         font-size: 1.8rem; 
     }
     
-    .btn-action-group { 
-        display: flex; 
-        gap: 5px; 
-        justify-content: center; 
-    }
+    .btn-action-group { display: flex; gap: 5px; justify-content: center; }
     
     .table .btn-action { 
         width: 38px; 
@@ -343,45 +312,56 @@
         opacity: 0.9; 
     }
 
-    /* --- MODAL UPLOAD STYLING --- */
-    .upload-area {
-        border: 2px dashed #cbd5e1;
-        border-radius: 12px;
-        background-color: #f8fafc;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    .upload-area:hover, .upload-area.dragover {
-        border-color: var(--primary-color);
-        background-color: #eff6ff;
-    }
-    .preview-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 15px;
-        margin-top: 20px;
-        max-height: 400px;
-        overflow-y: auto;
-        padding-right: 5px;
-    }
-    .preview-card {
+    /* --- NEW UPLOAD ROW STYLING --- */
+    .upload-row {
+        background: #fff;
         border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        position: relative;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .upload-row:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        border-color: #cbd5e1;
+    }
+    .upload-row-img-box {
+        width: 120px;
+        height: 120px;
+        background: #f1f5f9;
         border-radius: 8px;
         overflow: hidden;
-        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #cbd5e1;
         position: relative;
-        transition: box-shadow 0.2s;
     }
-    .preview-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .preview-img-container { height: 140px; overflow: hidden; position: relative; }
-    .preview-img { width: 100%; height: 100%; object-fit: cover; }
-    .btn-remove-preview {
-        position: absolute; top: 5px; right: 5px;
-        width: 24px; height: 24px;
-        border-radius: 50%; background: rgba(239, 35, 60, 0.9);
-        color: white; border: none;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 12px; cursor: pointer; z-index: 10;
+    .upload-row-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .btn-remove-row {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #fee2e2;
+        color: #ef4444;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    .btn-remove-row:hover {
+        background: #ef4444;
+        color: white;
     }
 </style>
 
@@ -389,7 +369,6 @@
 
 <div class="container-fluid py-4">
 
-    <!-- Page Header -->
     <div class="page-header">
         <h3 class="page-title">
             <i class="bi bi-grid-3x3-gap-fill"></i>
@@ -397,13 +376,12 @@
         </h3>
     </div>
 
-    <!-- Toolbar -->
     <div class="toolbar">
         <div class="d-flex gap-2">
             <button type="button" class="btn-toolbar btn-add" 
                     data-bs-toggle="modal" data-bs-target="#addAlbumModal">
                 <i class="bi bi-plus-circle-fill"></i>
-                Tambah Foto
+                Tambah Album
             </button>
             
             <button type="button" class="btn-toolbar btn-refresh" onclick="location.reload()">
@@ -427,7 +405,6 @@
         </div>
     </div>
 
-    <!-- Album Grid -->
     <?php if (empty($albums)): ?>
         <div class="empty-state">
             <img src="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" width="120" alt="Empty">
@@ -439,7 +416,6 @@
             </button>
         </div>
     <?php else: ?>
-        <!-- Grid View -->
         <div class="album-grid active" id="gridView">
             <?php foreach ($albums as $row): ?>
             <div class="album-card" onclick="window.location='<?= site_url('album/'.$row['id_album']) ?>'">
@@ -505,7 +481,6 @@
             <?php endforeach; ?>
         </div>
 
-        <!-- List View -->
         <div class="album-list" id="listView">
             <div class="card card-table">
                 <div class="card-body p-0">
@@ -585,7 +560,6 @@
     <?php endif; ?>
 </div>
 
-<!-- Modal Tambah Album -->
 <div class="modal fade" id="addAlbumModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -638,7 +612,6 @@
     </div>
 </div>
 
-<!-- Modal Upload -->
 <div class="modal fade" id="uploadModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
@@ -646,7 +619,7 @@
             <div class="modal-header bg-white border-bottom-0 pb-0">
                 <div>
                     <h5 class="modal-title fw-bold text-primary"><i class="bi bi-cloud-upload me-2"></i>Upload Foto</h5>
-                    <p class="text-muted small mb-0">Menambahkan foto ke album: <strong id="modalAlbumName" class="text-dark">Loading...</strong></p>
+                    <p class="text-muted small mb-0">Album: <strong id="modalAlbumName" class="text-dark">Loading...</strong></p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -656,19 +629,19 @@
                     <?= csrf_field() ?>
                     <input type="hidden" name="id_album" id="modalAlbumId">
                     
-                    <div class="upload-area p-5 text-center mb-3" id="dropZone" onclick="document.getElementById('fileInput').click()">
-                        <input type="file" class="d-none" name="gallery_photos[]" id="fileInput" multiple accept="image/*">
-                        <div class="mb-3">
-                            <i class="bi bi-images text-primary" style="font-size: 3rem; opacity: 0.7;"></i>
-                        </div>
-                        <h6 class="fw-bold">Klik atau Tarik Foto ke Sini</h6>
-                        <p class="text-muted small mb-0">Mendukung banyak file sekaligus (JPG, PNG)</p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted small text-uppercase fw-bold">Daftar Foto yang Akan Diupload</span>
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" onclick="addPhotoRow()">
+                            <i class="bi bi-plus-lg me-1"></i> Tambah Foto
+                        </button>
                     </div>
 
-                    <div id="previewContainer" class="preview-grid"></div>
+                    <div id="uploadRowsContainer">
+                        </div>
 
-                    <div id="emptyState" class="text-center py-4 text-muted">
-                        <small>Belum ada foto yang dipilih untuk diupload.</small>
+                    <div id="modalEmptyState" class="text-center py-5">
+                        <i class="bi bi-images text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p class="text-muted mt-2">Belum ada foto. Klik tombol <strong>"Tambah Foto"</strong> di atas.</p>
                     </div>
 
                 </form>
@@ -676,7 +649,7 @@
             
             <div class="modal-footer border-top-0 bg-white">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                <button type="button" onclick="document.getElementById('uploadForm').submit()" class="btn btn-primary rounded-pill px-4" id="btnSimpan" disabled>
+                <button type="button" onclick="document.getElementById('uploadForm').submit()" class="btn btn-success rounded-pill px-4" id="btnSimpan" disabled>
                     <i class="bi bi-send me-2"></i> Mulai Upload
                 </button>
             </div>
@@ -690,50 +663,39 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Toggle View
+    // --- UTILITY SCRIPT (Toggle View & Search) ---
     function toggleView(view) {
         const gridView = document.getElementById('gridView');
         const listView = document.getElementById('listView');
         const viewButtons = document.querySelectorAll('.view-btn');
         
-        // Update button states
         viewButtons.forEach(btn => btn.classList.remove('active'));
         event.currentTarget.classList.add('active');
         
         if(view === 'list') {
-            gridView.classList.remove('active');
-            gridView.style.display = 'none';
-            listView.classList.add('active');
-            listView.style.display = 'block';
+            gridView.classList.remove('active'); gridView.style.display = 'none';
+            listView.classList.add('active'); listView.style.display = 'block';
         } else {
-            listView.classList.remove('active');
-            listView.style.display = 'none';
-            gridView.classList.add('active');
-            gridView.style.display = 'grid';
+            listView.classList.remove('active'); listView.style.display = 'none';
+            gridView.classList.add('active'); gridView.style.display = 'grid';
         }
     }
 
-    // Search functionality
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const searchTerm = e.target.value.toLowerCase();
-        
-        // Search in grid view
         document.querySelectorAll('.album-card').forEach(card => {
             const title = card.querySelector('.album-title').textContent.toLowerCase();
             card.style.display = title.includes(searchTerm) ? 'block' : 'none';
         });
-        
-        // Search in list view
         document.querySelectorAll('#listView tbody tr').forEach(row => {
             const title = row.querySelector('.fw-bold').textContent.toLowerCase();
             row.style.display = title.includes(searchTerm) ? '' : 'none';
         });
     });
 
-    // Preview Cover Image
+    // --- COVER PREVIEW FOR NEW ALBUM ---
     const coverInput = document.getElementById('coverInput');
     const coverPreview = document.getElementById('coverPreview');
-
     if(coverInput) {
         coverInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -748,19 +710,7 @@
         });
     }
 
-    // Reset Form
-    const addAlbumModalEl = document.getElementById('addAlbumModal');
-    if(addAlbumModalEl) {
-        addAlbumModalEl.addEventListener('hidden.bs.modal', function () {
-            document.getElementById('addAlbumForm').reset();
-            if(coverPreview) {
-                coverPreview.src = "https://cdn-icons-png.flaticon.com/512/83/83574.png";
-                coverPreview.style.opacity = '0.4';
-            }
-        });
-    }
-
-    // Delete Confirmation
+    // --- DELETE CONFIRMATION ---
     document.querySelectorAll('.btn-delete-confirm').forEach(button => {
         button.addEventListener('click', function() {
             const form = this.closest('.delete-form');
@@ -779,113 +729,114 @@
         });
     });
 
-    // Upload Logic
+    // --- NEW UPLOAD LOGIC (TABLE / ROW BASED) ---
     const uploadModalEl = document.getElementById('uploadModal');
-    const fileInput = document.getElementById('fileInput');
-    const previewContainer = document.getElementById('previewContainer');
-    const emptyState = document.getElementById('emptyState');
+    const uploadRowsContainer = document.getElementById('uploadRowsContainer');
+    const modalEmptyState = document.getElementById('modalEmptyState');
     const btnSimpan = document.getElementById('btnSimpan');
-    const dropZone = document.getElementById('dropZone');
-
-    let dataTransfer = new DataTransfer(); 
-
+    
+    // Set ID Album saat modal dibuka
     uploadModalEl.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const idAlbum = button.getAttribute('data-id');
         const nameAlbum = button.getAttribute('data-name');
+        
         uploadModalEl.querySelector('#modalAlbumId').value = idAlbum;
         uploadModalEl.querySelector('#modalAlbumName').textContent = nameAlbum;
+        
+        // Reset form content
+        uploadRowsContainer.innerHTML = '';
+        checkEmptyState();
+        // Otomatis tambah 1 baris saat dibuka
+        addPhotoRow();
     });
 
-    fileInput.addEventListener('change', handleFiles);
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
-    });
-    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-    
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-    });
-    
-    dropZone.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleFiles({ target: { files: files } });
-    });
-
-    function handleFiles(e) {
-        const newFiles = Array.from(e.target.files);
-        newFiles.forEach(file => {
-            if (!file.type.match('image.*')) return;
-            dataTransfer.items.add(file);
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                createCard(evt.target.result, file.name);
-            }
-            reader.readAsDataURL(file);
-        });
-        fileInput.files = dataTransfer.files;
-        updateUI();
-    }
-
-    function createCard(imgSrc, fileName) {
-        const div = document.createElement('div');
-        div.className = 'preview-card';
-        div.innerHTML = `
-            <button type="button" class="btn-remove-preview" onclick="removeFile(this, '${fileName}')">
-                <i class="bi bi-x"></i>
-            </button>
-            <div class="preview-img-container">
-                <img src="${imgSrc}" class="preview-img">
-            </div>
-            <div class="p-2">
-                <input type="text" name="titles[]" class="form-control form-control-sm mb-2" 
-                       placeholder="Judul" value="${fileName.split('.')[0]}">
-                <textarea name="descriptions[]" class="form-control form-control-sm" 
-                          rows="1" placeholder="Deskripsi..."></textarea>
+    // Fungsi Tambah Baris Foto
+    function addPhotoRow() {
+        const rowId = Date.now(); // Unique ID for element
+        const rowHtml = `
+            <div class="upload-row" id="row-${rowId}">
+                <button type="button" class="btn-remove-row" onclick="removeRow('${rowId}')" title="Hapus Baris">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-3 col-sm-4">
+                        <div class="upload-row-img-box" onclick="triggerFileClick('${rowId}')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/126/126477.png" id="preview-${rowId}" style="opacity: 0.3; width: 40px; height: 40px;">
+                        </div>
+                        <input type="file" name="gallery_photos[]" id="file-${rowId}" class="d-none" accept="image/*" onchange="previewImage(this, '${rowId}')" required>
+                        <div class="text-center mt-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm py-0" style="font-size: 0.75rem;" onclick="triggerFileClick('${rowId}')">Pilih Foto</button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-9 col-sm-8">
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted">Nama Foto</label>
+                            <input type="text" name="titles[]" class="form-control" placeholder="Beri nama foto ini..." required>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label small fw-bold text-muted">Deskripsi</label>
+                            <textarea name="descriptions[]" class="form-control" rows="2" placeholder="Keterangan foto (opsional)"></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
-        previewContainer.appendChild(div);
+        
+        uploadRowsContainer.insertAdjacentHTML('beforeend', rowHtml);
+        checkEmptyState();
     }
 
-    window.removeFile = function(btn, fileName) {
-        btn.closest('.preview-card').remove();
-        const newDataTransfer = new DataTransfer();
-        Array.from(dataTransfer.files).forEach(file => {
-            if (file.name !== fileName) newDataTransfer.items.add(file);
-        });
-        dataTransfer = newDataTransfer;
-        fileInput.files = dataTransfer.files;
-        updateUI();
+    // Trigger File Input
+    function triggerFileClick(rowId) {
+        document.getElementById(`file-${rowId}`).click();
     }
 
-    function updateUI() {
-        if (dataTransfer.files.length > 0) {
-            emptyState.style.display = 'none';
-            btnSimpan.disabled = false;
-            btnSimpan.innerHTML = `<i class="bi bi-cloud-arrow-up-fill me-2"></i>Upload ${dataTransfer.files.length} Foto`;
-        } else {
-            emptyState.style.display = 'block';
-            btnSimpan.disabled = true;
-            btnSimpan.innerHTML = `<i class="bi bi-send me-2"></i> Mulai Upload`;
+    // Preview Image Logic
+    function previewImage(input, rowId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(`preview-${rowId}`);
+                img.src = e.target.result;
+                img.style.opacity = '1';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                
+                // Auto fill title with filename (optional)
+                const row = document.getElementById(`row-${rowId}`);
+                const titleInput = row.querySelector('input[name="titles[]"]');
+                if(!titleInput.value) {
+                    let filename = input.files[0].name;
+                    titleInput.value = filename.split('.').slice(0, -1).join('.');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
-    uploadModalEl.addEventListener('hidden.bs.modal', function () {
-        dataTransfer = new DataTransfer();
-        fileInput.files = dataTransfer.files;
-        previewContainer.innerHTML = '';
-        updateUI();
-    });
+    // Remove Row Logic
+    function removeRow(rowId) {
+        const row = document.getElementById(`row-${rowId}`);
+        if(row) {
+            row.remove();
+            checkEmptyState();
+        }
+    }
 
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+    // Check State (Tampilkan/Sembunyikan tombol Simpan)
+    function checkEmptyState() {
+        const rowCount = uploadRowsContainer.children.length;
+        if (rowCount === 0) {
+            modalEmptyState.style.display = 'block';
+            btnSimpan.disabled = true;
+        } else {
+            modalEmptyState.style.display = 'none';
+            btnSimpan.disabled = false;
+        }
+    }
+
 </script>
 <?= $this->endSection() ?>

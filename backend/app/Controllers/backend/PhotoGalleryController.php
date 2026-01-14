@@ -44,6 +44,19 @@ class PhotoGalleryController extends BaseController
         return view('pages/gallery/index', $data);
     }
 
+    public function toggle($id)
+{
+    $photoModel = new \App\Models\PhotoGalleryModel();
+    
+    // Ambil status baru dari form input
+    $newStatus = $this->request->getPost('status');
+    
+    // Update database
+    $photoModel->update($id, ['status' => $newStatus]);
+    
+    return redirect()->back()->with('success', 'Status foto berhasil diperbarui.');
+}
+
     // ================= FORM TAMBAH =================
     public function new()
     {

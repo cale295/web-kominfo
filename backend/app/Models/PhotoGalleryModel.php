@@ -13,6 +13,7 @@ class PhotoGalleryModel extends Model
         'deskripsi',
         'file_path',
         'id_album',
+        'status',
     ];
 
     // Untuk otomatis update timestamp kalau mau (opsional)
