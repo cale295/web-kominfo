@@ -131,8 +131,8 @@
         padding: 3px;
         background: white;
         transition: all 0.2s;
-        width: 60px !important;
-        height: 45px !important;
+        width: 70px !important;
+        height: 55px !important;
         object-fit: cover;
     }
 

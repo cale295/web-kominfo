@@ -119,13 +119,11 @@ interface BeritaDetail {
   feat_image: string;
   additional_images?: any;
   tanggal: string;
-  updated_at: string;
   hit: string;
   created_by_name?: string;
   sumber?: string;
   link_video?: string;
   caption?: string;
-  topik?: string;
   id_kategori: string;
   id_sub_kategori: string | null;
   kategori: string[];
@@ -139,7 +137,6 @@ interface BeritaTerkait {
   slug: string;
   intro: string;
   feat_image: string;
-  created_at: string;
   hit?: string;
 }
 
@@ -158,10 +155,10 @@ const BeritaTerkaitSisipan: React.FC<BeritaTerkaitSisipanProps> = ({
       className="berita-sisipan-simple mt-4 mb-4 cursor-pointer"
       onClick={() => onItemClick(berita.slug)}
     >
-      <div className="sisipan-content p-3 ">
+      <div className="sisipan-content p-3">
         <div className="sisipan-label mb-2">
-        <strong>Baca Juga:</strong>
-      </div>
+          <strong>Baca Juga:</strong>
+        </div>
         <h6 className="sisipan-judul mb-0 fw-bold">{berita.judul}</h6>
       </div>
     </div>
@@ -174,47 +171,18 @@ const BeritaDetail: React.FC = () => {
   const [berita, setBerita] = useState<BeritaDetail | null>(null);
   const [beritaTerkaitSisipan1, setBeritaTerkaitSisipan1] = useState<BeritaTerkait | null>(null);
   const [beritaTerkaitSisipan2, setBeritaTerkaitSisipan2] = useState<BeritaTerkait | null>(null);
-  const [beritaTerkaitSidebar, setBeritaTerkaitSidebar] = useState<BeritaTerkait[]>([]);
   const [beritaPopuler, setBeritaPopuler] = useState<BeritaTerkait[]>([]);
   const [tagPopuler, setTagPopuler] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
-
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
+    return new Date(dateString).toLocaleDateString("id-ID", {
       day: "numeric",
       month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleDateString("id-ID", options);
-  };
-
-  const formatDateShort = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString("id-ID", options);
-  };
-
-  const getImageUrl = (imagePath: string | undefined) => {
-    if (!imagePath) return null;
-
-    const cleanPath = imagePath.replace(/^\/+/, "");
-
-    if (cleanPath.startsWith("http")) {
-      return cleanPath;
-    }
-
-    const fullUrl = `${ROOT}/${cleanPath}`;
-    console.log("Image URL:", fullUrl);
-    return fullUrl;
+      year: "numeric"
+    });
   };
   
   const allImages = useMemo(() => {
@@ -222,10 +190,10 @@ const BeritaDetail: React.FC = () => {
 
     const images: AdditionalImage[] = [];
 
-    // Tambahkan feat_image sebagai gambar pertama (simpan path saja)
+    // Tambahkan feat_image sebagai gambar pertama
     if (berita.feat_image) {
       images.push({
-        url: berita.feat_image, // Simpan path mentah
+        url: berita.feat_image,
         caption: berita.caption || "",
       });
     }
@@ -290,9 +258,8 @@ const BeritaDetail: React.FC = () => {
     };
   }, []);
 
-  const fetchBeritaManualTerkait = async (idTerkait: string, semuaBerita: BeritaTerkait[]) => {
+  const fetchBeritaManualTerkait = (idTerkait: string, semuaBerita: BeritaTerkait[]) => {
     if (!idTerkait) return null;
-    
     return semuaBerita.find((item: BeritaTerkait) => item.id_berita === idTerkait);
   };
 
@@ -314,58 +281,30 @@ const BeritaDetail: React.FC = () => {
 
         if (data) {
           setBerita(data);
-          console.log("Data Berita Detail:", data);
-          console.log("ID Berita Terkait 1:", data.id_berita_terkait);
-          console.log("ID Berita Terkait 2:", data.id_berita_terkait2);
 
           const allBerita = allData?.berita || [];
           
-          // 1. Ambil berita terkait sisipan (manual berdasarkan id)
+          // Ambil berita terkait sisipan
           if (data.id_berita_terkait) {
-            const terkait1 = await fetchBeritaManualTerkait(data.id_berita_terkait, allBerita);
+            const terkait1 = fetchBeritaManualTerkait(data.id_berita_terkait, allBerita);
             setBeritaTerkaitSisipan1(terkait1 || null);
           }
 
           if (data.id_berita_terkait2) {
-            const terkait2 = await fetchBeritaManualTerkait(data.id_berita_terkait2, allBerita);
+            const terkait2 = fetchBeritaManualTerkait(data.id_berita_terkait2, allBerita);
             setBeritaTerkaitSisipan2(terkait2 || null);
           }
 
-          // 2. Filter berita terkait untuk sidebar (otomatis)
-          const terkaitSidebar = allBerita
-            .filter((item: BeritaTerkait) => {
-              // Exclude berita saat ini dan berita yang sudah ditampilkan sebagai sisipan
-              if (item.id_berita === id) return false;
-              if (data.id_berita_terkait && item.id_berita === data.id_berita_terkait) return false;
-              if (data.id_berita_terkait2 && item.id_berita === data.id_berita_terkait2) return false;
-              
-              return true;
-            })
-            .sort(
-              (a: BeritaTerkait, b: BeritaTerkait) =>
-                new Date(b.created_at).getTime() -
-                new Date(a.created_at).getTime()
-            )
-            .slice(0, 4);
-
-          setBeritaTerkaitSidebar(terkaitSidebar);
-
-          // 3. Setup Berita Populer
+          // Setup Berita Populer
           const populer = [...allBerita]
             .sort((a: BeritaTerkait, b: BeritaTerkait) => Number(b.hit || 0) - Number(a.hit || 0))
             .slice(0, 5);
           setBeritaPopuler(populer);
 
-          // 4. Setup Tag Populer
+          // Setup Tag Populer
           if (allData?.tag) {
             setTagPopuler(allData.tag);
           }
-
-          console.log("Berita Terkait Sisipan 1:", beritaTerkaitSisipan1);
-          console.log("Berita Terkait Sisipan 2:", beritaTerkaitSisipan2);
-          console.log("Berita Terkait Sidebar:", terkaitSidebar);
-          console.log("Berita Populer:", populer);
-          console.log("Tag Populer:", allData?.tag);
         } else {
           setError("Berita tidak ditemukan");
         }

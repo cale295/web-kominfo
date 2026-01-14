@@ -161,16 +161,14 @@ $menuItems = [
         'submenu' => $dynamicInfoPublikSubmenu 
     ],
     [
-        'type'   => 'dropdown', 
+        'type'   => 'item', 
         'title'  => 'Galeri & Media', 
+        'url' => '/album',
         'icon'   => 'bi-images', 
         'roles'  => ['superadmin', 'admin'],
-        'color'  => '#f6c23e', 
+        'module' => 'galeri_album',
+        'color'  => '#f6c23e',
         'bg'     => 'rgba(246, 194, 62, 0.1)',
-        'submenu' => [
-            ['title' => 'Album Foto', 'url' => '/album', 'roles' => ['superadmin', 'admin'], 'module' => 'galeri_album'],
-            ['title' => 'Foto Galeri', 'url' => '/gallery', 'roles' => ['superadmin', 'admin'], 'module' => 'galeri_foto'],
-        ]
     ],
     [
         'type'   => 'dropdown', 
