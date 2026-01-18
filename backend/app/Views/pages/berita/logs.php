@@ -103,6 +103,11 @@
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
 
+    /* TAMBAHAN CSS UNTUK MENUNGGU VERIFIKASI (WARNING/ORANGE) */
+    .dot-verif {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
     .timeline-line {
         position: absolute;
         left: 19px;
@@ -167,6 +172,12 @@
     .status-layak {
         background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
         color: #065f46;
+    }
+
+    /* TAMBAHAN CSS UNTUK MENUNGGU VERIFIKASI (WARNING/ORANGE) */
+    .status-verif {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        color: #92400e;
     }
 
     .collapse-hint {
@@ -496,17 +507,25 @@
                     $statusBeritaChangeInfo = $item['statusBeritaChangeInfo'] ?? null;
                     $currentStatusBerita = $item['currentStatusBerita'] ?? 0;
                     
-                    // Tentukan label & class
+                    // Tentukan label & class (DEFAULT = DRAFT)
                     $statusText = 'Draft';
                     $statusClass = 'status-draft';
                     $dotClass = 'dot-draft';
                     $iconStatus = 'bi-file-earmark-text';
                     
+                    // LOGIKA UNTUK MENENTUKAN TAMPILAN BERDASARKAN STATUS
                     if ($currentStatusBerita == '4') {
+                        // Jika Status 4 = Layak Tayang
                         $statusText = 'Layak Tayang';
                         $statusClass = 'status-layak';
                         $dotClass = 'dot-layak';
                         $iconStatus = 'bi-check-circle-fill';
+                    } elseif ($currentStatusBerita == '2') {
+                        // Jika Status 2 = Menunggu Verifikasi
+                        $statusText = 'Menunggu Verifikasi';
+                        $statusClass = 'status-verif';
+                        $dotClass = 'dot-verif';
+                        $iconStatus = 'bi-hourglass-split'; // Icon Jam Pasir
                     }
                 ?>
                 <div class="timeline-item">
@@ -551,8 +570,15 @@
                                 <div class="info-badges">
                                     <?php if ($statusBeritaChanged): ?>
                                         <?php 
-                                            $fromText = ($statusBeritaChangeInfo['from'] == '4') ? 'Layak Tayang' : 'Draft';
-                                            $toText = ($statusBeritaChangeInfo['to'] == '4') ? 'Layak Tayang' : 'Draft';
+                                            // Helper function/logic untuk label perubahan status
+                                            $getLabel = function($code) {
+                                                if ($code == '4') return 'Layak Tayang';
+                                                if ($code == '2') return 'Menunggu Verifikasi';
+                                                return 'Draft';
+                                            };
+
+                                            $fromText = $getLabel($statusBeritaChangeInfo['from']);
+                                            $toText = $getLabel($statusBeritaChangeInfo['to']);
                                         ?>
                                         <span class="info-badge badge-change">
                                             <i class="bi bi-arrow-left-right"></i>
