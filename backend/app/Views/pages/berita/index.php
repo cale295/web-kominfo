@@ -197,15 +197,15 @@
     }
 
     /* Status Toggle */
-    .status-btn {
+.status-btn {
         background: none;
         border: none;
         padding: 0;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         cursor: pointer;
-        transition: opacity 0.3s;
+        outline: none;
     }
     
     .status-btn .switch {
@@ -244,6 +244,12 @@
         color: #334155;
         min-width: 60px;
         text-align: left;
+    }
+    
+    /* Disabled state for status button */
+    .status-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
     }
 
     /* Responsive */
@@ -380,7 +386,7 @@
                         <th>Topik</th>
                         <th>Konten</th>
                         <th>Kategori</th>
-                        <th class="text-center">Status Tayang</th>
+                        <th>Tags</th>q
                         <th class="text-center">Status Berita</th>
                         <th class="text-center">Dibuat</th>
                         <th class="text-center">Status</th>
@@ -401,36 +407,42 @@
                     <?php else: ?>
                         <?php foreach ($berita as $i => $row): ?>
                             <?php 
-                                // === LOGIKA PERMISSION KHUSUS EDITOR ===
-                                // Ambil role dan ID user dari session
-                                $currentRole = session()->get('role'); // Asumsi key session adalah 'role'
-                                $currentUserId = session()->get('id'); // Asumsi key session adalah 'id'
+                                // ===========================================
+                                // LOGIKA PERMISSION KHUSUS EDITOR
+                                // ===========================================
                                 
-                                // Default permission dari controller
+                                // 1. Ambil data session user saat ini
+                                $currentRole = session()->get('role'); // Role user (admin, editor, etc)
+                                $currentUserId = session()->get('id'); // ID user yang login (sesuaikan key session jika perlu)
+                                
+                                // 2. Set permission default dari Controller
                                 $allowEdit = !empty($can_update);
-                                $allowDelete = !empty($can_delete) && ($row['status'] != '1');
+                                $allowDelete = !empty($can_delete) && ($row['status'] != '1'); // Tidak bisa hapus jika sedang tayang
+                                $isLayakTayang = ($row['status_berita'] == '4'); // Status siap tayang
 
-                                // Jika role adalah Editor, terapkan pembatasan ketat
+                                // 3. Logika Pembatasan Editor
+                                $disableToggle = false; // Default: toggle aktif
+
                                 if ($currentRole == 'editor') {
-                                    // 1. CEK KEPEMILIKAN
+                                    // A. PEMBATASAN KEPEMILIKAN
+                                    // Editor HANYA bisa mengedit/hapus data yang DIA BUAT SENDIRI
                                     // Pastikan 'author_id' sesuai dengan nama kolom di database Anda (misal: created_by, id_user, dll)
-                                    // Jika Editor BUKAN pemilik, matikan akses edit & delete
-                                    if (isset($row['author_id']) && $row['author_id'] != $currentUserId) {
+                                    $authorId = $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? null;
+                                    
+                                    if ($authorId != $currentUserId) {
                                         $allowEdit = false;
                                         $allowDelete = false;
                                     }
 
-                                    // 2. CEK STATUS BERITA
-                                    // Editor hanya bisa edit jika status Draft (0) atau Revisi (6)
-                                    // Jika status Verifikasi (2) atau Layak Tayang (4), edit akan hilang
-                                    if (!in_array($row['status_berita'], ['0', '6'])) {
-                                        $allowEdit = false;
-                                        $allowDelete = false;
-                                    }
+                                    // B. PEMBATASAN TOGGLE PUBLISH
+                                    // Editor tidak boleh mempublikasikan berita secara langsung (harus via admin/verifikator)
+                                    $disableToggle = true; 
                                 }
 
-                                $isTayang = ($row['status'] == '1');
-                                $isLayakTayang = ($row['status_berita'] == '4');
+                                // C. Pembatasan umum untuk tombol Toggle (Non-Editor pun butuh status Layak Tayang)
+                                if (!$isLayakTayang && $currentRole != 'editor') {
+                                    $disableToggle = true;
+                                }
                             ?>
                             <tr class="data-row">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
@@ -504,15 +516,26 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <td class="text-center status-badge-cell">
-                                    <?php if ($row['status'] == '1'): ?>
-                                        <span class="badge bg-success">Tayang</span>
-                                    <?php elseif ($row['status'] == '5'): ?>
-                                        <span class="badge bg-secondary">Tidak Tayang</span>
+                                <td class="text-center">
+                                    <?php if (!empty($row['tags'])): ?>
+                                        <?php 
+                                        $displayCount = 0;
+                                        foreach ($row['tags'] as $tagName):
+                                            if ($displayCount < 2): ?>
+                                                <span class="badge bg-secondary d-block mb-1"><?= esc($tagName) ?></span>
+                                                <?php 
+                                                $displayCount++;
+                                            endif;
+                                        endforeach;
+                                        if (count($row['tags']) > 2): ?>
+                                            <small class="text-muted">+<?= count($row['tags']) - 2 ?> lainnya</small>
+                                        <?php endif; ?>
                                     <?php else: ?>
-                                        <span class="badge bg-warning">Draft</span>
+                                        <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
+
+
 
                                 <td class="text-center">
                                     <?php
@@ -533,14 +556,6 @@
                                 </td>
                                 
                                 <td class="text-center">
-                                    <?php 
-                                    // Tombol toggle status tayang biasanya hanya untuk Admin/Superadmin
-                                    // Jika Editor, tombol ini didisabled
-                                    $disableToggle = !$isLayakTayang;
-                                    if ($currentRole == 'editor') {
-                                        $disableToggle = true; // Editor tidak bisa toggle status tayang
-                                    }
-                                    ?>
                                     <button type="button" class="status-btn" 
                                             data-id="<?= $row['id_berita'] ?>" 
                                             data-url="<?= site_url('berita/toggle-status') ?>"
@@ -560,7 +575,7 @@
                                         <?php endif; ?>
                                         
                                         <?php 
-                                        // Gunakan variabel $allowEdit yang sudah difilter di atas
+                                        // Tampilkan Tombol Edit jika Permission $allowEdit TRUE
                                         if ($allowEdit): 
                                         ?>
                                             <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning btn-sm py-1" title="Edit">
@@ -569,7 +584,7 @@
                                         <?php endif; ?>
 
                                         <?php 
-                                        // Gunakan variabel $allowDelete yang sudah difilter di atas
+                                        // Tampilkan Tombol Hapus jika Permission $allowDelete TRUE
                                         if ($allowDelete): 
                                         ?>
                                             <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post" class="d-inline delete-form">
@@ -633,7 +648,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCsrfHash = '<?= csrf_hash() ?>';
 
     // Fungsi helper untuk update token di semua form input yang ada di halaman
-    // Ini penting agar tombol delete (form submit biasa) tetap bekerja setelah toggle diklik
     function updateAllCsrfInputs(newHash) {
         currentCsrfHash = newHash;
         document.querySelectorAll('input[name="' + currentCsrfName + '"]').forEach(el => {
@@ -803,101 +817,112 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updatePaginationButtons() {
-        if(!firstPageBtn) return;
-        firstPageBtn.disabled = currentPage <= 1;
-        prevPageBtn.disabled = currentPage <= 1;
-        nextPageBtn.disabled = currentPage >= totalPages;
-        lastPageBtn.disabled = currentPage >= totalPages;
+        if(!prevPageBtn) return;
+        firstPageBtn.disabled = currentPage === 1;
+        prevPageBtn.disabled = currentPage === 1;
+        nextPageBtn.disabled = currentPage === totalPages;
+        lastPageBtn.disabled = currentPage === totalPages;
     }
 
     // ==========================================
-    // 3. LOGIC TOGGLE STATUS (AJAX FIXED)
-    // ==========================================
-    
-    document.body.addEventListener('click', function(e) {
-        // Cari tombol terdekat (karena mungkin user klik di bagian span/div dalam tombol)
-        const btn = e.target.closest('.status-btn');
+// 3. TOGGLE STATUS (Publish/Unpublish) - FIXED
+// ==========================================
+const statusBtns = document.querySelectorAll('.status-btn');
+
+statusBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
         
-        if (!btn || btn.disabled) return;
-        e.preventDefault(); // Mencegah form submit default jika ada
-
-        const id = btn.getAttribute('data-id');
-        const url = btn.getAttribute('data-url');
-        const switchEl = btn.querySelector('.switch');
-        const labelEl = btn.querySelector('.switch-label');
-        const row = btn.closest('tr');
-        const badgeCell = row.querySelector('.status-badge-cell'); // Kolom Badge Status Tayang
-
-        // Validasi URL dan ID
-        if (!url || !id) {
-            console.error('URL atau ID tidak ditemukan pada tombol');
+        // Cek jika disabled (misal role Editor)
+        if(this.hasAttribute('disabled')) return;
+        
+        const id = this.dataset.id;
+        const url = this.dataset.url;
+        const switchEl = this.querySelector('.switch');
+        const labelEl = this.querySelector('.switch-label');
+        const row = this.closest('tr');
+        const statusBadgeCell = row.querySelector('.status-badge-cell');
+        
+        // Konfirmasi sebelum toggle (opsional tapi direkomendasikan)
+        const currentStatus = switchEl.classList.contains('active') ? 'Aktif' : 'Non-Aktif';
+        const newStatus = currentStatus === 'Aktif' ? 'Non-Aktif' : 'Aktif';
+        
+        if(!confirm(`Ubah status dari ${currentStatus} ke ${newStatus}?`)) {
             return;
         }
-
-        // Feedback UI: Loading...
-        const originalOpacity = btn.style.opacity;
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-        btn.style.cursor = 'wait';
-
-        // Persiapan Data
+        
+        // Loading state
+        this.style.opacity = '0.5';
+        this.disabled = true;
+        
+        // Buat FormData untuk mengirim data
         const formData = new FormData();
         formData.append('id', id);
-        formData.append(currentCsrfName, currentCsrfHash); // Gunakan token global terbaru
-
+        formData.append(currentCsrfName, currentCsrfHash);
+        
         fetch(url, {
             method: 'POST',
-            body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest' // Header wajib untuk CI4 deteksi AJAX
-            }
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
         })
         .then(response => {
-            // Cek apakah response OK (status 200-299)
+            // Cek apakah response OK
             if (!response.ok) {
-                throw new Error('Terjadi kesalahan jaringan atau server (Status: ' + response.status + ')');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
-        .then(res => {
-            // 1. UPDATE CSRF TOKEN (SANGAT PENTING)
-            const newToken = res.token || res.csrf_token || res.csrfHash; 
+        .then(data => {
+            this.style.opacity = '1';
+            this.disabled = false;
             
-            if (newToken) {
-                updateAllCsrfInputs(newToken);
-            } else {
-                console.warn('Peringatan: Server tidak mengembalikan CSRF Token baru.');
+            // Update CSRF token
+            if(data.token && data.tokenName) {
+                currentCsrfHash = data.token;
+                currentCsrfName = data.tokenName;
+                updateAllCsrfInputs(data.token);
             }
-
-            // 2. CEK STATUS SUKSES DARI SERVER
-            if (res.status === 'success' || res.success === true) {
-                const newStatus = res.new_status || res.data?.status; // Sesuaikan dengan response controller
-                
-                // Update UI Toggle
-                if (newStatus == '1') {
+            
+            if (data.status === 'success') {
+                // Update Switch UI
+                if (data.new_status == '1') {
                     switchEl.classList.add('active');
                     labelEl.textContent = 'Aktif';
-                    if(badgeCell) badgeCell.innerHTML = '<span class="badge bg-success">Tayang</span>';
+                    if(statusBadgeCell) {
+                        statusBadgeCell.innerHTML = '<span class="badge bg-success">Tayang</span>';
+                    }
                 } else {
                     switchEl.classList.remove('active');
                     labelEl.textContent = 'Non-Aktif';
-                    if(badgeCell) badgeCell.innerHTML = '<span class="badge bg-secondary">Tidak Tayang</span>';
+                    if(statusBadgeCell) {
+                        statusBadgeCell.innerHTML = '<span class="badge bg-secondary">Tidak Tayang</span>';
+                    }
                 }
+                
+                // Optional: Tampilkan notifikasi sukses
+                showNotification('success', data.message || 'Status berhasil diubah');
             } else {
-                alert('Gagal mengubah status: ' + (res.message || 'Unknown error'));
+                alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
+            this.style.opacity = '1';
+            this.disabled = false;
             console.error('Error:', error);
-            alert('Terjadi kesalahan saat menghubungi server.');
-        })
-        .finally(() => {
-            // Restore Button State
-            btn.disabled = false;
-            btn.style.opacity = originalOpacity;
-            btn.style.cursor = 'pointer';
+            alert('Terjadi kesalahan: ' + error.message);
         });
     });
+});
+
+// Helper function untuk notifikasi (opsional)
+function showNotification(type, message) {
+    // Bisa menggunakan toast library atau alert sederhana
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    // Atau gunakan alert jika tidak ada toast library
+    // alert(message);
+}
 });
 </script>
 <?= $this->endSection() ?>

@@ -287,41 +287,66 @@
                 <div id="selected-kategori-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Tags</label>
-                <div class="dropdown" id="tags-dropdown">
-                    <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle" aria-haspopup="true" aria-expanded="false">
-                        <span id="tags-placeholder">Pilih tags (opsional)</span>
-                        <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
-                    </button>
-                    <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
-                        <div class="px-3 py-2 border-bottom">
-                            <div class="input-group">
-                                <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
-                                <input type="text" class="form-control border-gray-300" id="tags-search" placeholder="Cari tags..." autocomplete="off">
-                            </div>
-                        </div>
-                        <div class="tags-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
-                            <?php foreach ($tags as $tag): ?>
-                                <div class="form-check ps-3 py-1 tags-item" data-name="<?= esc(strtolower($tag['nama_tag'])) ?>">
-                                    <input class="form-check-input tags-checkbox" type="checkbox" 
-                                           id="tag-<?= $tag['id_tags'] ?>" 
-                                           value="<?= $tag['id_tags'] ?>"
-                                           <?= in_array($tag['id_tags'], $selectedTags) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="tag-<?= $tag['id_tags'] ?>">
-                                        <?= esc($tag['nama_tag']) ?>
-                                    </label>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <div id="tags-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
-                            <small>Tidak ada tags yang cocok</small>
-                        </div>
-                    </div>
+<div class="mb-3">
+    <label class="form-label">Tags</label>
+    
+    <?php 
+        // ✅ PERBAIKAN LOGIKA - Prioritaskan $selectedTags (relasi many-to-many)
+        // JANGAN pakai $berita['id_tags'] karena itu cuma single value!
+        
+        $currentTagsData = old('id_tags', $selectedTags ?? []); 
+        
+        // Normalisasi: Pastikan formatnya Array
+        if (!is_array($currentTagsData)) {
+            // Jika string comma-separated (dari old input atau fallback)
+            $currentTagsData = array_filter(explode(',', $currentTagsData));
+        }
+        
+        // Convert ke string untuk debugging (optional)
+        // echo "<!-- DEBUG Tags: " . print_r($currentTagsData, true) . " -->";
+    ?>
+
+    <div class="dropdown" id="tags-dropdown">
+        <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle" aria-haspopup="true" aria-expanded="false">
+            <span id="tags-placeholder">Pilih tags (opsional)</span>
+            <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
+        </button>
+        <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 320px; overflow: hidden; z-index: 1000;">
+            <div class="px-3 py-2 border-bottom">
+                <div class="input-group">
+                    <span class="input-group-text bg-gray-100 border-gray-300"><i class="bi bi-search text-gray-500"></i></span>
+                    <input type="text" class="form-control border-gray-300" id="tags-search" placeholder="Cari tags..." autocomplete="off">
                 </div>
-                <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $selectedTags) ?>">
-                <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
+            <div class="tags-list px-2 py-1" style="max-height: 240px; overflow-y: auto;">
+                <?php foreach ($tags as $tag): ?>
+                    <div class="form-check ps-3 py-1 tags-item" data-name="<?= esc(strtolower($tag['nama_tag'])) ?>">
+                        <?php
+                            // ✅ PERBAIKAN: Konversi ke string untuk perbandingan yang akurat
+                            $tagIdStr = (string)$tag['id_tags'];
+                            $isChecked = in_array($tagIdStr, array_map('strval', $currentTagsData));
+                        ?>
+                        <input class="form-check-input tags-checkbox" type="checkbox" 
+                               id="tag-<?= $tag['id_tags'] ?>" 
+                               value="<?= $tag['id_tags'] ?>"
+                               <?= $isChecked ? 'checked' : '' ?>>
+                        
+                        <label class="form-check-label" for="tag-<?= $tag['id_tags'] ?>">
+                            <?= esc($tag['nama_tag']) ?>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div id="tags-no-results" class="px-3 py-2 text-center text-gray-500" style="display: none;">
+                <small>Tidak ada tags yang cocok</small>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $currentTagsData) ?>">
+    
+    <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
+</div>
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (SEO)</label>
@@ -374,70 +399,79 @@
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label class="form-label">Foto Tambahan</label>
-                
+<div class="mb-4">
+    <label class="form-label">Foto Tambahan</label>
+    
+    <?php 
+    $oldAdditional = !empty($berita['additional_images']) ? json_decode($berita['additional_images'], true) : [];
+    ?>
+    
+    <?php if (!empty($oldAdditional)): ?>
+        <label class="form-label small text-muted mb-2">Gambar Sebelumnya (Klik X untuk menghapus, edit caption di bawah gambar)</label>
+        <div class="row mb-3">
+            <?php foreach ($oldAdditional as $index => $img): ?>
                 <?php 
-                $oldAdditional = !empty($berita['additional_images']) ? json_decode($berita['additional_images'], true) : [];
+                    $path = is_array($img) ? $img['path'] : $img;
+                    $cap  = is_array($img) ? ($img['caption'] ?? '') : '';
+                    $filePath = FCPATH . ltrim($path, '/');
+                    if (!file_exists($filePath)) continue; 
                 ?>
-                
-                <?php if (!empty($oldAdditional)): ?>
-                    <label class="form-label small text-muted mb-2">Gambar Sebelumnya (Klik X untuk menghapus)</label>
-                    <div class="additional-preview mb-3">
-                        <?php foreach ($oldAdditional as $img): ?>
-                            <?php 
-                                $path = is_array($img) ? $img['path'] : $img;
-                                $cap  = is_array($img) ? $img['caption'] : '';
-                                $filePath = FCPATH . ltrim($path, '/');
-                                if (!file_exists($filePath)) continue; 
-                            ?>
-                            <div class="old-image-card">
-                                <span class="old-badge">Lama</span>
-                                <button type="button" class="btn-delete-img delete-old-image" data-image="<?= $path ?>">✕</button>
-                                <img src="<?= base_url($path) ?>" alt="Old Image">
-                                <div class="card-body">
-                                    <p class="text-muted small mb-0 text-truncate" title="<?= esc($cap) ?>">
-                                        <?= !empty($cap) ? esc($cap) : '<i>-</i>' ?>
-                                    </p>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border shadow-sm position-relative">
+                        <span class="old-badge">Lama</span>
+                        <button type="button" class="btn-delete-img delete-old-image" data-image="<?= $path ?>">✕</button>
+                        
+                        <img src="<?= base_url($path) ?>" alt="Old Image" class="card-img-top" style="height: 150px; object-fit: cover;">
+                        
+                        <div class="card-body p-2">
+                            <label class="form-label text-muted small mb-1">Caption:</label>
+                            <input type="text" 
+                                   name="caption_existing[]" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Edit caption..." 
+                                   value="<?= esc($cap) ?>"
+                                   data-old-path="<?= esc($path) ?>">
+                            <input type="hidden" name="existing_image_paths[]" value="<?= esc($path) ?>">
+                        </div>
                     </div>
-                <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
-                <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
-                    <label class="form-label small text-info mb-2">Gambar Baru (Temporary)</label>
-                    <div class="row mb-3" id="temp-additional-images">
-                        <?php $oldCaptions = old('caption_additional', []); ?>
-                        <?php foreach ($tempAdditionalImages as $index => $tempImage): ?>
-                            <div class="col-md-4 mb-3">
-                                <div class="card h-100 border-info shadow-sm">
-                                    <div class="position-relative">
-                                        <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" class="card-img-top" style="height: 120px; object-fit: cover;">
-                                        <div class="temp-image-badge"><i class="bi bi-clock-history"></i></div>
-                                    </div>
-                                    <div class="card-body p-2 bg-light">
-                                        <label class="form-label text-muted small mb-1">Caption:</label>
-                                        <input type="text" name="caption_additional[]" 
-                                               class="form-control form-control-sm" 
-                                               placeholder="Ket. foto..."
-                                               value="<?= isset($oldCaptions[$index]) ? esc($oldCaptions[$index]) : '' ?>">
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+    <?php if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)): ?>
+        <label class="form-label small text-info mb-2">Gambar Baru (Temporary)</label>
+        <div class="row mb-3" id="temp-additional-images">
+            <?php $oldCaptions = old('caption_additional', []); ?>
+            <?php foreach ($tempAdditionalImages as $index => $tempImage): ?>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-info shadow-sm">
+                        <div class="position-relative">
+                            <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" class="card-img-top" style="height: 120px; object-fit: cover;">
+                            <div class="temp-image-badge"><i class="bi bi-clock-history"></i></div>
+                        </div>
+                        <div class="card-body p-2 bg-light">
+                            <label class="form-label text-muted small mb-1">Caption:</label>
+                            <input type="text" name="caption_additional[]" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Ket. foto..."
+                                   value="<?= isset($oldCaptions[$index]) ? esc($oldCaptions[$index]) : '' ?>">
+                        </div>
                     </div>
-                    <div class="retained-image-info mb-3">
-                        <i class="bi bi-info-circle-fill"></i>
-                        <strong><?= count($tempAdditionalImages) ?> gambar baru tersimpan sementara.</strong>
-                    </div>
-                <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="retained-image-info mb-3">
+            <i class="bi bi-info-circle-fill"></i>
+            <strong><?= count($tempAdditionalImages) ?> gambar baru tersimpan sementara.</strong>
+        </div>
+    <?php endif; ?>
 
-                <input type="file" name="additional_images[]" class="form-control" accept="image/*" id="additional-images" multiple>
-                <small class="text-muted">Upload gambar baru lagi untuk menambah koleksi.</small>
-                
-                <div id="additional-preview-new" class="row mt-3"></div>
-            </div>
+    <input type="file" name="additional_images[]" class="form-control" accept="image/*" id="additional-images" multiple>
+    <small class="text-muted">Upload gambar baru lagi untuk menambah koleksi.</small>
+    
+    <div id="additional-preview-new" class="row mt-3"></div>
+</div>
 
             <div class="mb-3">
                 <label class="form-label">Link Video</label>
@@ -455,42 +489,60 @@
             </div>
         </div>
 
-        <div class="form-section">
-            <div class="section-title"><i class="bi bi-gear"></i> Status & Catatan Admin</div>
+        
+   <?php 
+    // TENTUKAN LOGIKA CEK ROLE DI SINI
+    // Sesuaikan dengan sistem login Anda (pilih salah satu contoh di bawah):
+    
+    // Opsi A: Jika pakai Session Manual
+    $isAllowed = in_array(session('role'), ['admin', 'superadmin']);
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Status Tayang</label>
-                    <select name="status" id="status-publish" class="form-select">
-                        <option value="1" <?= old('status', $berita['status']) == '1' ? 'selected' : '' ?>>🟢 Tayang</option>
-                        <option value="5" <?= old('status', $berita['status']) == '5' ? 'selected' : '' ?>>🔴 Tidak Tayang</option>
-                    </select>
-                </div>
+    // Opsi B: Jika pakai Myth:Auth
+    // $isAllowed = in_groups(['admin', 'superadmin']);
 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Status Berita</label>
-                    <select name="status_berita" class="form-select bg-light">
-                        <option value="0" <?= old('status_berita', $berita['status_berita']) == '0' ? 'selected' : '' ?>>📝 Draft</option>
-                        <option value="2" <?= old('status_berita', $berita['status_berita']) == '2' ? 'selected' : '' ?>>⏳ Menunggu Verifikasi</option>
-                        <option value="3" <?= old('status_berita', $berita['status_berita']) == '3' ? 'selected' : '' ?>>❌ Ditolak</option>
-                        <option value="4" <?= old('status_berita', $berita['status_berita']) == '4' ? 'selected' : '' ?>>✅ Layak Tayang</option>
-                        <option value="6" <?= old('status_berita', $berita['status_berita']) == '6' ? 'selected' : '' ?>>🔄 Revisi</option>
-                    </select>
-                    <small class="text-muted">Gunakan tombol "Ajukan Verifikasi" di bawah untuk mengubah status otomatis.</small>
-                </div>
+    // Opsi C: Jika pakai CI Shield
+    // $isAllowed = auth()->user()->inGroup('admin', 'superadmin');
+?>
+
+<?php if ($isAllowed) : ?>
+
+    <div class="form-section">
+        <div class="section-title"><i class="bi bi-gear"></i> Status & Catatan Admin (Superadmin/Admin)</div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Status Tayang</label>
+                <select name="status" id="status-publish" class="form-select">
+                    <option value="1" <?= old('status', $berita['status']) == '1' ? 'selected' : '' ?>>🟢 Tayang</option>
+                    <option value="5" <?= old('status', $berita['status']) == '5' ? 'selected' : '' ?>>🔴 Tidak Tayang</option>
+                </select>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Catatan Admin</label>
-                <textarea name="note" class="form-control" rows="3"><?= esc(old('note', $berita['note'])) ?></textarea>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Note Revisi</label>
-                <textarea name="note_revisi" class="form-control" rows="3"><?= esc(old('note_revisi', $berita['note_revisi'])) ?></textarea>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Status Berita</label>
+                <select name="status_berita" class="form-select bg-light">
+                    <option value="0" <?= old('status_berita', $berita['status_berita']) == '0' ? 'selected' : '' ?>>📝 Draft</option>
+                    <option value="2" <?= old('status_berita', $berita['status_berita']) == '2' ? 'selected' : '' ?>>⏳ Menunggu Verifikasi</option>
+                    <option value="3" <?= old('status_berita', $berita['status_berita']) == '3' ? 'selected' : '' ?>>❌ Ditolak</option>
+                    <option value="4" <?= old('status_berita', $berita['status_berita']) == '4' ? 'selected' : '' ?>>✅ Layak Tayang</option>
+                    <option value="6" <?= old('status_berita', $berita['status_berita']) == '6' ? 'selected' : '' ?>>🔄 Revisi</option>
+                </select>
+                <small class="text-muted">Ubah status verifikasi di sini (Hak akses Admin/Superadmin).</small>
             </div>
         </div>
 
+        <div class="mb-3">
+            <label class="form-label">Catatan Admin/Superadmin</label>
+            <textarea name="note" class="form-control" rows="3"><?= esc(old('note', $berita['note'])) ?></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Note Revisi</label>
+            <textarea name="note_revisi" class="form-control" rows="3"><?= esc(old('note_revisi', $berita['note_revisi'])) ?></textarea>
+        </div>
+    </div>
+
+<?php endif; ?>
         <div class="action-buttons d-flex justify-content-end gap-2">
             <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
             
@@ -516,25 +568,20 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. LOGIK STATUS TAYANG OTOMATIS (PERMINTAAN ANDA)
+    // 0. LOGIK STATUS TAYANG OTOMATIS
     // ============================================================
-    // Jika tombol Draft atau Verifikasi diklik, paksa status tayang jadi '5' (Tidak Tayang)
     const btnDraft = document.querySelector('button[value="draft"]');
     const btnVerif = document.querySelector('button[value="pending"]');
     const statusSelect = document.getElementById('status-publish');
 
     function forceStatusOff() {
         if(statusSelect) {
-            statusSelect.value = '5'; // Set dropdown ke value 5 (Tidak Tayang)
+            statusSelect.value = '5';
         }
     }
 
-    if(btnDraft) {
-        btnDraft.addEventListener('click', forceStatusOff);
-    }
-    if(btnVerif) {
-        btnVerif.addEventListener('click', forceStatusOff);
-    }
+    if(btnDraft) btnDraft.addEventListener('click', forceStatusOff);
+    if(btnVerif) btnVerif.addEventListener('click', forceStatusOff);
 
     // ============================================================
     // 1. TOGGLE CONTENT 2 LOGIC
@@ -555,7 +602,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if(toggleContent2) {
         toggleContent2.addEventListener('change', handleToggleContent2);
-        // Initial Run (in case DB has value)
         handleToggleContent2();
     }
 
@@ -578,7 +624,6 @@ document.addEventListener('DOMContentLoaded', function() {
         placeholder: 'Tulis isi berita bagian kedua di sini...'
     });
 
-    // Sync content saat form submit
     formBerita.addEventListener('submit', function() {
         contentHidden.value = quillContent.root.innerHTML;
         content2Hidden.value = quillContent2.root.innerHTML;
@@ -595,14 +640,14 @@ document.addEventListener('DOMContentLoaded', function() {
             input.type = 'hidden';
             input.name = 'delete_old_images[]';
             input.value = imgPath;
-            document.getElementById('form-berita').appendChild(input);
+            formBerita.appendChild(input);
 
             this.closest('.old-image-card').remove();
         });
     });
 
     // ============================================================
-    // 4. PREVIEW & DELETE NEW IMAGES (DATATRANSFER) - COMPLETED
+    // 4. PREVIEW & DELETE NEW IMAGES
     // ============================================================
     const additionalInput = document.getElementById('additional-images');
     const additionalPreviewNew = document.getElementById('additional-preview-new');
@@ -611,54 +656,43 @@ document.addEventListener('DOMContentLoaded', function() {
     if(additionalInput) {
         additionalInput.addEventListener('change', function(){
             for(let i = 0; i < this.files.length; i++){
-                let file = this.files[i];
-                dt.items.add(file);
+                dt.items.add(this.files[i]);
             }
-            // Update input files dengan DataTransfer terbaru
             this.files = dt.files;
-            
-            // Render Preview
             renderPreview();
         });
     }
 
     function renderPreview(){
         if(!additionalPreviewNew) return;
-        additionalPreviewNew.innerHTML = ''; // Reset container preview
+        additionalPreviewNew.innerHTML = '';
 
         for(let i = 0; i < dt.files.length; i++){
             let file = dt.files[i];
-            
-            // Buat elemen kolom
             let col = document.createElement('div');
             col.className = 'col-md-3 mb-3 position-relative';
             
-            // Buat Reader untuk preview gambar
             let reader = new FileReader();
             reader.onload = function(e){
-                let html = `
+                col.innerHTML = `
                     <div class="card h-100 shadow-sm border-0">
                         <button type="button" class="btn-delete-img" onclick="removeNewImage(${i})">✕</button>
                         <img src="${e.target.result}" class="card-img-top" style="height: 100px; object-fit: cover; border-radius: 8px;">
                         <div class="card-body p-2">
-                             <input type="text" name="caption_additional_new[]" class="form-control form-control-sm" placeholder="Caption...">
+                            <input type="text" name="caption_new[]" class="form-control form-control-sm" placeholder="Caption...">
                         </div>
                     </div>
                 `;
-                col.innerHTML = html;
                 additionalPreviewNew.appendChild(col);
             }
             reader.readAsDataURL(file);
         }
     }
 
-    // Fungsi Global untuk menghapus gambar baru dari antrian
     window.removeNewImage = function(index) {
         let dtTemp = new DataTransfer();
         for(let i = 0; i < dt.files.length; i++){
-            if(i !== index){
-                dtTemp.items.add(dt.files[i]);
-            }
+            if(i !== index) dtTemp.items.add(dt.files[i]);
         }
         dt = dtTemp;
         additionalInput.files = dt.files;
@@ -676,34 +710,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 6. DROPDOWN LOGIC (KATEGORI & TAGS)
+    // 6. DROPDOWN KATEGORI (UNIFIED)
     // ============================================================
-    // --- KATEGORI ---
     const katDropdown = document.getElementById('kategori-dropdown');
     const katToggle = document.getElementById('kategori-toggle');
     const katMenu = katDropdown.querySelector('.dropdown-menu');
     const katSearch = document.getElementById('kategori-search');
     const katItems = document.querySelectorAll('.kategori-item');
+    const katCheckboxes = document.querySelectorAll('.kategori-checkbox');
     const katHidden = document.getElementById('kategori-hidden');
     const katBadges = document.getElementById('selected-kategori-badges');
     const katPlaceholder = document.getElementById('kategori-placeholder');
     const katNoResults = document.getElementById('kategori-no-results');
 
-    // Toggle Kategori
+    // Toggle dropdown
     katToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         katMenu.classList.toggle('show');
         if (katMenu.classList.contains('show')) katSearch.focus();
     });
 
-    // Hide on outside click
-    document.addEventListener('click', (e) => {
-        if (!katDropdown.contains(e.target)) katMenu.classList.remove('show');
-        if (!document.getElementById('tags-dropdown').contains(e.target)) 
-            document.querySelector('#tags-dropdown .dropdown-menu').classList.remove('show');
-    });
-
-    // Search Kategori
+    // Search functionality
     katSearch.addEventListener('input', function() {
         const filter = this.value.toLowerCase();
         let hasResult = false;
@@ -719,25 +746,33 @@ document.addEventListener('DOMContentLoaded', function() {
         katNoResults.style.display = hasResult ? 'none' : 'block';
     });
 
-    // Checkbox Change Kategori
-    document.querySelectorAll('.kategori-checkbox').forEach(chk => {
+    // Checkbox change event
+    katCheckboxes.forEach(chk => {
         chk.addEventListener('change', updateSelectedKategori);
     });
 
     function updateSelectedKategori() {
         const selected = [];
-        const badges = [];
-        document.querySelectorAll('.kategori-checkbox:checked').forEach(chk => {
-            selected.push(chk.value);
-            const label = chk.nextElementSibling.innerText;
-            badges.push(`<span class="selected-badge">${label} <i class="bi bi-x" onclick="uncheckKategori('${chk.value}')"></i></span>`);
+        katBadges.innerHTML = '';
+        
+        katCheckboxes.forEach(chk => {
+            if (chk.checked) {
+                selected.push(chk.value);
+                const label = chk.nextElementSibling.innerText.trim();
+                
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge';
+                badge.innerHTML = `${label} <i class="bi bi-x" onclick="uncheckKategori('${chk.value}')"></i>`;
+                katBadges.appendChild(badge);
+            }
         });
+        
         katHidden.value = selected.join(',');
-        katBadges.innerHTML = badges.join('');
-        katPlaceholder.innerText = selected.length > 0 ? selected.length + ' kategori dipilih' : 'Pilih minimal 1 kategori';
+        katPlaceholder.innerText = selected.length > 0 
+            ? `${selected.length} kategori dipilih` 
+            : 'Pilih minimal 1 kategori';
     }
 
-    // Uncheck helper
     window.uncheckKategori = function(val) {
         const chk = document.getElementById('kat-' + val);
         if (chk) {
@@ -745,28 +780,32 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectedKategori();
         }
     };
-    
-    // Init Kategori
+
+    // Initialize kategori
     updateSelectedKategori();
 
-
-    // --- TAGS (LOGIC SAMA SEPERTI KATEGORI) ---
+    // ============================================================
+    // 7. DROPDOWN TAGS (UNIFIED - FIXED)
+    // ============================================================
     const tagDropdown = document.getElementById('tags-dropdown');
     const tagToggle = document.getElementById('tags-toggle');
     const tagMenu = tagDropdown.querySelector('.dropdown-menu');
     const tagSearch = document.getElementById('tags-search');
     const tagItems = document.querySelectorAll('.tags-item');
+    const tagCheckboxes = document.querySelectorAll('.tags-checkbox');
     const tagHidden = document.getElementById('tags-hidden');
     const tagBadges = document.getElementById('selected-tags-badges');
     const tagPlaceholder = document.getElementById('tags-placeholder');
     const tagNoResults = document.getElementById('tags-no-results');
 
+    // Toggle dropdown
     tagToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         tagMenu.classList.toggle('show');
         if (tagMenu.classList.contains('show')) tagSearch.focus();
     });
 
+    // Search functionality
     tagSearch.addEventListener('input', function() {
         const filter = this.value.toLowerCase();
         let hasResult = false;
@@ -782,21 +821,31 @@ document.addEventListener('DOMContentLoaded', function() {
         tagNoResults.style.display = hasResult ? 'none' : 'block';
     });
 
-    document.querySelectorAll('.tags-checkbox').forEach(chk => {
+    // Checkbox change event
+    tagCheckboxes.forEach(chk => {
         chk.addEventListener('change', updateSelectedTags);
     });
 
     function updateSelectedTags() {
         const selected = [];
-        const badges = [];
-        document.querySelectorAll('.tags-checkbox:checked').forEach(chk => {
-            selected.push(chk.value);
-            const label = chk.nextElementSibling.innerText.trim();
-            badges.push(`<span class="selected-badge bg-secondary">${label} <i class="bi bi-x" onclick="uncheckTag('${chk.value}')"></i></span>`);
+        tagBadges.innerHTML = '';
+        
+        tagCheckboxes.forEach(chk => {
+            if (chk.checked) {
+                selected.push(chk.value);
+                const label = chk.nextElementSibling.innerText.trim();
+                
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge bg-secondary';
+                badge.innerHTML = `${label} <i class="bi bi-x" onclick="uncheckTag('${chk.value}')"></i>`;
+                tagBadges.appendChild(badge);
+            }
         });
+        
         tagHidden.value = selected.join(',');
-        tagBadges.innerHTML = badges.join('');
-        tagPlaceholder.innerText = selected.length > 0 ? selected.length + ' tags dipilih' : 'Pilih tags (opsional)';
+        tagPlaceholder.innerText = selected.length > 0 
+            ? `${selected.length} tags dipilih` 
+            : 'Pilih tags (opsional)';
     }
 
     window.uncheckTag = function(val) {
@@ -806,13 +855,28 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectedTags();
         }
     };
-    
-    // Init Tags
+
+    // Initialize tags
     updateSelectedTags();
 
-    // COVER IMAGE PREVIEW
+    // ============================================================
+    // 8. HIDE DROPDOWNS ON OUTSIDE CLICK
+    // ============================================================
+    document.addEventListener('click', (e) => {
+        if (!katDropdown.contains(e.target)) {
+            katMenu.classList.remove('show');
+        }
+        if (!tagDropdown.contains(e.target)) {
+            tagMenu.classList.remove('show');
+        }
+    });
+
+    // ============================================================
+    // 9. COVER IMAGE PREVIEW
+    // ============================================================
     const coverInput = document.getElementById('cover-image');
     const coverPreview = document.getElementById('new-cover-preview');
+    
     if(coverInput){
         coverInput.addEventListener('change', function(e){
             const file = e.target.files[0];
@@ -829,5 +893,134 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // --- FUNGSI UTAMA: PENCARIAN & ENTER SELECT ---
+    function setupSearchEnter(inputId, itemClass, noResultId) {
+        const input = document.getElementById(inputId);
+        const items = document.querySelectorAll('.' + itemClass);
+        const noResult = document.getElementById(noResultId);
+
+        if (!input) return;
+
+        // 1. Logika Filtering (Pencarian)
+        input.addEventListener('keyup', function(e) {
+            // Jangan filter jika menekan enter (biarkan event keydown menangani)
+            if (e.key === 'Enter') return;
+
+            const filter = input.value.toLowerCase();
+            let hasResult = false;
+
+            items.forEach(item => {
+                // Ambil data-name untuk pencarian
+                const name = item.getAttribute('data-name');
+                if (name.includes(filter)) {
+                    item.style.display = 'flex'; // Tampilkan (flex agar layout rapi)
+                    hasResult = true;
+                } else {
+                    item.style.display = 'none'; // Sembunyikan
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada hasil
+            if (noResult) {
+                noResult.style.display = hasResult ? 'none' : 'block';
+            }
+        });
+
+        // 2. Logika Tombol ENTER
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Mencegah form submit tidak sengaja
+
+                // Cari item PERTAMA yang sedang tampil (display != none)
+                let firstVisibleItem = null;
+                for (let item of items) {
+                    if (item.style.display !== 'none') {
+                        firstVisibleItem = item;
+                        break; // Stop setelah ketemu yang paling atas
+                    }
+                }
+
+                // Jika ada item yang cocok
+                if (firstVisibleItem) {
+                    const checkbox = firstVisibleItem.querySelector('input[type="checkbox"]');
+                    
+                    // Jika belum tercentang, klik!
+                    if (checkbox && !checkbox.checked) {
+                        checkbox.click(); 
+                        
+                        // Opsional: Kosongkan search bar setelah memilih
+                        // input.value = ''; 
+                        // input.dispatchEvent(new Event('keyup')); // Reset list
+                        
+                        // Opsional: Beri feedback visual (kedip)
+                        firstVisibleItem.style.backgroundColor = '#dbeafe';
+                        setTimeout(() => {
+                            firstVisibleItem.style.backgroundColor = '';
+                        }, 300);
+                    }
+                }
+            }
+        });
+    }
+
+    // --- JALANKAN FUNGSI UNTUK KATEGORI & TAGS ---
+    setupSearchEnter('kategori-search', 'kategori-item', 'kategori-no-results');
+    setupSearchEnter('tags-search', 'tags-item', 'tags-no-results');
+
+
+    // --- LOGIKA UPDATE BADGE (TAMPILAN PILIHAN) ---
+    // Kode ini diperlukan agar saat di-enter (klik otomatis), badge di atas muncul
+    
+    function updateBadges(containerId, checkboxClass, hiddenInputId) {
+        const container = document.getElementById(containerId);
+        const checkboxes = document.querySelectorAll('.' + checkboxClass);
+        const hiddenInput = document.getElementById(hiddenInputId);
+        
+        const selectedValues = [];
+        container.innerHTML = ''; // Reset badge
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                selectedValues.push(cb.value);
+                const label = cb.nextElementSibling.innerText;
+                
+                // Buat Badge HTML
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge';
+                badge.innerHTML = `${label} <i class="bi bi-x" onclick="uncheckItem('${cb.id}')"></i>`;
+                container.appendChild(badge);
+            }
+        });
+
+        // Update value hidden input untuk dikirim ke database
+        if(hiddenInput) hiddenInput.value = selectedValues.join(',');
+    }
+
+    // Event Listener untuk update badge saat checkbox berubah (diklik manual atau via Enter)
+    document.querySelectorAll('.kategori-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => updateBadges('selected-kategori-badges', 'kategori-checkbox', 'kategori-hidden'));
+    });
+
+    document.querySelectorAll('.tags-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => updateBadges('selected-tags-badges', 'tags-checkbox', 'tags-hidden'));
+    });
+
+    // Jalankan sekali saat load untuk menampilkan data old()
+    updateBadges('selected-kategori-badges', 'kategori-checkbox', 'kategori-hidden');
+    updateBadges('selected-tags-badges', 'tags-checkbox', 'tags-hidden');
+
+});
+
+// Fungsi global untuk menghapus badge (uncheck checkbox)
+window.uncheckItem = function(checkboxId) {
+    const cb = document.getElementById(checkboxId);
+    if (cb) {
+        cb.click(); // Klik lagi untuk uncheck dan trigger event change
+    }
+};
 </script>
 <?= $this->endSection() ?>

@@ -761,320 +761,493 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
 <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    // ============================================================
-    // GLOBAL FUNCTION UNTUK MEMILIH SISIPAN
-    // ============================================================
-    function selectSisipan(prefix, id, judul, img, tgl) {
-        // 1. Set Value ke Hidden Input
-        document.getElementById(prefix + '-input').value = id;
+// ============================================================
+// GLOBAL FUNCTION UNTUK MEMILIH SISIPAN (Harus di luar DOMContentLoaded)
+// ============================================================
+function selectSisipan(prefix, id, judul, img, tgl) {
+    // 1. Set Value ke Hidden Input
+    document.getElementById(prefix + '-input').value = id;
 
-        // 2. Update Label Tombol Trigger
-        const label = document.getElementById(prefix + '-label');
-        if (id) {
-            label.innerHTML = `
+    // 2. Update Label Tombol Trigger
+    const label = document.getElementById(prefix + '-label');
+    if (id) {
+        label.innerHTML = `
             <div class="d-flex align-items-center">
                 <img src="${img}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; margin-right:8px;">
                 <div class="text-truncate" style="max-width: 200px; font-weight:600;">${judul}</div>
             </div>
         `;
-            label.classList.remove('text-muted');
-        } else {
-            // Jika batal memilih, kembalikan text default
-            if (prefix === 'sisipan2') {
-                label.innerHTML = '-- Pilih Berita Sisipan --';
-            } else {
-                label.innerHTML = '-- Pilih Berita Sisipan --';
-            }
-            label.classList.add('text-muted');
-        }
+        label.classList.remove('text-muted');
+    } else {
+        // Jika batal memilih, kembalikan text default
+        label.innerHTML = '-- Pilih Berita Sisipan --';
+        label.classList.add('text-muted');
+    }
 
-        // 3. Highlight Item di List
-        const items = document.querySelectorAll(`#${prefix}-list .news-item-option`);
-        items.forEach(el => el.classList.remove('active'));
+    // 3. Highlight Item di List
+    const items = document.querySelectorAll(`#${prefix}-list .news-item-option`);
+    items.forEach(el => el.classList.remove('active'));
+
+    if (id) {
+        items.forEach(el => {
+            if (el.getAttribute('onclick') && el.getAttribute('onclick').includes(`'${id}'`)) {
+                el.classList.add('active');
+            }
+        });
+    }
+
+    // 4. LOGIKA DEPENDENCY: SISIPAN 1 MENGONTROL SISIPAN 2
+    if (prefix === 'sisipan1') {
+        const sisipan2Btn = document.getElementById('sisipan2-btn');
+        const sisipan2Label = document.getElementById('sisipan2-label');
 
         if (id) {
-            items.forEach(el => {
-                if (el.getAttribute('onclick') && el.getAttribute('onclick').includes(`'${id}'`)) {
-                    el.classList.add('active');
-                }
-            });
-        }
-
-        // 4. LOGIKA DEPENDENCY: SISIPAN 1 MENGONTROL SISIPAN 2
-        if (prefix === 'sisipan1') {
-            const sisipan2Btn = document.getElementById('sisipan2-btn');
-            const sisipan2Label = document.getElementById('sisipan2-label');
-
-            if (id) {
-                // Jika Sisipan 1 dipilih, enable Sisipan 2
-                sisipan2Btn.removeAttribute('disabled');
-                if (sisipan2Label.innerText === '-- Pilih Sisipan 1 Terlebih Dahulu --') {
-                    sisipan2Label.innerText = '-- Pilih Berita Sisipan --';
-                }
-            } else {
-                // Jika Sisipan 1 dikosongkan (pilih 'Tidak Ada Sisipan'), disable Sisipan 2
-                sisipan2Btn.setAttribute('disabled', 'true');
-
-                // Reset juga nilai Sisipan 2 jika ada
-                selectSisipan('sisipan2', '', 'No Sisipan', '', '');
-                sisipan2Label.innerText = '-- Pilih Sisipan 1 Terlebih Dahulu --';
+            // Jika Sisipan 1 dipilih, enable Sisipan 2
+            sisipan2Btn.removeAttribute('disabled');
+            if (sisipan2Label.innerText === '-- Pilih Sisipan 1 Terlebih Dahulu --') {
+                sisipan2Label.innerText = '-- Pilih Berita Sisipan --';
             }
+        } else {
+            // Jika Sisipan 1 dikosongkan, disable Sisipan 2
+            sisipan2Btn.setAttribute('disabled', 'true');
+            
+            // Reset nilai Sisipan 2
+            selectSisipan('sisipan2', '', 'No Sisipan', '', '');
+            sisipan2Label.innerText = '-- Pilih Sisipan 1 Terlebih Dahulu --';
+        }
+    }
+}
+
+// Global function to uncheck from badge x
+function uncheck(type, id) {
+    const cb = document.getElementById((type === 'kategori' ? 'kat-' : 'tag-') + id);
+    if (cb) {
+        cb.checked = false;
+        // Trigger change event
+        const event = new Event('change');
+        cb.dispatchEvent(event);
+    }
+}
+
+// Global function untuk delete additional image preview
+function deleteAdditionalPreview(index) {
+    const preview = document.getElementById('additional-preview-' + index);
+    if (preview) {
+        preview.remove();
+    }
+    
+    // Update file input - remove the deleted file
+    const input = document.getElementById('additional-images');
+    const dt = new DataTransfer();
+    const files = input.files;
+    
+    for (let i = 0; i < files.length; i++) {
+        if (i !== index) {
+            dt.items.add(files[i]);
+        }
+    }
+    
+    input.files = dt.files;
+    
+    // Reindex remaining previews
+    const allPreviews = document.querySelectorAll('[id^="additional-preview-"]');
+    allPreviews.forEach((preview, idx) => {
+        preview.id = 'additional-preview-' + idx;
+        const deleteBtn = preview.querySelector('.btn-delete-new-img');
+        if (deleteBtn) {
+            deleteBtn.setAttribute('onclick', `deleteAdditionalPreview(${idx})`);
+        }
+    });
+}
+
+// Function Inisialisasi Pencarian Sisipan
+function initSisipanSearch(prefix) {
+    const searchInput = document.getElementById(prefix + '-search');
+    const listContainer = document.getElementById(prefix + '-list');
+    const noResult = document.getElementById(prefix + '-noresult');
+    const items = listContainer.querySelectorAll('.news-item-option');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            if (item.innerText.includes('-- Tidak Ada Sisipan --')) {
+                item.style.display = 'flex';
+                return;
+            }
+
+            const searchText = item.getAttribute('data-search');
+            if (searchText && searchText.includes(term)) {
+                item.style.display = 'flex';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0 && term !== '') {
+            noResult.style.display = 'block';
+        } else {
+            noResult.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+
+    // 1. Init Quill Editors
+    var quill1 = new Quill('#editor-content', {
+        theme: 'snow',
+        modules: {
+            toolbar: '#toolbar-content'
+        }
+    });
+
+    var quill2 = new Quill('#editor-content2', {
+        theme: 'snow',
+        modules: {
+            toolbar: '#toolbar-content2'
+        }
+    });
+
+    // Load old content if exists
+    var oldContent1 = <?= json_encode($oldContent1) ?>;
+    if (oldContent1) quill1.root.innerHTML = oldContent1;
+
+    var oldContent2 = <?= json_encode($oldContent2) ?>;
+    if (oldContent2) quill2.root.innerHTML = oldContent2;
+
+    // Sync to textarea on submit
+    var form = document.getElementById('form-berita');
+    form.onsubmit = function() {
+        document.getElementById('content-hidden').value = quill1.root.innerHTML;
+        document.getElementById('content2-hidden').value = quill2.root.innerHTML;
+    };
+
+    // 2. Init Flatpickr
+    flatpickr("#datetime-picker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        locale: "id",
+        allowInput: true
+    });
+
+    // 3. Init Sisipan Search
+    initSisipanSearch('sisipan1');
+    initSisipanSearch('sisipan2');
+
+    // 4. Toggle Content 2 & SISIPAN 1 Logic
+    const toggle = document.getElementById('toggle-content2');
+    const wrapper = document.getElementById('wrapper-content2');
+    const boxSisipan1 = document.getElementById('box-sisipan-1');
+    const hasContent2Val = document.getElementById('has-content2-val');
+
+    function updateToggleState() {
+        if (toggle.checked) {
+            wrapper.style.display = 'block';
+            boxSisipan1.style.display = 'block';
+            hasContent2Val.value = '1';
+        } else {
+            wrapper.style.display = 'none';
+            boxSisipan1.style.display = 'none';
+            hasContent2Val.value = '0';
         }
     }
 
-    // Function Inisialisasi Pencarian Sisipan
-    function initSisipanSearch(prefix) {
-        const searchInput = document.getElementById(prefix + '-search');
-        const listContainer = document.getElementById(prefix + '-list');
-        const noResult = document.getElementById(prefix + '-noresult');
-        const items = listContainer.querySelectorAll('.news-item-option');
+    toggle.addEventListener('change', updateToggleState);
+    updateToggleState(); // Run on load
 
+    // 5. Check Initial Dependency State for Sisipan 2
+    const sisipan1Val = document.getElementById('sisipan1-input').value;
+    const sisipan2Btn = document.getElementById('sisipan2-btn');
+    if (sisipan1Val) {
+        sisipan2Btn.removeAttribute('disabled');
+        const sisipan2Label = document.getElementById('sisipan2-label');
+        if (sisipan2Label.innerText.includes('Terlebih Dahulu')) {
+            sisipan2Label.innerText = '-- Pilih Berita Sisipan --';
+        }
+    }
+
+    // 6. Kategori & Tags Dropdown Logic
+    setupDropdownSearch('kategori');
+    setupDropdownSearch('tags');
+
+    function setupDropdownSearch(type) {
+        const toggleBtn = document.getElementById(type + '-toggle');
+        const dropdownMenu = toggleBtn.nextElementSibling;
+        const searchInput = document.getElementById(type + '-search');
+        const checkboxes = document.querySelectorAll('.' + type + '-checkbox');
+        const badgeContainer = document.getElementById('selected-' + type + '-badges');
+        const hiddenInput = document.getElementById(type + '-hidden');
+        const placeholder = document.getElementById(type + '-placeholder');
+        const noResults = document.getElementById(type + '-no-results');
+
+        // Toggle dropdown
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            // Close all others
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+
+            if (!isOpen) {
+                dropdownMenu.classList.add('show');
+                searchInput.focus();
+            }
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+
+        // Prevent dropdown close when clicking inside
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Search functionality
         searchInput.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
             let visibleCount = 0;
+            const items = dropdownMenu.querySelectorAll('.' + type + '-item');
 
             items.forEach(item => {
-                if (item.innerText.includes('-- Tidak Ada Sisipan --')) {
-                    item.style.display = 'flex';
-                    return;
-                }
-
-                const searchText = item.getAttribute('data-search');
-                if (searchText.includes(term)) {
-                    item.style.display = 'flex';
+                const name = item.getAttribute('data-name');
+                if (name && name.includes(term)) {
+                    item.style.display = 'block';
                     visibleCount++;
                 } else {
                     item.style.display = 'none';
                 }
             });
 
-            if (visibleCount === 0 && term !== '') {
-                noResult.style.display = 'block';
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
             } else {
-                noResult.style.display = 'none';
+                noResults.style.display = 'none';
+            }
+        });
+
+        // Checkbox change & badge update
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateBadges);
+        });
+
+        function updateBadges() {
+            badgeContainer.innerHTML = '';
+            const selectedIds = [];
+            let count = 0;
+
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedIds.push(cb.value);
+                    const label = cb.nextElementSibling.innerText;
+
+                    const badge = document.createElement('span');
+                    badge.className = 'selected-badge';
+                    badge.innerHTML = `${label} <i class="bi bi-x" onclick="uncheck('${type}', '${cb.value}')"></i>`;
+                    badgeContainer.appendChild(badge);
+                    count++;
+                }
+            });
+
+            hiddenInput.value = selectedIds.join(',');
+
+            if (count > 0) {
+                placeholder.innerText = count + ' ' + type + ' terpilih';
+                placeholder.classList.add('text-primary', 'fw-bold');
+            } else {
+                placeholder.innerText = type === 'kategori' ? 'Pilih minimal 1 kategori' : 'Pilih tags (opsional)';
+                placeholder.classList.remove('text-primary', 'fw-bold');
+            }
+        }
+
+        // Run once on load
+        updateBadges();
+    }
+
+    // 7. Image Preview Logic - Cover Image
+    const coverInput = document.getElementById('cover-image');
+    coverInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('cover-preview').innerHTML = `
+                    <div class="mt-3">
+                        <img src="${e.target.result}" class="preview-img" alt="Preview Cover">
+                    </div>
+                `;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 8. Image Preview Logic - Additional Images dengan Caption & Tombol Delete
+    const additionalInput = document.getElementById('additional-images');
+    additionalInput.addEventListener('change', function(e) {
+        const container = document.getElementById('additional-preview-new');
+        container.innerHTML = '';
+        
+        Array.from(e.target.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-3';
+                col.id = 'additional-preview-' + index;
+                col.innerHTML = `
+                    <div class="card h-100 border shadow-sm preview-card-wrapper">
+                        <button type="button" class="btn-delete-new-img" onclick="deleteAdditionalPreview(${index})">
+                            <i class="bi bi-x"></i>
+                        </button>
+                        <img src="${ev.target.result}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="Preview ${index + 1}">
+                        <div class="card-body p-2">
+                            <input type="text" name="caption_new[]" class="form-control form-control-sm" 
+                                placeholder="Caption foto ini..." 
+                                data-index="${index}">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            }
+            reader.readAsDataURL(file);
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // --- FUNGSI UTAMA: PENCARIAN & ENTER SELECT ---
+    function setupSearchEnter(inputId, itemClass, noResultId) {
+        const input = document.getElementById(inputId);
+        const items = document.querySelectorAll('.' + itemClass);
+        const noResult = document.getElementById(noResultId);
+
+        if (!input) return;
+
+        // 1. Logika Filtering (Pencarian)
+        input.addEventListener('keyup', function(e) {
+            // Jangan filter jika menekan enter (biarkan event keydown menangani)
+            if (e.key === 'Enter') return;
+
+            const filter = input.value.toLowerCase();
+            let hasResult = false;
+
+            items.forEach(item => {
+                // Ambil data-name untuk pencarian
+                const name = item.getAttribute('data-name');
+                if (name.includes(filter)) {
+                    item.style.display = 'flex'; // Tampilkan (flex agar layout rapi)
+                    hasResult = true;
+                } else {
+                    item.style.display = 'none'; // Sembunyikan
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada hasil
+            if (noResult) {
+                noResult.style.display = hasResult ? 'none' : 'block';
+            }
+        });
+
+        // 2. Logika Tombol ENTER
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Mencegah form submit tidak sengaja
+
+                // Cari item PERTAMA yang sedang tampil (display != none)
+                let firstVisibleItem = null;
+                for (let item of items) {
+                    if (item.style.display !== 'none') {
+                        firstVisibleItem = item;
+                        break; // Stop setelah ketemu yang paling atas
+                    }
+                }
+
+                // Jika ada item yang cocok
+                if (firstVisibleItem) {
+                    const checkbox = firstVisibleItem.querySelector('input[type="checkbox"]');
+                    
+                    // Jika belum tercentang, klik!
+                    if (checkbox && !checkbox.checked) {
+                        checkbox.click(); 
+                        
+                        // Opsional: Kosongkan search bar setelah memilih
+                        // input.value = ''; 
+                        // input.dispatchEvent(new Event('keyup')); // Reset list
+                        
+                        // Opsional: Beri feedback visual (kedip)
+                        firstVisibleItem.style.backgroundColor = '#dbeafe';
+                        setTimeout(() => {
+                            firstVisibleItem.style.backgroundColor = '';
+                        }, 300);
+                    }
+                }
             }
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // 1. Init Quill Editors
-        var quill1 = new Quill('#editor-content', {
-            theme: 'snow',
-            modules: {
-                toolbar: '#toolbar-content'
+    // --- JALANKAN FUNGSI UNTUK KATEGORI & TAGS ---
+    setupSearchEnter('kategori-search', 'kategori-item', 'kategori-no-results');
+    setupSearchEnter('tags-search', 'tags-item', 'tags-no-results');
+
+
+    // --- LOGIKA UPDATE BADGE (TAMPILAN PILIHAN) ---
+    // Kode ini diperlukan agar saat di-enter (klik otomatis), badge di atas muncul
+    
+    function updateBadges(containerId, checkboxClass, hiddenInputId) {
+        const container = document.getElementById(containerId);
+        const checkboxes = document.querySelectorAll('.' + checkboxClass);
+        const hiddenInput = document.getElementById(hiddenInputId);
+        
+        const selectedValues = [];
+        container.innerHTML = ''; // Reset badge
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                selectedValues.push(cb.value);
+                const label = cb.nextElementSibling.innerText;
+                
+                // Buat Badge HTML
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge';
+                badge.innerHTML = `${label} <i class="bi bi-x" onclick="uncheckItem('${cb.id}')"></i>`;
+                container.appendChild(badge);
             }
         });
 
-        var quill2 = new Quill('#editor-content2', {
-            theme: 'snow',
-            modules: {
-                toolbar: '#toolbar-content2'
-            }
-        });
+        // Update value hidden input untuk dikirim ke database
+        if(hiddenInput) hiddenInput.value = selectedValues.join(',');
+    }
 
-        // Load old content if exists
-        var oldContent1 = <?= json_encode($oldContent1) ?>;
-        if (oldContent1) quill1.root.innerHTML = oldContent1;
-
-        var oldContent2 = <?= json_encode($oldContent2) ?>;
-        if (oldContent2) quill2.root.innerHTML = oldContent2;
-
-        // Sync to textarea on submit
-        var form = document.getElementById('form-berita');
-        form.onsubmit = function() {
-            document.getElementById('content-hidden').value = quill1.root.innerHTML;
-            document.getElementById('content2-hidden').value = quill2.root.innerHTML;
-        };
-
-        // 2. Init Flatpickr
-        flatpickr("#datetime-picker", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            time_24hr: true,
-            locale: "id",
-            allowInput: true
-        });
-
-        // 3. Init Sisipan Search
-        initSisipanSearch('sisipan1');
-        initSisipanSearch('sisipan2');
-
-        // 4. Toggle Content 2 & SISIPAN 1 Logic
-        const toggle = document.getElementById('toggle-content2');
-        const wrapper = document.getElementById('wrapper-content2');
-        const boxSisipan1 = document.getElementById('box-sisipan-1');
-        const hasContent2Val = document.getElementById('has-content2-val');
-
-        function updateToggleState() {
-            if (toggle.checked) {
-                wrapper.style.display = 'block';
-                boxSisipan1.style.display = 'block'; // Munculkan Sisipan 1 saat toggle ON
-                hasContent2Val.value = '1';
-            } else {
-                wrapper.style.display = 'none';
-                boxSisipan1.style.display = 'none'; // Sembunyikan Sisipan 1 saat toggle OFF
-                hasContent2Val.value = '0';
-            }
-        }
-
-        toggle.addEventListener('change', updateToggleState);
-        updateToggleState(); // Run on load
-
-        // 5. Check Initial Dependency State for Sisipan 2
-        // Jika saat load Sisipan 1 sudah terisi (misal dari edit/validation error), enable Sisipan 2
-        const sisipan1Val = document.getElementById('sisipan1-input').value;
-        const sisipan2Btn = document.getElementById('sisipan2-btn');
-        if (sisipan1Val) {
-            sisipan2Btn.removeAttribute('disabled');
-            // Update label sisipan 2 jika belum dipilih
-            const sisipan2Label = document.getElementById('sisipan2-label');
-            if (sisipan2Label.innerText.includes('Terlebih Dahulu')) {
-                sisipan2Label.innerText = '-- Pilih Berita Sisipan --';
-            }
-        }
-
-        // 6. Kategori & Tags Dropdown Logic (Standard)
-        setupDropdownSearch('kategori');
-        setupDropdownSearch('tags');
-
-        function setupDropdownSearch(type) {
-            const toggleBtn = document.getElementById(type + '-toggle');
-            const dropdownMenu = toggleBtn.nextElementSibling;
-            const searchInput = document.getElementById(type + '-search');
-            const checkboxes = document.querySelectorAll('.' + type + '-checkbox');
-            const badgeContainer = document.getElementById('selected-' + type + '-badges');
-            const hiddenInput = document.getElementById(type + '-hidden');
-            const placeholder = document.getElementById(type + '-placeholder');
-            const noResults = document.getElementById(type + '-no-results');
-
-            // Toggle dropdown
-            toggleBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const isOpen = dropdownMenu.classList.contains('show');
-                // Close all others
-                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-
-                if (!isOpen) {
-                    dropdownMenu.classList.add('show');
-                    searchInput.focus();
-                }
-            });
-
-            // Close when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                    dropdownMenu.classList.remove('show');
-                }
-            });
-
-            // Search functionality
-            searchInput.addEventListener('input', function(e) {
-                const term = e.target.value.toLowerCase();
-                let visibleCount = 0;
-                const items = dropdownMenu.querySelectorAll('.' + type + '-item');
-
-                items.forEach(item => {
-                    const name = item.getAttribute('data-name');
-                    if (name.includes(term)) {
-                        item.style.display = 'block';
-                        visibleCount++;
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-
-                if (visibleCount === 0) noResults.style.display = 'block';
-                else noResults.style.display = 'none';
-            });
-
-            // Checkbox change & badge update
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', updateBadges);
-            });
-
-            function updateBadges() {
-                badgeContainer.innerHTML = '';
-                const selectedIds = [];
-                let count = 0;
-
-                checkboxes.forEach(cb => {
-                    if (cb.checked) {
-                        selectedIds.push(cb.value);
-                        const label = cb.nextElementSibling.innerText;
-
-                        const badge = document.createElement('span');
-                        badge.className = 'selected-badge';
-                        badge.innerHTML = `${label} <i class="bi bi-x" onclick="uncheck('${type}', '${cb.value}')"></i>`;
-                        badgeContainer.appendChild(badge);
-                        count++;
-                    }
-                });
-
-                hiddenInput.value = selectedIds.join(',');
-
-                if (count > 0) {
-                    placeholder.innerText = count + ' ' + type + ' terpilih';
-                    placeholder.classList.add('text-primary', 'fw-bold');
-                } else {
-                    placeholder.innerText = type === 'kategori' ? 'Pilih minimal 1 kategori' : 'Pilih tags (opsional)';
-                    placeholder.classList.remove('text-primary', 'fw-bold');
-                }
-            }
-
-            // Run once on load
-            updateBadges();
-        }
-
-        // Global function to uncheck from badge x
-        window.uncheck = function(type, id) {
-            const cb = document.getElementById((type === 'kategori' ? 'kat-' : 'tag-') + id);
-            if (cb) {
-                cb.checked = false;
-                // Trigger change event manual
-                const event = new Event('change');
-                cb.dispatchEvent(event);
-            }
-        };
-
-        // Image Preview Logic
-        const coverInput = document.getElementById('cover-image');
-        coverInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('cover-preview').innerHTML = `
-                    <div class="mt-3">
-                        <img src="${e.target.result}" class="preview-img">
-                    </div>
-                `;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        const additionalInput = document.getElementById('additional-images');
-        additionalInput.addEventListener('change', function(e) {
-            const container = document.getElementById('additional-preview-new');
-            container.innerHTML = '';
-            Array.from(e.target.files).forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    const col = document.createElement('div');
-                    col.className = 'col-md-3 mb-3';
-                    col.innerHTML = `
-                    <div class="card h-100 border shadow-sm">
-                        <img src="${ev.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;">
-                        <div class="card-body p-2">
-                             <input type="text" name="caption_new[]" class="form-control form-control-sm" placeholder="Caption...">
-                        </div>
-                    </div>
-                `;
-                    container.appendChild(col);
-                }
-                reader.readAsDataURL(file);
-            });
-        });
+    // Event Listener untuk update badge saat checkbox berubah (diklik manual atau via Enter)
+    document.querySelectorAll('.kategori-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => updateBadges('selected-kategori-badges', 'kategori-checkbox', 'kategori-hidden'));
     });
+
+    document.querySelectorAll('.tags-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => updateBadges('selected-tags-badges', 'tags-checkbox', 'tags-hidden'));
+    });
+
+    // Jalankan sekali saat load untuk menampilkan data old()
+    updateBadges('selected-kategori-badges', 'kategori-checkbox', 'kategori-hidden');
+    updateBadges('selected-tags-badges', 'tags-checkbox', 'tags-hidden');
+
+});
+
+// Fungsi global untuk menghapus badge (uncheck checkbox)
+window.uncheckItem = function(checkboxId) {
+    const cb = document.getElementById(checkboxId);
+    if (cb) {
+        cb.click(); // Klik lagi untuk uncheck dan trigger event change
+    }
+};
 </script>
 <?= $this->endSection() ?>
