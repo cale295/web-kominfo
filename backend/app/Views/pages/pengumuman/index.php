@@ -948,7 +948,7 @@
                             <div class="card mb-3">
                                 <div class="card-header">Gambar Cover <span class="text-danger">*</span></div>
                                 <div class="card-body text-center">
-                                    <div class="image-preview-container mb-3" onclick="document.querySelector('input[name=\"featured_image\"]').click()">
+                                    <div class="image-preview-container mb-3" onclick="document.querySelector('input[name=\'featured_image\']').click()">
                                         <img id="thumb-preview" src="#" alt="Preview" class="d-none">
                                         <div id="thumb-placeholder" class="image-preview-placeholder">
                                             <i class="fas fa-image"></i><br>

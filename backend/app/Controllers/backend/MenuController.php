@@ -126,46 +126,49 @@ class MenuController extends BaseController
             return redirect()->to('/menu')->with('error', 'Kamu tidak punya izin menambah menu.');
         }
 
-        $namaMenu = $this->request->getPost('menu_name');
-        $parentId = $this->request->getPost('parent_id') ?: 0;
-        $menuUrl  = $this->request->getPost('menu_url'); // Default input user
+        // Di dalam method create()
+$namaMenu = $this->request->getPost('menu_name');
+$parentId = $this->request->getPost('parent_id') ?: 0;
+$menuUrl  = $this->request->getPost('menu_url');
+$autoRoute = $this->request->getPost('auto_route'); // Toggle baru
 
-        // --- LOGIKA OTOMATIS KATEGORI DOKUMEN ---
-        // 1. Cari ID menu 'Informasi Publik' (sesuaikan string namanya dengan di DB kamu)
-        $parentInfoPublik = $this->menuModel->where('menu_name', 'Informasi Publik')->first();
+// --- LOGIKA OTOMATIS KATEGORI DOKUMEN ---
+$parentInfoPublik = $this->menuModel->where('menu_name', 'Informasi Publik')->first();
 
-        // 2. Cek apakah parent yang dipilih adalah 'Informasi Publik'
-        if ($parentInfoPublik && $parentId == $parentInfoPublik['id_menu']) {
+if ($parentInfoPublik && $parentId == $parentInfoPublik['id_menu']) {
+    $slug = url_title($namaMenu, '-', true);
 
-            // Buat slug bersih (contoh: Laporan Keuangan -> laporan-keuangan)
-            $slug = url_title($namaMenu, '-', true);
+    // Cek apakah kategori sudah ada (mencegah duplikat)
+    $existingCat = $this->kategoriModel->where('slug_kategori', $slug)->first();
 
-            // Cek apakah kategori sudah ada (mencegah duplikat)
-            $existingCat = $this->kategoriModel->where('slug_kategori', $slug)->first();
+    if (!$existingCat) {
+        // Insert ke tabel m_document_categories
+        $this->kategoriModel->save([
+            'nama_kategori' => $namaMenu,
+            'slug_kategori' => $slug
+        ]);
+    }
 
-            if (!$existingCat) {
-                // Insert ke tabel m_document_categories
-                $this->kategoriModel->save([
-                    'nama_kategori' => $namaMenu,
-                    'slug_kategori' => $slug
-                ]);
-            }
+    // 3. Hanya override URL jika auto_route aktif
+    if ($autoRoute == '1') {
+        $menuUrl = '/informasi-publik/' . $slug;
+        $adminUrl = '/informasi-publik/' . $slug;
+    } else {
+        // Gunakan URL yang diinput user
+        $adminUrl = $this->request->getPost('admin_url');
+    }
+}
 
-            // 3. Override/Paksa URL menjadi format dinamis agar connect ke DocumentController
-            $menuUrl = '/informasi-publik/' . $slug;
-        }
-        // ----------------------------------------
-
-        $data = [
-            'menu_name'     => $namaMenu,
-            'menu_url'      => $menuUrl, // Gunakan URL yang sudah diproses
-            'admin_url'     => $menuUrl,
-            'menu_icon'     => $this->request->getPost('menu_icon'),
-            'parent_id'     => $parentId,
-            'order_number'  => $this->request->getPost('order_number') ?: 0,
-            'status'        => $this->request->getPost('status') ?: 'active',
-            'allowed_roles' => $this->request->getPost('allowed_roles'),
-        ];
+$data = [
+    'menu_name'     => $namaMenu,
+    'menu_url'      => $menuUrl,
+    'admin_url'     => $adminUrl ?? $this->request->getPost('admin_url'), // Tambahkan ini
+    'menu_icon'     => $this->request->getPost('menu_icon'),
+    'parent_id'     => $parentId,
+    'order_number'  => $this->request->getPost('order_number') ?: 0,
+    'status'        => $this->request->getPost('status') ?: 'active',
+    'allowed_roles' => $this->request->getPost('allowed_roles'),
+];
 
         if (!$this->menuModel->insert($data)) {
             if ($this->request->isAJAX()) {

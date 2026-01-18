@@ -71,7 +71,6 @@ body {
     padding: 2rem;
 }
 
-
 /* ===============================
    STAT CARDS (Modern Grid)
 ================================ */
@@ -333,7 +332,6 @@ body {
     font-size: 0.875rem;
 }
 
-
 /* ===============================
    RESPONSIVE
 ================================ */
@@ -371,109 +369,144 @@ body {
 </style>
 <?= $this->endSection() ?>
 
-
 <?= $this->section('content') ?>
-<div class="dashboard-wrapper">
+<?= $this->include('layouts/alerts') ?>
 
-    <!-- STATISTICS GRID -->
-    <div class="stats-grid">
-
-        <div class="stat-card">
-            <div class="card-header-section">
-                <div class="card-icon-wrapper">
-                    <i class="bi bi-newspaper"></i>
-                </div>
-            </div>
-            <div class="card-title">Total Berita</div>
-            <div class="card-value"><?= $total_berita ?? 0 ?></div>
-            <div class="card-footer">
-                <span><strong><?= $publish_berita ?? 0 ?></strong> Terbit</span>
-                <span><strong><?= $draft_berita ?? 0 ?></strong> Draft</span>
-            </div>
+<div class="container-fluid px-4 pb-5">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between my-4 py-2">
+        <div class="mb-3 mb-md-0">
+            <h1 class="h3 fw-bolder mb-1" style="background: linear-gradient(45deg, #4e73df, #224abe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Dashboard Administrator
+            </h1>
+            <p class="text-muted small mb-0">
+                <i class="fas fa-tachometer-alt me-1 text-primary"></i> 
+                Ringkasan statistik dan aktivitas sistem.
+            </p>
         </div>
-
-        <div class="stat-card">
-            <div class="card-header-section">
-                <div class="card-icon-wrapper">
-                    <i class="bi bi-calendar-check"></i>
-                </div>
-            </div>
-            <div class="card-title">Agenda</div>
-            <div class="card-value"><?= $agenda_total ?? 0 ?></div>
-            <div class="card-footer">
-                <span><strong><?= $agenda_upcoming ?? 0 ?></strong> Akan Datang</span>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="card-header-section">
-                <div class="card-icon-wrapper">
-                    <i class="bi bi-images"></i>
-                </div>
-            </div>
-            <div class="card-title">Galeri Foto</div>
-            <div class="card-value"><?= $gallery_total ?? 0 ?></div>
-            <div class="card-footer">
-                <span>Album Tersimpan</span>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="card-header-section">
-                <div class="card-icon-wrapper">
-                    <i class="bi bi-file-earmark-text"></i>
-                </div>
-            </div>
-            <div class="card-title">Dokumen</div>
-            <div class="card-value"><?= $document_total ?? 0 ?></div>
-            <div class="card-footer">
-                <span><strong><?= $document_new ?? 0 ?></strong> Bulan Ini</span>
-            </div>
-        </div>
-
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-white px-3 py-2 rounded-pill shadow-sm mb-0 border">
+                <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none fw-bold text-primary small"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item active small" aria-current="page">Dashboard</li>
+            </ol>
+        </nav>
     </div>
 
-    <!-- RECENT ACTIVITY -->
-    <div class="table-card">
-        <div class="table-card-header">
-            <h3>
-                <i class="bi bi-clock-history"></i>
-                Aktivitas Terakhir
-            </h3>
+    <?php if (session()->getFlashdata('success')) : ?>
+        <div class="alert alert-success border-0 shadow-sm border-start border-4 border-success rounded-3 fade show mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center justify-content-center bg-white text-success me-3 shadow-sm rounded-circle" style="width: 32px; height: 32px;">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="fw-medium">
+                    <?= session()->getFlashdata('success') ?>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="dashboard-wrapper">
+        <!-- STATISTICS GRID -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="card-header-section">
+                    <div class="card-icon-wrapper">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                </div>
+                <div class="card-title">Total Berita</div>
+                <div class="card-value"><?= $total_berita ?? 0 ?></div>
+                <div class="card-footer">
+                    <span><strong><?= $publish_berita ?? 0 ?></strong> Terbit</span>
+                    <span><strong><?= $draft_berita ?? 0 ?></strong> Draft</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="card-header-section">
+                    <div class="card-icon-wrapper">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+                <div class="card-title">Agenda</div>
+                <div class="card-value"><?= $agenda_total ?? 0 ?></div>
+                <div class="card-footer">
+                    <span><strong><?= $agenda_upcoming ?? 0 ?></strong> Akan Datang</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="card-header-section">
+                    <div class="card-icon-wrapper">
+                        <i class="fas fa-images"></i>
+                    </div>
+                </div>
+                <div class="card-title">Galeri Foto</div>
+                <div class="card-value"><?= $gallery_total ?? 0 ?></div>
+                <div class="card-footer">
+                    <span>Album Tersimpan</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="card-header-section">
+                    <div class="card-icon-wrapper">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                </div>
+                <div class="card-title">Dokumen</div>
+                <div class="card-value"><?= $document_total ?? 0 ?></div>
+                <div class="card-footer">
+                    <span><strong><?= $document_new ?? 0 ?></strong> Bulan Ini</span>
+                </div>
+            </div>
+
         </div>
 
-        <ul class="activity-list">
-            <?php if (!empty($last_logs)): ?>
-                <?php foreach ($last_logs as $log): ?>
-                    <li class="activity-item">
-                        <div class="activity-icon-box">
-                            <i class="bi bi-activity"></i>
-                        </div>
-                        <div class="activity-details">
-                            <h5><?= esc($log['keterangan']) ?></h5>
-                            <div class="activity-meta">
-                                <span>
-                                    <i class="bi bi-clock"></i>
-                                    <?= date('d M Y, H:i', strtotime($log['created_date'])) ?>
-                                </span>
-                                <span class="activity-badge">
-                                    <i class="bi bi-person"></i>
-                                    <?= esc($log['username'] ?? 'System') ?>
-                                </span>
+        <!-- RECENT ACTIVITY -->
+        <div class="table-card">
+            <div class="table-card-header">
+                <h3>
+                    <i class="fas fa-history"></i>
+                    Aktivitas Terakhir
+                </h3>
+            </div>
+
+            <ul class="activity-list">
+                <?php if (!empty($last_logs)): ?>
+                    <?php foreach ($last_logs as $log): ?>
+                        <li class="activity-item">
+                            <div class="activity-icon-box">
+                                <i class="fas fa-history"></i>
                             </div>
+                            <div class="activity-details">
+                                <h5><?= esc($log['keterangan']) ?></h5>
+                                <div class="activity-meta">
+                                    <span>
+                                        <i class="fas fa-clock"></i>
+                                        <?= date('d M Y, H:i', strtotime($log['created_date'])) ?>
+                                    </span>
+                                    <span class="activity-badge">
+                                        <i class="fas fa-user"></i>
+                                        <?= esc($log['username'] ?? 'System') ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach ?>
+                <?php else: ?>
+                    <li class="activity-item">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h5>Belum Ada Aktivitas</h5>
+                            <p>Aktivitas sistem akan muncul di sini</p>
                         </div>
                     </li>
-                <?php endforeach ?>
-            <?php else: ?>
-                <li class="activity-item">
-                    <div class="empty-state">
-                        <i class="bi bi-inbox"></i>
-                        <h5>Belum Ada Aktivitas</h5>
-                        <p>Aktivitas sistem akan muncul di sini</p>
-                    </div>
-                </li>
-            <?php endif ?>
-        </ul>
+                <?php endif ?>
+            </ul>
+        </div>
     </div>
 </div>
+
 <?= $this->endSection() ?>

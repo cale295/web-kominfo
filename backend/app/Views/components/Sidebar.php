@@ -131,7 +131,7 @@ $menuItems = [
         'submenu' => [
             ['title' => 'Berita', 'url' => '/berita', 'roles' => ['superadmin', 'admin', 'editor'], 'module' => 'berita'],
             ['title' => 'Berita Utama', 'url' => '/berita-utama', 'roles' => ['superadmin', 'admin', 'editor'], 'module' => 'berita_utama'],
-            ['title' => 'Kategori', 'url' => '/kategori', 'roles' => ['superadmin', 'admin'], 'module' => 'kategori'],
+            ['title' => 'Kategori', 'url' => '/kategori', 'roles' => ['superadmin', 'admin'], 'module' => 'berita_kategori'],
             ['title' => 'Tag', 'url' => '/berita_tag', 'roles' => ['superadmin', 'admin'], 'module' => 'berita_tag'],
         ]
     ],
@@ -179,9 +179,7 @@ $menuItems = [
         'bg'     => 'rgba(253, 126, 20, 0.1)',
         'submenu' => [
             ['title' => 'Info Kontak', 'url' => '/kontak', 'roles' => ['superadmin', 'admin'], 'module' => 'kontak'],
-            ['title' => 'Sosial Media', 'url' => '/kontak_social', 'roles' => ['superadmin', 'admin'], 'module' => 'kontak_social'],
             ['title' => 'Pengaturan Footer', 'url' => '/footer_opd', 'roles' => ['superadmin', 'admin'], 'module' => 'footer_opd'],
-            ['title' => 'Footer Statistik', 'url' => '/footer_statistics', 'roles' => ['superadmin', 'admin'], 'module' => 'footer_statistics'],
         ]
     ],
     ['type' => 'header', 'title' => 'SYSTEM SETTINGS'],
