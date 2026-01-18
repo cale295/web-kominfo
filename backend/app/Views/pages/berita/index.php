@@ -401,13 +401,40 @@
                     <?php else: ?>
                         <?php foreach ($berita as $i => $row): ?>
                             <?php 
+                                // === LOGIKA PERMISSION KHUSUS EDITOR ===
+                                // Ambil role dan ID user dari session
+                                $currentRole = session()->get('role'); // Asumsi key session adalah 'role'
+                                $currentUserId = session()->get('id'); // Asumsi key session adalah 'id'
+                                
+                                // Default permission dari controller
+                                $allowEdit = !empty($can_update);
+                                $allowDelete = !empty($can_delete) && ($row['status'] != '1');
+
+                                // Jika role adalah Editor, terapkan pembatasan ketat
+                                if ($currentRole == 'editor') {
+                                    // 1. CEK KEPEMILIKAN
+                                    // Pastikan 'author_id' sesuai dengan nama kolom di database Anda (misal: created_by, id_user, dll)
+                                    // Jika Editor BUKAN pemilik, matikan akses edit & delete
+                                    if (isset($row['author_id']) && $row['author_id'] != $currentUserId) {
+                                        $allowEdit = false;
+                                        $allowDelete = false;
+                                    }
+
+                                    // 2. CEK STATUS BERITA
+                                    // Editor hanya bisa edit jika status Draft (0) atau Revisi (6)
+                                    // Jika status Verifikasi (2) atau Layak Tayang (4), edit akan hilang
+                                    if (!in_array($row['status_berita'], ['0', '6'])) {
+                                        $allowEdit = false;
+                                        $allowDelete = false;
+                                    }
+                                }
+
                                 $isTayang = ($row['status'] == '1');
                                 $isLayakTayang = ($row['status_berita'] == '4');
                             ?>
                             <tr class="data-row">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
-                                <!-- Cover Image -->
                                 <td class="text-center">
                                     <?php if (!empty($row['feat_image'])): ?>
                                         <img src="<?= base_url($row['feat_image']) ?>" alt="Cover" class="img-thumbnail">
@@ -416,7 +443,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Additional Images -->
                                 <td class="text-center">
                                     <?php
                                     $additional = !empty($row['additional_images']) ? json_decode($row['additional_images'], true) : [];
@@ -442,7 +468,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Title -->
                                 <td style="min-width: 180px;">
                                     <strong class="searchable"><?= esc($row['judul']) ?></strong>
                                     <?php if (!empty($row['hit'])): ?>
@@ -452,17 +477,14 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Topic -->
                                 <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
 
-                                <!-- Content Preview -->
                                 <td>
                                     <div class="content-preview" title="<?= strip_tags($row['content']) ?>">
                                         <?= strip_tags(mb_substr($row['content'], 0, 100)) ?>...
                                     </div>
                                 </td>
 
-                                <!-- Categories -->
                                 <td style="min-width: 120px;">
                                     <?php if (!empty($row['kategori'])): ?>
                                         <?php 
@@ -482,8 +504,7 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- Publish Status -->
-                                <td class="text-center">
+                                <td class="text-center status-badge-cell">
                                     <?php if ($row['status'] == '1'): ?>
                                         <span class="badge bg-success">Tayang</span>
                                     <?php elseif ($row['status'] == '5'): ?>
@@ -493,7 +514,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <!-- News Status -->
                                 <td class="text-center">
                                     <?php
                                     $statusBerita = [
@@ -508,23 +528,29 @@
                                     <span class="badge <?= $class ?>"><?= $text ?></span>
                                 </td>
 
-                                <!-- Created Date -->
                                 <td class="text-center compact-date">
                                     <?= !empty($row['created_at']) ? date('d/m/y', strtotime($row['created_at'])) : '-' ?>
                                 </td>
                                 
-                                <!-- Status Toggle -->
                                 <td class="text-center">
+                                    <?php 
+                                    // Tombol toggle status tayang biasanya hanya untuk Admin/Superadmin
+                                    // Jika Editor, tombol ini didisabled
+                                    $disableToggle = !$isLayakTayang;
+                                    if ($currentRole == 'editor') {
+                                        $disableToggle = true; // Editor tidak bisa toggle status tayang
+                                    }
+                                    ?>
                                     <button type="button" class="status-btn" 
                                             data-id="<?= $row['id_berita'] ?>" 
                                             data-url="<?= site_url('berita/toggle-status') ?>"
-                                            <?= !$isLayakTayang ? 'disabled title="Status belum Layak Tayang"' : '' ?>>
+                                            <?= $disableToggle ? 'disabled' : '' ?>
+                                            title="<?= $currentRole == 'editor' ? 'Editor tidak memiliki akses publish' : (!$isLayakTayang ? 'Status belum Layak Tayang' : '') ?>">
                                         <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
                                         <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
                                     </button>
                                 </td>
                                 
-                                <!-- Actions -->
                                 <td class="text-center" style="min-width: 110px;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
@@ -533,14 +559,20 @@
                                             </a>
                                         <?php endif; ?>
                                         
-                                        <?php if (!empty($can_update)): ?>
+                                        <?php 
+                                        // Gunakan variabel $allowEdit yang sudah difilter di atas
+                                        if ($allowEdit): 
+                                        ?>
                                             <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning btn-sm py-1" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                         <?php endif; ?>
 
-                                        <?php if (!empty($can_delete) && !$isTayang): ?>
-                                            <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post" class="d-inline">
+                                        <?php 
+                                        // Gunakan variabel $allowDelete yang sudah difilter di atas
+                                        if ($allowDelete): 
+                                        ?>
+                                            <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post" class="d-inline delete-form">
                                                 <?= csrf_field() ?>
                                                 <button type="submit" class="btn btn-danger btn-sm py-1 w-100" 
                                                         onclick="return confirm('Yakin membuang berita ini ke sampah?')"
@@ -562,7 +594,6 @@
             </table>
         </div>
         
-        <!-- Pagination Controls -->
         <div class="pagination-container">
             <div class="pagination-info">
                 Menampilkan <span id="showingStart">0</span> - <span id="showingEnd">0</span> dari <span id="totalData">0</span> data
@@ -593,15 +624,31 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    
     // ==========================================
-    // 1. BAGIAN PAGINATION & SEARCH (KODE ASLI)
+    // 1. GLOBAL VARIABLES & CSRF HANDLING
+    // ==========================================
+    // Simpan token saat ini di variable global agar bisa diupdate via AJAX
+    let currentCsrfName = '<?= csrf_token() ?>';
+    let currentCsrfHash = '<?= csrf_hash() ?>';
+
+    // Fungsi helper untuk update token di semua form input yang ada di halaman
+    // Ini penting agar tombol delete (form submit biasa) tetap bekerja setelah toggle diklik
+    function updateAllCsrfInputs(newHash) {
+        currentCsrfHash = newHash;
+        document.querySelectorAll('input[name="' + currentCsrfName + '"]').forEach(el => {
+            el.value = newHash;
+        });
+    }
+
+    // ==========================================
+    // 2. BAGIAN PAGINATION & SEARCH
     // ==========================================
     
     // Elements
     const searchInput = document.getElementById('searchInput');
     const limitSelect = document.getElementById('limitSelect');
     const tableBody = document.getElementById('tableBody');
-    // Menggunakan Array.from agar aman jika element null
     const rows = tableBody ? Array.from(tableBody.querySelectorAll('tr.data-row')) : [];
     
     // Pagination elements
@@ -624,12 +671,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalFilteredRows = 0;
     let totalPages = 1;
     
-    // Hanya jalankan init jika tabel ada datanya
     if(rows.length > 0) {
         initTable();
     }
 
-    // Event Listeners untuk Search & Limit
+    // Search Logic
     if(searchInput) {
         searchInput.addEventListener('input', function() {
             currentSearch = this.value.toLowerCase();
@@ -639,6 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Limit Logic
     if(limitSelect) {
         limitSelect.addEventListener('change', function() {
             currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
@@ -648,10 +695,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Helper function untuk event listener tombol pagination
-    function addClick(elem, fn) {
-        if(elem) elem.addEventListener('click', fn);
-    }
+    // Pagination Button Clicks
+    function addClick(elem, fn) { if(elem) elem.addEventListener('click', fn); }
 
     addClick(firstPageBtn, () => changePage(1));
     addClick(prevPageBtn, () => changePage(currentPage - 1));
@@ -660,8 +705,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if(currentPageInput) {
         currentPageInput.addEventListener('change', function() {
-            let page = parseInt(this.value);
-            changePage(page);
+            changePage(parseInt(this.value));
         });
     }
 
@@ -673,7 +717,6 @@ document.addEventListener('DOMContentLoaded', function() {
         filterAndPaginate();
     }
     
-    // Functions Logika Pagination
     function initTable() {
         limitSelect.value = '10';
         currentLimit = 10;
@@ -687,6 +730,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterAndPaginate() {
         const filteredRows = rows.filter(row => {
             if (currentSearch === '') return true;
+            // Cari hanya di elemen yang punya class 'searchable' atau text content umum
             const textContent = row.textContent.toLowerCase();
             return textContent.includes(currentSearch);
         });
@@ -721,7 +765,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         displayRows.forEach((row, index) => {
             row.style.display = '';
-            // Update nomor urut agar dinamis sesuai filter
+            // Update nomor urut
             const rowNum = (currentLimit === -1) ? (index + 1) : ((currentPage - 1) * currentLimit + index + 1);
             const rowNumberCell = row.querySelector('.row-number');
             if (rowNumberCell) rowNumberCell.textContent = rowNum;
@@ -734,8 +778,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updatePaginationInfo() {
-        if(!showingStartSpan) return; // Guard clause
-
+        if(!showingStartSpan) return;
         if (totalFilteredRows === 0) {
             showingStartSpan.textContent = '0';
             showingEndSpan.textContent = '0';
@@ -767,104 +810,94 @@ document.addEventListener('DOMContentLoaded', function() {
         lastPageBtn.disabled = currentPage >= totalPages;
     }
 
-
     // ==========================================
-    // 2. BAGIAN TOGGLE STATUS (FIX - FETCH API)
+    // 3. LOGIC TOGGLE STATUS (AJAX FIXED)
     // ==========================================
     
-    // Menggunakan Event Delegation pada document body
     document.body.addEventListener('click', function(e) {
-        // Cari tombol terdekat dari elemen yang diklik
+        // Cari tombol terdekat (karena mungkin user klik di bagian span/div dalam tombol)
         const btn = e.target.closest('.status-btn');
         
-        // Jika yang diklik bukan tombol status atau tombol sedang disabled, stop.
         if (!btn || btn.disabled) return;
-
-        // Cegah aksi default
-        e.preventDefault();
+        e.preventDefault(); // Mencegah form submit default jika ada
 
         const id = btn.getAttribute('data-id');
         const url = btn.getAttribute('data-url');
         const switchEl = btn.querySelector('.switch');
         const labelEl = btn.querySelector('.switch-label');
-        
-        // Ambil CSRF Token
-        const csrfName = '<?= csrf_token() ?>';
-        // Cari input CSRF yang ada di halaman (biasanya dari form delete yang sudah ada)
-        const csrfInput = document.querySelector('input[name="' + csrfName + '"]');
-        const csrfHash = csrfInput ? csrfInput.value : '';
+        const row = btn.closest('tr');
+        const badgeCell = row.querySelector('.status-badge-cell'); // Kolom Badge Status Tayang
 
-        if(!csrfHash) {
-            alert("Error: CSRF Token tidak ditemukan. Refresh halaman.");
+        // Validasi URL dan ID
+        if (!url || !id) {
+            console.error('URL atau ID tidak ditemukan pada tombol');
             return;
         }
 
-        // UI Feedback: Loading state
+        // Feedback UI: Loading...
+        const originalOpacity = btn.style.opacity;
         btn.disabled = true;
         btn.style.opacity = '0.5';
         btn.style.cursor = 'wait';
 
-        // Siapkan Data
+        // Persiapan Data
         const formData = new FormData();
         formData.append('id', id);
-        formData.append(csrfName, csrfHash);
+        formData.append(currentCsrfName, currentCsrfHash); // Gunakan token global terbaru
 
-        // Kirim Request dengan Fetch
         fetch(url, {
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest' // Header penting untuk CI4 detect AJAX
+                'X-Requested-With': 'XMLHttpRequest' // Header wajib untuk CI4 deteksi AJAX
             }
         })
         .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
+            // Cek apakah response OK (status 200-299)
+            if (!response.ok) {
+                throw new Error('Terjadi kesalahan jaringan atau server (Status: ' + response.status + ')');
+            }
             return response.json();
         })
         .then(res => {
-            // Kembalikan UI state
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.style.cursor = 'pointer';
+            // 1. UPDATE CSRF TOKEN (SANGAT PENTING)
+            const newToken = res.token || res.csrf_token || res.csrfHash; 
+            
+            if (newToken) {
+                updateAllCsrfInputs(newToken);
+            } else {
+                console.warn('Peringatan: Server tidak mengembalikan CSRF Token baru.');
+            }
 
-            if (res.status === 'success') {
-                // Update Tampilan Toggle secara langsung
-                if (res.newStatus == 1) {
+            // 2. CEK STATUS SUKSES DARI SERVER
+            if (res.status === 'success' || res.success === true) {
+                const newStatus = res.new_status || res.data?.status; // Sesuaikan dengan response controller
+                
+                // Update UI Toggle
+                if (newStatus == '1') {
                     switchEl.classList.add('active');
                     labelEl.textContent = 'Aktif';
+                    if(badgeCell) badgeCell.innerHTML = '<span class="badge bg-success">Tayang</span>';
                 } else {
                     switchEl.classList.remove('active');
                     labelEl.textContent = 'Non-Aktif';
+                    if(badgeCell) badgeCell.innerHTML = '<span class="badge bg-secondary">Tidak Tayang</span>';
                 }
-
-                // Update CSRF Token untuk request selanjutnya (PENTING di CI4)
-                if (res.token) {
-                    document.querySelectorAll('input[name="' + csrfName + '"]').forEach(el => {
-                        el.value = res.token;
-                    });
-                }
-                
-                // Opsional: Reload halaman jika ingin me-refresh tabel sepenuhnya
-                location.reload(); 
             } else {
-                alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
-                // Update token jika ada error
-                if (res.token) {
-                    document.querySelectorAll('input[name="' + csrfName + '"]').forEach(el => {
-                        el.value = res.token;
-                    });
-                }
+                alert('Gagal mengubah status: ' + (res.message || 'Unknown error'));
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('Terjadi kesalahan saat menghubungi server.');
+        })
+        .finally(() => {
+            // Restore Button State
             btn.disabled = false;
-            btn.style.opacity = '1';
+            btn.style.opacity = originalOpacity;
             btn.style.cursor = 'pointer';
-            alert('Terjadi kesalahan koneksi ke server.');
         });
     });
 });
 </script>
-
 <?= $this->endSection() ?>

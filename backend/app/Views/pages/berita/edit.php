@@ -461,7 +461,7 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Status Tayang</label>
-                    <select name="status" class="form-select">
+                    <select name="status" id="status-publish" class="form-select">
                         <option value="1" <?= old('status', $berita['status']) == '1' ? 'selected' : '' ?>>🟢 Tayang</option>
                         <option value="5" <?= old('status', $berita['status']) == '5' ? 'selected' : '' ?>>🔴 Tidak Tayang</option>
                     </select>
@@ -469,13 +469,14 @@
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Status Berita</label>
-                    <select name="status_berita" class="form-select">
+                    <select name="status_berita" class="form-select bg-light">
                         <option value="0" <?= old('status_berita', $berita['status_berita']) == '0' ? 'selected' : '' ?>>📝 Draft</option>
                         <option value="2" <?= old('status_berita', $berita['status_berita']) == '2' ? 'selected' : '' ?>>⏳ Menunggu Verifikasi</option>
                         <option value="3" <?= old('status_berita', $berita['status_berita']) == '3' ? 'selected' : '' ?>>❌ Ditolak</option>
                         <option value="4" <?= old('status_berita', $berita['status_berita']) == '4' ? 'selected' : '' ?>>✅ Layak Tayang</option>
                         <option value="6" <?= old('status_berita', $berita['status_berita']) == '6' ? 'selected' : '' ?>>🔄 Revisi</option>
                     </select>
+                    <small class="text-muted">Gunakan tombol "Ajukan Verifikasi" di bawah untuk mengubah status otomatis.</small>
                 </div>
             </div>
 
@@ -492,8 +493,18 @@
 
         <div class="action-buttons d-flex justify-content-end gap-2">
             <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
-            <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white"><i class="bi bi-file-earmark-text"></i> Simpan Draft</button>
-            <button type="submit" name="submit_type" value="publish" class="btn btn-primary"><i class="bi bi-send"></i> Publikasikan</button>
+            
+            <button type="submit" name="submit_type" value="draft" class="btn btn-light border fw-semibold">
+                <i class="bi bi-file-earmark-text"></i> Simpan Draft
+            </button>
+            
+            <button type="submit" name="submit_type" value="pending" class="btn btn-warning text-white fw-semibold">
+                <i class="bi bi-hourglass-split"></i> Ajukan Verifikasi
+            </button>
+            
+            <button type="submit" name="submit_type" value="publish" class="btn btn-primary fw-semibold">
+                <i class="bi bi-send"></i> Publikasikan
+            </button>
         </div>
     </form>
 </div>
@@ -505,7 +516,28 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. TOGGLE CONTENT 2 LOGIC
+    // 0. LOGIK STATUS TAYANG OTOMATIS (PERMINTAAN ANDA)
+    // ============================================================
+    // Jika tombol Draft atau Verifikasi diklik, paksa status tayang jadi '5' (Tidak Tayang)
+    const btnDraft = document.querySelector('button[value="draft"]');
+    const btnVerif = document.querySelector('button[value="pending"]');
+    const statusSelect = document.getElementById('status-publish');
+
+    function forceStatusOff() {
+        if(statusSelect) {
+            statusSelect.value = '5'; // Set dropdown ke value 5 (Tidak Tayang)
+        }
+    }
+
+    if(btnDraft) {
+        btnDraft.addEventListener('click', forceStatusOff);
+    }
+    if(btnVerif) {
+        btnVerif.addEventListener('click', forceStatusOff);
+    }
+
+    // ============================================================
+    // 1. TOGGLE CONTENT 2 LOGIC
     // ============================================================
     const toggleContent2 = document.getElementById('toggle-content2');
     const wrapperContent2 = document.getElementById('wrapper-content2');
@@ -521,12 +553,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    toggleContent2.addEventListener('change', handleToggleContent2);
-    // Initial Run (in case DB has value)
-    handleToggleContent2();
+    if(toggleContent2) {
+        toggleContent2.addEventListener('change', handleToggleContent2);
+        // Initial Run (in case DB has value)
+        handleToggleContent2();
+    }
 
     // ============================================================
-    // 1. CONFIG QUILL EDITOR
+    // 2. CONFIG QUILL EDITOR
     // ============================================================
     const formBerita = document.getElementById('form-berita');
     const contentHidden = document.getElementById('content-hidden');
@@ -551,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 2. DELETE OLD IMAGE (DATABASE)
+    // 3. DELETE OLD IMAGE (DATABASE)
     // ============================================================
     document.querySelectorAll('.delete-old-image').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -568,223 +602,232 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================================
-    // 3. PREVIEW & DELETE NEW IMAGES (DATATRANSFER)
+    // 4. PREVIEW & DELETE NEW IMAGES (DATATRANSFER) - COMPLETED
     // ============================================================
     const additionalInput = document.getElementById('additional-images');
     const additionalPreviewNew = document.getElementById('additional-preview-new');
     let dt = new DataTransfer();
 
-    additionalInput.addEventListener('change', function(e) {
-        dt = new DataTransfer();
-        for (let i = 0; i < this.files.length; i++) {
-            dt.items.add(this.files[i]);
-        }
-        renderNewPreviews();
-    });
+    if(additionalInput) {
+        additionalInput.addEventListener('change', function(){
+            for(let i = 0; i < this.files.length; i++){
+                let file = this.files[i];
+                dt.items.add(file);
+            }
+            // Update input files dengan DataTransfer terbaru
+            this.files = dt.files;
+            
+            // Render Preview
+            renderPreview();
+        });
+    }
 
-    function renderNewPreviews() {
-        additionalPreviewNew.innerHTML = '';
+    function renderPreview(){
+        if(!additionalPreviewNew) return;
+        additionalPreviewNew.innerHTML = ''; // Reset container preview
 
-        Array.from(dt.files).forEach((file, index) => {
-            if (!file.type.startsWith('image/')) return;
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const col = document.createElement('div');
-                col.className = 'col-md-4 mb-3';
-
-                col.innerHTML = `
-                    <div class="card h-100 border-gray-200 shadow-sm position-relative">
-                        <button type="button" class="btn-delete-img remove-new-image" data-index="${index}" title="Hapus">✕</button>
-                        <img src="${evt.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;">
-                        <div class="card-body p-2 bg-light">
-                            <label class="form-label text-muted small mb-1">Caption:</label>
-                            <input type="text" name="caption_additional[]" class="form-control form-control-sm" placeholder="Ket. foto...">
+        for(let i = 0; i < dt.files.length; i++){
+            let file = dt.files[i];
+            
+            // Buat elemen kolom
+            let col = document.createElement('div');
+            col.className = 'col-md-3 mb-3 position-relative';
+            
+            // Buat Reader untuk preview gambar
+            let reader = new FileReader();
+            reader.onload = function(e){
+                let html = `
+                    <div class="card h-100 shadow-sm border-0">
+                        <button type="button" class="btn-delete-img" onclick="removeNewImage(${i})">✕</button>
+                        <img src="${e.target.result}" class="card-img-top" style="height: 100px; object-fit: cover; border-radius: 8px;">
+                        <div class="card-body p-2">
+                             <input type="text" name="caption_additional_new[]" class="form-control form-control-sm" placeholder="Caption...">
                         </div>
                     </div>
                 `;
+                col.innerHTML = html;
                 additionalPreviewNew.appendChild(col);
-
-                col.querySelector('.remove-new-image').addEventListener('click', function() {
-                    removeFile(index);
-                });
             }
             reader.readAsDataURL(file);
-        });
+        }
     }
 
-    function removeFile(indexToRemove) {
-        const newDt = new DataTransfer();
-        Array.from(dt.files).forEach((file, i) => {
-            if (i !== indexToRemove) {
-                newDt.items.add(file);
+    // Fungsi Global untuk menghapus gambar baru dari antrian
+    window.removeNewImage = function(index) {
+        let dtTemp = new DataTransfer();
+        for(let i = 0; i < dt.files.length; i++){
+            if(i !== index){
+                dtTemp.items.add(dt.files[i]);
             }
-        });
-        dt = newDt;
+        }
+        dt = dtTemp;
         additionalInput.files = dt.files;
-        renderNewPreviews();
-    }
+        renderPreview();
+    };
 
     // ============================================================
-    // 4. PREVIEW COVER BARU
+    // 5. FLAT PICKER (DATETIME)
     // ============================================================
-    const coverInput = document.getElementById('cover-image');
-    const newCoverPreview = document.getElementById('new-cover-preview');
-
-    coverInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                newCoverPreview.innerHTML = `
-                    <div class="position-relative d-inline-block">
-                        <img src="${evt.target.result}" class="preview-img" style="border: 2px solid var(--success);">
-                        <span class="badge bg-success position-absolute top-0 start-0 m-2">Akan Diganti</span>
-                    </div>
-                `;
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // ============================================================
-    // 5. DROPDOWN KATEGORI & TAGS
-    // ============================================================
-// ============================================================
-    // 4. DROPDOWN KATEGORI & TAGS (MODIFIED)
-    // ============================================================
-    function setupDropdown(type) {
-        const toggleBtn = document.getElementById(type + '-toggle');
-        const dropdownMenu = toggleBtn.nextElementSibling;
-        const searchInput = document.getElementById(type + '-search');
-        const items = Array.from(document.querySelectorAll('.' + type + '-item'));
-        const checkboxes = document.querySelectorAll('.' + type + '-checkbox');
-        const hiddenInput = document.getElementById(type + '-hidden');
-        const placeholder = document.getElementById(type + '-placeholder');
-        const badgeContainer = document.getElementById('selected-' + type + '-badges');
-        const noResults = document.getElementById(type + '-no-results');
-
-        // Toggle dropdown
-        toggleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const isShown = dropdownMenu.classList.contains('show');
-            dropdownMenu.classList.toggle('show', !isShown);
-            if (!isShown) setTimeout(() => searchInput.focus(), 100);
-        });
-
-        // Close when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!toggleBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
-
-        // Search filtering
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            let hasVisible = false;
-            items.forEach(item => {
-                const text = item.getAttribute('data-name');
-                if (text.includes(term)) {
-                    item.style.display = 'flex';
-                    hasVisible = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            noResults.style.display = hasVisible ? 'none' : 'block';
-        });
-
-        // ------------------------------------------------------------
-        // --- BARU: LOGIKA ENTER UNTUK SELECT OTOMATIS ---
-        // ------------------------------------------------------------
-        searchInput.addEventListener('keydown', (e) => {
-            // Cek jika tombol yang ditekan adalah ENTER (key code 13)
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Mencegah form tersubmit secara tidak sengaja
-
-                // Cari item pertama yang terlihat (visible) berdasarkan hasil search
-                const firstVisibleItem = items.find(item => item.style.display !== 'none');
-
-                if (firstVisibleItem) {
-                    const checkbox = firstVisibleItem.querySelector('input[type="checkbox"]');
-                    
-                    // Trigger klik pada checkbox tersebut
-                    // Ini otomatis akan menjalankan logika update badges di bawah
-                    if (checkbox) {
-                        // Opsional: Cek jika belum terpilih, baru klik. 
-                        // Jika ingin bisa toggle (hapus/tambah) pakai enter, hapus "if (!checkbox.checked)"
-                        if (!checkbox.checked) { 
-                             checkbox.click();
-                        }
-                        
-                        // Opsional: Kosongkan search agar bisa cari tag lain
-                        searchInput.value = '';
-                        searchInput.dispatchEvent(new Event('input')); // Reset filter list
-                    }
-                }
-            }
-        });
-        // ------------------------------------------------------------
-
-        // Update logic (Checkboxes change)
-        checkboxes.forEach(chk => {
-            chk.addEventListener('change', updateBadges);
-        });
-
-        function updateBadges() {
-            const selected = Array.from(checkboxes).filter(c => c.checked);
-            const ids = selected.map(c => c.value);
-            hiddenInput.value = ids.join(',');
-
-            badgeContainer.innerHTML = '';
-            selected.forEach(c => {
-                const label = c.nextElementSibling.innerText;
-                const badge = document.createElement('span');
-                badge.className = 'selected-badge';
-                badge.innerHTML = `${label} <i class="bi bi-x" data-id="${c.value}"></i>`;
-                badgeContainer.appendChild(badge);
-                
-                badge.querySelector('i').addEventListener('click', (e) => {
-                    const id = e.target.getAttribute('data-id');
-                    const targetChk = document.getElementById(type + '-' + id); // pastikan ID checkbox sesuai format html (kat-ID atau tag-ID)
-                    if(targetChk) {
-                        targetChk.checked = false;
-                        updateBadges(); // Panggil fungsi ini lagi secara rekursif
-                    }
-                });
-            });
-
-            // Update Text Toggle Button
-            if (selected.length > 0) {
-                toggleBtn.classList.add('text-primary');
-                // Optional: Tampilkan jumlah
-                // placeholder.innerText = selected.length + ' dipilih';
-            } else {
-                toggleBtn.classList.remove('text-primary');
-                // Reset placeholder text based on type if needed
-            }
-        }
-
-        // Init badges on load (untuk data old input)
-        updateBadges();
-    }
-
-    // Panggil fungsi setup
-    setupDropdown('kategori');
-    setupDropdown('tags');
-
-    // --- INIT FLATPICKR (TANGGAL & WAKTU) ---
-    // minDate: "today" dihapus agar bisa pilih tanggal lampau
     flatpickr("#datetime-picker", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         time_24hr: true,
-        locale: "id",
-        altInput: true,
-        altFormat: "j F Y, H:i",
-        defaultDate: "<?= old('tanggal', date('Y-m-d H:i', strtotime($berita['tanggal']))) ?>"
+        locale: "id"
     });
+
+    // ============================================================
+    // 6. DROPDOWN LOGIC (KATEGORI & TAGS)
+    // ============================================================
+    // --- KATEGORI ---
+    const katDropdown = document.getElementById('kategori-dropdown');
+    const katToggle = document.getElementById('kategori-toggle');
+    const katMenu = katDropdown.querySelector('.dropdown-menu');
+    const katSearch = document.getElementById('kategori-search');
+    const katItems = document.querySelectorAll('.kategori-item');
+    const katHidden = document.getElementById('kategori-hidden');
+    const katBadges = document.getElementById('selected-kategori-badges');
+    const katPlaceholder = document.getElementById('kategori-placeholder');
+    const katNoResults = document.getElementById('kategori-no-results');
+
+    // Toggle Kategori
+    katToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        katMenu.classList.toggle('show');
+        if (katMenu.classList.contains('show')) katSearch.focus();
+    });
+
+    // Hide on outside click
+    document.addEventListener('click', (e) => {
+        if (!katDropdown.contains(e.target)) katMenu.classList.remove('show');
+        if (!document.getElementById('tags-dropdown').contains(e.target)) 
+            document.querySelector('#tags-dropdown .dropdown-menu').classList.remove('show');
+    });
+
+    // Search Kategori
+    katSearch.addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        let hasResult = false;
+        katItems.forEach(item => {
+            const text = item.getAttribute('data-name');
+            if (text.includes(filter)) {
+                item.style.display = '';
+                hasResult = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        katNoResults.style.display = hasResult ? 'none' : 'block';
+    });
+
+    // Checkbox Change Kategori
+    document.querySelectorAll('.kategori-checkbox').forEach(chk => {
+        chk.addEventListener('change', updateSelectedKategori);
+    });
+
+    function updateSelectedKategori() {
+        const selected = [];
+        const badges = [];
+        document.querySelectorAll('.kategori-checkbox:checked').forEach(chk => {
+            selected.push(chk.value);
+            const label = chk.nextElementSibling.innerText;
+            badges.push(`<span class="selected-badge">${label} <i class="bi bi-x" onclick="uncheckKategori('${chk.value}')"></i></span>`);
+        });
+        katHidden.value = selected.join(',');
+        katBadges.innerHTML = badges.join('');
+        katPlaceholder.innerText = selected.length > 0 ? selected.length + ' kategori dipilih' : 'Pilih minimal 1 kategori';
+    }
+
+    // Uncheck helper
+    window.uncheckKategori = function(val) {
+        const chk = document.getElementById('kat-' + val);
+        if (chk) {
+            chk.checked = false;
+            updateSelectedKategori();
+        }
+    };
+    
+    // Init Kategori
+    updateSelectedKategori();
+
+
+    // --- TAGS (LOGIC SAMA SEPERTI KATEGORI) ---
+    const tagDropdown = document.getElementById('tags-dropdown');
+    const tagToggle = document.getElementById('tags-toggle');
+    const tagMenu = tagDropdown.querySelector('.dropdown-menu');
+    const tagSearch = document.getElementById('tags-search');
+    const tagItems = document.querySelectorAll('.tags-item');
+    const tagHidden = document.getElementById('tags-hidden');
+    const tagBadges = document.getElementById('selected-tags-badges');
+    const tagPlaceholder = document.getElementById('tags-placeholder');
+    const tagNoResults = document.getElementById('tags-no-results');
+
+    tagToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        tagMenu.classList.toggle('show');
+        if (tagMenu.classList.contains('show')) tagSearch.focus();
+    });
+
+    tagSearch.addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        let hasResult = false;
+        tagItems.forEach(item => {
+            const text = item.getAttribute('data-name');
+            if (text.includes(filter)) {
+                item.style.display = '';
+                hasResult = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        tagNoResults.style.display = hasResult ? 'none' : 'block';
+    });
+
+    document.querySelectorAll('.tags-checkbox').forEach(chk => {
+        chk.addEventListener('change', updateSelectedTags);
+    });
+
+    function updateSelectedTags() {
+        const selected = [];
+        const badges = [];
+        document.querySelectorAll('.tags-checkbox:checked').forEach(chk => {
+            selected.push(chk.value);
+            const label = chk.nextElementSibling.innerText.trim();
+            badges.push(`<span class="selected-badge bg-secondary">${label} <i class="bi bi-x" onclick="uncheckTag('${chk.value}')"></i></span>`);
+        });
+        tagHidden.value = selected.join(',');
+        tagBadges.innerHTML = badges.join('');
+        tagPlaceholder.innerText = selected.length > 0 ? selected.length + ' tags dipilih' : 'Pilih tags (opsional)';
+    }
+
+    window.uncheckTag = function(val) {
+        const chk = document.getElementById('tag-' + val);
+        if (chk) {
+            chk.checked = false;
+            updateSelectedTags();
+        }
+    };
+    
+    // Init Tags
+    updateSelectedTags();
+
+    // COVER IMAGE PREVIEW
+    const coverInput = document.getElementById('cover-image');
+    const coverPreview = document.getElementById('new-cover-preview');
+    if(coverInput){
+        coverInput.addEventListener('change', function(e){
+            const file = e.target.files[0];
+            if(file){
+                const reader = new FileReader();
+                reader.onload = function(e){
+                    coverPreview.innerHTML = `<img src="${e.target.result}" class="preview-img mt-2" style="max-height:150px">`;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                coverPreview.innerHTML = '';
+            }
+        });
+    }
+
 });
 </script>
 <?= $this->endSection() ?>

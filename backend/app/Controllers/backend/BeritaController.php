@@ -586,6 +586,9 @@ class BeritaController extends BaseController
     // ========================================================
     // Update Berita (Full Code Fixed)
     // ========================================================
+// ========================================================
+    // Update Berita (Full Code - Fixed Status)
+    // ========================================================
     public function update($id)
     {
         // 1. Cek Hak Akses
@@ -603,7 +606,7 @@ class BeritaController extends BaseController
         $post = $this->request->getPost();
         $validation = \Config\Services::validation();
 
-        // 3. Rules Validasi Utama (Tanpa feat_image dulu)
+        // 3. Rules Validasi Utama
         $rules = [
             'judul' => [
                 'rules'  => 'required|min_length[5]|max_length[255]',
@@ -649,7 +652,6 @@ class BeritaController extends BaseController
 
         if ($isUploadNew || $hasTemp) {
             $rules['feat_image'] = [
-                // Hapus 'required', cukup validasi spek gambar
                 'rules'  => 'max_size[feat_image,2048]|is_image[feat_image]|mime_in[feat_image,image/jpg,image/jpeg,image/png]',
                 'errors' => [
                     'max_size' => 'Ukuran foto maksimal 2MB.',
@@ -746,10 +748,9 @@ class BeritaController extends BaseController
 
         // 6. HANDLE COVER IMAGE (FEAT IMAGE)
         // ----------------------------------
-        // Default: Pakai gambar lama
-        $featImagePath = $berita['feat_image'];
+        $featImagePath = $berita['feat_image']; // Default pakai lama
 
-        // Skenario A: Ada di Temporary (gagal validasi field lain sebelumnya)
+        // Skenario A: Ada di Temporary
         if (session()->has('temp_cover_image')) {
             $tempFile = session()->get('temp_cover_image');
             $tempPath = WRITEPATH . '../public/uploads/temp/' . $tempFile;
@@ -770,7 +771,6 @@ class BeritaController extends BaseController
         else {
             $featImage = $this->request->getFile('feat_image');
             if ($featImage && $featImage->isValid() && !$featImage->hasMoved()) {
-
                 // Hapus file lama fisik
                 if (!empty($berita['feat_image']) && file_exists(FCPATH . $berita['feat_image'])) {
                     @unlink(FCPATH . $berita['feat_image']);
@@ -782,80 +782,95 @@ class BeritaController extends BaseController
             }
         }
 
-        $submitType = $this->request->getPost('submit_type');
-        if ($submitType === 'draft') {
-            $status       = '1';
-            $statusBerita = 0;
-        } else {
-            $status       = '1';
-            $statusBerita = 4;
-        }
+        // 7. PROSES DATA UNTUK DISIMPAN
+        // -----------------------------
+        
+        // >>> PERBAIKAN LOGIKA STATUS <<<
+$submitType = $this->request->getPost('submit_type');
 
-        // 7. PERSIAPAN DATA SAVE
-        // ----------------------
+        if ($submitType === 'draft') {
+            // Tombol Simpan Draft
+            $status       = '5'; // 5 = Tidak Tayang
+            $statusBerita = 0;   // 0 = Draft
+        } elseif ($submitType === 'pending') {
+            // Tombol Ajukan Verifikasi (INI YANG KURANG SEBELUMNYA)
+            $status       = '5'; // 5 = Tidak Tayang (karena masih diverifikasi)
+            $statusBerita = 2;   // 2 = Menunggu Verifikasi
+        } else {
+            // Tombol Publish / Default
+            $status       = '1'; // 1 = Tayang
+            $statusBerita = 4;   // 4 = Layak Tayang
+        }
+        // Proses Kategori (Array atau String)
         $kategoriIds = $post['id_kategori'] ?? [];
         if (is_string($kategoriIds)) {
             $kategoriIds = array_filter(array_map('trim', explode(',', $kategoriIds)));
         }
         $idKategori = $kategoriIds[0] ?? null;
-        $captionCover = $post['caption_cover'] ?? $berita['caption'];
 
-        $tagsIds = $post['id_tags'] ?? [];
-        if (is_string($tagsIds)) {
+        // Proses Tags (Array atau String)
+        $tagsIds = $post['id_tags'] ?? '';
+        if (is_string($tagsIds) && !empty($tagsIds)) {
             $tagsIds = array_filter(array_map('trim', explode(',', $tagsIds)));
+        } elseif (!is_array($tagsIds)) {
+            $tagsIds = [];
         }
-        $idtags = $tagsIds[0] ?? null;
+        $idTagsUtama = !empty($tagsIds) ? $tagsIds[0] : null;
 
+        // Siapkan Array Data
         $data = [
-            'id_berita'         => $id,
-            'judul'             => $post['judul'],
-            'topik'             => $post['topik'],
-            'intro'             => $post['intro'],
-            'sumber'            => $post['sumber'],
-            'content'           => $post['content'],
-            'content2'          => $post['content2'],
-            'id_kategori'       => $idKategori,
-            'id_tags'           => $idtags,
-            'link_video'        => $post['link_video'] ?? null,
-            'keyword'           => $post['keyword'] ?? null,
-            'feat_image'        => $featImagePath, // Menggunakan path baru atau lama
-
+            'judul'              => $post['judul'],
+            'topik'              => $post['topik'],
+            'intro'              => $post['intro'],
+            'sumber'             => $post['sumber'],
+            'content'            => $post['content'],
+            'content2'           => $post['content2'],
+            'id_kategori'        => $idKategori,
+            'id_tags'            => $idTagsUtama,
+            'link_video'         => $post['link_video'] ?? null,
+            'keyword'            => $post['keyword'] ?? null,
+            'feat_image'         => $featImagePath,
             'id_berita_terkait'  => !empty($post['id_berita_terkait']) ? $post['id_berita_terkait'] : null,
             'id_berita_terkait2' => !empty($post['id_berita_terkait2']) ? $post['id_berita_terkait2'] : null,
+            'caption'            => $post['caption_cover'] ?? null,
+            'additional_images'  => !empty($finalAdditionalImages) ? json_encode($finalAdditionalImages) : null,
+            'slug'               => url_title($post['judul'], '-', true),
+            
+            // Kolom Status yang sudah diperbaiki
+            'status'             => $status,
+            'status_berita'      => $statusBerita,
 
-            'additional_images' => json_encode($finalAdditionalImages, JSON_UNESCAPED_SLASHES),
-            'slug'              => url_title($post['judul'], '-', true),
-            'caption'           => $captionCover,
-            'tanggal'           => $post['tanggal'],
-            'status'            => $status,
-            'status_berita'     => $statusBerita,
-            'updated_by_id'     => session()->get('id_user'),
-            'updated_by_name'   => session()->get('username'),
-            'updated_at'        => date('Y-m-d H:i:s'),
-            'note'              => $post['note'] ?? null,
-            'note_revisi'       => $post['note_revisi'] ?? null,
+            'updated_at'         => date('Y-m-d H:i:s'),
+            'updated_by_id'      => session()->get('id_user'),
+            'updated_by_name'    => session()->get('username'),
         ];
 
-        // 8. UPDATE DATABASE
-        if (!$this->beritaModel->save($data)) {
+        // Eksekusi Update ke Database
+        if (!$this->beritaModel->update($id, $data)) {
             return redirect()->back()->withInput()->with('errors', $this->beritaModel->errors());
         }
 
-        // 9. UPDATE RELASI KATEGORI
+        // Update Relasi Kategori (Many-to-Many)
         if (!empty($kategoriIds)) {
+            // Asumsi: method ini menghapus kategori lama lalu insert yang baru
             $this->beritaModel->saveKategoriBerita($id, $kategoriIds);
         }
 
-        // 10. UPDATE RELASI TAGS
-        $this->beritaModel->saveTagsBerita($id, $tagsIds);
+        // Update Relasi Tags (Many-to-Many)
+        if (!empty($tagsIds)) {
+            // Asumsi: method ini menghapus tags lama lalu insert yang baru
+            $this->beritaModel->saveTagsBerita($id, $tagsIds);
+        }
 
-        // 11. LOG & SELESAI
-        $this->saveLog($id, 'Berita diperbarui', $data['status'], $data['note'], $data['note_revisi']);
+        // 8. LOG & CLEANUP
+        $logMessage = ($submitType === 'draft') ? 'Berita diupdate menjadi draft' : 'Berita diupdate dan dipublish';
+        $this->saveLog($id, $logMessage, $status);
+        
         $this->clearTemporaryImages();
 
-        return redirect()->to('/berita')->with('success', 'Berita berhasil diperbarui.');
+        $message = ($submitType === 'draft') ? 'Berita berhasil disimpan sebagai draft.' : 'Berita berhasil diperbarui.';
+        return redirect()->to('/berita')->with('success', $message);
     }
-
     // ========================================================
     // Delete (Soft Delete)
     // ========================================================
