@@ -1,0 +1,281 @@
+/* Container utama */
+.pendidikan-pelatihan-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Judul section */
+.section-title {
+  text-align: center;
+  font-size: 2.2rem;
+  color: #2c3e50;
+  margin-bottom: 40px;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  border-radius: 2px;
+}
+
+/* Grid container untuk card */
+.pendidikan-pelatihan-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+  margin-top: 20px;
+}
+
+/* Style untuk card */
+.pendidikan-pelatihan-item {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pendidikan-pelatihan-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* Thumbnail image */
+.pendidikan-pelatihan-thumbnail {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 4px solid #f1f8ff;
+  transition: transform 0.5s ease;
+}
+
+.pendidikan-pelatihan-item:hover .pendidikan-pelatihan-thumbnail {
+  transform: scale(1.05);
+}
+
+/* Container untuk konten card */
+.pendidikan-pelatihan-info {
+  padding: 25px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Judul card */
+.pendidikan-pelatihan-judul {
+  font-size: 1.4rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  line-height: 1.4;
+  font-weight: 700;
+  flex-grow: 1;
+}
+
+/* Informasi meta (tanggal, waktu, tempat) */
+.pendidikan-pelatihan-tanggal,
+.pendidikan-pelatihan-waktu,
+.pendidikan-pelatihan-tempat {
+  color: #555;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.pendidikan-pelatihan-tanggal::before,
+.pendidikan-pelatihan-waktu::before,
+.pendidikan-pelatihan-tempat::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: #3498db;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+/* Deskripsi */
+.pendidikan-pelatihan-deskripsi {
+  color: #666;
+  line-height: 1.6;
+  margin-top: 15px;
+  font-size: 0.95rem;
+  flex-grow: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Badge status */
+.pendidikan-pelatihan-status {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 15px;
+  align-self: flex-start;
+}
+
+/* Style untuk status aktif */
+.pendidikan-pelatihan-status.aktif {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #27ae60;
+}
+
+/* Style untuk status selesai */
+.pendidikan-pelatihan-status.selesai {
+  background-color: rgba(52, 152, 219, 0.15);
+  color: #2980b9;
+}
+
+/* Style untuk status mendatang */
+.pendidikan-pelatihan-status.mendatang {
+  background-color: rgba(241, 196, 15, 0.15);
+  color: #f39c12;
+}
+
+/* Container kosong */
+.pendidikan-pelatihan-list .text-center {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px 20px;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+/* Responsive design */
+@media (max-width: 992px) {
+  .pendidikan-pelatihan-list {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pendidikan-pelatihan-container {
+    padding: 20px 15px;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+  
+  .pendidikan-pelatihan-list {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .pendidikan-pelatihan-info {
+    padding: 20px;
+  }
+  
+  .pendidikan-pelatihan-judul {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .pendidikan-pelatihan-thumbnail {
+    height: 200px;
+  }
+  
+  .pendidikan-pelatihan-info {
+    padding: 18px;
+  }
+  
+  .pendidikan-pelatihan-judul {
+    font-size: 1.2rem;
+  }
+}
+
+/* Animasi loading */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+/* Loading skeleton untuk card */
+.pendidikan-pelatihan-loading {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.loading-card {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  height: 400px;
+}
+
+.loading-thumbnail {
+  width: 100%;
+  height: 220px;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite linear;
+}
+
+.loading-content {
+  padding: 25px;
+}
+
+.loading-title {
+  height: 24px;
+  width: 80%;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite linear;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.loading-meta {
+  height: 16px;
+  width: 60%;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite linear;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.loading-description {
+  height: 60px;
+  width: 100%;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite linear;
+  margin-top: 15px;
+  border-radius: 4px;
+}

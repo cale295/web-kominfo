@@ -54,8 +54,6 @@
 
 
 .video-card {
-  background: #fff;
-  border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
   height: 100%;
