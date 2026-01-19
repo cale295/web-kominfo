@@ -276,14 +276,6 @@ class BeritaController extends BaseController
                     'max_length' => 'Judul maksimal 255 karakter.'
                 ]
             ],
-            'topik' => [
-                'rules'  => 'required|min_length[5]|max_length[255]',
-                'errors' => [
-                    'required'   => 'Topik wajib diisi.',
-                    'min_length' => 'Topik minimal 5 karakter.',
-                    'max_length' => 'Topik maksimal 255 karakter.'
-                ]
-            ],
             'intro' => [
                 'rules'  => 'required|min_length[5]',
                 'errors' => [
@@ -442,7 +434,6 @@ class BeritaController extends BaseController
 
         $data = [
             'judul'             => $post['judul'],
-            'topik'             => $post['topik'],
             'intro'             => $post['intro'],
             'sumber'            => $post['sumber'],
             'content'           => $post['content'],
@@ -592,14 +583,6 @@ public function update($id)
                 'required'   => 'Judul berita wajib diisi.',
                 'min_length' => 'Judul minimal 5 karakter.',
                 'max_length' => 'Judul maksimal 255 karakter.'
-            ]
-        ],
-        'topik' => [
-            'rules'  => 'required|min_length[5]|max_length[255]',
-            'errors' => [
-                'required'   => 'Topik wajib diisi.',
-                'min_length' => 'Topik minimal 5 karakter.',
-                'max_length' => 'Topik maksimal 255 karakter.'
             ]
         ],
         'intro' => [
@@ -836,7 +819,6 @@ public function update($id)
     // ============================================================
     $data = [
         'judul'              => $post['judul'],
-        'topik'              => $post['topik'],
         'intro'              => $post['intro'],
         'sumber'             => $post['sumber'],
         'content'            => $post['content'],
@@ -1159,7 +1141,6 @@ private function saveLog($idBerita, $keterangan, $status = null, $notePerbaikan 
                     'intro' => 'Intro',
                     'content' => 'Konten',
                     'content2' => 'Konten Tambahan',
-                    'topik' => 'Topik',
                     'sumber' => 'Sumber',
                     'keyword' => 'Keyword',
                     'feat_image' => 'Foto Cover',

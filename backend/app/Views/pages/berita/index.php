@@ -366,7 +366,7 @@
                     <span class="input-group-text bg-white border-end-0 text-muted">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" id="searchInput" class="form-control border-start-0 shadow-none ps-0" placeholder="Cari Judul, Topik, atau Penulis...">
+                    <input type="text" id="searchInput" class="form-control border-start-0 shadow-none ps-0" placeholder="Cari Judul, atau Penulis...">
                 </div>
             </div>
         </div>
@@ -383,7 +383,6 @@
                         <th class="text-center">Cover</th>
                         <th class="text-center">Foto</th>
                         <th>Judul</th>
-                        <th>Topik</th>
                         <th>Konten</th>
                         <th>Kategori</th>
                         <th>Tags</th>q
@@ -489,7 +488,6 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <td class="searchable"><?= esc($row['topik'] ?? '-') ?></td>
 
                                 <td>
                                     <div class="content-preview" title="<?= strip_tags($row['content']) ?>">

@@ -409,12 +409,6 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Topik</label>
-                <input type="text" name="topik" class="form-control" placeholder="Masukkan topik berita" value="<?= old('topik') ?>">
-                <small class="text-muted">Topik utama dari berita ini</small>
-            </div>
-
-            <div class="mb-3">
                 <label class="form-label">Intro Singkat</label>
                 <textarea name="intro" class="form-control" rows="3" placeholder="Deskripsi singkat yang menarik pembaca"><?= old('intro') ?></textarea>
                 <small class="text-muted">Ringkasan singkat yang akan ditampilkan di preview berita</small>
@@ -660,12 +654,6 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 <input type="hidden" name="id_tags" id="tags-hidden" value="<?= implode(',', $oldTags) ?>">
                 <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Kata Kunci (SEO)</label>
-                <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma"><?= old('keyword') ?></textarea>
-            </div>
-        </div>
 
         <div class="form-section">
             <div class="section-title"><i class="bi bi-images"></i> Media & Gambar</div>

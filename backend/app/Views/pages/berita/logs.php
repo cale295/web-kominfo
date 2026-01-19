@@ -646,16 +646,6 @@
 
                                         <div class="snapshot-item">
                                             <div class="snapshot-label">
-                                                <i class="bi bi-tags"></i>
-                                                Topik
-                                            </div>
-                                            <div class="snapshot-value">
-                                                <?= esc($data['topik'] ?? '-') ?>
-                                            </div>
-                                        </div>
-
-                                        <div class="snapshot-item">
-                                            <div class="snapshot-label">
                                                 <i class="bi bi-text-paragraph"></i>
                                                 Ringkasan (Intro)
                                             </div>

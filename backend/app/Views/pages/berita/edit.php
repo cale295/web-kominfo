@@ -124,14 +124,68 @@
     
     .action-buttons .btn { margin-left: 8px; }
 
-    /* --- SISIPAN BOX STYLE --- */
-    .sisipan-box {
-        background: #eff6ff;
-        border: 1px dashed #3b82f6;
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 15px;
-    }
+/* --- Style Khusus Dropdown Berita Sisipan --- */
+.sisipan-box {
+    background: #eff6ff;
+    border: 1px dashed #3b82f6;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+/* Container Item Dropdown */
+.news-item-option {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.news-item-option:hover {
+    background-color: #f8fafc;
+}
+
+/* Style Gambar Kecil */
+.news-item-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    background: #eee;
+    border: 1px solid #e2e8f0;
+}
+
+/* Style Konten Teks */
+.news-item-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Style Judul */
+.news-item-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1e293b;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Titik-titik jika judul kepanjangan */
+}
+
+/* Style Tanggal */
+.news-item-date {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.dropdown-menu-custom {
+    max-height: 300px;
+    overflow-y: auto;
+}
 </style>
 <?= $this->endSection() ?>
 
@@ -154,11 +208,6 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Topik</label>
-                <input type="text" name="topik" class="form-control" placeholder="Topik berita" value="<?= esc(old('topik', $berita['topik'])) ?>">
-            </div>
-
-            <div class="mb-3">
                 <label class="form-label">Intro Singkat</label>
                 <textarea name="intro" class="form-control" rows="3"><?= esc(old('intro', $berita['intro'])) ?></textarea>
             </div>
@@ -171,81 +220,210 @@
             </div>
         </div>
 
-        <div class="form-section">
-            <div class="section-title"><i class="bi bi-file-text"></i> Konten & Struktur Berita</div>
-            
-            <div class="mb-4">
-                <label class="form-label">Isi Berita 1 <span class="text-danger">*</span></label>
-                <div id="toolbar-content" class="ql-toolbar-custom">
-                     <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
-                     <button class="ql-list" value="ordered"></button><button class="ql-list" value="bullet"></button>
-                     <button class="ql-link"></button><button class="ql-image"></button><button class="ql-clean"></button>
-                </div>
-                <div id="editor-content" class="ql-container ql-snow">
-                    <div class="ql-editor"><?= old('content', $berita['content']) ?></div>
-                </div>
-                <textarea name="content" id="content-hidden" style="display:none;"></textarea>
+ <div class="form-section">
+    <div class="section-title"><i class="bi bi-file-text"></i> Konten & Struktur Berita</div>
 
-                <div class="sisipan-box">
-                    <label class="form-label d-flex align-items-center">
-                        <i class="bi bi-paperclip me-2"></i> Berita Sisipan 1 (Baca Juga)
-                    </label>
-                    <select name="id_berita_terkait" class="form-select">
-                        <option value="">-- Pilih Berita Sisipan --</option>
-                        <?php foreach ($beritaAll as $b): ?>
-                            <option value="<?= $b['id_berita'] ?>" 
-                                    <?= $b['id_berita'] == old('id_berita_terkait', $berita['id_berita_terkait']) ? 'selected' : '' ?>>
-                                <?= esc($b['judul']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 1.</small>
-                </div>
-            </div>
+    <div class="mb-4">
+        <label class="form-label">Isi Berita 1 <span class="text-danger">*</span></label>
+        <div id="toolbar-content" class="ql-toolbar-custom">
+             <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
+             <button class="ql-list" value="ordered"></button><button class="ql-list" value="bullet"></button>
+             <button class="ql-link"></button><button class="ql-image"></button><button class="ql-clean"></button>
+        </div>
+        <div id="editor-content">
+            <?= old('content', $berita['content']) ?>
+        </div>
+        <textarea name="content" id="content-hidden" style="display:none;"></textarea>
+    </div>
+
+    <?php 
+        // Logika Baru: Toggle ON jika ada Sisipan 1 ATAU ada Content 2 ATAU input toggle bernilai 1
+        $hasSisipan1 = !empty($berita['id_berita_terkait']) || old('id_berita_terkait');
+        $hasContent2 = !empty($berita['content2']) || old('content2');
+        $isToggleOn  = $hasSisipan1 || $hasContent2 || old('has_content2') == '1';
+    ?>
+    <div class="d-flex align-items-center mb-3 mt-4 p-3 bg-gray-50 border rounded">
+        <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="toggle-advanced" <?= $isToggleOn ? 'checked' : '' ?>>
+            <label class="form-check-label fw-bold" for="toggle-advanced">Tambah Sisipan / Halaman Kedua</label>
+        </div>
+        <input type="hidden" name="has_content2" id="has-content2-val" value="<?= $isToggleOn ? '1' : '0' ?>">
+    </div>
+
+    <div id="wrapper-advanced" style="display: <?= $isToggleOn ? 'block' : 'none' ?>;">
+
+        <div class="sisipan-box mb-4">
+            <label class="form-label d-flex align-items-center">
+                <i class="bi bi-paperclip me-2"></i> Berita Sisipan 1 (Disisipkan di Artikel 1)
+            </label>
 
             <?php 
-                // Cek apakah konten 2 sebelumnya ada isinya (dari DB atau old input)
-                $hasContent2 = !empty($berita['content2']) || old('has_content2') == '1'; 
+                // --- LOGIKA PHP SISIPAN 1 ---
+                $val_s1 = old('id_berita_terkait', $berita['id_berita_terkait'] ?? '');
+                $lbl_s1 = '-- Pilih Berita Sisipan --';
+                $img_s1 = '';
+                $cls_s1 = 'd-none';
+                $col_s1 = 'text-muted';
+
+                if(!empty($val_s1)) {
+                    foreach($beritaAll as $item) {
+                        if($item['id_berita'] == $val_s1) {
+                            $lbl_s1 = $item['judul'];
+                            $col_s1 = 'text-dark fw-bold';
+                            $cls_s1 = '';
+                            $g = $item['feat_image'];
+                            if (empty($g)) { $img_s1 = 'https://via.placeholder.com/60?text=IMG'; }
+                            elseif (strpos($g, 'http') === 0) { $img_s1 = $g; }
+                            else {
+                                $clean = ltrim($g, '/');
+                                $img_s1 = (strpos($clean, 'uploads/') === 0) ? base_url($clean) : base_url('uploads/' . $clean);
+                            }
+                            break;
+                        }
+                    }
+                }
             ?>
 
-            <div class="d-flex align-items-center mb-3 mt-5 p-3 bg-gray-50 border rounded">
-                <div class="form-check form-switch m-0">
-                    <input class="form-check-input" type="checkbox" role="switch" id="toggle-content2" 
-                           <?= $hasContent2 ? 'checked' : '' ?>>
-                    <label class="form-check-label fw-bold" for="toggle-content2">Edit/Tambah Halaman Kedua (Isi Berita 2)</label>
-                </div>
-                <input type="hidden" name="has_content2" id="has-content2-val" value="<?= $hasContent2 ? '1' : '0' ?>">
-            </div>
+            <div class="dropdown custom-img-select" id="sisipan1-wrapper">
+                <input type="hidden" name="id_berita_terkait" id="sisipan1-input" value="<?= $val_s1 ?>">
 
-            <div id="wrapper-content2" style="display: <?= $hasContent2 ? 'block' : 'none' ?>;">
-                <div class="mb-4 ps-3 border-start border-3 border-info">
-                    <label class="form-label">Isi Berita 2</label>
-                    <div id="toolbar-content2" class="ql-toolbar-custom">
-                         <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
-                    </div>
-                    <div id="editor-content2" class="ql-container ql-snow">
-                        <div class="ql-editor"><?= old('content2', $berita['content2']) ?></div>
-                    </div>
-                    <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
+                <button class="form-select dropdown-toggle-custom text-start d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img id="sisipan1-preview-img" src="<?= $img_s1 ?>" class="rounded me-2 <?= $cls_s1 ?>" style="width:30px; height:30px; object-fit:cover;">
+                    <span id="sisipan1-label" class="<?= $col_s1 ?> text-truncate"><?= esc($lbl_s1) ?></span>
+                </button>
 
-                    <div class="sisipan-box mt-3">
-                        <label class="form-label d-flex align-items-center">
-                            <i class="bi bi-paperclip me-2"></i> Berita Sisipan 2 (Baca Juga)
-                        </label>
-                        <select name="id_berita_terkait2" class="form-select">
-                            <option value="">-- Pilih Berita Sisipan --</option>
-                            <?php foreach ($beritaAll as $b): ?>
-                                <option value="<?= $b['id_berita'] ?>" 
-                                        <?= $b['id_berita'] == old('id_berita_terkait2', $berita['id_berita_terkait2']) ? 'selected' : '' ?>>
-                                    <?= esc($b['judul']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                         <small class="text-muted">Berita ini akan muncul disisipkan setelah paragraf akhir Berita 2.</small>
+                <div class="dropdown-menu w-100 p-0 shadow border dropdown-menu-custom">
+                    <div class="p-2 border-bottom sticky-top bg-white">
+                        <input type="text" class="form-control form-control-sm search-sisipan" data-target="sisipan1-list" placeholder="Cari judul berita...">
                     </div>
+
+                    <div id="sisipan1-list">
+                        <div class="news-item-option" onclick="selectSisipan('sisipan1', '', '-- Tidak Ada Sisipan --', '', '')">
+                            <div class="news-item-content text-center text-muted small">-- Kosongkan Sisipan --</div>
+                        </div>
+
+                        <?php foreach ($beritaAll as $b): 
+                            if($b['id_berita'] == $berita['id_berita']) continue;
+                            
+                            // Helper Gambar
+                            $gambarDB = $b['feat_image'];
+                            if (empty($gambarDB)) { $imgSrc = 'https://via.placeholder.com/60?text=IMG'; }
+                            elseif (strpos($gambarDB, 'http') === 0) { $imgSrc = $gambarDB; }
+                            else {
+                                $cleanPath = ltrim($gambarDB, '/');
+                                $imgSrc = (strpos($cleanPath, 'uploads/') === 0) ? base_url($cleanPath) : base_url('uploads/' . $cleanPath);
+                            }
+                            $tgl = isset($b['tanggal']) ? date('d M Y', strtotime($b['tanggal'])) : '-';
+                            $judulSafe = addslashes(esc($b['judul']));
+                        ?>
+                        <div class="news-item-option search-item" data-search="<?= strtolower(esc($b['judul'])) ?>"
+                             onclick="selectSisipan('sisipan1', '<?= $b['id_berita'] ?>', '<?= $judulSafe ?>', '<?= $imgSrc ?>', '<?= $tgl ?>')">
+                            <img src="<?= $imgSrc ?>" class="news-item-img" alt="Thumb">
+                            <div class="news-item-content">
+                                <div class="news-item-title"><?= esc($b['judul']) ?></div>
+                                <div class="news-item-date"><i class="bi bi-calendar3"></i> <?= $tgl ?></div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="p-3 text-center text-muted no-result-msg" style="display:none;">Tidak ditemukan</div>
                 </div>
             </div>
+            <small class="text-muted mt-2 d-block">Berita ini akan muncul di tengah paragraf Berita 1.</small>
         </div>
+        <div class="mb-4 ps-3 border-start border-3 border-info">
+            <label class="form-label">Isi Berita 2 (Halaman Kedua)</label>
+            <div id="toolbar-content2" class="ql-toolbar-custom">
+                 <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button>
+                 <button class="ql-list" value="ordered"></button><button class="ql-list" value="bullet"></button>
+                 <button class="ql-link"></button><button class="ql-clean"></button>
+            </div>
+            <div id="editor-content2">
+                <?= old('content2', $berita['content2']) ?>
+            </div>
+            <textarea name="content2" id="content2-hidden" style="display:none;"></textarea>
+            
+            <div class="sisipan-box mt-4">
+                <label class="form-label d-flex align-items-center">
+                    <i class="bi bi-paperclip me-2"></i> Sisipan Berita 2
+                </label>
+
+                <?php 
+                    // --- LOGIKA PHP SISIPAN 2 ---
+                    $val_s2 = old('id_berita_terkait2', $berita['id_berita_terkait2'] ?? '');
+                    $lbl_s2 = '-- Pilih Berita Sisipan 2 --';
+                    $img_s2 = '';
+                    $cls_s2 = 'd-none';
+                    $col_s2 = 'text-muted';
+
+                    if(!empty($val_s2)) {
+                        foreach($beritaAll as $item) {
+                            if($item['id_berita'] == $val_s2) {
+                                $lbl_s2 = $item['judul'];
+                                $col_s2 = 'text-dark fw-bold';
+                                $cls_s2 = '';
+                                $g = $item['feat_image'];
+                                if (empty($g)) { $img_s2 = 'https://via.placeholder.com/60?text=IMG'; }
+                                elseif (strpos($g, 'http') === 0) { $img_s2 = $g; }
+                                else {
+                                    $clean = ltrim($g, '/');
+                                    $img_s2 = (strpos($clean, 'uploads/') === 0) ? base_url($clean) : base_url('uploads/' . $clean);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                ?>
+
+                <div class="dropdown custom-img-select" id="sisipan2-wrapper">
+                    <input type="hidden" name="id_berita_terkait2" id="sisipan2-input" value="<?= $val_s2 ?>">
+
+                    <button class="form-select dropdown-toggle-custom text-start d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img id="sisipan2-preview-img" src="<?= $img_s2 ?>" class="rounded me-2 <?= $cls_s2 ?>" style="width:30px; height:30px; object-fit:cover;">
+                        <span id="sisipan2-label" class="<?= $col_s2 ?> text-truncate"><?= esc($lbl_s2) ?></span>
+                    </button>
+
+                    <div class="dropdown-menu w-100 p-0 shadow border dropdown-menu-custom">
+                        <div class="p-2 border-bottom sticky-top bg-white">
+                            <input type="text" class="form-control form-control-sm search-sisipan" data-target="sisipan2-list" placeholder="Cari judul berita...">
+                        </div>
+                        
+                        <div id="sisipan2-list">
+                            <div class="news-item-option" onclick="selectSisipan('sisipan2', '', '-- Tidak Ada Sisipan --', '', '')">
+                                <div class="news-item-content text-center text-muted small">-- Kosongkan Sisipan --</div>
+                            </div>
+                            <?php foreach ($beritaAll as $b): 
+                                if($b['id_berita'] == $berita['id_berita']) continue;
+                                
+                                $gambarDB = $b['feat_image'];
+                                if (empty($gambarDB)) { $imgSrc = 'https://via.placeholder.com/60?text=IMG'; } 
+                                elseif (strpos($gambarDB, 'http') === 0) { $imgSrc = $gambarDB; } 
+                                 else {
+                                    $cleanPath = ltrim($gambarDB, '/');
+                                    $imgSrc = (strpos($cleanPath, 'uploads/') === 0) ? base_url($cleanPath) : base_url('uploads/' . $cleanPath);
+                                }
+                                $tgl = isset($b['tanggal']) ? date('d M Y', strtotime($b['tanggal'])) : '-';
+                                $judulSafe = addslashes(esc($b['judul']));
+                            ?>
+                            <div class="news-item-option search-item" data-search="<?= strtolower(esc($b['judul'])) ?>"
+                                 onclick="selectSisipan('sisipan2', '<?= $b['id_berita'] ?>', '<?= $judulSafe ?>', '<?= $imgSrc ?>', '<?= $tgl ?>')">
+                                <img src="<?= $imgSrc ?>" class="news-item-img" alt="Thumb">
+                                <div class="news-item-content">
+                                    <div class="news-item-title"><?= esc($b['judul']) ?></div>
+                                    <div class="news-item-date"><i class="bi bi-calendar3"></i> <?= $tgl ?></div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="p-3 text-center text-muted no-result-msg" style="display:none;">Tidak ditemukan</div>
+                    </div>
+                </div>
+                <small class="text-muted mt-2 d-block">Berita ini akan muncul di akhir Berita 2.</small>
+            </div>
+            </div>
+        </div> 
+    </div>
+
 
         <div class="form-section">
             <div class="section-title"><i class="bi bi-tags"></i> Kategori & Klasifikasi</div>
@@ -348,17 +526,6 @@
     <div id="selected-tags-badges" class="mt-2 d-flex flex-wrap"></div>
 </div>
 
-            <div class="mb-3">
-                <label class="form-label">Kata Kunci (SEO)</label>
-                <textarea name="keyword" class="form-control" rows="2" placeholder="Pisahkan dengan koma"><?= old('keyword') ?></textarea>
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Sub Kategori</label>
-                <input type="text" name="id_sub_kategori" class="form-control" value="<?= esc(old('id_sub_kategori', $berita['id_sub_kategori'])) ?>">
-            </div>
-        </div>
-
         <div class="form-section">
             <div class="section-title"><i class="bi bi-images"></i> Media & Gambar</div>
 
@@ -371,7 +538,7 @@
                             <span class="current-image-badge" style="background: var(--info);">
                                 <i class="bi bi-clock-history me-1"></i>Gambar Temporary
                             </span>
-                            <img src="<?= base_url('uploads/temp/' . $tempCoverImage) ?>" class="preview-img" alt="Temp Cover">
+                            <img src="<?= base_url('public/uploads/temp/' . $tempCoverImage) ?>" class="preview-img" alt="Temp Cover">
                         </div>
                         <div class="retained-image-info">
                             <i class="bi bi-info-circle-fill"></i>
@@ -1022,5 +1189,229 @@ window.uncheckItem = function(checkboxId) {
         cb.click(); // Klik lagi untuk uncheck dan trigger event change
     }
 };
+</script>
+<script>
+    // --- 1. SETUP QUILL EDITOR ---
+    var quill1 = new Quill('#editor-content', {
+        theme: 'snow',
+        modules: { toolbar: '#toolbar-content' }
+    });
+
+    var quill2 = new Quill('#editor-content2', {
+        theme: 'snow',
+        modules: { toolbar: '#toolbar-content2' }
+    });
+
+    // Saat form disubmit, pindahkan isi editor ke textarea hidden
+    document.querySelector('#form-berita').onsubmit = function() {
+        document.querySelector('#content-hidden').value = quill1.root.innerHTML;
+        document.querySelector('#content2-hidden').value = quill2.root.innerHTML;
+    };
+
+
+    // --- 2. LOGIKA DROPDOWN SISIPAN (PENTING) ---
+    
+    // Fungsi untuk memilih item
+    function selectSisipan(targetPrefix, id, title, imgSrc, date) {
+        // 1. Set nilai input hidden
+        document.getElementById(targetPrefix + '-input').value = id;
+        
+        // 2. Update Label Tombol
+        var labelEl = document.getElementById(targetPrefix + '-label');
+        var imgEl = document.getElementById(targetPrefix + '-preview-img');
+
+        if(id) {
+            // Jika ada yang dipilih
+            labelEl.innerHTML = '<span class="fw-bold text-dark">' + title + '</span> <br> <span class="small text-muted">' + date + '</span>';
+            labelEl.classList.remove('text-muted');
+            
+            if(imgSrc) {
+                imgEl.src = imgSrc;
+                imgEl.classList.remove('d-none');
+            }
+        } else {
+            // Jika dikosongkan (Reset)
+            labelEl.textContent = '-- Pilih Berita Sisipan --';
+            labelEl.classList.add('text-muted');
+            imgEl.classList.add('d-none');
+        }
+    }
+
+    // Fungsi Pencarian (Search) di dalam Dropdown
+    document.querySelectorAll('.search-sisipan').forEach(input => {
+        input.addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase();
+            let targetListId = this.getAttribute('data-target');
+            let container = document.getElementById(targetListId);
+            let items = container.querySelectorAll('.search-item');
+            let hasResult = false;
+
+            items.forEach(item => {
+                let text = item.getAttribute('data-search');
+                if (text.indexOf(filter) > -1) {
+                    item.style.display = "flex";
+                    hasResult = true;
+                } else {
+                    item.style.display = "none";
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada hasil
+            let noResultMsg = container.parentNode.querySelector('.no-result-msg');
+            if(noResultMsg) {
+                noResultMsg.style.display = hasResult ? 'none' : 'block';
+            }
+        });
+    });
+
+
+    // --- 3. LOGIKA TOGGLE KONTEN 2 ---
+    document.getElementById('toggle-content2').addEventListener('change', function() {
+        var wrapper = document.getElementById('wrapper-content2');
+        var hiddenInput = document.getElementById('has-content2-val');
+        
+        if(this.checked) {
+            wrapper.style.display = 'block';
+            hiddenInput.value = '1';
+        } else {
+            wrapper.style.display = 'none';
+            hiddenInput.value = '0';
+        }
+    });
+
+    // --- 4. PRELOAD NILAI LAMA (JIKA EDIT) ---
+    // Jika sedang mode edit, kita perlu memicu UI update agar sisipan terpilih terlihat
+    // Anda bisa menambahkan logika PHP kecil di sini untuk trigger selectSisipan() saat load page
+    // Contoh sederhana manual trigger jika ada data (opsional)
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Jalankan pengecekan saat halaman pertama kali dibuka (untuk mode Edit)
+    checkSisipanDependency();
+});
+
+// Fungsi Logika Dependency
+function checkSisipanDependency() {
+    const sisipan1Input = document.getElementById('sisipan1-input');
+    const sisipan2Btn = document.querySelector('#sisipan2-wrapper button');
+    const sisipan2Wrapper = document.getElementById('sisipan2-wrapper');
+    
+    // Cek apakah Sisipan 1 ada nilainya (tidak kosong)
+    const isSisipan1Filled = sisipan1Input.value.trim() !== "";
+
+    if (isSisipan1Filled) {
+        // --- AKTIFKAN SISIPAN 2 ---
+        sisipan2Btn.removeAttribute('disabled');
+        sisipan2Btn.classList.remove('bg-light', 'text-muted');
+        sisipan2Wrapper.style.cursor = 'default';
+        sisipan2Btn.style.pointerEvents = 'auto';
+    } else {
+        // --- NONAKTIFKAN SISIPAN 2 ---
+        sisipan2Btn.setAttribute('disabled', 'true');
+        sisipan2Btn.classList.add('bg-light', 'text-muted'); // Visual abu-abu
+        sisipan2Wrapper.style.cursor = 'not-allowed';
+        sisipan2Btn.style.pointerEvents = 'none'; // Mencegah klik
+    }
+}
+
+// Fungsi Utama Memilih Sisipan (Update fungsi yang sudah ada atau gunakan ini)
+function selectSisipan(target, id, title, img, date) {
+    // 1. Update Input Hidden
+    document.getElementById(target + '-input').value = id;
+
+    // 2. Update Tampilan Label & Gambar
+    const label = document.getElementById(target + '-label');
+    const previewImg = document.getElementById(target + '-preview-img');
+
+    if (id) {
+        // Jika memilih berita
+        label.innerText = title;
+        label.classList.remove('text-muted');
+        label.classList.add('text-dark', 'fw-bold');
+        
+        previewImg.src = img;
+        previewImg.classList.remove('d-none');
+    } else {
+        // Jika memilih "Kosongkan/Hapus"
+        label.innerText = (target === 'sisipan1') ? '-- Pilih Berita Sisipan --' : '-- Pilih Berita Sisipan 2 --';
+        label.classList.add('text-muted');
+        label.classList.remove('text-dark', 'fw-bold');
+        
+        previewImg.src = '';
+        previewImg.classList.add('d-none');
+    }
+
+    // 3. LOGIKA DEPENDENCY KHUSUS SISIPAN 1
+    if (target === 'sisipan1') {
+        // Jika Sisipan 1 dikosongkan, maka Sisipan 2 harus di-reset dan dimatikan
+        if (!id) {
+            resetSisipan2();
+        }
+        // Jalankan pengecekan status tombol
+        checkSisipanDependency();
+    }
+}
+
+// Fungsi Helper untuk Mereset Sisipan 2 (Jika Sisipan 1 dihapus)
+function resetSisipan2() {
+    document.getElementById('sisipan2-input').value = '';
+    
+    const label = document.getElementById('sisipan2-label');
+    const previewImg = document.getElementById('sisipan2-preview-img');
+    
+    label.innerText = '-- Pilih Berita Sisipan 2 --';
+    label.classList.add('text-muted');
+    label.classList.remove('text-dark', 'fw-bold');
+    
+    previewImg.src = '';
+    previewImg.classList.add('d-none');
+}
+
+// Fitur Pencarian di Dropdown (Opsional, agar search tetap jalan)
+document.querySelectorAll('.search-sisipan').forEach(input => {
+    input.addEventListener('keyup', function() {
+        const filter = this.value.toLowerCase();
+        const targetList = document.getElementById(this.dataset.target);
+        const items = targetList.querySelectorAll('.search-item');
+        let hasResult = false;
+
+        items.forEach(item => {
+            const text = item.dataset.search;
+            if (text.includes(filter)) {
+                item.style.display = 'flex';
+                hasResult = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        const noResult = targetList.querySelector('.no-result-msg');
+        if (noResult) noResult.style.display = hasResult ? 'none' : 'block';
+    });
+});
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Logika Toggle Advanced (Sisipan 1 + Content 2 + Sisipan 2)
+        const toggleAdv = document.getElementById('toggle-advanced');
+        const wrapperAdv = document.getElementById('wrapper-advanced');
+        const hiddenVal = document.getElementById('has-content2-val');
+
+        if(toggleAdv && wrapperAdv) {
+            toggleAdv.addEventListener('change', function() {
+                if(this.checked) {
+                    wrapperAdv.style.display = 'block';
+                    hiddenVal.value = '1';
+                } else {
+                    wrapperAdv.style.display = 'none';
+                    hiddenVal.value = '0';
+                    // Optional: Kosongkan value jika dimatikan agar tidak tersimpan
+                    // tapi biasanya user ingin datanya tetap ada kalau kepencet off
+                }
+            });
+        }
+        
+        // ... (Kode Javascript Select Sisipan/Quill/dll biarkan saja) ...
+    });
 </script>
 <?= $this->endSection() ?>
