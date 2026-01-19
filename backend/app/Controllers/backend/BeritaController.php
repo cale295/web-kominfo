@@ -45,7 +45,7 @@ class BeritaController extends BaseController
             ->findAll();
 
         // Ambil semua kategori (id => nama)
-        $kategoriAll = $this->kategoriModel->where('trash', '0')->findAll();
+        $kategoriAll = $this->kategoriModel->findAll();
         $kategoriMap = [];
         foreach ($kategoriAll as $k) {
             $kategoriMap[$k['id_kategori']] = $k['kategori'];
@@ -164,7 +164,7 @@ class BeritaController extends BaseController
 
         $data = [
             'title' => 'Tambah Berita',
-            'kategori' => $this->kategoriModel->where('trash', '0')->where('status', '1')->findAll(),
+            'kategori' => $this->kategoriModel->findAll(),
             'tags' => $this->beritaTagModel->findAll(),
 
             // --- PERUBAHAN DISINI ---
@@ -186,20 +186,12 @@ class BeritaController extends BaseController
     // ========================================================
     // Detail Berita (Show)
     // ========================================================
-    // ========================================================
-    // Detail Berita (Show)
-    // ========================================================
-    // Ubah parameter dari $id menjadi $slug
     public function show($slug = null)
     {
         $access = $this->getAccess(session()->get('role'));
         if (!$access || !$access['can_read']) {
             return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat berita.');
         }
-
-        // ----------------------------------------------------
-        // PERUBAHAN LOGIKA PENCARIAN
-        // ----------------------------------------------------
         // Cari berdasarkan kolom 'slug'
         $berita = $this->beritaModel->where('slug', $slug)->first();
 
