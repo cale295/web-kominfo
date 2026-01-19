@@ -386,7 +386,7 @@
                         <th>Topik</th>
                         <th>Konten</th>
                         <th>Kategori</th>
-                        <th>Tags</th>q
+                        <th>Tags</th>
                         <th class="text-center">Status Berita</th>
                         <th class="text-center">Dibuat</th>
                         <th class="text-center">Status</th>
