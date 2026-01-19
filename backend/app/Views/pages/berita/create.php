@@ -732,12 +732,15 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
         <input type="hidden" name="status" value="0">
         <input type="hidden" name="status_berita" value="2">
 
-        <div class="action-buttons d-flex justify-content-end gap-2">
+         <div class="action-buttons d-flex justify-content-end gap-2">
     <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
 
+    <?php $role = session()->get('role'); ?>
+    <?php if ($role == 'editor') : ?>
     <button type="submit" name="submit_type" value="pending" class="btn btn-warning text-white fw-semibold">
         <i class="bi bi-hourglass-split"></i> Ajukan Verifikasi
     </button>
+    <?php endif; ?>
 
     <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
         <i class="bi bi-file-earmark-text"></i> Simpan Draft

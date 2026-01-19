@@ -670,29 +670,8 @@
 <?php if ($isAllowed) : ?>
 
     <div class="form-section">
-        <div class="section-title"><i class="bi bi-gear"></i> Status & Catatan Admin (Superadmin/Admin)</div>
+        <div class="section-title"><i class="bi bi-gear"></i> Catatan Admin (Superadmin/Admin)</div>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Status Tayang</label>
-                <select name="status" id="status-publish" class="form-select">
-                    <option value="1" <?= old('status', $berita['status']) == '1' ? 'selected' : '' ?>>🟢 Tayang</option>
-                    <option value="5" <?= old('status', $berita['status']) == '5' ? 'selected' : '' ?>>🔴 Tidak Tayang</option>
-                </select>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Status Berita</label>
-                <select name="status_berita" class="form-select bg-light">
-                    <option value="0" <?= old('status_berita', $berita['status_berita']) == '0' ? 'selected' : '' ?>>📝 Draft</option>
-                    <option value="2" <?= old('status_berita', $berita['status_berita']) == '2' ? 'selected' : '' ?>>⏳ Menunggu Verifikasi</option>
-                    <option value="3" <?= old('status_berita', $berita['status_berita']) == '3' ? 'selected' : '' ?>>❌ Ditolak</option>
-                    <option value="4" <?= old('status_berita', $berita['status_berita']) == '4' ? 'selected' : '' ?>>✅ Layak Tayang</option>
-                    <option value="6" <?= old('status_berita', $berita['status_berita']) == '6' ? 'selected' : '' ?>>🔄 Revisi</option>
-                </select>
-                <small class="text-muted">Ubah status verifikasi di sini (Hak akses Admin/Superadmin).</small>
-            </div>
-        </div>
 
         <div class="mb-3">
             <label class="form-label">Catatan Admin/Superadmin</label>
@@ -709,9 +688,12 @@
                 <div class="action-buttons d-flex justify-content-end gap-2">
     <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
 
+    <?php $role = session()->get('role'); ?>
+    <?php if ($role == 'editor') : ?>
     <button type="submit" name="submit_type" value="pending" class="btn btn-warning text-white fw-semibold">
         <i class="bi bi-hourglass-split"></i> Ajukan Verifikasi
     </button>
+    <?php endif; ?>
 
     <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
         <i class="bi bi-file-earmark-text"></i> Simpan Draft
