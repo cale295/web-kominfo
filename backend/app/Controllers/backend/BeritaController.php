@@ -518,8 +518,16 @@ public function create()
     $this->saveLog($idBerita, 'Berita dibuat', $post['status'] ?? '5');
     $this->clearTemporaryImages();
 
-    $message = ($submitType === 'draft') ? 'Berita berhasil disimpan sebagai draft.' : 'Berita berhasil dipublikasikan.';
-    return redirect()->to('/berita')->with('success', $message);
+  if ($submitType === 'draft') {
+    $message = 'Berita berhasil disimpan sebagai draft.';
+} elseif ($submitType === 'pending') {
+    $message = 'Berita berhasil disimpan sebagai menunggu verifikasi.';
+} else {
+    // Asumsi default adalah publish, atau kamu bisa cek spesifik ($submitType === 'publish')
+    $message = 'Berita berhasil dipublikasikan.';
+}
+
+return redirect()->to('/berita')->with('success', $message);
 }
 
     // ========================================================
@@ -913,11 +921,16 @@ public function update($id)
     
     $this->clearTemporaryImages();
 
-    // ============================================================
-    // 13. REDIRECT DENGAN PESAN SUKSES
-    // ============================================================
-    $message = ($submitType === 'draft') ? 'Berita berhasil disimpan sebagai draft.' : 'Berita berhasil diperbarui.';
-    return redirect()->to('/berita')->with('success', $message);
+if ($submitType === 'draft') {
+    $message = 'Berita berhasil disimpan sebagai draft.';
+} elseif ($submitType === 'pending') {
+    $message = 'Berita berhasil disimpan sebagai menunggu verifikasi.';
+} else {
+    // Asumsi default adalah publish, atau kamu bisa cek spesifik ($submitType === 'publish')
+    $message = 'Berita berhasil dipublikasikan.';
+}
+
+return redirect()->to('/berita')->with('success', $message);
 }
     // ========================================================
     // Delete (Soft Delete)
