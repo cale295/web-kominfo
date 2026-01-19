@@ -89,7 +89,7 @@ $menuItems = [
         'icon'   => 'bi-speedometer2',
         'url'    => '/dashboard', 
         'roles'  => ['superadmin', 'admin', 'editor'],
-        'module' => 'dashboard', // Tambahkan module name
+        'module' => 'dashboard',
         'color'  => '#4e73df', 
         'bg'     => 'rgba(78, 115, 223, 0.1)' 
     ],
@@ -103,7 +103,7 @@ $menuItems = [
         'color'  => '#4e73df', 
         'bg'     => 'rgba(78, 115, 223, 0.1)' 
     ],
-    ['type' => 'header', 'title' => 'BANNER & LAYANAN'],
+    ['type' => 'header', 'title' => 'BANNER & LAYANAN', 'roles' => ['superadmin, admin, editor']],
     [
         'type'   => 'dropdown', 
         'title'  => 'Tampil Home', 
@@ -115,8 +115,8 @@ $menuItems = [
             ['title' => 'Banner Slider', 'url' => '/banner', 'roles' => ['superadmin', 'admin'], 'module' => 'banner'],
             ['title' => 'Layanan', 'url' => '/home_service', 'roles' => ['superadmin', 'admin'], 'module' => 'home_service'],
             ['title' => 'Video Layanan', 'url' => '/home_video_layanan', 'roles' => ['superadmin', 'admin'], 'module' => 'home_video_layanan'],
-            ['title' => 'Agenda', 'url' => '/agenda', 'roles' => ['superadmin', 'admin'], 'module' => 'agenda'],
-            ['title' => 'Pengumuman', 'url' => '/pengumuman', 'roles' => ['superadmin', 'admin'], 'module' => 'pengumuman'],
+            ['title' => 'Agenda', 'url' => '/agenda', 'roles' => ['superadmin', 'admin', 'editor'], 'module' => 'agenda'],
+            ['title' => 'Pengumuman', 'url' => '/pengumuman', 'roles' => ['superadmin', 'admin', 'editor'], 'module' => 'pengumuman'],
             ['title' => 'Pejabat Publik', 'url' => '/pejabat', 'roles' => ['superadmin', 'admin'], 'module' => 'pejabat'],
         ]
     ],
@@ -130,12 +130,12 @@ $menuItems = [
         'bg'     => 'rgba(231, 74, 59, 0.1)',
         'submenu' => [
             ['title' => 'Berita', 'url' => '/berita', 'roles' => ['superadmin', 'admin', 'editor'], 'module' => 'berita'],
-            ['title' => 'Berita Utama', 'url' => '/berita-utama', 'roles' => ['superadmin', 'admin', 'editor'], 'module' => 'berita_utama'],
+            ['title' => 'Berita Utama', 'url' => '/berita-utama', 'roles' => ['superadmin', 'admin'], 'module' => 'berita_utama'],
             ['title' => 'Kategori', 'url' => '/kategori', 'roles' => ['superadmin', 'admin'], 'module' => 'berita_kategori'],
             ['title' => 'Tag', 'url' => '/berita_tag', 'roles' => ['superadmin', 'admin'], 'module' => 'berita_tag'],
         ]
     ],
-    ['type' => 'header', 'title' => 'HALAMAN PUBLIK'],
+    ['type' => 'header', 'title' => 'HALAMAN PUBLIK', 'roles' => ['superadmin, admin']],
     [
         'type'   => 'dropdown', 
         'title'  => 'Profil Instansi', 
@@ -165,7 +165,7 @@ $menuItems = [
         'title'  => 'Galeri & Media', 
         'url' => '/album',
         'icon'   => 'bi-images', 
-        'roles'  => ['superadmin', 'admin'],
+        'roles'  => ['superadmin', 'admin', 'editor'],
         'module' => 'galeri_album',
         'color'  => '#f6c23e',
         'bg'     => 'rgba(246, 194, 62, 0.1)',
