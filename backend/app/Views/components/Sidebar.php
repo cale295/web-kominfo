@@ -135,7 +135,7 @@ $menuItems = [
             ['title' => 'Tag', 'url' => '/berita_tag', 'roles' => ['superadmin', 'admin'], 'module' => 'berita_tag'],
         ]
     ],
-    ['type' => 'header', 'title' => 'HALAMAN PUBLIK', 'roles' => ['superadmin, admin']],
+    ['type' => 'header', 'title' => 'HALAMAN PUBLIK', 'roles' => ['superadmin, admin', 'editor']],
     [
         'type'   => 'dropdown', 
         'title'  => 'Profil Instansi', 
