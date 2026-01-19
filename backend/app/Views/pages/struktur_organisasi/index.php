@@ -110,6 +110,61 @@
     .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
 
     .input-group:focus-within { box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25) !important; border-color: #bac8f3; }
+    
+    /* Style untuk indikator deskripsi */
+    .deskripsi-info {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin-top: 5px;
+    }
+    .deskripsi-info-normal {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+    }
+    .deskripsi-info-child {
+        background-color: #e7f4ff;
+        color: #0066cc;
+        border: 1px solid #b3d9ff;
+    }
+    .deskripsi-info-parent {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    
+    /* Style untuk tampilan deskripsi di tabel */
+    .deskripsi-preview {
+        max-height: 60px;
+        overflow: hidden;
+        position: relative;
+    }
+    .deskripsi-preview::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(to bottom, transparent, #f8f9fc);
+    }
+    .deskripsi-empty {
+        color: #999;
+        font-style: italic;
+        font-size: 0.85rem;
+    }
+    
+    /* Style untuk deskripsi yang tersembunyi */
+    .deskripsi-hidden {
+        background-color: #f8f9fa;
+        border: 1px dashed #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -149,7 +204,7 @@ if (!empty($struktur)) {
 
     $hierarchicalData = buildFlatTree($roots, $grouped);
     
-    // Copy hierarchicalData ke parents untuk dropdown
+    // Copy hierarchicalData ke parents untuk dropdown (semua data untuk dropdown)
     $parents = $hierarchicalData;
 }
 ?>
@@ -199,18 +254,19 @@ if (!empty($struktur)) {
                     <thead class="bg-light">
                         <tr class="text-uppercase text-secondary text-xs fw-bolder" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                             <th class="text-center py-3 border-0" width="5%">#</th>
-                            <th class="py-3 border-0" width="45%">Nama Unit (Hierarki)</th>
+                            <th class="py-3 border-0" width="40%">Nama Unit (Hierarki)</th>
+                            <th class="py-3 border-0" width="25%">Deskripsi</th>
                             <th class="text-center py-3 border-0" width="10%">Urutan</th>
-                            <th class="text-center py-3 border-0" width="15%">Status</th>
+                            <th class="text-center py-3 border-0" width="10%">Status</th>
                             <?php if ($can_update || $can_delete): ?>
-                                <th class="text-center py-3 border-0" width="15%">Aksi</th>
+                                <th class="text-center py-3 border-0" width="10%">Aksi</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
                         <?php if (empty($hierarchicalData)) : ?>
                             <tr>
-                                <td colspan="<?= ($can_update || $can_delete) ? 5 : 4 ?>" class="text-center py-5">
+                                <td colspan="<?= ($can_update || $can_delete) ? 6 : 5 ?>" class="text-center py-5">
                                     <div class="empty-state py-4">
                                         <div class="mb-3 text-muted opacity-25">
                                             <i class="fas fa-sitemap fa-4x"></i>
@@ -224,6 +280,9 @@ if (!empty($struktur)) {
                             <?php 
                                 foreach ($hierarchicalData as $index => $item) : 
                                     $paddingLeft = $item['depth'] * 30;
+                                    $isRoot = empty($item['parent_id']);
+                                    $deskripsi = $item['deskripsi'] ?? '';
+                                    $hasDeskripsi = !empty($deskripsi) && trim(strip_tags($deskripsi)) !== '';
                             ?>
                                 <tr class="transition-row border-bottom border-light">
                                     <td class="text-center text-muted fw-bold small"><?= $index + 1 ?></td>
@@ -239,6 +298,15 @@ if (!empty($struktur)) {
                                             <div>
                                                 <div class="<?= $item['depth'] == 0 ? 'fw-bold text-primary' : 'fw-semibold text-dark' ?>">
                                                     <?= esc($item['nama']) ?>
+                                                    <?php if ($isRoot): ?>
+                                                        <span class="badge bg-light text-dark border ms-2" title="Root Unit">
+                                                            <i class="fas fa-building me-1"></i>Root
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-info text-white border ms-2" title="Child Unit">
+                                                            <i class="fas fa-sitemap me-1"></i>Child
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </div>
                                                 <?php if (!empty($item['slug'])): ?>
                                                     <div class="small text-muted fst-italic" style="font-size: 0.75rem;">
@@ -247,6 +315,34 @@ if (!empty($struktur)) {
                                                 <?php endif; ?>
                                             </div>
                                         </div>
+                                    </td>
+
+                                    <td>
+                                        <?php if ($isRoot): ?>
+                                            <!-- Root unit - tidak perlu deskripsi -->
+                                            <div class="deskripsi-empty">
+                                                <i class="fas fa-minus-circle me-1 text-muted"></i>
+                                                Root unit tidak perlu deskripsi
+                                            </div>
+                                        <?php elseif (!$hasDeskripsi): ?>
+                                            <!-- Child unit tapi belum ada deskripsi -->
+                                            <div class="deskripsi-empty">
+                                                <i class="fas fa-exclamation-triangle me-1 text-warning"></i>
+                                                Belum ada deskripsi
+                                            </div>
+                                        <?php else: ?>
+                                            <!-- Child unit dengan deskripsi -->
+                                            <div class="deskripsi-preview small">
+                                                <?= strip_tags(substr($deskripsi, 0, 150)) ?>...
+                                            </div>
+                                            <button class="btn btn-link btn-sm p-0 mt-1 text-primary view-deskripsi" 
+                                                data-bs-toggle="tooltip" 
+                                                title="Lihat deskripsi lengkap"
+                                                data-deskripsi="<?= htmlspecialchars($deskripsi) ?>"
+                                                data-nama="<?= esc($item['nama']) ?>">
+                                                <i class="fas fa-eye me-1"></i>Lihat lengkap
+                                            </button>
+                                        <?php endif; ?>
                                     </td>
 
                                     <td class="text-center">
@@ -272,7 +368,8 @@ if (!empty($struktur)) {
                                                        data-nama="<?= esc($item['nama']) ?>"
                                                        data-parent="<?= $item['parent_id'] ?>"
                                                        data-deskripsi="<?= htmlspecialchars($item['deskripsi'] ?? '') ?>"
-                                                       data-sorting="<?= $item['sorting'] ?>">
+                                                       data-sorting="<?= $item['sorting'] ?>"
+                                                       data-isroot="<?= $isRoot ? '1' : '0' ?>">
                                                         <i class="fas fa-pen fa-xs"></i>
                                                     </button>
                                                 <?php endif; ?>
@@ -309,6 +406,31 @@ if (!empty($struktur)) {
     </div>
 </div>
 
+<!-- Modal View Deskripsi -->
+<div class="modal fade" id="modalViewDeskripsi" tabindex="-1" aria-labelledby="modalViewDeskripsiLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalViewDeskripsiLabel">
+                    <i class="fas fa-file-alt me-2"></i>Deskripsi Unit
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="view-deskripsi-title" class="mb-3"></h6>
+                <div id="view-deskripsi-content" class="border rounded p-3 bg-light" style="min-height: 200px;">
+                    <!-- Deskripsi akan dimuat di sini -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Create -->
 <div class="modal fade" id="modalCreate" tabindex="-1" aria-labelledby="modalCreateLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -335,12 +457,12 @@ if (!empty($struktur)) {
 
                             <div class="mb-3">
                                 <label class="form-label">Induk (Parent)</label>
-                                <select class="form-select select2-create" name="parent_id">
+                                <select class="form-select select2-create" name="parent_id" id="select2-create">
                                     <option value="" data-depth="0">- Tidak Ada (Root) -</option>
                                     <?php if (!empty($parents)): ?>
                                         <?php foreach ($parents as $p): ?>
                                             <option value="<?= $p['id_struktur'] ?>" data-depth="<?= $p['depth'] ?>">
-                                                <?= $p['nama'] ?>
+                                                <?= esc($p['nama']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -355,7 +477,10 @@ if (!empty($struktur)) {
                                 <div id="editor-container-create"></div>
                                 <input type="hidden" name="deskripsi" id="deskripsi_input_create">
                                 <div class="form-text mt-2">
-                                    <i class="fas fa-pen-fancy me-1"></i>Jelaskan tugas pokok dan fungsi unit ini
+                                    <div id="deskripsi-info-create" class="deskripsi-info deskripsi-info-normal">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span>Deskripsi opsional untuk semua unit</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -436,12 +561,12 @@ if (!empty($struktur)) {
 
                             <div class="mb-3">
                                 <label class="form-label">Induk (Parent)</label>
-                                <select class="form-select select2-edit" name="parent_id" id="edit_parent">
+                                <select class="form-select select2-edit" name="parent_id" id="select2-edit">
                                     <option value="" data-depth="0">- Tidak Ada (Root) -</option>
                                     <?php if (!empty($parents)): ?>
                                         <?php foreach ($parents as $p): ?>
                                             <option value="<?= $p['id_struktur'] ?>" data-depth="<?= $p['depth'] ?>">
-                                                <?= $p['nama'] ?>
+                                                <?= esc($p['nama']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -451,12 +576,16 @@ if (!empty($struktur)) {
                                 </div>
                             </div>
 
-                            <div class="mb-3">
+                            <!-- Bagian Deskripsi (akan ditampilkan/sembunyikan berdasarkan kondisi) -->
+                            <div class="mb-3" id="edit-deskripsi-container">
                                 <label class="form-label">Deskripsi Tugas & Fungsi</label>
                                 <div id="editor-container-edit"></div>
                                 <input type="hidden" name="deskripsi" id="deskripsi_input_edit">
                                 <div class="form-text mt-2">
-                                    <i class="fas fa-pen-fancy me-1"></i>Jelaskan tugas pokok dan fungsi unit ini
+                                    <div id="deskripsi-info-edit" class="deskripsi-info deskripsi-info-normal">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span>Deskripsi opsional untuk semua unit</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -500,7 +629,7 @@ if (!empty($struktur)) {
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+$(document).ready(function() {
     // Initialize Tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -521,6 +650,34 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
+    // --- QUILL EDITOR FOR CREATE ---
+    var quillCreate = new Quill('#editor-container-create', {
+        theme: 'snow',
+        placeholder: 'Tulis tugas pokok dan fungsi unit...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'header': [1, 2, 3, false] }],
+                ['link', 'clean']
+            ]
+        }
+    });
+
+    // --- QUILL EDITOR FOR EDIT ---
+    var quillEdit = new Quill('#editor-container-edit', {
+        theme: 'snow',
+        placeholder: 'Tulis tugas pokok dan fungsi unit...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'header': [1, 2, 3, false] }],
+                ['link', 'clean']
+            ]
+        }
+    });
 
     // --- SELECT2 FORMATTING FUNCTIONS ---
     function formatStruktur(state) {
@@ -557,48 +714,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return $('<span>' + icon + state.text + '</span>');
     }
 
-    // --- QUILL EDITOR FOR CREATE ---
-    var quillCreate = new Quill('#editor-container-create', {
-        theme: 'snow',
-        placeholder: 'Tulis tugas pokok dan fungsi unit...',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                [{ 'header': [1, 2, 3, false] }],
-                ['link', 'clean']
-            ]
-        }
-    });
-
-    // --- QUILL EDITOR FOR EDIT ---
-    var quillEdit = new Quill('#editor-container-edit', {
-        theme: 'snow',
-        placeholder: 'Tulis tugas pokok dan fungsi unit...',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                [{ 'header': [1, 2, 3, false] }],
-                ['link', 'clean']
-            ]
-        }
-    });
-
-    // --- FORM CREATE SUBMISSION ---
-    document.getElementById('formCreate').onsubmit = function() {
-        var input = document.getElementById('deskripsi_input_create');
-        input.value = (quillCreate.root.innerHTML === '<p><br></p>') ? '' : quillCreate.root.innerHTML;
-    };
-
-    // --- FORM EDIT SUBMISSION ---
-    document.getElementById('formEdit').onsubmit = function() {
-        var input = document.getElementById('deskripsi_input_edit');
-        input.value = (quillEdit.root.innerHTML === '<p><br></p>') ? '' : quillEdit.root.innerHTML;
-    };
-
     // --- INITIALIZE SELECT2 FOR CREATE ---
     $('#modalCreate').on('shown.bs.modal', function () {
+        // Destroy existing select2 instance if any
+        if ($('#select2-create').hasClass('select2-hidden-accessible')) {
+            $('#select2-create').select2('destroy');
+        }
+        
         $('.select2-create').select2({
             theme: 'bootstrap-5',
             placeholder: 'Cari Unit Induk...',
@@ -607,10 +729,18 @@ document.addEventListener('DOMContentLoaded', function () {
             templateResult: formatStruktur,
             templateSelection: formatSelection
         });
+        
+        // Update info message based on parent selection
+        updateDeskripsiInfo('create');
     });
 
     // --- INITIALIZE SELECT2 FOR EDIT ---
     $('#modalEdit').on('shown.bs.modal', function () {
+        // Destroy existing select2 instance if any
+        if ($('#select2-edit').hasClass('select2-hidden-accessible')) {
+            $('#select2-edit').select2('destroy');
+        }
+        
         $('.select2-edit').select2({
             theme: 'bootstrap-5',
             placeholder: 'Cari Unit Induk...',
@@ -619,52 +749,163 @@ document.addEventListener('DOMContentLoaded', function () {
             templateResult: formatStruktur,
             templateSelection: formatSelection
         });
+        
+        // Update info message based on parent selection
+        updateDeskripsiInfo('edit');
+    });
+
+    // Fungsi untuk update info deskripsi
+    function updateDeskripsiInfo(type) {
+        const selectElement = type === 'create' ? '#select2-create' : '#select2-edit';
+        const infoSpan = type === 'create' ? $('#deskripsi-info-create span') : $('#deskripsi-info-edit span');
+        const infoDiv = type === 'create' ? $('#deskripsi-info-create') : $('#deskripsi-info-edit');
+        
+        function updateInfo(hasParent) {
+            if (!hasParent) {
+                infoSpan.html('Deskripsi opsional (root unit jarang butuh deskripsi)');
+                infoDiv.removeClass('deskripsi-info-child').addClass('deskripsi-info-parent');
+            } else {
+                infoSpan.html('<strong>Deskripsi diperlukan</strong> untuk child unit');
+                infoDiv.removeClass('deskripsi-info-parent').addClass('deskripsi-info-child');
+            }
+        }
+        
+        // Initial state
+        const currentValue = $(selectElement).val();
+        updateInfo(currentValue && currentValue !== '');
+        
+        // Change event
+        $(selectElement).off('change').on('change', function() {
+            const selectedValue = $(this).val();
+            const hasParent = selectedValue && selectedValue !== '';
+            updateInfo(hasParent);
+        });
+    }
+
+    // --- FORM CREATE SUBMISSION ---
+    document.getElementById('formCreate').onsubmit = function() {
+        var input = document.getElementById('deskripsi_input_create');
+        input.value = (quillCreate.root.innerHTML === '<p><br></p>') ? '' : quillCreate.root.innerHTML;
+        return true;
+    };
+
+    // --- FORM EDIT SUBMISSION ---
+    document.getElementById('formEdit').onsubmit = function() {
+        var input = document.getElementById('deskripsi_input_edit');
+        input.value = (quillEdit.root.innerHTML === '<p><br></p>') ? '' : quillEdit.root.innerHTML;
+        return true;
+    };
+
+    // --- VIEW DESKRIPSI MODAL ---
+    $('.view-deskripsi').on('click', function() {
+        var deskripsi = $(this).data('deskripsi');
+        var nama = $(this).data('nama');
+        
+        $('#view-deskripsi-title').html('Deskripsi: ' + nama);
+        $('#view-deskripsi-content').html(deskripsi);
+        
+        $('#modalViewDeskripsi').modal('show');
     });
 
     // --- HANDLE EDIT BUTTON CLICK ---
-    document.querySelectorAll('.btn-edit').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var id = this.dataset.id;
-            var nama = this.dataset.nama;
-            var parent = this.dataset.parent;
-            var deskripsi = this.dataset.deskripsi;
-            var sorting = this.dataset.sorting;
+    $('.btn-edit').on('click', function() {
+        var id = $(this).data('id');
+        var nama = $(this).data('nama');
+        var parent = $(this).data('parent');
+        var deskripsi = $(this).data('deskripsi');
+        var sorting = $(this).data('sorting');
+        var isRoot = $(this).data('isroot') === '1';
 
-            // Set form action
-            document.getElementById('formEdit').action = '/struktur_organisasi/' + id;
+        // Set form action
+        $('#formEdit').attr('action', '/struktur_organisasi/' + id);
 
-            // Fill form fields
-            document.getElementById('edit_nama').value = nama;
-            document.getElementById('edit_sorting').value = sorting;
+        // Fill form fields
+        $('#edit_nama').val(nama);
+        $('#edit_sorting').val(sorting);
 
-            // Set parent select value
-            $('.select2-edit').val(parent).trigger('change');
-
-            // Set Quill content
-            if (deskripsi && deskripsi !== '') {
+        // Set Quill content
+        if (deskripsi) {
+            setTimeout(function() {
                 quillEdit.clipboard.dangerouslyPasteHTML(deskripsi);
-            } else {
-                quillEdit.setText('');
-            }
-
-            // Show modal
-            var modalEdit = new bootstrap.Modal(document.getElementById('modalEdit'));
-            modalEdit.show();
+            }, 500);
+        }
+        
+        // Store data for when modal opens
+        $('#modalEdit').data('edit-data', {
+            parent: parent,
+            isRoot: isRoot
         });
+
+        // Show modal
+        $('#modalEdit').modal('show');
+    });
+    
+    // Handle when edit modal is shown
+    $('#modalEdit').on('shown.bs.modal', function() {
+        var editData = $(this).data('edit-data');
+        if (editData) {
+            // Set parent value
+            if (editData.parent !== undefined) {
+                $('#select2-edit').val(editData.parent).trigger('change');
+            }
+            
+            // Tampilkan/sembunyikan bagian deskripsi berdasarkan apakah ini root/parent
+            var isRoot = editData.isRoot;
+            var deskripsiContainer = $('#edit-deskripsi-container');
+            
+            if (isRoot) {
+                // Untuk parent/root unit: sembunyikan bagian deskripsi
+                deskripsiContainer.hide();
+                
+                // Tambahkan placeholder untuk menjelaskan
+                if (!deskripsiContainer.prev().hasClass('deskripsi-hidden-info')) {
+                    $('<div class="deskripsi-hidden mb-3">' +
+                        '<i class="fas fa-info-circle me-2"></i>' +
+                        'Deskripsi tidak diperlukan untuk root/parent unit. ' +
+                        'Hanya child unit yang memerlukan deskripsi tugas dan fungsi.' +
+                      '</div>').insertBefore(deskripsiContainer)
+                        .addClass('deskripsi-hidden-info');
+                }
+            } else {
+                // Untuk child unit: tampilkan bagian deskripsi
+                deskripsiContainer.show();
+                
+                // Hapus placeholder jika ada
+                $('.deskripsi-hidden-info').remove();
+            }
+        }
     });
 
     // --- RESET FORMS WHEN MODALS CLOSE ---
     $('#modalCreate').on('hidden.bs.modal', function () {
         document.getElementById('formCreate').reset();
         quillCreate.setText('');
-        $('.select2-create').val('').trigger('change');
+        $('#select2-create').val('').trigger('change');
+        
+        // Destroy select2 to prevent duplication
+        if ($('#select2-create').hasClass('select2-hidden-accessible')) {
+            $('#select2-create').select2('destroy');
+        }
     });
 
     $('#modalEdit').on('hidden.bs.modal', function () {
         document.getElementById('formEdit').reset();
         quillEdit.setText('');
-        $('.select2-edit').val('').trigger('change');
+        $('#select2-edit').val('').trigger('change');
+        
+        // Destroy select2 to prevent duplication
+        if ($('#select2-edit').hasClass('select2-hidden-accessible')) {
+            $('#select2-edit').select2('destroy');
+        }
+        
+        // Tampilkan kembali bagian deskripsi untuk next edit
+        $('#edit-deskripsi-container').show();
+        $('.deskripsi-hidden-info').remove();
+        
+        // Clear edit data
+        $(this).removeData('edit-data');
     });
 });
 </script>
+
 <?= $this->endSection() ?>
