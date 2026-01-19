@@ -41,5 +41,10 @@ class PhotoGalleryModel extends Model
                     ->findAll();
     }
 
+    public function getPhotoCount($albumId)
+    {
+        return $this->where('id_album', $albumId)->countAllResults();
+    }
+
     // Ambil data foto yang masuk tong sampah
 }
