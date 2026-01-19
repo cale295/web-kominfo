@@ -444,12 +444,12 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
             </div>
 
             <div class="d-flex align-items-center mb-3 mt-5 p-3 bg-gray-50 border rounded">
-                <div class="form-check form-switch m-0">
-                    <input class="form-check-input" type="checkbox" role="switch" id="toggle-content2"
-                        <?= old('has_content2') || !empty($oldContent2) ? 'checked' : '' ?>>
-                    <label class="form-check-label fw-bold" for="toggle-content2">Tambah Halaman/Bagian Kedua (Isi Berita 2 & Sisipan)</label>
-                </div>
-                <input type="hidden" name="has_content2" id="has-content2-val" value="0">
+<div class="form-check form-switch m-0">
+    <input class="form-check-input" type="checkbox" role="switch" id="toggle-content2"
+        <?= (old('has_content2') == '1' || !empty($oldContent2)) ? 'checked' : '' ?>>
+    <label class="form-check-label fw-bold" for="toggle-content2">Tambah Halaman/Bagian Kedua (Isi Berita 2 & Sisipan)</label>
+</div>
+<input type="hidden" name="has_content2" id="has-content2-val" value="<?= (old('has_content2') == '1' || !empty($oldContent2)) ? '1' : '0' ?>">
             </div>
 
             <div class="sisipan-box mb-4" id="box-sisipan-1" style="display: none;">
@@ -689,34 +689,35 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                     $oldCaptions = old('caption_additional', []);
                 ?>
                     <div class="row mt-3">
-                        <?php foreach ($tempAdditionalImages as $index => $tempImage): ?>
-                            <div class="col-md-4 mb-3">
-                                <div class="card h-100 border-info shadow-sm">
-                                    <div class="position-relative">
-                                        <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
-                                        <div class="temp-image-badge position-absolute top-0 end-0 m-1">
-                                            <i class="bi bi-clock-history"></i> Temp
-                                        </div>
-                                    </div>
-                                    <div class="card-body p-2 bg-light">
-                                        <input type="text" name="caption_additional[]" class="form-control form-control-sm"
-                                            placeholder="Caption foto ini..."
-                                            value="<?= isset($oldCaptions[$index]) ? esc($oldCaptions[$index]) : '' ?>">
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+<?php foreach ($tempAdditionalImages as $index => $tempImage): ?>
+    <div class="col-md-4 mb-3" id="temp-img-card-<?= $index ?>">
+        <input type="hidden" name="temp_uploaded_files[]" value="<?= esc($tempImage) ?>">
+        
+        <div class="card h-100 border-info shadow-sm">
+            <div class="position-relative">
+                <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
+                
+                <div class="temp-image-badge position-absolute top-0 start-0 m-1">
+                    <i class="bi bi-clock-history"></i> Temp
+                </div>
+
+                <button type="button" class="btn-delete-new-img" onclick="removeTempImage('temp-img-card-<?= $index ?>')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="card-body p-2 bg-light">
+                <input type="text" name="caption_additional_temp[]" class="form-control form-control-sm"
+                    placeholder="Caption foto ini..."
+                    value="<?= isset($oldCaptions[$index]) ? esc($oldCaptions[$index]) : '' ?>">
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
                     </div>
                 <?php endif; ?>
 
                 <div id="additional-preview-new" class="row mt-3"></div>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Link Video</label>
-                <input type="text" name="link_video" class="form-control" placeholder="https://youtube.com/watch?v=..." value="<?= old('link_video') ?>">
-            </div>
-        </div>
 
         <div class="mb-3">
             <label class="form-label">Waktu Publish</label>
@@ -732,16 +733,22 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
         <input type="hidden" name="status_berita" value="2">
 
         <div class="action-buttons d-flex justify-content-end gap-2">
-            <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
+    <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
 
-            <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
-                <i class="bi bi-file-earmark-text"></i> Simpan Draft
-            </button>
+    <button type="submit" name="submit_type" value="pending" class="btn btn-warning text-white fw-semibold">
+        <i class="bi bi-hourglass-split"></i> Ajukan Verifikasi
+    </button>
 
-            <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
-                <i class="bi bi-send"></i> Publikasikan
-            </button>
-        </div>
+    <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
+        <i class="bi bi-file-earmark-text"></i> Simpan Draft
+    </button>
+    <?php $role = session()->get('role'); ?>
+    <?php if ($role == 'admin' || $role == 'superadmin') : ?>
+        <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
+            <i class="bi bi-send"></i> Publikasikan
+        </button>
+    <?php endif; ?>
+</div>
     </form>
 </div>
 
@@ -848,6 +855,13 @@ function deleteAdditionalPreview(index) {
     });
 }
 
+function removeTempImage(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        // Hapus elemen dari DOM
+        element.remove();
+    }
+}
 // Function Inisialisasi Pencarian Sisipan
 function initSisipanSearch(prefix) {
     const searchInput = document.getElementById(prefix + '-search');
@@ -1238,4 +1252,5 @@ window.uncheckItem = function(checkboxId) {
     }
 };
 </script>
+
 <?= $this->endSection() ?>

@@ -301,12 +301,6 @@ class BeritaController extends BaseController
                     'required' => 'Tanggal wajib diisi.'
                 ],
             ],
-            'sumber' => [
-                'rules'  => 'required|max_length[255]',
-                'errors' => [
-                    'max_length' => 'Sumber maksimal 255 karakter.'
-                ]
-            ],
             'additional_images' => [
                 'rules'  => 'permit_empty',
             ],
@@ -410,14 +404,18 @@ class BeritaController extends BaseController
         $post = $this->request->getPost();
         
         // Draft/Publish Logic
-        $submitType = $this->request->getPost('submit_type');
-        if ($submitType === 'draft') {
-            $status       = '5';
-            $statusBerita = 0;
-        } else {
-            $status       = '1';
-            $statusBerita = 4;
-        }
+           $submitType = $this->request->getPost('submit_type');
+
+    if ($submitType === 'draft') {
+        $status       = '5'; // Tidak Tayang
+        $statusBerita = 0;   // Draft
+    } elseif ($submitType === 'pending') {
+        $status       = '5'; // Tidak Tayang
+        $statusBerita = 2;   // Menunggu Verifikasi
+    } else {
+        $status       = '1'; // Tayang
+        $statusBerita = 4;   // Layak Tayang
+    }
 
         // Kategori
         $kategoriIds = is_array($post['id_kategori']) ? $post['id_kategori'] : explode(',', $post['id_kategori']);
@@ -440,7 +438,6 @@ class BeritaController extends BaseController
             'content2'          => $post['content2'],
             'id_kategori'       => $idKategori,
             'id_tags'           => $idTagsUtama,
-            'link_video'        => $post['link_video'] ?? null,
             'keyword'           => $post['keyword'] ?? null,
             'feat_image'        => $featImagePath,
             'id_berita_terkait'  => !empty($post['id_berita_terkait']) ? $post['id_berita_terkait'] : null,
@@ -825,7 +822,6 @@ public function update($id)
         'content2'           => $post['content2'],
         'id_kategori'        => $idKategori,
         'id_tags'            => $idTagsUtama,
-        'link_video'         => $post['link_video'] ?? null,
         'keyword'            => $post['keyword'] ?? null,
         'feat_image'         => $featImagePath,
         'id_berita_terkait'  => !empty($post['id_berita_terkait']) ? $post['id_berita_terkait'] : null,
@@ -1144,7 +1140,6 @@ private function saveLog($idBerita, $keterangan, $status = null, $notePerbaikan 
                     'sumber' => 'Sumber',
                     'keyword' => 'Keyword',
                     'feat_image' => 'Foto Cover',
-                    'link_video' => 'Link Video',
                     'caption' => 'Caption Cover'
                 ];
 

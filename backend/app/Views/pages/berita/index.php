@@ -404,46 +404,55 @@
                             </td>
                         </tr>
                     <?php else: ?>
-                        <?php foreach ($berita as $i => $row): ?>
-                            <?php 
-                                // ===========================================
-                                // LOGIKA PERMISSION KHUSUS EDITOR
-                                // ===========================================
-                                
-                                // 1. Ambil data session user saat ini
-                                $currentRole = session()->get('role'); // Role user (admin, editor, etc)
-                                $currentUserId = session()->get('id'); // ID user yang login (sesuaikan key session jika perlu)
-                                
-                                // 2. Set permission default dari Controller
-                                $allowEdit = !empty($can_update);
-                                $allowDelete = !empty($can_delete) && ($row['status'] != '1'); // Tidak bisa hapus jika sedang tayang
-                                $isLayakTayang = ($row['status_berita'] == '4'); // Status siap tayang
+<?php foreach ($berita as $i => $row): ?>
+                    <?php 
+                        // ===========================================
+                        // LOGIKA PERMISSION FINAL
+                        // ===========================================
+                        
+                        $currentRole   = session()->get('role'); 
+                        $currentUserId = session()->get('id_user');
+                        
+                        // 1. Setting Default (Untuk Admin)
+                        // Admin ikut settingan controller ($can_update)
+                        $allowEdit   = !empty($can_update);
+                        $allowDelete = !empty($can_delete) && ($row['status'] != '1'); 
+                        $isLayakTayang = ($row['status_berita'] == '4');
+                        $disableToggle = false;
 
-                                // 3. Logika Pembatasan Editor
-                                $disableToggle = false; // Default: toggle aktif
+                        // 2. Setting Khusus EDITOR
+                        if ($currentRole == 'editor') {
+                            // A. Matikan dulu semua izin editor (Default: Dilarang)
+                            $allowEdit   = false; 
+                            $allowDelete = false;
+                            $disableToggle = true; // Editor tidak boleh publish langsung
 
-                                if ($currentRole == 'editor') {
-                                    // A. PEMBATASAN KEPEMILIKAN
-                                    // Editor HANYA bisa mengedit/hapus data yang DIA BUAT SENDIRI
-                                    // Pastikan 'author_id' sesuai dengan nama kolom di database Anda (misal: created_by, id_user, dll)
-                                    $authorId = $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? null;
-                                    
-                                    if ($authorId != $currentUserId) {
-                                        $allowEdit = false;
-                                        $allowDelete = false;
-                                    }
-
-                                    // B. PEMBATASAN TOGGLE PUBLISH
-                                    // Editor tidak boleh mempublikasikan berita secara langsung (harus via admin/verifikator)
-                                    $disableToggle = true; 
+                            // B. Cek Kepemilikan (Apakah ini berita buatannya?)
+                            $authorId = $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? null;
+                            
+                            if ($authorId == $currentUserId) {
+                                // C. Cek Status Berita
+                                // 0 = Draft
+                                // 3 = Perbaikan
+                                // 6 = Revisi
+                                // Jika statusnya salah satu di atas => IZINKAN EDIT
+                                if (in_array($row['status_berita'], ['0', '3', '6'])) {
+                                    $allowEdit   = true;
+                                    $allowDelete = true;
                                 }
+                                // Catatan: Jika status '2' (Verifikasi) atau '4' (Layak Tayang),
+                                // maka kode masuk ke 'else' (tidak melakukan apa-apa), 
+                                // sehingga $allowEdit tetap FALSE.
+                            }
+                        }
 
-                                // C. Pembatasan umum untuk tombol Toggle (Non-Editor pun butuh status Layak Tayang)
-                                if (!$isLayakTayang && $currentRole != 'editor') {
-                                    $disableToggle = true;
-                                }
-                            ?>
-                            <tr class="data-row">
+                        // 3. Logika Toggle untuk Non-Editor (Admin)
+                        if (!$isLayakTayang && $currentRole != 'editor') {
+                            $disableToggle = true;
+                        }
+                    ?>
+
+                    <tr class="data-row">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
                                 <td class="text-center">

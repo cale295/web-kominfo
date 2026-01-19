@@ -640,11 +640,7 @@
     <div id="additional-preview-new" class="row mt-3"></div>
 </div>
 
-            <div class="mb-3">
-                <label class="form-label">Link Video</label>
-                <input type="text" name="link_video" class="form-control" value="<?= esc(old('link_video', $berita['link_video'])) ?>">
-            </div>
-        </div>
+         
 
         <div class="mb-3">
             <label class="form-label">Waktu Publish</label>
@@ -710,21 +706,23 @@
     </div>
 
 <?php endif; ?>
-        <div class="action-buttons d-flex justify-content-end gap-2">
-            <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
-            
-            <button type="submit" name="submit_type" value="draft" class="btn btn-light border fw-semibold">
-                <i class="bi bi-file-earmark-text"></i> Simpan Draft
-            </button>
-            
-            <button type="submit" name="submit_type" value="pending" class="btn btn-warning text-white fw-semibold">
-                <i class="bi bi-hourglass-split"></i> Ajukan Verifikasi
-            </button>
-            
-            <button type="submit" name="submit_type" value="publish" class="btn btn-primary fw-semibold">
-                <i class="bi bi-send"></i> Publikasikan
-            </button>
-        </div>
+                <div class="action-buttons d-flex justify-content-end gap-2">
+    <a href="<?= site_url('berita') ?>" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Batal</a>
+
+    <button type="submit" name="submit_type" value="pending" class="btn btn-warning text-white fw-semibold">
+        <i class="bi bi-hourglass-split"></i> Ajukan Verifikasi
+    </button>
+
+    <button type="submit" name="submit_type" value="draft" class="btn btn-warning text-white">
+        <i class="bi bi-file-earmark-text"></i> Simpan Draft
+    </button>
+    <?php $role = session()->get('role'); ?>
+    <?php if ($role == 'admin' || $role == 'superadmin') : ?>
+        <button type="submit" name="submit_type" value="publish" class="btn btn-primary">
+            <i class="bi bi-send"></i> Publikasikan
+        </button>
+    <?php endif; ?>
+</div>
     </form>
 </div>
 
