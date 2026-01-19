@@ -231,6 +231,32 @@
         border-radius: 6px;
     }
 
+    /* Kategori styles */
+    .kategori-list .form-check {
+        cursor: pointer;
+        border-radius: 6px;
+        margin: 5px 20px;
+    }
+
+    .form-check-input {
+        margin-right: 10px;
+        outline: 1px solid black;
+    }
+
+    .kategori-list .form-check:hover {
+        background-color: var(--gray-50);
+    }
+
+    .tags-list .form-check {
+        cursor: pointer;
+        border-radius: 6px;
+        margin: 5px 20px;
+    }
+
+    .tags-list .form-check:hover {
+        background-color: var(--gray-50);
+    }
+
     /* Tombol aksi kompak */
     .action-buttons {
         padding-top: 20px;
@@ -513,7 +539,6 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                     <div class="dropdown" id="kategori-dropdown">
                         <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="kategori-toggle">
                             <span id="kategori-placeholder">Pilih minimal 1 kategori</span>
-                            <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
                         </button>
                         <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 280px;">
                             <div class="px-2 py-2 border-bottom">
@@ -550,7 +575,6 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                     <div class="dropdown" id="tags-dropdown">
                         <button type="button" class="form-select text-start d-flex align-items-center pe-3" id="tags-toggle">
                             <span id="tags-placeholder">Pilih tags (opsional)</span>
-                            <i class="ms-auto bi bi-chevron-down text-gray-500"></i>
                         </button>
                         <div class="dropdown-menu w-100 p-0 shadow border" style="max-height: 280px;">
                             <div class="px-2 py-2 border-bottom">

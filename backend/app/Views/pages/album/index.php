@@ -394,6 +394,7 @@
 
 <div class="container-fluid py-4">
 
+    <!-- Page Header -->
     <div class="page-header">
         <h3 class="page-title">
             <i class="bi bi-grid-3x3-gap-fill"></i>
@@ -401,25 +402,26 @@
         </h3>
     </div>
 
+    <!-- Toolbar -->
     <div class="toolbar">
         <div class="d-flex gap-2">
-            <button type="button" class="btn-toolbar btn-add" 
-                    data-bs-toggle="modal" data-bs-target="#addAlbumModal">
+            <button type="button" class="btn-toolbar btn-add"
+                data-bs-toggle="modal" data-bs-target="#addAlbumModal">
                 <i class="bi bi-plus-circle-fill"></i>
-                Tambah Album
+                Tambah Foto
             </button>
-            
+
             <button type="button" class="btn-toolbar btn-refresh" onclick="location.reload()">
                 <i class="bi bi-arrow-clockwise"></i>
                 Refresh Data
             </button>
         </div>
-        
+
         <div class="search-box">
             <i class="bi bi-search"></i>
             <input type="text" class="form-control" placeholder="Cari Foto..." id="searchInput">
         </div>
-        
+
         <div class="view-toggle">
             <button class="view-btn" onclick="toggleView('list')" title="List View">
                 <i class="bi bi-list-ul"></i>
@@ -430,88 +432,87 @@
         </div>
     </div>
 
+    <!-- Album Grid -->
     <?php if (empty($albums)): ?>
         <div class="empty-state">
             <img src="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" width="120" alt="Empty">
             <h5 class="text-muted mt-3">Belum ada album</h5>
             <p class="text-muted">Mulai dengan membuat album pertama Anda.</p>
-            <button type="button" class="btn btn-primary mt-3 px-4" 
-                    data-bs-toggle="modal" data-bs-target="#addAlbumModal">
+            <button type="button" class="btn btn-primary mt-3 px-4"
+                data-bs-toggle="modal" data-bs-target="#addAlbumModal">
                 <i class="bi bi-plus-lg me-2"></i>Buat Album Baru
             </button>
         </div>
     <?php else: ?>
+        <!-- Grid View -->
         <div class="album-grid active" id="gridView">
             <?php foreach ($albums as $row): ?>
-            <div class="album-card" onclick="window.location='<?= site_url('album/'.$row['id_album']) ?>'">
-                <?php if ($row['cover_image'] && file_exists('uploads/album_covers/' . $row['cover_image'])): ?>
-                    <img src="<?= base_url('uploads/album_covers/'.$row['cover_image']) ?>" class="album-cover" alt="Cover">
-                <?php else: ?>
-                    <div class="album-cover-placeholder">
-                        <i class="bi bi-image"></i>
-                    </div>
-                <?php endif; ?>
-                
-                <div class="album-info">
-                    <h5 class="album-title"><?= esc($row['album_name']) ?></h5>
-                    
-                    <div class="album-meta">
-                        <div class="photo-count">
-                            <i class="bi bi-images"></i>
-                            <span>3 Foto</span>
+                <div class="album-card" onclick="window.location='<?= site_url('album/' . $row['id_album']) ?>'">
+                    <?php if ($row['cover_image'] && file_exists('uploads/album_covers/' . $row['cover_image'])): ?>
+                        <img src="<?= base_url('uploads/album_covers/' . $row['cover_image']) ?>" class="album-cover" alt="Cover">
+                    <?php else: ?>
+                        <div class="album-cover-placeholder">
+                            <i class="bi bi-image"></i>
                         </div>
-                        <span class="album-author">
-                            <i class="bi bi-person-circle"></i>
-                            Admin
-                        </span>
-                    </div>
-                    
-                    <div class="album-date">
-                        <i class="bi bi-calendar-event"></i>
-                        <?= date('d M Y H:i', strtotime($row['created_at'] ?? 'now')) ?>
-                    </div>
-                    
-                    <div class="album-actions" onclick="event.stopPropagation()">
-                        <button class="action-btn btn-view" 
-                                onclick="window.location='<?= site_url('album/'.$row['id_album']) ?>'"
+                    <?php endif; ?>
+
+                    <div class="album-info">
+                        <h5 class="album-title"><?= esc($row['album_name']) ?></h5>
+
+                        <div class="album-meta">
+                            <div class="photo-count">
+                                <i class="bi bi-images"></i>
+                                <?= $row['photo_count'] ?? 0; ?> Foto
+                            </div>
+
+                            <span class="album-author">
+                                <i class="bi bi-person-circle"></i>
+                                Admin
+                            </span>
+                        </div>
+
+
+                        <div class="album-date">
+                            <i class="bi bi-calendar-event"></i>
+                            <?= date('d M Y H:i', strtotime($row['created_at'] ?? 'now')) ?>
+                        </div>
+
+                        <div class="album-actions" onclick="event.stopPropagation()">
+                            <button class="action-btn btn-view"
+                                onclick="window.location='<?= site_url('album/' . $row['id_album']) ?>'"
                                 title="Lihat Album">
-                            <i class="bi bi-eye-fill"></i>
-                        </button>
-                        
-                        <button class="action-btn btn-upload"
-                                data-bs-toggle="modal" 
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+
+                            <button class="action-btn btn-upload"
+                                data-bs-toggle="modal"
                                 data-bs-target="#uploadModal"
-                                data-id="<?= $row['id_album'] ?>" 
-                                data-name="<?= esc($row['album_name']) ?>"
-                                title="Upload Foto">
-                            <i class="bi bi-cloud-arrow-up-fill"></i>
-                        </button>
-                        
-                        <!-- Tombol Edit dengan trigger modal -->
-                        <button class="action-btn btn-edit"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#editAlbumModal"
                                 data-id="<?= $row['id_album'] ?>"
                                 data-name="<?= esc($row['album_name']) ?>"
-                                data-description="<?= esc($row['description']) ?>"
-                                data-cover="<?= $row['cover_image'] ?>"
-                                title="Edit Album">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        
-                        <form action="<?= site_url('album/'.$row['id_album']) ?>" method="post" class="d-inline delete-form" style="margin: 0;">
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="button" class="action-btn btn-delete btn-delete-confirm" title="Hapus Album">
-                                <i class="bi bi-trash-fill"></i>
+                                title="Upload Foto">
+                                <i class="bi bi-cloud-arrow-up-fill"></i>
                             </button>
-                        </form>
+
+                            <button class="action-btn btn-edit"
+                                onclick="window.location='<?= site_url('album/' . $row['id_album'] . '/edit') ?>'"
+                                title="Edit Album">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+
+                            <form action="<?= site_url('album/' . $row['id_album']) ?>" method="post" class="d-inline delete-form" style="margin: 0;">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="button" class="action-btn btn-delete btn-delete-confirm" title="Hapus Album">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
             <?php endforeach; ?>
         </div>
 
+        <!-- List View -->
         <div class="album-list" id="listView">
             <div class="card card-table">
                 <div class="card-body p-0">
@@ -528,66 +529,59 @@
                             </thead>
                             <tbody>
                                 <?php foreach ($albums as $i => $row): ?>
-                                <tr>
-                                    <td class="text-center text-muted fw-bold"><?= $i+1 ?></td>
-                                    
-                                    <td>
-                                        <?php if ($row['cover_image'] && file_exists('uploads/album_covers/' . $row['cover_image'])): ?>
-                                            <img src="<?= base_url('uploads/album_covers/'.$row['cover_image']) ?>" class="album-cover-thumb" alt="Cover">
-                                        <?php else: ?>
-                                            <div class="table-album-cover-placeholder"><i class="bi bi-image"></i></div>
-                                        <?php endif; ?>
-                                    </td>
+                                    <tr>
+                                        <td class="text-center text-muted fw-bold"><?= $i + 1 ?></td>
 
-                                    <td>
-                                        <div class="fw-bold text-dark fs-6"><?= esc($row['album_name']) ?></div>
-                                        <span class="badge bg-light text-secondary border mt-1">ID: #<?= $row['id_album'] ?></span>
-                                    </td>
+                                        <td>
+                                            <?php if ($row['cover_image'] && file_exists('uploads/album_covers/' . $row['cover_image'])): ?>
+                                                <img src="<?= base_url('uploads/album_covers/' . $row['cover_image']) ?>" class="album-cover-thumb" alt="Cover">
+                                            <?php else: ?>
+                                                <div class="table-album-cover-placeholder"><i class="bi bi-image"></i></div>
+                                            <?php endif; ?>
+                                        </td>
 
-                                    <td>
-                                        <div class="text-muted small" style="line-height: 1.5;">
-                                            <?= esc($row['description']) ?: '<i class="text-muted">- Tidak ada deskripsi -</i>' ?>
-                                        </div>
-                                    </td>
+                                        <td>
+                                            <div class="fw-bold text-dark fs-6"><?= esc($row['album_name']) ?></div>
+                                            <span class="badge bg-light text-secondary border mt-1">ID: #<?= $row['id_album'] ?></span>
+                                        </td>
 
-                                    <td class="text-center">
-                                        <div class="btn-action-group">
-                                            <a href="<?= site_url('album/'.$row['id_album']) ?>" 
-                                               class="btn-action btn-view" 
-                                               data-bs-toggle="tooltip" title="Lihat Isi Galeri">
-                                                <i class="bi bi-eye-fill"></i>
-                                            </a>
+                                        <td>
+                                            <div class="text-muted small" style="line-height: 1.5;">
+                                                <?= esc($row['description']) ?: '<i class="text-muted">- Tidak ada deskripsi -</i>' ?>
+                                            </div>
+                                        </td>
 
-                                            <button type="button" class="btn-action btn-upload" 
+                                        <td class="text-center">
+                                            <div class="btn-action-group">
+                                                <a href="<?= site_url('album/' . $row['id_album']) ?>"
+                                                    class="btn-action btn-view"
+                                                    data-bs-toggle="tooltip" title="Lihat Isi Galeri">
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </a>
+
+                                                <button type="button" class="btn-action btn-upload"
                                                     data-bs-toggle="modal" data-bs-target="#uploadModal"
-                                                    data-id="<?= $row['id_album'] ?>" 
-                                                    data-name="<?= esc($row['album_name']) ?>"
-                                                    title="Upload Foto Baru">
-                                                <i class="bi bi-cloud-arrow-up-fill"></i>
-                                            </button>
-
-                                            <!-- Tombol Edit dengan trigger modal -->
-                                            <button type="button" class="btn-action btn-edit" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editAlbumModal"
                                                     data-id="<?= $row['id_album'] ?>"
                                                     data-name="<?= esc($row['album_name']) ?>"
-                                                    data-description="<?= esc($row['description']) ?>"
-                                                    data-cover="<?= $row['cover_image'] ?>"
-                                                    title="Edit Info Album">
-                                                <i class="bi bi-pencil-fill"></i>
-                                            </button>
-
-                                            <form action="<?= site_url('album/'.$row['id_album']) ?>" method="post" class="d-inline delete-form">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="_method" value="DELETE">
-                                                <button type="button" class="btn-action btn-delete btn-delete-confirm" title="Hapus Album">
-                                                    <i class="bi bi-trash-fill"></i>
+                                                    title="Upload Foto Baru">
+                                                    <i class="bi bi-cloud-arrow-up-fill"></i>
                                                 </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
+
+                                                <a href="<?= site_url('album/' . $row['id_album'] . '/edit') ?>"
+                                                    class="btn-action btn-edit" title="Edit Info Album">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+
+                                                <form action="<?= site_url('album/' . $row['id_album']) ?>" method="post" class="d-inline delete-form">
+                                                    <?= csrf_field() ?>
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <button type="button" class="btn-action btn-delete btn-delete-confirm" title="Hapus Album">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
