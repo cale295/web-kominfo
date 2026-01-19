@@ -29,32 +29,41 @@ class PhotoAlbumController extends BaseController
 
         if (!$access) {
             return view('pages/album/index', [
-                'title' => 'Manajemen Album', // PERBAIKAN: Sebelumnya Banner
+                'title' => 'Manajemen Album',
                 'albums' => [],
                 'error' => '⚠ Kamu tidak memiliki hak akses ke modul ini.'
             ]);
         }
 
         if (!$access['can_read']) {
-            return redirect()->to('/dashboard')->with('error', 'Kamu tidak punya izin melihat album.');
+            return redirect()->to('/dashboard')
+                ->with('error', 'Kamu tidak punya izin melihat album.');
         }
 
-        $data = [
+        $albums = $this->albumModel->findAll();
+
+        // ✅ WAJIB pakai & (reference)
+        foreach ($albums as &$album) {
+            $album['photo_count'] =
+                $this->galleryModel->getPhotoCount($album['id_album']);
+        }
+        unset($album); // best practice
+
+        return view('pages/album/index', [
             'title' => 'Daftar Album Foto',
-            'albums' => $this->albumModel->findAll(),
+            'albums' => $albums, // ✅ kirim yg sudah ada photo_count
             'can_create' => $access['can_create'],
             'can_update' => $access['can_update'],
             'can_delete' => $access['can_delete'],
-        ];
-
-        return view('pages/album/index', $data);
+        ]);
     }
+
 
     // ================= GET PHOTOS (AJAX) =================
     public function get_photos($id_album = null)
     {
         if (!$this->request->isAJAX()) {
-             // return $this->response->setStatusCode(403);
+            // return $this->response->setStatusCode(403);
         }
 
         if ($id_album === null) {
@@ -85,8 +94,8 @@ class PhotoAlbumController extends BaseController
         }
 
         $albumId = $this->request->getPost('id_album');
-        $titles = $this->request->getPost('titles');       
-        $descriptions = $this->request->getPost('descriptions'); 
+        $titles = $this->request->getPost('titles');
+        $descriptions = $this->request->getPost('descriptions');
         $files = $this->request->getFileMultiple('gallery_photos');
 
         $count = 0;
@@ -95,9 +104,9 @@ class PhotoAlbumController extends BaseController
             foreach ($files as $index => $file) {
                 if ($file->isValid() && !$file->hasMoved()) {
                     $fileName = $file->getRandomName();
-                    
+
                     // Pastikan path folder benar
-                    $file->move('uploads/gallery/', $fileName); 
+                    $file->move('uploads/gallery/', $fileName);
 
                     $userTitle = !empty($titles[$index]) ? $titles[$index] : pathinfo($file->getClientName(), PATHINFO_FILENAME);
                     $userDesc = !empty($descriptions[$index]) ? $descriptions[$index] : '-';
@@ -142,7 +151,7 @@ class PhotoAlbumController extends BaseController
             'photos' => $photos
         ];
 
-        return view('pages/album/detail', $data); 
+        return view('pages/album/detail', $data);
     }
 
     // ================= HAPUS SATU FOTO =================
@@ -152,8 +161,8 @@ class PhotoAlbumController extends BaseController
 
         if ($photo) {
             // Gunakan FCPATH agar path absolut server terbaca dengan benar
-            $filePath = FCPATH . 'uploads/gallery/' . $photo['file_path']; 
-            
+            $filePath = FCPATH . 'uploads/gallery/' . $photo['file_path'];
+
             if (file_exists($filePath)) {
                 @unlink($filePath); // Pakai @ agar tidak error jika file sudah hilang duluan
             }

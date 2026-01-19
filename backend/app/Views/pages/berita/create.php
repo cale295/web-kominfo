@@ -187,10 +187,25 @@
     .kategori-list .form-check {
         cursor: pointer;
         border-radius: 6px;
-        margin: 2px 0;
+        margin: 5px 20px;
+    }
+
+    .form-check-input {
+        margin-right: 10px;
+        outline: 1px solid black;
     }
 
     .kategori-list .form-check:hover {
+        background-color: var(--gray-50);
+    }
+
+    .tags-list .form-check {
+        cursor: pointer;
+        border-radius: 6px;
+        margin: 5px 20px;
+    }
+
+    .tags-list .form-check:hover {
         background-color: var(--gray-50);
     }
 
