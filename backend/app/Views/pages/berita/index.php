@@ -388,6 +388,7 @@
                         <th>Tags</th>
                         <th class="text-center">Status Berita</th>
                         <th class="text-center">Dibuat</th>
+                        <th class="text-center">Dilihat</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Aksi</th>
                         
@@ -490,11 +491,6 @@
 
                                 <td style="min-width: 180px;">
                                     <strong class="searchable"><?= esc($row['judul']) ?></strong>
-                                    <?php if (!empty($row['hit'])): ?>
-                                        <small class="d-block text-muted mt-1">
-                                            <i class="bi bi-eye"></i> <?= $row['hit'] ?> dilihat
-                                        </small>
-                                    <?php endif; ?>
                                 </td>
 
 
@@ -561,6 +557,12 @@
                                 <td class="text-center compact-date">
                                     <?= !empty($row['created_at']) ? date('d/m/y', strtotime($row['created_at'])) : '-' ?>
                                 </td>
+
+                            <td style="min-width: 180px;">
+                                    <strong class="searchable"><?= esc($row['hit']) ?></strong>
+                                </td>
+
+                                
                                 
                                 <td class="text-center">
                                     <button type="button" class="status-btn" 

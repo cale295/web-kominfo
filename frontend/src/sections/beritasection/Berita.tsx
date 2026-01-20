@@ -19,13 +19,25 @@ interface BeritaItem {
   kategori_slugs?: string[];
   tags?: string[];
   tags_slugs?: string[];
+  tags_hits?: string[];
 }
 
 interface Tag {
   id_tags: string;
   nama_tag: string;
   slug: string;
+  hit?: string;
 }
+
+// Interface untuk ApiTag (untuk data dari API yang mungkin punya properti berbeda)
+interface ApiTag {
+  id_tags?: string;
+  id_tags_berita?: string; // Properti alternatif
+  nama_tag?: string;
+  slug?: string;
+  hit?: string;
+}
+
 
 interface Kategori {
   id_kategori: string;
@@ -40,6 +52,23 @@ interface BeritaUtamaItem {
   jenis: string;
   created_date: string;
   status: string;
+}
+
+interface ApiResponse {
+  status: boolean;
+  message: string;
+  data: {
+    utama?: BeritaItem[];
+    berita?: BeritaItem[];
+    kategori?: Kategori[];
+    tag?: Tag[];
+  };
+  tag_info?: {
+    id_tags: string;
+    nama_tag: string;
+    slug: string;
+    hit: string;
+  };
 }
 
 const Berita: React.FC = () => {
@@ -62,7 +91,9 @@ const Berita: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [beritaByTag, setBeritaByTag] = useState<BeritaItem[]>([]);
   const [loadingTag, setLoadingTag] = useState<boolean>(false);
-  const [selectedKategori, setSelectedKategori] = useState<Kategori | null>(null);
+  const [selectedKategori, setSelectedKategori] = useState<Kategori | null>(
+    null,
+  );
   const [loadingKategori, setLoadingKategori] = useState<boolean>(false);
   const [beritaByKategori, setBeritaByKategori] = useState<BeritaItem[]>([]);
 
@@ -70,7 +101,9 @@ const Berita: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const [initialBeritaTerkini, setInitialBeritaTerkini] = useState<BeritaItem[]>([]);
+  const [initialBeritaTerkini, setInitialBeritaTerkini] = useState<
+    BeritaItem[]
+  >([]);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const ROOT = api.defaults.baseURL?.replace("/api", "") ?? "";
@@ -102,7 +135,7 @@ const Berita: React.FC = () => {
   // Filter data berdasarkan search query
   const filterDataBySearch = (
     data: BeritaItem[],
-    query: string
+    query: string,
   ): BeritaItem[] => {
     if (!query.trim()) return [];
 
@@ -111,10 +144,10 @@ const Berita: React.FC = () => {
       const matchJudul = berita.judul?.toLowerCase().includes(lowerQuery);
       const matchIntro = berita.intro?.toLowerCase().includes(lowerQuery);
       const matchKategori = berita.kategori?.some((kat) =>
-        kat?.toLowerCase().includes(lowerQuery)
+        kat?.toLowerCase().includes(lowerQuery),
       );
       const matchTags = berita.tags?.some((tag) =>
-        tag?.toLowerCase().includes(lowerQuery)
+        tag?.toLowerCase().includes(lowerQuery),
       );
 
       return matchJudul || matchIntro || matchKategori || matchTags;
@@ -124,124 +157,177 @@ const Berita: React.FC = () => {
   // =========================================
   // FETCH DATA UTAMA
   // =========================================
-  const fetchGeneralData = async () => {
-    try {
-      const res = await api.get("/berita");
-      const data = res?.data?.data;
-      if (!data) return;
+const fetchGeneralData = async () => {
+  try {
+    const res = await api.get("/berita");
+    const data = res?.data?.data;
+    if (!data) return;
 
-      const beritaData: BeritaItem[] = data.berita || [];
-      setAllBerita(beritaData);
+    const beritaData: BeritaItem[] = data.berita || [];
+    setAllBerita(beritaData);
 
-      // Setup Kategori dari API
-      if (data.kategori) {
-        const filteredKategori = data.kategori.filter(
-          (k: Kategori) => k.trash === "0"
+    // Setup Kategori dari API
+    if (data.kategori) {
+      const filteredKategori = (data.kategori as Kategori[]).filter(
+        (k: Kategori) => k.trash === "0",
+      );
+      setKategoriList(filteredKategori);
+    }
+
+    // Setup Berita Utama (Carousel)
+    const utamaArray: BeritaUtamaItem[] = data.utama || [];
+    const beritaUtamaDetailList: BeritaItem[] = [];
+
+    if (utamaArray.length > 0) {
+      for (const utamaItem of utamaArray) {
+        const idUtama = utamaItem.id_berita;
+        const foundInList = beritaData.find(
+          (item: BeritaItem) => item.id_berita === idUtama,
         );
-        setKategoriList(filteredKategori);
-      }
-
-      // Setup Berita Utama (Carousel)
-      const utamaArray: BeritaUtamaItem[] = data.utama || [];
-      const beritaUtamaDetailList: BeritaItem[] = [];
-
-      if (utamaArray.length > 0) {
-        for (const utamaItem of utamaArray) {
-          const idUtama = utamaItem.id_berita;
-          const foundInList = beritaData.find(
-            (item: BeritaItem) => item.id_berita === idUtama
-          );
-          if (foundInList) {
-            beritaUtamaDetailList.push(foundInList);
-          } else {
-            try {
-              const detailRes = await api.get(`/berita/${idUtama}`);
-              if (detailRes?.data?.data)
-                beritaUtamaDetailList.push(detailRes.data.data);
-            } catch (e) {
-              console.error(e);
-            }
+        if (foundInList) {
+          beritaUtamaDetailList.push(foundInList);
+        } else {
+          try {
+            const detailRes = await api.get(`/berita/${idUtama}`);
+            if (detailRes?.data?.data)
+              beritaUtamaDetailList.push(detailRes.data.data);
+          } catch (e) {
+            console.error(e);
           }
         }
       }
-      setBeritaUtamaList(beritaUtamaDetailList);
+    }
+    setBeritaUtamaList(beritaUtamaDetailList);
 
-      // Setup Tag & Populer
-      if (data.tag) {
-        setTagPopuler(data.tag);
+    // Setup Tag & Populer - PERBAIKAN DI SINI
+    if (data.tag) {
+      // Gunakan ApiTag sebagai tipe
+      const tagsWithHit = (data.tag as ApiTag[]).map((tag: ApiTag) => ({
+        id_tags: tag.id_tags || tag.id_tags_berita || "",
+        nama_tag: tag.nama_tag || "",
+        slug: tag.slug || "",
+        hit: tag.hit || "0",
+      }));
+      setTagPopuler(tagsWithHit);
+    }
+
+    const populer = [...beritaData]
+      .sort((a, b) => Number(b.hit) - Number(a.hit))
+      .slice(0, 5);
+    setBeritaPopuler(populer);
+
+    // Setup Berita Terkini (Initial 10 items)
+    const sortedBerita = [...beritaData].sort(
+      (a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime(),
+    );
+    setInitialBeritaTerkini(sortedBerita);
+
+    // Set initial berita terkini (first page)
+    const initialItems = sortedBerita.slice(0, ITEMS_PER_PAGE);
+    setBeritaTerkini(initialItems);
+    setHasMore(sortedBerita.length > ITEMS_PER_PAGE);
+    setPage(1);
+  } catch (error) {
+    console.error("Gagal fetch berita:", error);
+  }
+};
+
+  // =========================================
+  // FETCH TAG POPULER DARI API
+  // =========================================
+ const fetchPopularTags = async () => {
+   try {
+     const response = await api.get("/berita/tags/popular");
+     if (response.data && response.data.data) {
+       // Gunakan ApiTag sebagai tipe
+       const tags = (response.data.data as ApiTag[]).map((tag: ApiTag) => ({
+         id_tags: tag.id_tags || tag.id_tags_berita || "",
+         nama_tag: tag.nama_tag || "",
+         slug: tag.slug || "",
+         hit: tag.hit || "0",
+       }));
+       setTagPopuler(tags);
+     }
+   } catch (error) {
+     console.error("Error fetching popular tags:", error);
+   }
+ };
+
+  // =========================================
+  // FILTER BERITA BERDASARKAN TAG DENGAN API
+  // =========================================
+const filterBeritaByTag = async (tag: Tag) => {
+  console.log("🚀 filterBeritaByTag dipanggil untuk:", tag.nama_tag, tag.slug);
+
+  setLoadingTag(true);
+  setSelectedTag(tag);
+  setSelectedKategori(null);
+
+  // Clear search saat filter by tag
+  setIsSearching(false);
+  setSearchQuery("");
+  setSearchResults([]);
+  setHasSearched(false);
+
+  // Update URL dengan parameter tag
+  navigate(`/berita?tag=${encodeURIComponent(tag.slug)}`);
+
+  try {
+    // Panggil API untuk mendapatkan berita berdasarkan tag
+    console.log("📡 Mengirim request ke:", `/berita/tag/${tag.slug}`);
+
+    const response = await api.get(`/berita/tag/${tag.slug}`);
+
+    console.log("✅ Response dari API:", response.data);
+
+    if (response.data && response.data.data) {
+      // Data dari API sudah termasuk berita dengan tag tersebut
+      setBeritaByTag(response.data.data);
+
+      // Cek tag_info
+      if (response.data.tag_info) {
+        console.log("🏷️ Tag info setelah update:", response.data.tag_info);
+        console.log("Hit count baru:", response.data.tag_info.hit);
       }
 
-      const populer = [...beritaData]
-        .sort((a, b) => Number(b.hit) - Number(a.hit))
-        .slice(0, 5);
-      setBeritaPopuler(populer);
-
-      // Setup Berita Terkini (Initial 10 items)
-      const sortedBerita = [...beritaData].sort(
-        (a, b) =>
-          new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime()
+      console.log(
+        `✅ Berita dengan tag "${tag.nama_tag}":`,
+        response.data.data.length,
       );
-      setInitialBeritaTerkini(sortedBerita);
-      
-      // Set initial berita terkini (first page)
-      const initialItems = sortedBerita.slice(0, ITEMS_PER_PAGE);
-      setBeritaTerkini(initialItems);
-      setHasMore(sortedBerita.length > ITEMS_PER_PAGE);
-      setPage(1);
-
-    } catch (error) {
-      console.error("Gagal fetch berita:", error);
-    }
-  };
-
-  // =========================================
-  // LAZY LOADING BERITA TERKINI
-  // =========================================
-  const loadMoreBerita = useCallback(async () => {
-    if (loadingMore || !hasMore || isFilterMode) return;
-
-    setLoadingMore(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const nextPage = page + 1;
-    const startIndex = page * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    
-    const moreBerita = initialBeritaTerkini.slice(startIndex, endIndex);
-    
-    if (moreBerita.length > 0) {
-      setBeritaTerkini(prev => [...prev, ...moreBerita]);
-      setPage(nextPage);
-      setHasMore(endIndex < initialBeritaTerkini.length);
     } else {
-      setHasMore(false);
+      console.log("⚠️ Response tidak memiliki data");
+      // Fallback ke filter lokal jika API gagal
+      const filteredBerita = allBerita.filter((berita) => {
+        if (!berita.tags || !Array.isArray(berita.tags)) return false;
+        return berita.tags.some((tagString) =>
+          tagString?.toLowerCase().includes(tag.nama_tag?.toLowerCase()),
+        );
+      });
+      setBeritaByTag(filteredBerita);
     }
-    
-    setLoadingMore(false);
-  }, [page, loadingMore, hasMore, initialBeritaTerkini, isFilterMode]);
+  } catch (error) {
+    // HAPUS `: any`
+    console.error("❌ Error fetching berita by tag:", error);
 
-  // Setup Intersection Observer untuk lazy loading
-  useEffect(() => {
-    if (!observerTarget.current || !hasMore || isFilterMode || loadingMore) return;
+    // Tampilkan error detail
+    if (error instanceof Error && "response" in error) {
+      const err = error as any;
+      console.error("Response error:", err.response?.data);
+      console.error("Status:", err.response?.status);
+    }
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasMore) {
-          loadMoreBerita();
-        }
-      },
-      { threshold: 0.1, rootMargin: '100px' }
-    );
+    // Fallback ke filter lokal
+    const filteredBerita = allBerita.filter((berita) => {
+      if (!berita.tags || !Array.isArray(berita.tags)) return false;
+      return berita.tags.some((tagString) =>
+        tagString?.toLowerCase().includes(tag.nama_tag?.toLowerCase()),
+      );
+    });
+    setBeritaByTag(filteredBerita);
+  }
 
-    const currentTarget = observerTarget.current;
-    observer.observe(currentTarget);
-
-    return () => {
-      if (currentTarget) observer.unobserve(currentTarget);
-    };
-  }, [loadMoreBerita, hasMore, isFilterMode, loadingMore]);
+  setLoadingTag(false);
+};
 
   // =========================================
   // FILTER BERITA BERDASARKAN KATEGORI
@@ -265,7 +351,9 @@ const Berita: React.FC = () => {
       if (!berita.kategori || !Array.isArray(berita.kategori)) return false;
 
       return berita.kategori.some((kategoriString) =>
-        kategoriString?.toLowerCase().includes(kategori.kategori?.toLowerCase())
+        kategoriString
+          ?.toLowerCase()
+          .includes(kategori.kategori?.toLowerCase()),
       );
     });
 
@@ -278,7 +366,9 @@ const Berita: React.FC = () => {
           berita.judul
             ?.toLowerCase()
             .includes(kategori.kategori?.toLowerCase()) ||
-          berita.intro?.toLowerCase().includes(kategori.kategori?.toLowerCase())
+          berita.intro
+            ?.toLowerCase()
+            .includes(kategori.kategori?.toLowerCase()),
       );
       setBeritaByKategori(filteredByKeyword);
     } else {
@@ -289,44 +379,54 @@ const Berita: React.FC = () => {
   };
 
   // =========================================
-  // FILTER BERITA BERDASARKAN TAG (Lokal)
+  // LAZY LOADING BERITA TERKINI
   // =========================================
-  const filterBeritaByTag = (tag: Tag) => {
-    setLoadingTag(true);
-    setSelectedTag(tag);
-    setSelectedKategori(null);
+  const loadMoreBerita = useCallback(async () => {
+    if (loadingMore || !hasMore || isFilterMode) return;
 
-    // Clear search saat filter by tag
-    setIsSearching(false);
-    setSearchQuery("");
-    setSearchResults([]);
-    setHasSearched(false);
+    setLoadingMore(true);
 
-    // Filter berita yang memiliki tag yang dipilih
-    const filteredBerita = allBerita.filter((berita) => {
-      if (!berita.tags || !Array.isArray(berita.tags)) return false;
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-      return berita.tags.some((tagString) =>
-        tagString?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
-      );
-    });
+    const nextPage = page + 1;
+    const startIndex = page * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
 
-    console.log("📊 Found berita with tag:", filteredBerita.length);
+    const moreBerita = initialBeritaTerkini.slice(startIndex, endIndex);
 
-    // Jika tidak ada data, coba fallback dengan keyword di judul/intro
-    if (filteredBerita.length === 0) {
-      const filteredByKeyword = allBerita.filter(
-        (berita) =>
-          berita.judul?.toLowerCase().includes(tag.nama_tag?.toLowerCase()) ||
-          berita.intro?.toLowerCase().includes(tag.nama_tag?.toLowerCase())
-      );
-      setBeritaByTag(filteredByKeyword);
+    if (moreBerita.length > 0) {
+      setBeritaTerkini((prev) => [...prev, ...moreBerita]);
+      setPage(nextPage);
+      setHasMore(endIndex < initialBeritaTerkini.length);
     } else {
-      setBeritaByTag(filteredBerita);
+      setHasMore(false);
     }
 
-    setLoadingTag(false);
-  };
+    setLoadingMore(false);
+  }, [page, loadingMore, hasMore, initialBeritaTerkini, isFilterMode]);
+
+  // Setup Intersection Observer untuk lazy loading
+  useEffect(() => {
+    if (!observerTarget.current || !hasMore || isFilterMode || loadingMore)
+      return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreBerita();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" },
+    );
+
+    const currentTarget = observerTarget.current;
+    observer.observe(currentTarget);
+
+    return () => {
+      if (currentTarget) observer.unobserve(currentTarget);
+    };
+  }, [loadMoreBerita, hasMore, isFilterMode, loadingMore]);
 
   // =========================================
   // HANDLE SEARCH
@@ -409,6 +509,7 @@ const Berita: React.FC = () => {
   // =========================================
   useEffect(() => {
     fetchGeneralData();
+    fetchPopularTags();
   }, []);
 
   useEffect(() => {
@@ -416,11 +517,22 @@ const Berita: React.FC = () => {
     const searchParams = new URLSearchParams(location.search);
     const kategoriParam = searchParams.get("kategori");
     const searchParam = searchParams.get("search");
+    const tagParam = searchParams.get("tag");
 
+    // Jika ada parameter tag di URL
+    if (tagParam && tagPopuler.length > 0) {
+      const foundTag = tagPopuler.find((tag) => tag.slug === tagParam);
+
+      if (foundTag) {
+        // Panggil fungsi filter berita by tag
+        filterBeritaByTag(foundTag);
+        return; // Keluar agar tidak eksekusi kode di bawah
+      }
+    }
     // Jika ada parameter kategori di URL
-    if (kategoriParam && allBerita.length > 0 && kategoriList.length > 0) {
+    else if (kategoriParam && allBerita.length > 0 && kategoriList.length > 0) {
       const foundKategori = kategoriList.find(
-        (kategori) => kategori.slug === kategoriParam
+        (kategori) => kategori.slug === kategoriParam,
       );
 
       if (foundKategori) {
@@ -431,7 +543,7 @@ const Berita: React.FC = () => {
           return berita.kategori.some((kategoriString) =>
             kategoriString
               ?.toLowerCase()
-              .includes(foundKategori.kategori?.toLowerCase())
+              .includes(foundKategori.kategori?.toLowerCase()),
           );
         });
         setBeritaByKategori(filteredBerita);
@@ -446,6 +558,7 @@ const Berita: React.FC = () => {
     else if (
       !searchParam &&
       !kategoriParam &&
+      !tagParam &&
       (hasSearched || selectedKategori || selectedTag)
     ) {
       setSearchQuery("");
@@ -457,7 +570,12 @@ const Berita: React.FC = () => {
       setBeritaByKategori([]);
       setBeritaByTag([]);
     }
-  }, [location.search, allBerita.length, kategoriList.length]);
+  }, [
+    location.search,
+    allBerita.length,
+    kategoriList.length,
+    tagPopuler.length,
+  ]);
 
   // =========================================
   // RENDER BERITA CARD (Reusable Component)
@@ -483,9 +601,7 @@ const Berita: React.FC = () => {
         <div className="berita-terkini-card-item">
           <h6 className="berita-terkini-title">{item.judul}</h6>
           <p className="berita-terkini-intro">{item.intro}</p>
-          <div className="berita-terkini-date">
-            {formatDate(item.tanggal)}
-          </div>
+          <div className="berita-terkini-date">{formatDate(item.tanggal)}</div>
         </div>
       </div>
     </Link>
@@ -526,7 +642,7 @@ const Berita: React.FC = () => {
       return searchResults.map((item, index) => renderBeritaCard(item, index));
     }
 
-    // 3. Jika ada tag yang dipilih (filter lokal)
+    // 3. Jika ada tag yang dipilih
     if (selectedTag) {
       if (loadingTag) {
         return (
@@ -579,7 +695,9 @@ const Berita: React.FC = () => {
           </div>
         );
       }
-      return beritaByKategori.map((item, index) => renderBeritaCard(item, index));
+      return beritaByKategori.map((item, index) =>
+        renderBeritaCard(item, index),
+      );
     }
 
     // 5. Default: tampilkan berita terkini dengan lazy loading
@@ -587,22 +705,25 @@ const Berita: React.FC = () => {
       return (
         <>
           {beritaTerkini.map((item, index) => renderBeritaCard(item, index))}
-          
+
           {/* Loading indicator */}
           {loadingMore && (
             <div className="text-center py-4">
-              <div className="spinner-border text-primary spinner-border-sm" role="status">
+              <div
+                className="spinner-border text-primary spinner-border-sm"
+                role="status"
+              >
                 <span className="visually-hidden">Memuat lebih banyak...</span>
               </div>
               <p className="text-muted mt-2 small">Memuat berita...</p>
             </div>
           )}
-          
+
           {/* Observer target untuk lazy loading */}
           {hasMore && !loadingMore && (
-            <div ref={observerTarget} style={{ height: '20px' }}></div>
+            <div ref={observerTarget} style={{ height: "20px" }}></div>
           )}
-          
+
           {/* End of content message */}
           {!hasMore && beritaTerkini.length > 0 && (
             <div className="text-center py-4">
@@ -614,7 +735,7 @@ const Berita: React.FC = () => {
         </>
       );
     }
-    
+
     return <p className="text-muted">Memuat berita terkini...</p>;
   };
 
@@ -629,6 +750,72 @@ const Berita: React.FC = () => {
     if (selectedKategori)
       return `Berita dengan Kategori: ${selectedKategori.kategori} (${beritaByKategori.length} hasil)`;
     return "Berita Terkini";
+  };
+
+  // =========================================
+  // RENDER TAG LIST
+  // =========================================
+  // =========================================
+  // RENDER TAG LIST DENGAN SORTING BERDASARKAN HIT
+  // =========================================
+  const renderTagList = () => {
+    if (tagPopuler.length === 0) {
+      return <p className="text-muted small">Memuat tag...</p>;
+    }
+
+    // 1. URUTKAN TAG BERDASARKAN HIT (tertinggi ke terendah)
+    const sortedTags = [...tagPopuler].sort((a, b) => {
+      // Convert hit ke number, default 0 jika null/undefined
+      const hitA = parseInt(a.hit as string) || 0;
+      const hitB = parseInt(b.hit as string) || 0;
+
+      // DESC: tertinggi ke terendah
+      return hitB - hitA;
+    });
+
+    // 2. RENDER TAG YANG SUDAH DIURUTKAN
+    return sortedTags.map((tag, index) => {
+      const tagId = tag.id_tags || `tag-${index}`;
+      const isSelected = selectedTag?.id_tags === tagId;
+      const hitCount = parseInt(tag.hit as string) || 0;
+
+      return (
+        <li key={tagId} className="tag-populer-item">
+          <button
+            onClick={() => filterBeritaByTag(tag)}
+            className={`tag-populer-link ${isSelected ? "active" : ""}`}
+            style={{
+              background: "none",
+              border: "none",
+              width: "100%",
+              textAlign: "left",
+              cursor: "pointer",
+              padding: "0.5rem",
+            }}
+            disabled={loadingTag && isSelected}
+          >
+            <span className="tag-number">#{index + 1}</span>
+            <span className="tag-name">{tag.nama_tag}</span>
+            {loadingTag && isSelected && (
+              <span className="ms-2">
+                <div
+                  className="spinner-border spinner-border-sm text-primary"
+                  role="status"
+                >
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </span>
+            )}
+            {/* Tambah indikator hit count */}
+            <span className="tag-hit-count ms-2">
+              <small className="text-muted">
+                ({hitCount.toLocaleString()} {hitCount === 1 ? "kali" : "kali"})
+              </small>
+            </span>
+          </button>
+        </li>
+      );
+    });
   };
 
   // =========================================
@@ -795,12 +982,12 @@ const Berita: React.FC = () => {
               <h5 className="section-title">
                 <Triangle className="icon-triangle" /> Berita Terkini
               </h5>
-              <div 
+              <div
                 className="berita-terkini-scroll-container"
-                style={{ 
-                  maxHeight: "850px", 
+                style={{
+                  maxHeight: "850px",
                   overflowY: "auto",
-                  position: "relative"
+                  position: "relative",
                 }}
               >
                 {getMainContent()}
@@ -814,31 +1001,7 @@ const Berita: React.FC = () => {
               </h5>
               <div className="tag-populer-card">
                 <ul className="list-unstyled tag-populer-list">
-                  {tagPopuler.length > 0 ? (
-                    tagPopuler.map((tag, index) => (
-                      <li key={tag.id_tags} className="tag-populer-item">
-                        <button
-                          onClick={() => filterBeritaByTag(tag)}
-                          className={`tag-populer-link ${
-                            selectedTag?.id_tags === tag.id_tags ? "active" : ""
-                          }`}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            width: "100%",
-                            textAlign: "left",
-                            cursor: "pointer",
-                            padding: "0.5rem",
-                          }}
-                        >
-                          <span className="tag-number">#{index + 1}</span>
-                          <span className="tag-name">{tag.nama_tag}</span>
-                        </button>
-                      </li>
-                    ))
-                  ) : (
-                    <p className="text-muted small">Memuat tag...</p>
-                  )}
+                  {renderTagList()}
                 </ul>
               </div>
             </div>
@@ -907,33 +1070,7 @@ const Berita: React.FC = () => {
                 </h5>
                 <div className="tag-populer-card">
                   <ul className="list-unstyled tag-populer-list">
-                    {tagPopuler.length > 0 ? (
-                      tagPopuler.map((tag, index) => (
-                        <li key={tag.id_tags} className="tag-populer-item">
-                          <button
-                            onClick={() => filterBeritaByTag(tag)}
-                            className={`tag-populer-link ${
-                              selectedTag?.id_tags === tag.id_tags
-                                ? "active"
-                                : ""
-                            }`}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              width: "100%",
-                              textAlign: "left",
-                              cursor: "pointer",
-                              padding: "0.5rem",
-                            }}
-                          >
-                            <span className="tag-number">#{index + 1}</span>
-                            <span className="tag-name">{tag.nama_tag}</span>
-                          </button>
-                        </li>
-                      ))
-                    ) : (
-                      <p className="text-muted small">Memuat tag...</p>
-                    )}
+                    {renderTagList()}
                   </ul>
                 </div>
               </div>
@@ -943,6 +1080,6 @@ const Berita: React.FC = () => {
       </div>
     </div>
   );
-};
+};;
 
 export default Berita;

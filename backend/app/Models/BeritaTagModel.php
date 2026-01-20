@@ -9,7 +9,7 @@ class BeritaTagModel extends Model
     protected $table = 'm_berita_tag';
     protected $primaryKey = 'id_tags';
     protected $allowedFields = [
-        'nama_tag', 'slug', 'created_at', 'created_by_id', 'created_by_name', 'is_delete'
+        'nama_tag', 'slug', 'created_at', 'created_by_id', 'created_by_name', 'is_delete','hit'
     ];
 
     protected $useTimestamps = true;
