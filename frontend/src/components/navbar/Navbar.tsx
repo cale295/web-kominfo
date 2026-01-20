@@ -155,7 +155,7 @@ function Navbar() {
       // Filter kategori yang tampil di navbar
       const filtered = categories
         .filter(
-          (c: CategoryItemType) => c.status === "1"
+          (c: CategoryItemType) => c.is_show_nav === "1"
         )
         .sort(
           (a: CategoryItemType, b: CategoryItemType) =>
