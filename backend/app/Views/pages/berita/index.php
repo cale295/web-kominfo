@@ -252,6 +252,38 @@
         opacity: 0.6;
     }
 
+    /* Filter Button Styles */
+    .filter-btn {
+        background: white;
+        border: 1px solid var(--gray-300);
+        color: var(--gray-700);
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+    }
+    
+    .filter-btn:hover {
+        background: var(--gray-50);
+        border-color: var(--primary-light);
+        color: var(--primary);
+        transform: translateY(-1px);
+    }
+    
+    .filter-btn.active {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: white;
+    }
+    
+    .filter-btn.active:hover {
+        background: var(--primary);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .gov-header { padding: 16px; }
@@ -260,6 +292,17 @@
         .action-buttons .btn { width: 100%; }
         .gov-table { font-size: 0.8rem; }
         .content-preview { max-width: 150px; }
+        
+        .filter-section {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+        
+        .filter-section .d-flex {
+            width: 100%;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
     }
 
     .no-data {
@@ -347,9 +390,9 @@
 
 <div class="card mb-3 shadow-sm border-0">
     <div class="card-body py-3">
-        <div class="row align-items-center">
-            <div class="col-md-3 col-lg-2 mb-2 mb-md-0">
-                <div class="d-flex align-items-center">
+        <div class="row align-items-center filter-section">
+            <div class="col-md-4 col-lg-3 mb-2 mb-md-0">
+                <div class="d-flex align-items-center gap-2">
                     <label for="limitSelect" class="me-2 small fw-bold text-muted">Tampil:</label>
                     <select id="limitSelect" class="form-select form-select-sm shadow-none border-gray-300" style="width: 90px;">
                         <option value="10" selected>10</option>
@@ -358,10 +401,16 @@
                         <option value="100">100</option>
                         <option value="-1">Semua</option>
                     </select>
+                    
+                    <?php if (session()->has('id_user')): ?>
+                    <button id="filterMyData" class="filter-btn" title="Tampilkan hanya data saya">
+                        <i class="bi bi-filter-circle"></i> Data Saya
+                    </button>
+                    <?php endif; ?>
                 </div>
             </div>
-            <div class="col-md-5 col-lg-6"></div>
-            <div class="col-md-4 col-lg-4">
+            <div class="col-md-4 col-lg-6"></div>
+            <div class="col-md-4 col-lg-3">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white border-end-0 text-muted">
                         <i class="bi bi-search"></i>
@@ -453,7 +502,7 @@
                         }
                     ?>
 
-                    <tr class="data-row">
+                    <tr class="data-row" data-user-id="<?= $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? '' ?>">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
                                 <td class="text-center">
@@ -655,6 +704,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Simpan token saat ini di variable global agar bisa diupdate via AJAX
     let currentCsrfName = '<?= csrf_token() ?>';
     let currentCsrfHash = '<?= csrf_hash() ?>';
+    
+    // Variabel untuk filter data user
+    let currentUserId = '<?= session()->get('id_user') ?>';
+    let showMyDataOnly = false;
 
     // Fungsi helper untuk update token di semua form input yang ada di halaman
     function updateAllCsrfInputs(newHash) {
@@ -665,7 +718,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ==========================================
-    // 2. BAGIAN PAGINATION & SEARCH
+    // 2. BAGIAN FILTER DATA USER
+    // ==========================================
+    
+    const filterMyDataBtn = document.getElementById('filterMyData');
+    if (filterMyDataBtn) {
+        filterMyDataBtn.addEventListener('click', function() {
+            showMyDataOnly = !showMyDataOnly;
+            
+            if (showMyDataOnly) {
+                this.classList.add('active');
+                this.innerHTML = '<i class="bi bi-filter-circle-fill"></i> Data Saya';
+                this.title = 'Menampilkan semua data';
+            } else {
+                this.classList.remove('active');
+                this.innerHTML = '<i class="bi bi-filter-circle"></i> Data Saya';
+                this.title = 'Tampilkan hanya data saya';
+            }
+            
+            currentPage = 1;
+            if(currentPageInput) currentPageInput.value = 1;
+            filterAndPaginate();
+        });
+    }
+
+    // ==========================================
+    // 3. BAGIAN PAGINATION & SEARCH
     // ==========================================
     
     // Elements
@@ -752,6 +830,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function filterAndPaginate() {
         const filteredRows = rows.filter(row => {
+            // Filter berdasarkan data user sendiri
+            if (showMyDataOnly && currentUserId) {
+                const rowUserId = row.dataset.userId;
+                if (rowUserId !== currentUserId) {
+                    return false;
+                }
+            }
+            
+            // Filter berdasarkan pencarian
             if (currentSearch === '') return true;
             // Cari hanya di elemen yang punya class 'searchable' atau text content umum
             const textContent = row.textContent.toLowerCase();
@@ -834,7 +921,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ==========================================
-// 3. TOGGLE STATUS (Publish/Unpublish) - FIXED
+// 4. TOGGLE STATUS (Publish/Unpublish) - FIXED
 // ==========================================
 const statusBtns = document.querySelectorAll('.status-btn');
 
