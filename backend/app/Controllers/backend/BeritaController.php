@@ -836,7 +836,10 @@ public function update($id)
     } elseif ($submitType === 'pending') {
         $status       = '5'; // Tidak Tayang
         $statusBerita = 2;   // Menunggu Verifikasi
-    } else {
+    }  elseif ($submitType === 'revisi') {
+        $status       = '5'; // Tidak Tayang
+        $statusBerita = 6;   // Revisi
+    }   else {
         $status       = '1'; // Tayang
         $statusBerita = 4;   // Layak Tayang
     }
@@ -925,7 +928,9 @@ if ($submitType === 'draft') {
     $message = 'Berita berhasil disimpan sebagai draft.';
 } elseif ($submitType === 'pending') {
     $message = 'Berita berhasil disimpan sebagai menunggu verifikasi.';
-} else {
+} elseif ($submitType === 'revisi') {
+    $message = 'Berita berhasil disimpan sebagai revisi.';
+}   else {
     // Asumsi default adalah publish, atau kamu bisa cek spesifik ($submitType === 'publish')
     $message = 'Berita berhasil dipublikasikan.';
 }

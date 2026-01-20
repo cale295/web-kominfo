@@ -854,6 +854,12 @@
             </button>
             <?php endif; ?>
             
+             <?php if ($role == 'admin' || $role == 'superadmin') : ?>
+                <button type="submit" name="submit_type" value="revisi" class="btn btn-primary">
+                    <i class="bi bi-hourglass-split"></i> Revisi
+                </button>
+            <?php endif; ?>
+
             <button type="submit" name="submit_type" value="draft" class="btn btn-draft">
                 <i class="bi bi-file-earmark-text"></i> Draft
             </button>
