@@ -855,7 +855,7 @@
             <?php endif; ?>
             
              <?php if ($role == 'admin' || $role == 'superadmin') : ?>
-                <button type="submit" name="submit_type" value="revisi" class="btn btn-primary">
+                <button type="submit" name="submit_type" value="revisi" class="btn btn-danger">
                     <i class="bi bi-hourglass-split"></i> Revisi
                 </button>
             <?php endif; ?>

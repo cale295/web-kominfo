@@ -806,12 +806,6 @@ const filterBeritaByTag = async (tag: Tag) => {
                 </div>
               </span>
             )}
-            {/* Tambah indikator hit count */}
-            <span className="tag-hit-count ms-2">
-              <small className="text-muted">
-                ({hitCount.toLocaleString()} {hitCount === 1 ? "kali" : "kali"})
-              </small>
-            </span>
           </button>
         </li>
       );
