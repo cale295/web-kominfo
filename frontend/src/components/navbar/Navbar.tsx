@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Menu as MenuIcon, ChevronDown, X } from "lucide-react";
+import { Menu as MenuIcon, X } from "lucide-react";
 import "./navbar.css";
 import api from "../../services/api";
 import MenuList from "./MenuList";
-import MenuItem from "./MenuItem";
 
 // Interface untuk tipe menu yang berbeda
 export interface MenuItemType {
@@ -156,7 +155,7 @@ function Navbar() {
       // Filter kategori yang tampil di navbar
       const filtered = categories
         .filter(
-          (c: CategoryItemType) => c.is_show_nav === "1" && c.status === "1"
+          (c: CategoryItemType) => c.status === "1"
         )
         .sort(
           (a: CategoryItemType, b: CategoryItemType) =>

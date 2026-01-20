@@ -83,30 +83,31 @@ const MenuItem: React.FC<MenuItemProps> = ({
             </>
           ) : (
             // Desktop version untuk MenuItem
-            <div className="position-relative d-inline-block h-100">
-              <a
-                href={menuItem.menu_url || "#"}
-                className={`px-3 py-2 d-inline-block transition-colors duration-300 navbar-menu-link h-100 d-flex align-items-center ${
-                  depth === 0
-                    ? "text-white hover-text-decoration-underline"
-                    : "hover-bg-blue-100 text-blue-900"
-                }`}
-              >
-                {menuItem.menu_name}
-                {hasChildren && <ChevronDown size={14} className="ms-1" />}
-              </a>
-              {hasChildren && depth === 0 && (
-                <div className="submenu-hidden">
-                  {menuItem.children!.map((child) => (
-                    <a
-                      key={child.id_menu}
-                      href={child.menu_url || "#"}
-                      className="d-block px-4 py-2 text-blue-900 hover-bg-blue-50 text-decoration-none"
-                    >
-                      {child.menu_name}
-                    </a>
-                  ))}
-                </div>
+            <div className="navbar-menu-item">
+  <a
+    href={menuItem.menu_url || "#"}
+    className={`px-3 py-2 d-inline-flex align-items-center navbar-menu-link ${
+      depth === 0
+        ? "text-white hover-text-decoration-underline"
+        : "hover-bg-blue-100 text-blue-900"
+    }`}
+  >
+    {menuItem.menu_name}
+    {hasChildren && <ChevronDown size={14} className="ms-1" />}
+  </a>
+
+  {hasChildren && depth === 0 && (
+    <div className="submenu-hidden">
+      {menuItem.children!.map((child) => (
+        <a
+          key={child.id_menu}
+          href={child.menu_url || "#"}
+          className="d-block px-4 py-2 text-blue-900 hover-bg-blue-50 text-decoration-none"
+        >
+          {child.menu_name}
+        </a>
+      ))}
+    </div>
               )}
             </div>
           )}

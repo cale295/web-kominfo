@@ -287,54 +287,44 @@ nav {
   }
 }
 
-/* === DESKTOP SUBMENU (HOVER) === */
-.submenu-hidden {
-  opacity: 0;
-  transform: translateY(8px);
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  z-index: 999999 !important;
-  min-width: 220px;
-  position: fixed !important;
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  backdrop-filter: blur(8px);
-  border: 2px solid rgba(0, 0, 0, 0.1);
-  text-align: left;
-  top: auto !important;
-  left: auto !important;
-}
-
-.navbar-wrapper {
-  overflow-x: auto !important;
-  overflow-y: visible !important;
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* atau space-between */
+  gap: 2rem;
   position: relative;
-  -webkit-overflow-scrolling: touch;
-  z-index: 100;
 }
 
-.navbar-wrapper .d-inline-block:hover .submenu-hidden,
-.navbar-menu-item:hover .submenu-hidden {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-  z-index: 999999 !important;
-}
 
 .navbar-menu-item {
   position: relative;
-  z-index: 100;
+  display: inline-flex;   /* 🔥 PENTING */
+  align-items: center;
+  white-space: nowrap;
 }
 
-.navbar-menu-item:hover {
-  z-index: 999998 !important;
+
+.submenu-hidden {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+
+  min-width: 220px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.25);
+
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity .25s ease, transform .25s ease;
 }
 
-/* Container parent untuk submenu */
-.navbar-menu-item > div {
-  position: relative;
-  z-index: inherit;
+.navbar-menu-item:hover .submenu-hidden {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
 
 .submenu-hidden a {
