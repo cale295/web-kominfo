@@ -104,6 +104,7 @@ class ApiBeritaController extends ResourceController
             ->get()
             ->getResultArray();
     }
+    
 
     // ==========================================================
     // ANTI SPAM HIT
