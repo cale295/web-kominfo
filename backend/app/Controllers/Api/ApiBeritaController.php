@@ -62,7 +62,6 @@ class ApiBeritaController extends ResourceController
                 ->where('t_berita_kategori.id_kategori', $kategoriData['id_kategori'])
                 // Filter Status Berita (Wajib Aktif)
                 ->where('t_berita.trash', '0')
-                ->where('t_berita.status', '1')
                 ->orderBy('t_berita.created_at', 'DESC')
                 ->findAll();
 
@@ -132,7 +131,6 @@ class ApiBeritaController extends ResourceController
             $tagmodes = $this->tagmodel->orderBy('created_at', 'DESC')->findAll();
 
             $kategories = $this->katemodel
-                ->where('trash', '0')
                 ->where('is_show_nav', '1')
                 ->orderBy('created_on', 'DESC')
                 ->findAll();

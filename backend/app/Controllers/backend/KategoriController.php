@@ -76,11 +76,11 @@ class KategoriController extends BaseController
 
         if ($data) {
             // Logic Toggle (1 -> 0, 0 -> 1)
-            $newStatus = ($data['status'] == '1') ? '0' : '1';
+            $newStatus = ($data['is_show_nav'] == '1') ? '0' : '1';
 
             // Data Update (Termasuk Audit Trail)
             $updateData = [
-                'status'            => $newStatus,
+                'is_show_nav'            => $newStatus,
                 'updated_at'        => date('Y-m-d H:i:s'),
                 'updated_by_id'     => session()->get('id_user'),
                 'updated_by_name'   => session()->get('username'),

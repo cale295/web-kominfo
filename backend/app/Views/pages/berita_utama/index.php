@@ -729,21 +729,17 @@
                                     </td>
                                     
                                     <td class="text-center">
-                                        <?php if ($b['status']): ?>
-                                            <span class="badge bg-success rounded-pill">
-                                                <i class="fas fa-check-circle me-1"></i> Aktif
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary rounded-pill">
-                                                <i class="fas fa-times-circle me-1"></i> Nonaktif
-                                            </span>
-                                        <?php endif; ?>
-                                    </td>
-                                    
-                                    <td class="text-center">
                                         <div class="d-flex flex-column small">
                                             <span class="text-dark fw-semibold"><?= date('d M Y', strtotime($b['created_date'])) ?></span>
                                             <span class="text-muted"><?= date('H:i', strtotime($b['created_date'])) ?></span>
+                                        </div>
+                                    </td>
+
+                                     <td class="text-center">
+                                        <div class="d-flex flex-column align-items-center justify-content-center">
+                                            <div class="mb-1">
+                                                <?= btn_toggle($b['id_berita_utama'], $b['status'], 'berita-utama/toggle-status') ?>
+                                            </div>
                                         </div>
                                     </td>
 

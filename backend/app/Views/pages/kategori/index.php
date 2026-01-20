@@ -225,7 +225,7 @@
     $activeCount = 0;
     if (!empty($kategori)) {
         foreach ($kategori as $row) {
-            if ($row['status'] == '1') {
+            if ($row['is_show_nav'] == '1') {
                 $activeCount++;
             }
         }
@@ -287,7 +287,6 @@
                             <tr>
                                 <th class="text-center py-3" width="5%">No</th>
                                 <th class="py-3" width="20%">Nama Kategori</th>
-                                <th class="text-center py-3" width="10%">Tampil Nav</th>
                                 <th class="text-center py-3" width="10%">Urutan</th>
                                 <th class="py-3" width="15%">Info Waktu</th>
                                 <th class="text-center py-3" width="10%">Status</th>
@@ -307,20 +306,7 @@
                                             </div>
                                         <?php endif; ?>
                                     </td>
-
-                                    <td class="text-center">
-                                        <?php if ($row['is_show_nav'] == '1'): ?>
-                                            <span class="badge-nav">
-                                                <i class="fas fa-check me-1"></i> Ya
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge-nav no">
-                                                Tidak
-                                            </span>
-                                        <?php endif ?>
-                                    </td>
-
-                                    <td class="text-center">
+    <td class="text-center">
                                         <span class="badge-sorting"><?= $row['sorting_nav'] ?? '-' ?></span>
                                     </td>
 
@@ -341,7 +327,7 @@
 
                                     <td class="text-center">
                                         <?php 
-                                        $isLocked = ($row['status'] == '0' && $activeCount >= 10);
+                                        $isLocked = ($row['is_show_nav'] == '1' && $activeCount >= 10);
                                         ?>
                                         
                                         <div class="d-flex justify-content-center">
@@ -365,7 +351,7 @@
                                             <?php else: ?>
                                                 <!-- Toggle normal -->
                                                 <div data-bs-toggle="tooltip" title="Klik untuk mengubah status">
-                                                    <?= btn_toggle($row['id_kategori'], $row['status'], 'kategori/toggle-status') ?>
+                                                    <?= btn_toggle($row['id_kategori'], $row['is_show_nav'], 'kategori/toggle-status') ?>
                                                 </div>
                                             <?php endif; ?>
                                         </div>
@@ -430,7 +416,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Status</label>
-                            <select name="status" class="form-select" id="createStatus" <?= $activeCount >= 10 ? 'disabled' : '' ?>>
+                            <select name="is_show_nav" class="form-select" id="createStatus" <?= $activeCount >= 10 ? 'disabled' : '' ?>>
                                 <option value="1" <?= $activeCount < 10 ? 'selected' : '' ?>>
                                     Aktif <?= $activeCount >= 10 ? '(Batas 10 tercapai)' : '' ?>
                                 </option>
@@ -439,7 +425,7 @@
                                 </option>
                             </select>
                             <?php if ($activeCount >= 10): ?>
-                                <input type="hidden" name="status" value="0">
+                                <input type="hidden" name="is_show_nav" value="0">
                                 <div class="form-text text-danger small">
                                     <i class="fas fa-exclamation-triangle me-1"></i>
                                     Batas 10 kategori aktif telah tercapai. Kategori baru harus dibuat sebagai nonaktif.
