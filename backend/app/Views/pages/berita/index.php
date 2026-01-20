@@ -607,7 +607,7 @@
                                     <?= !empty($row['created_at']) ? date('d/m/y', strtotime($row['created_at'])) : '-' ?>
                                 </td>
 
-                            <td style="min-width: 180px;">
+                            <td class="text-center" style="min-width: 180px;">
                                     <strong class="searchable"><?= esc($row['hit']) ?></strong>
                                 </td>
 

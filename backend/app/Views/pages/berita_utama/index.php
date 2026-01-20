@@ -258,6 +258,17 @@
         box-shadow: var(--shadow-lg);
     }
 
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-primary:disabled:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+
     .btn-secondary {
         background: var(--gray-300);
         color: var(--gray-700);
@@ -425,10 +436,16 @@
         border-left: 4px solid;
     }
 
-    .alert-info {
-        background: var(--info-soft);
-        border-left-color: var(--info);
-        color: var(--info-text);
+    .alert-warning {
+        background: var(--warning-soft);
+        border-left-color: var(--warning);
+        color: var(--warning-text);
+    }
+
+    .alert-warning {
+        background: var(--warning-soft);
+        border-left-color: var(--warning);
+        color: var(--warning-text);
     }
 
     /* ===============================
@@ -642,7 +659,7 @@
             </h1>
             <p class="text-muted small mb-0">
                 <i class="fas fa-star me-1 text-primary"></i> 
-                Kelola berita yang ditampilkan di halaman utama.
+                Kelola berita yang ditampilkan di halaman utama (Maksimal 6 berita).
             </p>
         </div>
         
@@ -655,6 +672,22 @@
         </nav>
     </div>
 
+    <!-- Limit Warning Alert -->
+    <?php 
+    $totalBerita = count($beritaUtama ?? []);
+    $isLimitReached = $totalBerita >= 6;
+    ?>
+    
+    <?php if ($isLimitReached): ?>
+    <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+        <i class="fas fa-exclamation-triangle me-3 fs-5"></i>
+        <div>
+            <strong>Limit Tercapai!</strong> Anda sudah mencapai batas maksimal 6 berita utama. 
+            Hapus berita yang ada untuk menambahkan berita baru.
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Main Card -->
     <div class="card card-modern mt-4">
         <div class="card-header">
@@ -664,12 +697,20 @@
                         <i class="fas fa-newspaper me-2 text-primary"></i>
                         Daftar Berita Utama
                     </h5>
-                    <span class="text-muted small">Kelola berita yang ditampilkan di halaman utama</span>
+                    <span class="text-muted small">
+                        Kelola berita yang ditampilkan di halaman utama 
+                        <span class="badge bg-info ms-2"><?= $totalBerita ?> / 6</span>
+                    </span>
                 </div>
                 
                 <?php if (!empty($can_create) && $can_create): ?>
-                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale" data-bs-toggle="modal" data-bs-target="#modalCreate">
-                        <i class="fas fa-plus me-1"></i> Tambah Berita Utama
+                    <button type="button" 
+                            class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm hover-scale" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalCreate"
+                            <?= $isLimitReached ? 'disabled' : '' ?>>
+                        <i class="fas fa-plus me-1"></i> 
+                        <?= $isLimitReached ? 'Limit Tercapai' : 'Tambah Berita Utama' ?>
                     </button>
                 <?php endif; ?>
             </div>
@@ -682,9 +723,8 @@
                         <tr>
                             <th class="text-center py-3 text-uppercase font-monospace" width="5%">No</th>
                             <th class="text-center py-3 text-uppercase" width="10%">Gambar</th>
-                            <th class="py-3 text-uppercase" width="25%">Judul Berita</th>
+                            <th class="py-3 text-uppercase" width="35%">Judul Berita</th>
                             <th class="py-3 text-uppercase" width="15%">Dibuat Oleh</th>
-                            <th class="text-center py-3 text-uppercase" width="10%">Urutan</th>
                             <th class="text-center py-3 text-uppercase" width="10%">Status</th>
                             <th class="text-center py-3 text-uppercase" width="10%">Tanggal</th>
                             <th class="text-center py-3 text-uppercase" width="10%">Aksi</th>
@@ -720,12 +760,6 @@
                                             <i class="fas fa-user-circle me-2 text-primary fs-5"></i>
                                             <span class="text-dark fw-semibold"><?= esc($b['created_by_name'] ?? 'System') ?></span>
                                         </div>
-                                    </td>
-                                    
-                                    <td class="text-center">
-                                        <span class="badge bg-info rounded-pill">
-                                            <?= $b['jenis'] ?? '-' ?>
-                                        </span>
                                     </td>
                                     
                                     <td class="text-center">
@@ -776,7 +810,7 @@
                                             <i class="fas fa-newspaper"></i>
                                         </div>
                                         <h6 class="fw-bold text-secondary">Belum ada berita utama</h6>
-                                        <p class="text-muted">Silakan tambahkan berita utama baru</p>
+                                        <p class="text-muted">Silakan tambahkan berita utama baru (Maksimal 6 berita)</p>
                                         <?php if (!empty($can_create) && $can_create): ?>
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">
                                                 <i class="fas fa-plus me-2"></i> Tambah Berita Utama
@@ -795,13 +829,20 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div class="d-flex align-items-center text-muted small">
                     <i class="fas fa-info-circle me-2 text-primary"></i>
-                    <span>Total: <strong><?= count($beritaUtama) ?></strong> berita utama</span>
+                    <span>Total: <strong><?= $totalBerita ?> / 6</strong> berita utama</span>
                 </div>
-                <div class="d-flex align-items-center">
-                    <span class="badge bg-primary px-3 py-2 rounded-pill">
-                        <i class="fas fa-star me-1"></i>
-                        Berita Pilihan
-                    </span>
+                <div class="d-flex align-items-center gap-2">
+                    <?php if ($isLimitReached): ?>
+                        <span class="badge bg-warning px-3 py-2 rounded-pill">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Limit Tercapai
+                        </span>
+                    <?php else: ?>
+                        <span class="badge bg-success px-3 py-2 rounded-pill">
+                            <i class="fas fa-check me-1"></i>
+                            <?= 6 - $totalBerita ?> Slot Tersisa
+                        </span>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -818,18 +859,9 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('berita-utama') ?>" method="post">
+            <form action="<?= site_url('berita-utama') ?>" method="post" id="formCreate">
                 <?= csrf_field() ?>
                 <div class="modal-body">
-                    <!-- Info Box -->
-                    <div class="alert alert-info d-flex align-items-start mb-4">
-                        <i class="fas fa-info-circle me-2 mt-1"></i>
-                        <div>
-                            <strong>Petunjuk Pengisian</strong><br>
-                            <small>Pilih berita yang akan dijadikan berita utama. Atur urutan dan status sesuai kebutuhan.</small>
-                        </div>
-                    </div>
-
                     <!-- Pilih Berita -->
                     <div class="mb-4">
                         <label for="create_id_berita" class="form-label">
@@ -865,19 +897,6 @@
 
                     <!-- Pengaturan -->
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="create_jenis" class="form-label">
-                                    <i class="fas fa-sort-numeric-down me-1"></i>
-                                    Urutan Tampilan
-                                </label>
-                                <input type="number" name="jenis" id="create_jenis" class="form-control" placeholder="Contoh: 1" min="1">
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle"></i>
-                                    Angka kecil tampil lebih dahulu (1 = headline utama)
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="create_status" class="form-label">
@@ -959,19 +978,6 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="edit_jenis" class="form-label">
-                                    <i class="fas fa-sort-numeric-down me-1"></i>
-                                    Urutan Tampilan
-                                </label>
-                                <input type="number" name="jenis" id="edit_jenis" class="form-control" placeholder="Contoh: 1" min="1">
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle"></i>
-                                    Angka kecil tampil lebih dahulu (1 = headline utama)
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
                                 <label for="edit_status" class="form-label">
                                     <i class="fas fa-toggle-on me-1"></i>
                                     Status Publikasi <span class="text-danger">*</span>
@@ -1046,6 +1052,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Validasi Limit 6 Data pada Form Create
+document.getElementById('formCreate').addEventListener('submit', function(e) {
+    const totalBerita = <?= $totalBerita ?>;
+    if (totalBerita >= 6) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'warning',
+            title: 'Limit Tercapai!',
+            html: 'Anda sudah mencapai batas maksimal <strong>6 berita utama</strong>.<br>Silakan hapus berita yang ada untuk menambahkan berita baru.',
+            confirmButtonColor: 'var(--warning)',
+            background: 'var(--warning-soft)',
+            color: 'var(--warning-text)'
+        });
+        return false;
+    }
+});
+
 // Create Modal Preview
 document.getElementById('create_id_berita').addEventListener('change', function() {
     const selectedOption = this.options[this.selectedIndex];
@@ -1065,7 +1088,6 @@ document.getElementById('create_id_berita').addEventListener('change', function(
 function openEditModal(id, idBerita, judul, image, jenis, status) {
     document.getElementById('formEdit').action = '<?= site_url('berita-utama/') ?>' + id;
     document.getElementById('edit_id_berita').value = idBerita;
-    document.getElementById('edit_jenis').value = jenis || '';
     document.getElementById('edit_status').value = status || '1';
     document.getElementById('edit_preview_image').src = image;
     
@@ -1098,12 +1120,10 @@ function confirmDelete(url) {
         html: 'Anda akan menghapus berita utama ini.<br><small class="text-muted">Tindakan ini tidak dapat dibatalkan.</small>',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: 'var(--primary)',
+        confirmButtonColor: 'var(--danger)',
         cancelButtonColor: 'var(--gray-500)',
         confirmButtonText: 'Ya, Hapus!',
         cancelButtonText: 'Batal',
-        background: 'var(--warning-soft)',
-        color: 'var(--warning-text)',
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
@@ -1117,14 +1137,12 @@ function confirmDelete(url) {
 // Reset forms on modal close
 document.getElementById('modalCreate').addEventListener('hidden.bs.modal', function () {
     document.getElementById('create_id_berita').selectedIndex = 0;
-    document.getElementById('create_jenis').value = '';
     document.getElementById('create_status').value = '1';
     document.getElementById('create_preview_wrapper').style.display = 'none';
 });
 
 document.getElementById('modalEdit').addEventListener('hidden.bs.modal', function () {
     document.getElementById('edit_id_berita').selectedIndex = 0;
-    document.getElementById('edit_jenis').value = '';
     document.getElementById('edit_status').value = '1';
 });
 
