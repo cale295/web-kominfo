@@ -36,6 +36,9 @@ $menuModel = new \App\Models\MenuModel();
 $parentInfoPublik = $menuModel->where('menu_name', 'Informasi Publik')->first();
 $dynamicInfoPublikSubmenu = [];
 
+// Daftar menu yang HANYA BOLEH muncul di dalam dropdown Pengadaan
+$pengadaanOnlyMenus = ['Penyedia', 'Swakelola', 'IP Penyedia', 'IP Swakelola'];
+
 if ($parentInfoPublik) {
     $children = $menuModel->where('parent_id', $parentInfoPublik['id_menu'])
                           ->where('status', 'active')
@@ -43,6 +46,11 @@ if ($parentInfoPublik) {
                           ->findAll();
 
     foreach ($children as $child) {
+        // SKIP menu yang HANYA BOLEH jadi submenu Pengadaan
+        if (in_array($child['menu_name'], $pengadaanOnlyMenus)) {
+            continue;
+        }
+
         $childRoles = !empty($child['allowed_roles']) 
                       ? array_map('trim', explode(',', $child['allowed_roles'])) 
                       : ['superadmin', 'admin'];
@@ -51,30 +59,83 @@ if ($parentInfoPublik) {
             'title'  => $child['menu_name'],
             'url'    => $child['menu_url'] ?: '#',
             'roles'  => $childRoles,
-            'module' => $child['module_name'] ?? null // Tambahkan module name
+            'module' => $child['module_name'] ?? null
         ];
 
-        $grandChildren = $menuModel->where('parent_id', $child['id_menu'])
-                                   ->where('status', 'active')
-                                   ->orderBy('order_number', 'ASC')
-                                   ->findAll();
+        // KHUSUS UNTUK MENU "PENGADAAN BARANG DAN JASA"
+        if ($child['menu_name'] === 'Pengadaan Barang dan Jasa') {
+            // Ambil semua submenu untuk Pengadaan Barang dan Jasa
+            $grandChildren = $menuModel->where('parent_id', $child['id_menu'])
+                                       ->where('status', 'active')
+                                       ->orderBy('order_number', 'ASC')
+                                       ->findAll();
 
-        if (!empty($grandChildren)) {
+            // Juga ambil menu "Penyedia" dan "Swakelola" yang mungkin parent_id-nya langsung ke Informasi Publik
+            $additionalMenus = $menuModel->whereIn('menu_name', $pengadaanOnlyMenus)
+                                         ->where('status', 'active')
+                                         ->orderBy('order_number', 'ASC')
+                                         ->findAll();
+            
             $grandChildItems = [];
-            foreach ($grandChildren as $gc) {
+            
+            // Gabungkan semua
+            $allGrandChildren = array_merge($grandChildren, $additionalMenus);
+            
+            foreach ($allGrandChildren as $gc) {
                 $gcRoles = !empty($gc['allowed_roles']) 
                            ? array_map('trim', explode(',', $gc['allowed_roles'])) 
                            : ['superadmin', 'admin'];
 
+                // Normalisasi nama (hilangkan prefix "IP " jika ada)
+                $title = $gc['menu_name'];
+                if (strpos($title, 'IP ') === 0) {
+                    $title = substr($title, 3); // Hilangkan "IP "
+                }
+
                 $grandChildItems[] = [
-                    'title'  => $gc['menu_name'],
+                    'title'  => $title,
                     'url'    => $gc['menu_url'],
                     'roles'  => $gcRoles,
                     'module' => $gc['module_name'] ?? null
                 ];
             }
-            $menuItem['submenu'] = $grandChildItems;
+            
+            // Hapus duplikat berdasarkan URL
+            $uniqueItems = [];
+            $urls = [];
+            foreach ($grandChildItems as $item) {
+                if (!in_array($item['url'], $urls)) {
+                    $uniqueItems[] = $item;
+                    $urls[] = $item['url'];
+                }
+            }
+            
+            $menuItem['submenu'] = $uniqueItems;
             $menuItem['url'] = '#';
+        } else {
+            // Untuk menu lainnya, ambil submenu seperti biasa
+            $grandChildren = $menuModel->where('parent_id', $child['id_menu'])
+                                       ->where('status', 'active')
+                                       ->orderBy('order_number', 'ASC')
+                                       ->findAll();
+
+            if (!empty($grandChildren)) {
+                $grandChildItems = [];
+                foreach ($grandChildren as $gc) {
+                    $gcRoles = !empty($gc['allowed_roles']) 
+                               ? array_map('trim', explode(',', $gc['allowed_roles'])) 
+                               : ['superadmin', 'admin'];
+
+                    $grandChildItems[] = [
+                        'title'  => $gc['menu_name'],
+                        'url'    => $gc['menu_url'],
+                        'roles'  => $gcRoles,
+                        'module' => $gc['module_name'] ?? null
+                    ];
+                }
+                $menuItem['submenu'] = $grandChildItems;
+                $menuItem['url'] = '#';
+            }
         }
 
         $dynamicInfoPublikSubmenu[] = $menuItem;

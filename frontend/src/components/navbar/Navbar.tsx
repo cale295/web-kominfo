@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menu as MenuIcon, X } from "lucide-react";
 import "./navbar.css";
 import api from "../../services/api";
@@ -51,7 +51,7 @@ interface Banner {
   category_banner: string;
 }
 
-type MenuType = "main" | "berita";
+type MenuType = "main" | "berita" | "profile";
 
 function Navbar() {
   const location = useLocation();
@@ -63,6 +63,7 @@ function Navbar() {
   const [kontakSocials, setKontakSocials] = useState<KontakSocialType[]>([]);
   const [heroBanner, setHeroBanner] = useState<Banner | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [profileSubmenus, setProfileSubmenus] = useState<MenuItemType[]>([]);
 
   useEffect(() => {
     const fetchBanner = async () => {
@@ -95,6 +96,18 @@ function Navbar() {
     ) {
       return "berita";
     }
+
+    if (
+      pathname === "/profile" ||
+      pathname.startsWith("/profil_tentang") ||
+      pathname.startsWith("/pejabat_struktural") ||
+      pathname.startsWith("/tugas_fungsi") ||
+      pathname.startsWith("/struktur_organisasi") ||
+      pathname.startsWith("/profile/")
+    ) {
+      return "profile";
+    }
+
     return "main";
   };
 
@@ -141,6 +154,12 @@ function Navbar() {
         }));
 
       setMainMenus(activeMenus);
+
+      // Ambil submenu dari PROFIL (id_menu: "1")
+      const profileMenu = activeMenus.find((menu) => menu.id_menu === "1");
+      if (profileMenu && profileMenu.children) {
+        setProfileSubmenus(profileMenu.children);
+      }
     } catch (error) {
       console.error("Gagal mengambil data menu:", error);
     }
@@ -154,9 +173,7 @@ function Navbar() {
 
       // Filter kategori yang tampil di navbar
       const filtered = categories
-        .filter(
-          (c: CategoryItemType) => c.is_show_nav === "1"
-        )
+        .filter((c: CategoryItemType) => c.is_show_nav === "1")
         .sort(
           (a: CategoryItemType, b: CategoryItemType) =>
             Number(a.sorting_nav) - Number(b.sorting_nav)
@@ -199,7 +216,14 @@ function Navbar() {
 
   // Get current menus based on type
   const getCurrentMenus = () => {
-    return currentMenuType === "main" ? mainMenus : categoryMenus;
+    switch (currentMenuType) {
+      case "profile":
+        return profileSubmenus;
+      case "berita":
+        return categoryMenus;
+      default:
+        return mainMenus;
+    }
   };
 
   return (
@@ -259,8 +283,8 @@ function Navbar() {
                   ""
                 )}/uploads/banner/${heroBanner.image}`}
                 alt={heroBanner.title}
-                 className="w-24"
-              style={{ width: "6rem" }}
+                className="w-24"
+                style={{ width: "6rem" }}
               />
             ) : (
               <p>Banner tidak tersedia</p>
@@ -292,21 +316,38 @@ function Navbar() {
           className="d-flex justify-content-between align-items-center min-width-max px-3 px-md-5 py-3 font-semibold text-md"
           style={{ maxWidth: "4000px", margin: "0 auto" }}
         >
-          <MenuList
-            menus={getCurrentMenus()}
-            currentMenuType={currentMenuType}
-            depth={0}
-            isMobile={false}
-            openSubmenu={openSubmenu}
-            onToggleSubmenu={toggleSubmenu}
-            onCloseMenu={() => {}}
-          />
+          {/* Header khusus untuk halaman profile */}
+          {currentMenuType === "profile" && (
+            <MenuList
+              menus={getCurrentMenus()}
+              currentMenuType={currentMenuType}
+              depth={0}
+              isMobile={false}
+              openSubmenu={openSubmenu}
+              onToggleSubmenu={toggleSubmenu}
+              onCloseMenu={() => {}}
+            />
+          )}
+
+          {/* Menu normal untuk halaman lain */}
+          {currentMenuType !== "profile" && (
+            <MenuList
+              menus={getCurrentMenus()}
+              currentMenuType={currentMenuType}
+              depth={0}
+              isMobile={false}
+              openSubmenu={openSubmenu}
+              onToggleSubmenu={toggleSubmenu}
+              onCloseMenu={() => {}}
+            />
+          )}
         </div>
       </div>
 
       {/* MOBILE MENU (Hamburger) */}
       {isMenuOpen && (
         <div className="d-md-none bg-white p-4 text-blue-900 position-relative z-index-100 shadow-lg">
+          {/* Header khusus untuk halaman profile di mobile */}
           <MenuList
             menus={getCurrentMenus()}
             currentMenuType={currentMenuType}

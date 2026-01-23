@@ -27,6 +27,7 @@ public function index()
             ->where('status', 'active')
             ->where('menu_url IS NOT NULL')
             ->where('menu_url !=', '')
+            ->whereNotIn('menu_name', ['Penyedia', 'Swakelola'])
             ->orderBy('order_number', 'ASC')
             ->findAll();
 

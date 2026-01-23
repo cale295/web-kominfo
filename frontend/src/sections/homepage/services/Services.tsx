@@ -34,7 +34,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
       <img
         src={`${BASE_URL}/${icon_image}`}
         alt={title}
-        
       />
       <p className="title">{title}</p>
     </a>
@@ -74,6 +73,17 @@ const Service: React.FC = () => {
     fetchServices();
   }, []);
 
+  // Pisahkan services menjadi 2 baris
+  const getRows = () => {
+    const totalItems = services.length;
+    const itemsPerRow = Math.ceil(totalItems / 2);
+    
+    const row1 = services.slice(0, itemsPerRow);
+    const row2 = services.slice(itemsPerRow);
+    
+    return { row1, row2 };
+  };
+
   if (loading) {
     return <div className="service-container">Memuat layanan...</div>;
   }
@@ -86,22 +96,41 @@ const Service: React.FC = () => {
     return <div className="service-container">Tidak ada layanan aktif</div>;
   }
 
+  const { row1, row2 } = getRows();
+
   return (
     <div className="service-container">
       <div className="service-wrapper">
-        <div className="service-grid">
-          {services.map((service) => {
-            console.log("IMAGE URL =>", `${BASE_URL}/${service.icon_image}`);
-
-            return (
-              <ServiceCard
-                key={service.id_service}
-                title={service.title}
-                icon_image={service.icon_image}
-                link={service.link}
-              />
-            );
-          })}
+        <div className="service-scroll-wrapper">
+          <div className="service-grid-horizontal">
+            {/* Baris pertama */}
+            <div className="service-row">
+              {row1.map((service) => (
+                <div key={`row1-${service.id_service}`} className="service-item">
+                  <ServiceCard
+                    title={service.title}
+                    icon_image={service.icon_image}
+                    link={service.link}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            {/* Baris kedua (jika ada) */}
+            {row2.length > 0 && (
+              <div className="service-row">
+                {row2.map((service) => (
+                  <div key={`row2-${service.id_service}`} className="service-item">
+                    <ServiceCard
+                      title={service.title}
+                      icon_image={service.icon_image}
+                      link={service.link}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

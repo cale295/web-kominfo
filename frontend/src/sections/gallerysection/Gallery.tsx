@@ -19,26 +19,58 @@ interface Photo {
   id_album: string;
 }
 
+interface PaginationData {
+  current_page: number;
+  total_pages: number;
+  total_items: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
 const Gallery: React.FC = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [pagination, setPagination] = useState<PaginationData>({
+    current_page: 1,
+    total_pages: 1,
+    total_items: 0,
+    has_next: false,
+    has_prev: false,
+  });
   const navigate = useNavigate();
 
   const BASE_URL = import.meta.env.VITE_API_URL;
   const ROOT_ALBUM = `${BASE_URL}/uploads/album_covers`;
   const ROOT_GALLERY = `${BASE_URL}/uploads/gallery`;
+  const ITEMS_PER_PAGE = 9; // Sesuaikan dengan kebutuhan
 
-  const fetchData = async () => {
+  // Fungsi untuk fetch data awal
+  const fetchData = async (page = 1, isLoadMore = false) => {
     try {
-      setLoading(true);
+      if (isLoadMore) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
       const [albumRes, photoRes] = await Promise.all([
-        api.get("/album"),
+        api.get(`/album?page=${page}&limit=${ITEMS_PER_PAGE}`),
         api.get("/gallery"),
       ]);
 
       if (albumRes.data.status) {
-        setAlbums(albumRes.data.data);
+        if (isLoadMore) {
+          setAlbums(prev => [...prev, ...albumRes.data.data]);
+        } else {
+          setAlbums(albumRes.data.data);
+        }
+        
+        // Asumsi API mengembalikan data pagination
+        if (albumRes.data.pagination) {
+          setPagination(albumRes.data.pagination);
+        }
       }
 
       if (photoRes.data.status) {
@@ -48,12 +80,51 @@ const Gallery: React.FC = () => {
       console.error("Gagal mengambil data gallery:", error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  // Fungsi untuk fetch data dengan infinite scroll
+  const fetchInfiniteData = async (page = 1) => {
+    try {
+      setLoadingMore(true);
+      
+      const albumRes = await api.get(`/album?page=${page}&limit=${ITEMS_PER_PAGE}`);
+      
+      if (albumRes.data.status) {
+        setAlbums(prev => [...prev, ...albumRes.data.data]);
+        
+        if (albumRes.data.pagination) {
+          setPagination(albumRes.data.pagination);
+        }
+      }
+    } catch (error) {
+      console.error("Gagal mengambil data album:", error);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(1, false);
   }, []);
+
+  // Handle scroll untuk infinite scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >= 
+        document.documentElement.offsetHeight - 100 &&
+        !loadingMore && 
+        pagination.has_next
+      ) {
+        fetchInfiniteData(pagination.current_page + 1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadingMore, pagination]);
 
   const getPhotoCount = (albumId: string) => {
     return photos.filter((photo) => photo.id_album === albumId).length;
@@ -76,7 +147,13 @@ const Gallery: React.FC = () => {
     navigate(`/gallery/${albumId}`);
   };
 
-  if (loading) {
+  const handleLoadMore = () => {
+    if (pagination.has_next && !loadingMore) {
+      fetchData(pagination.current_page + 1, true);
+    }
+  };
+
+  if (loading && albums.length === 0) {
     return (
       <div className="container py-5">
         <div className="text-center">
@@ -122,6 +199,7 @@ const Gallery: React.FC = () => {
                         src={coverImage}
                         alt={album.album_name}
                         loading="lazy"
+                        className="album-cover-img"
                       />
                     ) : (
                       <div className="album-placeholder">
@@ -177,6 +255,35 @@ const Gallery: React.FC = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Loading indicator untuk infinite scroll */}
+        {loadingMore && (
+          <div className="text-center my-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading more...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Tombol Load More (opsional, bisa diganti dengan infinite scroll saja) */}
+        {pagination.has_next && !loadingMore && (
+          <div className="text-center mt-5">
+            <button 
+              className="btn btn-primary btn-lg"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+            >
+              Muat Lebih Banyak
+            </button>
+          </div>
+        )}
+
+        {/* Informasi pagination */}
+        <div className="text-center mt-3 text-muted">
+          <small>
+            Menampilkan {albums.length} dari {pagination.total_items} album
+          </small>
         </div>
       </div>
     </div>

@@ -1,41 +1,125 @@
+/* Services.css */
+
 .service-container {
   padding: 30px 0;
   background: #f5f5f5;
   display: flex;
   justify-content: center;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-/* Wrapper supaya grid tidak melebar lebih dari 5 kolom */
 .service-wrapper {
   width: 100%;
-  max-width: 1450px; /* 5 kolom */
+  max-width: 1450px;
   padding: 0 20px;
 }
 
-/* GRID: maksimum 5 kolom */
-.service-grid {
-  display: grid;
-  gap: 22px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+/* Container untuk scroll horizontal */
+.service-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  padding-bottom: 20px;
+  margin-right: -20px;
+  padding-right: 20px;
 }
 
+/* Grid 2 baris yang bisa di-scroll horizontal */
+.service-grid-horizontal {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: min-content; /* Agar konten tidak mengecil */
+}
+
+/* Setiap baris */
+.service-row {
+  display: flex;
+  gap: 22px;
+  flex-wrap: nowrap; /* Tidak wrap ke bawah, tetap sejajar */
+  min-width: min-content;
+}
+
+/* Item dalam baris */
+.service-item {
+  flex: 0 0 auto;
+}
+
+/* Desktop: grid biasa (tidak scroll) */
+@media (min-width: 768px) {
+  .service-scroll-wrapper {
+    overflow-x: visible;
+    margin-right: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+  
+  .service-grid-horizontal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+    min-width: auto;
+  }
+  
+  .service-row {
+    display: contents; /* Hancurkan baris, biar grid yang atur */
+  }
+  
+  .service-item {
+    width: auto !important;
+  }
+}
+
+/* Mobile: scroll horizontal dengan 2 baris */
+@media (max-width: 767.98px) {
+  .service-item {
+    width: 180px; /* Fixed width untuk mobile */
+  }
+}
+
+.service-scroll-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.service-scroll-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.service-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.service-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
 
 .service-card {
   background-color: #ffffff;
   border-radius: 16px;
   padding: 10px;
   min-height: 135px;
-
+  width: 100%;
+  
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
+  
   border: 1px solid #e8e8e8;
   transition: 0.2s ease;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
+}
+
+.service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .service-card img {
@@ -50,30 +134,60 @@
   font-weight: 600;
   text-align: center;
   line-height: 1.35;
-}
-@media (max-width: 992px) {
-  .service-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  margin: 0;
 }
 
+/* Responsive untuk mobile */
 @media (max-width: 576px) {
-  .service-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .service-item {
+    width: 160px; /* Lebih kecil untuk mobile */
   }
-
+  
   .service-card {
-    min-height: 170px;
-    padding: 16px 12px;
+    min-height: 150px;
+    padding: 14px 10px;
   }
-
+  
   .service-card img {
     width: 60px;
     height: 60px;
   }
-
+  
   .service-card .title {
     font-size: 13px;
   }
 }
 
+/* Tablet: lebar sedikit lebih besar */
+@media (min-width: 577px) and (max-width: 767px) {
+  .service-item {
+    width: 200px;
+  }
+  
+  .service-card {
+    min-height: 160px;
+  }
+}
+
+/* Optional: indicator bahwa ada lebih banyak konten di kanan */
+.service-scroll-wrapper:after {
+  content: "";
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .service-scroll-wrapper:after {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, transparent, rgba(245, 245, 245, 0.9));
+    pointer-events: none;
+  }
+  
+  .service-scroll-wrapper {
+    position: relative;
+  }
+}
