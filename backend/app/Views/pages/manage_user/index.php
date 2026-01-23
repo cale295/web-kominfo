@@ -305,9 +305,24 @@
         margin-bottom: 1rem;
         opacity: 0.3;
     }
+    
+    .password-section {
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .password-section.hidden {
+        opacity: 0;
+        max-height: 0;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        pointer-events: none;
+    }
 </style>
 
 <div class="container-fluid px-4 pb-5">
+    <!-- Header Section -->
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between my-4 py-2">
         <div class="mb-3 mb-md-0">
             <h1 class="h3 fw-bolder mb-1 text-gradient">Manajemen Pengguna</h1>
@@ -324,6 +339,7 @@
         </nav>
     </div>
 
+    <!-- Flash Messages -->
     <?php if (session()->getFlashdata('success')) : ?>
         <div class="alert alert-success border-0 shadow-sm border-start border-4 border-success rounded-3 fade show mb-4" role="alert">
             <div class="d-flex align-items-center">
@@ -647,7 +663,7 @@
                                     <label class="form-check-label fw-bold" for="type_pegawai">
                                         <i class="fas fa-building me-1"></i> Pegawai Internal
                                     </label>
-                                    <div class="text-muted small ms-4">Login via NIP (Auto Username)</div>
+                                    <div class="text-muted small ms-4">Login via NIP (Auto Username) - Tidak Perlu Password</div>
                                 </div>
                             </div>
                         </div>
@@ -719,27 +735,30 @@
                         </div>
                     </div>
 
-                    <div class="form-section-title mt-2">
-                        <i class="fas fa-shield-alt me-2"></i> Keamanan & Akses
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold"><i class="fas fa-key me-1"></i> Password <span class="text-danger">*</span></label>
-                            <div class="input-group-modern">
-                                <i class="fas fa-lock input-icon"></i>
-                                <input type="password" name="password" id="password" class="form-control form-control-modern" placeholder="Min. 8 karakter" required>
-                                <i class="fas fa-eye password-toggle" id="togglePassword" style="cursor: pointer;"></i>
-                            </div>
-                            <div class="password-strength" id="passwordStrength"><div class="password-strength-bar" id="strengthBar"></div></div>
-                            <div class="password-strength-text" id="strengthText"></div>
+                    <!-- Password Section (Hanya untuk Masyarakat Umum) -->
+                    <div id="passwordSection" class="password-section">
+                        <div class="form-section-title mt-2">
+                            <i class="fas fa-shield-alt me-2"></i> Keamanan & Akses
                         </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold"><i class="fas fa-key me-1"></i> Password <span class="text-danger">*</span></label>
+                                <div class="input-group-modern">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" name="password" id="password" class="form-control form-control-modern" placeholder="Min. 8 karakter" required>
+                                    <i class="fas fa-eye password-toggle" id="togglePassword" style="cursor: pointer;"></i>
+                                </div>
+                                <div class="password-strength" id="passwordStrength"><div class="password-strength-bar" id="strengthBar"></div></div>
+                                <div class="password-strength-text" id="strengthText"></div>
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold"><i class="fas fa-check-double me-1"></i> Konfirmasi <span class="text-danger">*</span></label>
-                            <div class="input-group-modern">
-                                <i class="fas fa-lock input-icon"></i>
-                                <input type="password" name="password_confirm" id="password_confirm" class="form-control form-control-modern" placeholder="Ulangi password" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold"><i class="fas fa-check-double me-1"></i> Konfirmasi <span class="text-danger">*</span></label>
+                                <div class="input-group-modern">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" name="password_confirm" id="password_confirm" class="form-control form-control-modern" placeholder="Ulangi password" required>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1009,9 +1028,11 @@
         const nonPegawaiFields = document.getElementById('non_pegawai_fields');
         const usernameInput = document.getElementById('username');
         const emailInput = document.getElementById('email');
+        const passwordSection = document.getElementById('passwordSection');
         
-        // Password Logic
+        // Password Logic (hanya untuk masyarakat umum)
         const passwordInput = document.getElementById('password');
+        const passwordConfirmInput = document.getElementById('password_confirm');
         const togglePassword = document.getElementById('togglePassword');
         const strengthBar = document.getElementById('strengthBar');
         const strengthText = document.getElementById('strengthText');
@@ -1032,19 +1053,27 @@
                 // Hide fields yang auto-generate untuk pegawai
                 nonPegawaiFields.classList.add('hidden');
                 
+                // Hide password section untuk pegawai
+                passwordSection.classList.add('hidden');
+                
                 // Remove required attribute saat hidden agar form bisa submit
                 usernameInput.removeAttribute('required');
                 emailInput.removeAttribute('required');
+                passwordInput.removeAttribute('required');
+                passwordConfirmInput.removeAttribute('required');
             } else {
                 identityLabel.innerHTML = '<i class="fas fa-id-card me-1"></i> NIK (Nomor Induk Kependudukan) <span class="text-danger">*</span>';
                 idUser.placeholder = "Masukkan 16 digit NIK";
                 
-                // Show fields
+                // Show fields untuk masyarakat umum
                 nonPegawaiFields.classList.remove('hidden');
+                passwordSection.classList.remove('hidden');
                 
                 // Add required back
                 usernameInput.setAttribute('required', 'required');
                 emailInput.setAttribute('required', 'required');
+                passwordInput.setAttribute('required', 'required');
+                passwordConfirmInput.setAttribute('required', 'required');
             }
         }
 
@@ -1057,7 +1086,7 @@
         if(radios.length > 0) toggleUserType();
 
         // ==========================================
-        // 2. PASSWORD STRENGTH METER
+        // 2. PASSWORD STRENGTH METER (hanya untuk masyarakat umum)
         // ==========================================
         if(passwordInput) {
             passwordInput.addEventListener('input', function() {
