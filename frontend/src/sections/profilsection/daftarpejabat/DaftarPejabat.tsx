@@ -70,7 +70,7 @@ const DaftarPejabat: React.FC = () => {
   }
 
   return (
-    <div className="pejabat-container">
+    <div id="pejabat_struktural" className="pejabat-container">
       <h3 className="pejabat-title">{pejabatData.title}</h3>
       <p className="pejabat-subtitle">{pejabatData.subtitle}</p>
       {pejabatData.image_url && (

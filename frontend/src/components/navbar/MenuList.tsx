@@ -23,6 +23,27 @@ const MenuItem: React.FC<MenuItemProps> = ({
   onToggleSubmenu,
   onCloseMenu,
 }) => {
+  // Handle klik pada chevron down (hanya toggle submenu)
+  const handleChevronClick = (e: React.MouseEvent, menuId: string | number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggleSubmenu(menuId);
+  };
+
+  // Handle klik pada menu text (navigate)
+  const handleMenuTextClick = (e: React.MouseEvent, menuUrl: string | null) => {
+    if (menuUrl) {
+      e.preventDefault();
+      if (menuUrl === "#" || menuUrl === "") {
+        return; // Jangan navigate jika URL kosong
+      }
+      window.location.href = menuUrl;
+      if (isMobile) {
+        onCloseMenu();
+      }
+    }
+  };
+
   // Fungsi untuk render menu item berdasarkan tipe
   const renderMenuItem = () => {
     if (currentMenuType === "main" || currentMenuType === "profile") {
@@ -35,6 +56,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       if (!isValid) return null;
 
       const hasChildren = menuItem.children && menuItem.children.length > 0;
+      const shouldNavigate = menuItem.menu_url && menuItem.menu_url !== "#";
 
       return (
         <div
@@ -45,88 +67,147 @@ const MenuItem: React.FC<MenuItemProps> = ({
           {isMobile ? (
             // Mobile version untuk MenuItem
             <>
-              <div
-                className="d-flex justify-content-between align-items-center px-3 py-2 cursor-pointer"
-                onClick={() => {
-                  if (hasChildren) {
-                    onToggleSubmenu(menuItem.id_menu);
-                  } else {
-                    if (menuItem.menu_url) {
-                      // Untuk submenu profile, langsung navigasi
-                      window.location.href = menuItem.menu_url;
-                    }
-                    onCloseMenu();
-                  }
-                }}
-              >
-                <span
-                  className={`d-block flex-grow-1 ${
+              <div className="d-flex justify-content-between align-items-center px-3 py-2">
+                {/* Menu text yang bisa di-klik untuk navigate */}
+                <a
+                  href={shouldNavigate ? menuItem.menu_url : "#"}
+                  className={`d-block flex-grow-1 text-decoration-none ${
                     currentMenuType === "profile"
                       ? "text-blue-900"
                       : "text-blue-900"
                   }`}
+                  onClick={(e) => {
+                    if (shouldNavigate) {
+                      handleMenuTextClick(e, menuItem.menu_url);
+                    } else {
+                      e.preventDefault();
+                      if (hasChildren) {
+                        onToggleSubmenu(menuItem.id_menu);
+                      }
+                    }
+                  }}
+                  style={{ cursor: shouldNavigate ? "pointer" : "default" }}
                 >
                   {menuItem.menu_name}
-                </span>
+                </a>
+                
+                {/* Chevron down hanya untuk toggle submenu */}
                 {hasChildren && (
-                  <ChevronDown
-                    size={16}
-                    className={`transition-transform ${
-                      isSubOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  <button
+                    onClick={(e) => handleChevronClick(e, menuItem.id_menu)}
+                    className="btn btn-link p-0 border-0 bg-transparent text-blue-900"
+                    aria-label="Toggle submenu"
+                  >
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform ${
+                        isSubOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
                 )}
               </div>
+              
+              {/* Submenu items */}
               {hasChildren && isSubOpen && (
                 <div className="ms-4 mt-2">
-                  {menuItem.children!.map((child) => (
-                    <a
-                      key={child.id_menu}
-                      href={child.menu_url || "#"}
-                      className="d-block px-3 py-2 text-blue-900 hover-bg-blue-50 rounded text-decoration-none"
-                      onClick={() => onCloseMenu()}
-                    >
-                      {child.menu_name}
-                    </a>
-                  ))}
+                  {menuItem.children!.map((child) => {
+                    const childShouldNavigate = child.menu_url && child.menu_url !== "#";
+                    return (
+                      <a
+                        key={child.id_menu}
+                        href={child.menu_url || "#"}
+                        className="d-block px-3 py-2 text-blue-900 hover-bg-blue-50 rounded text-decoration-none"
+                        onClick={(e) => {
+                          if (childShouldNavigate) {
+                            handleMenuTextClick(e, child.menu_url);
+                          } else {
+                            e.preventDefault();
+                          }
+                        }}
+                        style={{ cursor: childShouldNavigate ? "pointer" : "default" }}
+                      >
+                        {child.menu_name}
+                      </a>
+                    );
+                  })}
                 </div>
               )}
             </>
           ) : (
             // Desktop version untuk MenuItem
             <>
-              <a
-                href={menuItem.menu_url || "#"}
-                className={`px-3 py-2 d-inline-flex align-items-center navbar-menu-link ${
-                  currentMenuType === "profile"
-                    ? "text-white profile-submenu-item"
-                    : depth === 0
-                    ? "text-white"
-                    : "text-blue-900"
-                }`}
-                style={{
-                  fontWeight: currentMenuType === "profile" ? "500" : "normal",
-                }}
-              >
-                {menuItem.menu_name}
-                {hasChildren && <ChevronDown size={14} className="ms-1" />}
-              </a>
+              <div className="d-inline-flex align-items-center position-relative">
+                {/* Menu text yang bisa di-klik untuk navigate */}
+                <a
+                  href={shouldNavigate ? menuItem.menu_url : "#"}
+                  className={`px-3 py-2 d-inline-flex align-items-center navbar-menu-link ${
+                    currentMenuType === "profile"
+                      ? "text-white profile-submenu-item"
+                      : depth === 0
+                      ? "text-white"
+                      : "text-blue-900"
+                  }`}
+                  style={{
+                    fontWeight: currentMenuType === "profile" ? "500" : "normal",
+                    cursor: shouldNavigate ? "pointer" : "default",
+                  }}
+                  onClick={(e) => {
+                    if (shouldNavigate) {
+                      handleMenuTextClick(e, menuItem.menu_url);
+                    } else {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  {menuItem.menu_name}
+                </a>
+                
+                {/* Chevron down hanya untuk toggle submenu */}
+                {hasChildren && (
+                  <button
+                    onClick={(e) => handleChevronClick(e, menuItem.id_menu)}
+                    className="btn btn-link p-0 border-0 bg-transparent text-white ms-1"
+                    style={{ 
+                      lineHeight: 1,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    aria-label="Toggle submenu"
+                  >
+                    <ChevronDown size={14} />
+                  </button>
+                )}
 
-              {hasChildren && depth === 0 && currentMenuType === "main" && (
-                <div className="navbar-submenu-container">
-                  <div className="submenu-hidden">
-                    {menuItem.children!.map((child) => (
-                      <a
-                        key={child.id_menu}
-                        href={child.menu_url || "#"}
-                        className="d-block px-4 py-2 text-blue-900 hover-bg-blue-50 text-decoration-none"
-                      >
-                        {child.menu_name}
-                      </a>
-                    ))}
+                {/* Submenu container (muncul saat hover atau klik chevron) */}
+                {hasChildren && depth === 0 && currentMenuType === "main" && (
+                  <div className={`navbar-submenu-container ${isSubOpen ? 'active' : ''}`}>
+                    <div className="submenu-hidden">
+                      {menuItem.children!.map((child) => {
+                        const childShouldNavigate = child.menu_url && child.menu_url !== "#";
+                        return (
+                          <a
+                            key={child.id_menu}
+                            href={child.menu_url || "#"}
+                            className="d-block px-4 py-2 text-blue-900 hover-bg-blue-50 text-decoration-none"
+                            onClick={(e) => {
+                              if (childShouldNavigate) {
+                                handleMenuTextClick(e, child.menu_url);
+                              } else {
+                                e.preventDefault();
+                              }
+                            }}
+                            style={{ cursor: childShouldNavigate ? "pointer" : "default" }}
+                          >
+                            {child.menu_name}
+                          </a>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
         </div>
@@ -147,29 +228,38 @@ const MenuItem: React.FC<MenuItemProps> = ({
           {isMobile ? (
             // Mobile version untuk CategoryItem
             <>
-              <div
-                className="d-flex justify-content-between align-items-center px-3 py-2 cursor-pointer"
-                onClick={() => {
-                  if (hasChildren) {
-                    onToggleSubmenu(categoryItem.id_kategori);
-                  } else {
+              <div className="d-flex justify-content-between align-items-center px-3 py-2">
+                {/* Menu text yang bisa di-klik untuk navigate */}
+                <a
+                  href={`/berita?kategori=${categoryItem.slug}`}
+                  className="d-block flex-grow-1 text-blue-900 text-decoration-none"
+                  onClick={(e) => {
+                    e.preventDefault();
                     window.location.href = `/berita?kategori=${categoryItem.slug}`;
                     onCloseMenu();
-                  }
-                }}
-              >
-                <span className="text-blue-900 d-block flex-grow-1">
+                  }}
+                >
                   {categoryItem.kategori}
-                </span>
+                </a>
+                
+                {/* Chevron down hanya untuk toggle submenu */}
                 {hasChildren && (
-                  <ChevronDown
-                    size={16}
-                    className={`transition-transform ${
-                      isSubOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  <button
+                    onClick={(e) => handleChevronClick(e, categoryItem.id_kategori)}
+                    className="btn btn-link p-0 border-0 bg-transparent text-blue-900"
+                    aria-label="Toggle submenu"
+                  >
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform ${
+                        isSubOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
                 )}
               </div>
+              
+              {/* Submenu items */}
               {hasChildren && isSubOpen && (
                 <div className="ms-4 mt-2">
                   {categoryItem.children!.map((child) => (
@@ -192,36 +282,57 @@ const MenuItem: React.FC<MenuItemProps> = ({
           ) : (
             // Desktop version untuk CategoryItem
             <>
-              <a
-                href={`/berita?kategori=${categoryItem.slug}`}
-                className={`px-3 py-2 d-inline-flex align-items-center navbar-menu-link text-white`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = `/berita?kategori=${categoryItem.slug}`;
-                }}
-              >
-                {categoryItem.kategori}
-                {hasChildren && <ChevronDown size={14} className="ms-1" />}
-              </a>
-              {hasChildren && depth === 0 && (
-                <div className="navbar-submenu-container">
-                  <div className="submenu-hidden">
-                    {categoryItem.children!.map((child) => (
-                      <a
-                        key={child.id_kategori}
-                        href={`/berita?kategori=${child.slug}`}
-                        className="d-block px-4 py-2 text-blue-900 hover-bg-blue-50 text-decoration-none"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          window.location.href = `/berita?kategori=${child.slug}`;
-                        }}
-                      >
-                        {child.kategori}
-                      </a>
-                    ))}
+              <div className="d-inline-flex align-items-center position-relative">
+                {/* Menu text yang bisa di-klik untuk navigate */}
+                <a
+                  href={`/berita?kategori=${categoryItem.slug}`}
+                  className="px-3 py-2 d-inline-flex align-items-center navbar-menu-link text-white"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = `/berita?kategori=${categoryItem.slug}`;
+                  }}
+                >
+                  {categoryItem.kategori}
+                </a>
+                
+                {/* Chevron down hanya untuk toggle submenu */}
+                {hasChildren && (
+                  <button
+                    onClick={(e) => handleChevronClick(e, categoryItem.id_kategori)}
+                    className="btn btn-link p-0 border-0 bg-transparent text-white ms-1"
+                    style={{ 
+                      lineHeight: 1,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    aria-label="Toggle submenu"
+                  >
+                    <ChevronDown size={14} />
+                  </button>
+                )}
+
+                {/* Submenu container */}
+                {hasChildren && depth === 0 && (
+                  <div className={`navbar-submenu-container ${isSubOpen ? 'active' : ''}`}>
+                    <div className="submenu-hidden">
+                      {categoryItem.children!.map((child) => (
+                        <a
+                          key={child.id_kategori}
+                          href={`/berita?kategori=${child.slug}`}
+                          className="d-block px-4 py-2 text-blue-900 hover-bg-blue-50 text-decoration-none"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href = `/berita?kategori=${child.slug}`;
+                          }}
+                        >
+                          {child.kategori}
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
         </div>

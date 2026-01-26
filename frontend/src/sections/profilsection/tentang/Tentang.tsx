@@ -56,7 +56,7 @@ const Tentang: React.FC = () => {
   if (error) return <p className="text-center text-danger mt-5">{error}</p>;
 
   return (
-    <div className="tentang-container">
+    <div id="tentang" className="tentang-container">
       <div className="tentang-header">
         <h1>Tentang</h1>
         <p>Dinas Kominfo Kota Tangerang</p>

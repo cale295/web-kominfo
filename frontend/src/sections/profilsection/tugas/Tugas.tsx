@@ -75,7 +75,7 @@ const Tugas: React.FC = () => {
   }
 
   return (
-    <div className="tugas-container">
+    <div id="tugas_fungsi" className="tugas-container">
       <h1 className="tugas-title">Tugas</h1>
       <p className="tugas-subtitle">Dinas Kominfo Kota Tangerang</p>
 

@@ -55,7 +55,7 @@ const TreeNode: React.FC<{
   if (level === 0) {
     // Root level (Parent)
     return (
-      <div className="sidebar-section">
+      <div id="struktur_organisasi" className="sidebar-section">
         <div
           className={`sidebar-section-title d-flex justify-content-between align-items-center ${
             activeId === item.id_struktur ? "active-parent" : ""

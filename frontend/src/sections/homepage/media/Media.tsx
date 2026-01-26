@@ -84,7 +84,7 @@ const Media: React.FC = () => {
         <div className="media-content-wrapper">
           {/* Video Utama */}
           {mainVideo && (
-            <div className="main-video-section ">
+            <div className="main-video-section">
               <div className="main-video-container">
                 <div className="ratio ratio-16x9">
                   <iframe
@@ -95,33 +95,36 @@ const Media: React.FC = () => {
                     className="video-iframe"
                   />
                 </div>
+                <h3 className="video-title-main mt-3 mb-4">{mainVideo.title}</h3>
               </div>
             </div>
           )}
 
-          {/* Video Lainnya */}
+          {/* Video Lainnya dengan Scroll Horizontal */}
           {otherVideos.length > 0 && (
             <div className="other-videos-section">
-              <div className="row justify-content-center g-3">
-                {otherVideos.map((vid) => (
-                  <div
-                    key={vid.id_video_layanan}
-                    className="col-12 col-sm-6 col-lg-3"
-                  >
-                    <div className="video-card">
-                      <div className="ratio ratio-16x9">
-                        <iframe
-                          src={convertToEmbedUrl(vid.youtube_url)}
-                          title={vid.title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="video-iframe"
-                        />
+              <div className="other-videos-scroll-container">
+                <div className="other-videos-scroll-wrapper">
+                  {otherVideos.map((vid) => (
+                    <div
+                      key={vid.id_video_layanan}
+                      className="other-video-item"
+                    >
+                      <div className="video-card">
+                        <div className="ratio ratio-16x9">
+                          <iframe
+                            src={convertToEmbedUrl(vid.youtube_url)}
+                            title={vid.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="video-iframe"
+                          />
+                        </div>
+                        <h6 className="video-title mt-2 mb-0 text-center">{vid.title}</h6>
                       </div>
-                      <h6 className="video-title mt-2 mb-0">{vid.title}</h6>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
