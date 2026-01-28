@@ -364,6 +364,7 @@
         border-radius: 4px;
     }
 </style>
+<?= $this->include('layouts/alerts') ?>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>

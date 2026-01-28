@@ -48,7 +48,7 @@ class FooterStatisticsController extends BaseController
 
         $data = [
             'statistics' => $stats,
-            'active_tab' => 'footer_statistics', // <--- TAMBAHKAN INI
+            'active_tab' => 'footer_statistics',
             'can_create' => $access['can_create'],
             'can_update' => $access['can_update'],
             'can_delete' => $access['can_delete'],
@@ -56,15 +56,13 @@ class FooterStatisticsController extends BaseController
 
         return view('pages/footer_statistics/index', $data);
     }
+
     public function toggleStatus()
     {
-        // 1. Cek Request AJAX
         if (!$this->request->isAJAX()) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        // 2. CEK HAK AKSES
-        // Pastikan Controller punya property $this->accessRightsModel & fungsi getAccess()
         $role = session()->get('role');
         $access = $this->getAccess($role);
 
@@ -76,24 +74,18 @@ class FooterStatisticsController extends BaseController
             ]);
         }
 
-        // 3. LOAD MODEL & AMBIL DATA
-        // ==================================================
-        $model = new \App\Models\frontend\FooterStatisticsModel(); // <--- GANTI INI SESUAI MODUL
-        // ==================================================
-
+        $model = new \App\Models\frontend\FooterStatisticsModel();
         $id = $this->request->getPost('id');
         $data = $model->find($id);
 
         if ($data) {
-            // Logic Toggle (1 -> 0, 0 -> 1)
             $newStatus = ($data['is_active'] == '1') ? '0' : '1';
 
-            // Data Update (Termasuk Audit Trail)
             $updateData = [
-                'is_active'            => $newStatus,
-                'updated_at'        => date('Y-m-d H:i:s'),
-                'updated_by_id'     => session()->get('id_user'),
-                'updated_by_name'   => session()->get('username'),
+                'is_active'       => $newStatus,
+                'updated_at'      => date('Y-m-d H:i:s'),
+                'updated_by_id'   => session()->get('id_user'),
+                'updated_by_name' => session()->get('username'),
             ];
 
             if ($model->update($id, $updateData)) {
@@ -101,7 +93,7 @@ class FooterStatisticsController extends BaseController
                     'status'    => 'success',
                     'message'   => 'Status berhasil diperbarui',
                     'newStatus' => $newStatus,
-                    'token'     => csrf_hash() // Kirim token baru
+                    'token'     => csrf_hash()
                 ]);
             }
         }
@@ -129,13 +121,19 @@ class FooterStatisticsController extends BaseController
             return redirect()->to('/footer_statistics')->with('error', 'Kamu tidak punya izin menambah data.');
         }
 
+        // Tentukan auto_update berdasarkan tipe statistik
+        $stat_type = $this->request->getPost('stat_type');
+        $auto_update = ($stat_type == 'manual') ? 0 : 1; // Hanya auto update jika bukan manual
+
         $data = [
-            'stat_type'   => $this->request->getPost('stat_type'),
-            'stat_label'  => $this->request->getPost('stat_label'),
-            'stat_value'  => $this->request->getPost('stat_value'),
-            'auto_update' => $this->request->getPost('auto_update') ?? 0,
-            'sorting'     => $this->request->getPost('sorting') ?? 0,
-            'is_active'   => $this->request->getPost('is_active') ?? 0,
+            'stat_type'     => $stat_type,
+            'stat_label'    => $this->request->getPost('stat_label'),
+            'stat_value'    => 0, // Default 0 karena auto update akan mengisi nanti
+            'auto_update'   => $auto_update,
+            'sorting'       => $this->request->getPost('sorting') ?? 0,
+            'is_active'     => $this->request->getPost('is_active') ?? 0,
+            'created_by_id' => session()->get('id_user'),
+            'created_at'    => date('Y-m-d H:i:s'),
         ];
 
         if (!$this->statsModel->save($data)) {
@@ -174,14 +172,20 @@ class FooterStatisticsController extends BaseController
             return redirect()->to('/footer_statistics')->with('error', 'Data tidak ditemukan.');
         }
 
+        // Tentukan auto_update berdasarkan tipe statistik
+        $stat_type = $this->request->getPost('stat_type');
+        $auto_update = ($stat_type == 'manual') ? 0 : 1;
+
         $data = [
             'id_footer_statis' => $id,
-            'stat_type'        => $this->request->getPost('stat_type'),
+            'stat_type'        => $stat_type,
             'stat_label'       => $this->request->getPost('stat_label'),
-            'stat_value'       => $this->request->getPost('stat_value'),
-            'auto_update'      => $this->request->getPost('auto_update') ?? 0,
+            'stat_value'       => $oldData['stat_value'], // Tetap pakai nilai yang ada
+            'auto_update'      => $auto_update,
             'sorting'          => $this->request->getPost('sorting') ?? 0,
-            'updated_at'       => session()->get('id_user'),
+            'is_active'        => $this->request->getPost('is_active') ?? 0,
+            'updated_by_id'    => session()->get('id_user'),
+            'updated_at'       => date('Y-m-d H:i:s'),
         ];
 
         if (!$this->statsModel->save($data)) {

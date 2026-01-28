@@ -217,18 +217,238 @@
         margin-top: 8px;
     }
 
-    .additional-preview {
+    /* NEW: Styles untuk foto tambahan yang baru - GRID LAYOUT */
+    .additional-images-container {
+        margin-top: 12px;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .additional-image-item {
+        background: var(--gray-50);
+        border: 2px dashed var(--gray-300);
+        border-radius: 8px;
+        padding: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .additional-image-item:hover {
+        border-color: var(--primary);
+        background: #eff6ff;
+    }
+
+    .additional-image-item.has-image {
+        border-style: solid;
+        border-color: var(--success);
+        background: #f0fdf4;
+    }
+
+    .image-upload-area {
+        display: flex;
+        flex-direction: column;
         gap: 8px;
+        flex: 1;
+    }
+
+    .image-preview-box {
+        width: 100%;
+        height: 120px;
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--gray-200);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .image-preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-preview-box .placeholder {
+        color: var(--gray-400);
+        font-size: 2.5rem;
+    }
+
+    .btn-remove-image {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        border-radius: 4px;
+        background: rgba(220, 38, 38, 0.95);
+        color: white;
+        border: none;
+        cursor: pointer;
+        opacity: 0.9;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-remove-image:hover {
+        opacity: 1;
+        background: var(--danger);
+    }
+
+    .btn-remove-item {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        background: var(--gray-300);
+        color: var(--gray-700);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        align-self: stretch;
+    }
+
+    .btn-remove-item:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+    .btn-add-more {
+        background: var(--primary-light);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 8px;
+        font-weight: 600;
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+
+    .btn-add-more:hover {
+        background: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+    }
+
+    .btn-add-more i {
+        font-size: 1.1rem;
+    }
+
+    .temp-images-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
         margin-top: 12px;
     }
 
-    .additional-preview img {
-        width: 100%;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 6px;
+    /* Accordion/Collapsible untuk foto tambahan */
+    .photos-section {
+        border: 2px solid var(--gray-200);
+        border-radius: 8px;
+        margin-bottom: 16px;
+        background: white;
+        overflow: hidden;
+    }
+
+    .photos-section-header {
+        padding: 12px 16px;
+        background: var(--gray-50);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .photos-section-header:hover {
+        background: var(--gray-100);
+    }
+
+    .photos-section-header.active {
+        background: var(--primary-light);
+        color: white;
+    }
+
+    .photos-section-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .photos-count-badge {
+        background: var(--primary);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .photos-section-header.active .photos-count-badge {
+        background: white;
+        color: var(--primary);
+    }
+
+    .collapse-icon {
+        transition: transform 0.3s;
+        font-size: 1.2rem;
+    }
+
+    .collapse-icon.rotated {
+        transform: rotate(180deg);
+    }
+
+    .photos-section-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+
+    .photos-section-body.open {
+        max-height: 2000px;
+        transition: max-height 0.5s ease-in;
+    }
+
+    .photos-section-content {
+        padding: 16px;
+    }
+
+    /* Limit tinggi dengan scroll untuk banyak foto */
+    .photos-grid-wrapper {
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
+    .photos-grid-wrapper::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .photos-grid-wrapper::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 4px;
+    }
+
+    .photos-grid-wrapper::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 4px;
+    }
+
+    .photos-grid-wrapper::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-500);
     }
 
     /* Kategori styles */
@@ -333,6 +553,12 @@
         .ql-container {
             height: 180px;
         }
+
+        /* Grid foto tambahan jadi 1 kolom di mobile */
+        .additional-images-container,
+        .temp-images-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 <?= $this->endSection() ?>
@@ -407,7 +633,7 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                     <input class="form-check-input" type="checkbox" role="switch" id="toggle-content2"
                         <?= (old('has_content2') == '1' || !empty($oldContent2)) ? 'checked' : '' ?>>
                     <label class="form-check-label fw-bold" for="toggle-content2" style="font-size: 0.875rem;">
-                        Tambah Bagian Kedua
+                        Tambah Bagian Kedua Dan Sisipan
                     </label>
                 </div>
                 <input type="hidden" name="has_content2" id="has-content2-val" value="<?= (old('has_content2') == '1' || !empty($oldContent2)) ? '1' : '0' ?>">
@@ -633,22 +859,14 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                 
                 <div>
                     <label class="form-label">Foto Tambahan</label>
-                    <input type="file" name="additional_images[]" class="form-control" accept="image/*" id="additional-images" multiple>
-                    <small class="text-muted">Pilih beberapa foto</small>
+                    <small class="text-muted d-block mb-2">Kelola foto tambahan dengan accordion di bawah</small>
                     
+                    <!-- Preview untuk temp images yang sudah ada -->
                     <?php 
-                    // PERBAIKAN: Filter temp images yang belum dihapus dengan cara yang benar
                     $displayTempImages = [];
                     if (!empty($tempAdditionalImages) && is_array($tempAdditionalImages)) {
-                        // Ambil daftar gambar yang sudah dihapus dari old()
                         $deletedTempImages = old('deleted_temp_images', '');
-                        
-                        // Debug: Tampilkan informasi debugging
-                        // echo "<!-- DEBUG: tempAdditionalImages count: " . count($tempAdditionalImages) . " -->";
-                        // echo "<!-- DEBUG: deletedTempImages: " . $deletedTempImages . " -->";
-                        
                         if (!empty($deletedTempImages)) {
-                            // Jika ada string deleted_temp_images, konversi ke array
                             if (is_string($deletedTempImages)) {
                                 $deletedArray = explode(',', $deletedTempImages);
                             } elseif (is_array($deletedTempImages)) {
@@ -656,54 +874,94 @@ $oldContent2 = htmlspecialchars_decode($oldContent2, ENT_QUOTES);
                             } else {
                                 $deletedArray = [];
                             }
-                            
-                            // Debug
-                            // echo "<!-- DEBUG: deletedArray count: " . count($deletedArray) . " -->";
-                            
-                            // Filter gambar yang TIDAK ada di daftar deleted
                             foreach ($tempAdditionalImages as $index => $tempImage) {
                                 if (!in_array($tempImage, $deletedArray)) {
                                     $displayTempImages[] = $tempImage;
                                 }
                             }
                         } else {
-                            // Jika tidak ada deleted_temp_images, tampilkan semua
                             $displayTempImages = $tempAdditionalImages;
                         }
                     }
                     
                     if (!empty($displayTempImages)):
                         $oldCaptions = old('caption_additional_temp', []);
-                        // Debug
-                        // echo "<!-- DEBUG: displayTempImages count: " . count($displayTempImages) . " -->";
-                        // echo "<!-- DEBUG: oldCaptions count: " . count($oldCaptions) . " -->";
                     ?>
-                        <div class="additional-preview mt-2" id="temp-additional-preview">
-                            <?php foreach ($displayTempImages as $index => $tempImage): ?>
-                                <?php 
-                                // Cari caption yang sesuai untuk gambar ini
-                                $captionIndex = array_search($tempImage, $tempAdditionalImages);
-                                $captionValue = '';
-                                if ($captionIndex !== false && isset($oldCaptions[$captionIndex])) {
-                                    $captionValue = $oldCaptions[$captionIndex];
-                                }
-                                ?>
-                                <div class="position-relative" id="temp-img-card-<?= $index ?>">
-                                    <input type="hidden" name="temp_uploaded_files[]" value="<?= esc($tempImage) ?>">
-                                    <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" class="img-fluid rounded">
-                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1" 
-                                            onclick="removeTempImage('<?= esc($tempImage) ?>', 'temp-img-card-<?= $index ?>', <?= $index ?>)">
-                                        <i class="bi bi-x"></i>
-                                    </button>
-                                    <input type="text" name="caption_additional_temp[]" class="form-control form-control-sm mt-1" 
-                                           placeholder="Caption..." 
-                                           value="<?= esc($captionValue) ?>">
+                        <!-- Accordion untuk foto sebelumnya -->
+                        <div class="photos-section">
+                            <div class="photos-section-header" onclick="togglePhotoSection('temp-photos')">
+                                <div class="photos-section-title">
+                                    <i class="bi bi-clock-history text-info"></i>
+                                    <span>Foto Sebelumnya</span>
+                                    <span class="photos-count-badge"><?= count($displayTempImages) ?></span>
                                 </div>
-                            <?php endforeach; ?>
+                                <i class="bi bi-chevron-down collapse-icon" id="temp-photos-icon"></i>
+                            </div>
+                            <div class="photos-section-body" id="temp-photos-body">
+                                <div class="photos-section-content">
+                                    <div class="photos-grid-wrapper">
+                                        <div class="temp-images-grid" id="temp-additional-preview">
+                                            <?php foreach ($displayTempImages as $index => $tempImage): ?>
+                                                <?php 
+                                                $captionIndex = array_search($tempImage, $tempAdditionalImages);
+                                                $captionValue = '';
+                                                if ($captionIndex !== false && isset($oldCaptions[$captionIndex])) {
+                                                    $captionValue = $oldCaptions[$captionIndex];
+                                                }
+                                                ?>
+                                                <div class="additional-image-item has-image" id="temp-img-card-<?= $index ?>">
+                                                    <input type="hidden" name="temp_uploaded_files[]" value="<?= esc($tempImage) ?>">
+                                                    <div class="image-upload-area">
+                                                        <div class="image-preview-box">
+                                                            <img src="<?= base_url('uploads/temp/' . $tempImage) ?>" alt="Temp">
+                                                            <button type="button" class="btn-remove-image" 
+                                                                    onclick="removeTempImage('<?= esc($tempImage) ?>', 'temp-img-card-<?= $index ?>', <?= $index ?>)"
+                                                                    title="Hapus gambar">
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                        <input type="text" name="caption_additional_temp[]" 
+                                                               class="form-control form-control-sm" 
+                                                               placeholder="Caption..." 
+                                                               value="<?= esc($captionValue) ?>">
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     <?php endif; ?>
                     
-                    <div id="additional-preview-new" class="additional-preview mt-2"></div>
+                    <!-- Accordion untuk foto baru -->
+                    <div class="photos-section">
+                        <div class="photos-section-header active" onclick="togglePhotoSection('new-photos')">
+                            <div class="photos-section-title">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>Tambah Foto Baru</span>
+                                <span class="photos-count-badge" id="new-photos-count">0</span>
+                            </div>
+                            <i class="bi bi-chevron-down collapse-icon rotated" id="new-photos-icon"></i>
+                        </div>
+                        <div class="photos-section-body open" id="new-photos-body">
+                            <div class="photos-section-content">
+                                <div class="photos-grid-wrapper">
+                                    <div id="additional-images-wrapper">
+                                        <div id="additional-images-container" class="additional-images-container">
+                                            <!-- Item foto tambahan akan ditambahkan di sini oleh JavaScript -->
+                                        </div>
+                                        
+                                        <!-- Tombol tambah foto baru -->
+                                        <button type="button" class="btn-add-more" id="btn-add-additional-image">
+                                            <i class="bi bi-plus-circle"></i>
+                                            Tambah Foto Baru
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -783,47 +1041,25 @@ function uncheck(type, id) {
     }
 }
 
-function deleteAdditionalPreview(index) {
-    const preview = document.getElementById('additional-preview-' + index);
-    if (preview) preview.remove();
-    
-    const input = document.getElementById('additional-images');
-    const dt = new DataTransfer();
-    const files = input.files;
-    
-    for (let i = 0; i < files.length; i++) {
-        if (i !== index) dt.items.add(files[i]);
-    }
-    
-    input.files = dt.files;
-}
-
-// PERBAIKAN: Fungsi removeTempImage yang menyimpan daftar gambar yang dihapus
 function removeTempImage(imageName, elementId, index) {
     const element = document.getElementById(elementId);
     if (element) {
-        // Tambahkan nama gambar ke daftar yang dihapus
         const deletedInput = document.getElementById('deleted-temp-images');
         let deletedArray = [];
         
-        // PERBAIKAN: Jangan lupa ambil nilai yang sudah ada
         if (deletedInput.value && deletedInput.value.trim() !== '') {
             deletedArray = deletedInput.value.split(',');
-            // Bersihkan array dari nilai kosong
             deletedArray = deletedArray.filter(item => item.trim() !== '');
         }
         
-        // Cegah duplikasi
         if (!deletedArray.includes(imageName)) {
             deletedArray.push(imageName);
             deletedInput.value = deletedArray.join(',');
             console.log('Deleted images:', deletedInput.value);
         }
         
-        // Hapus dari DOM
         element.remove();
         
-        // PERBAIKAN: Update session storage jika perlu (opsional)
         if (typeof(Storage) !== "undefined") {
             let sessionDeleted = JSON.parse(sessionStorage.getItem('deleted_temp_images') || '[]');
             if (!sessionDeleted.includes(imageName)) {
@@ -863,7 +1099,6 @@ function initSisipanSearch(prefix) {
     });
 }
 
-// Fungsi khusus untuk ENTER pada kategori dan tags
 function setupSearchEnter(type) {
     const searchInput = document.getElementById(type + '-search');
     const items = document.querySelectorAll('.' + type + '-item');
@@ -875,7 +1110,6 @@ function setupSearchEnter(type) {
         if (e.key === 'Enter') {
             e.preventDefault();
             
-            // Cari item pertama yang terlihat (display != none)
             let firstVisibleItem = null;
             for (let item of items) {
                 if (item.style.display !== 'none' && item.style.display !== '') {
@@ -887,15 +1121,11 @@ function setupSearchEnter(type) {
                 }
             }
 
-            // Jika ada checkbox yang terlihat, toggle statusnya
             if (firstVisibleItem) {
                 firstVisibleItem.checked = !firstVisibleItem.checked;
-                
-                // Trigger event change untuk update badge
                 const event = new Event('change');
                 firstVisibleItem.dispatchEvent(event);
                 
-                // Beri feedback visual
                 const parentItem = firstVisibleItem.closest('.' + type + '-item');
                 if (parentItem) {
                     parentItem.style.backgroundColor = firstVisibleItem.checked ? '#dbeafe' : '';
@@ -908,14 +1138,123 @@ function setupSearchEnter(type) {
     });
 }
 
+// NEW: Fungsi untuk menambah item foto tambahan
+let additionalImageCounter = 0;
+
+function addAdditionalImageItem() {
+    const container = document.getElementById('additional-images-container');
+    const itemId = 'additional-item-' + additionalImageCounter;
+    const inputId = 'additional-input-' + additionalImageCounter;
+    const previewId = 'additional-preview-' + additionalImageCounter;
+    
+    const itemHTML = `
+        <div class="additional-image-item" id="${itemId}">
+            <div class="image-upload-area">
+                <div class="image-preview-box" id="${previewId}">
+                    <i class="bi bi-image placeholder"></i>
+                </div>
+                <input type="file" name="additional_images[]" class="form-control form-control-sm" 
+                       accept="image/*" id="${inputId}" data-item-id="${itemId}" data-preview-id="${previewId}">
+                <input type="text" name="caption_new[]" class="form-control form-control-sm" 
+                       placeholder="Caption..." disabled>
+                <button type="button" class="btn-remove-item" onclick="removeAdditionalItem('${itemId}')">
+                    <i class="bi bi-trash"></i> Hapus
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Insert before the "Tambah Foto" button
+    const addButton = document.getElementById('btn-add-additional-image');
+    addButton.insertAdjacentHTML('beforebegin', itemHTML);
+    
+    // Attach event listener untuk preview
+    const fileInput = document.getElementById(inputId);
+    fileInput.addEventListener('change', function(e) {
+        handleAdditionalImagePreview(e, previewId, itemId);
+    });
+    
+    additionalImageCounter++;
+    updateNewPhotosCount();
+}
+
+function handleAdditionalImagePreview(e, previewId, itemId) {
+    const file = e.target.files[0];
+    const previewBox = document.getElementById(previewId);
+    const item = document.getElementById(itemId);
+    const captionInput = item.querySelector('input[name="caption_new[]"]');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            previewBox.innerHTML = `
+                <img src="${event.target.result}" alt="Preview">
+                <button type="button" class="btn-remove-image" onclick="clearAdditionalImage('${e.target.id}', '${previewId}', '${itemId}')" title="Hapus gambar">
+                    ✕
+                </button>
+            `;
+            item.classList.add('has-image');
+            captionInput.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function clearAdditionalImage(inputId, previewId, itemId) {
+    const fileInput = document.getElementById(inputId);
+    const previewBox = document.getElementById(previewId);
+    const item = document.getElementById(itemId);
+    const captionInput = item.querySelector('input[name="caption_new[]"]');
+    
+    fileInput.value = '';
+    previewBox.innerHTML = '<i class="bi bi-image placeholder"></i>';
+    item.classList.remove('has-image');
+    captionInput.disabled = true;
+    captionInput.value = '';
+}
+
+function removeAdditionalItem(itemId) {
+    const item = document.getElementById(itemId);
+    if (item) {
+        item.remove();
+        updateNewPhotosCount();
+    }
+}
+
+// Fungsi untuk toggle accordion foto
+function togglePhotoSection(sectionId) {
+    const body = document.getElementById(sectionId + '-body');
+    const icon = document.getElementById(sectionId + '-icon');
+    const header = body.previousElementSibling;
+    
+    if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        icon.classList.remove('rotated');
+        header.classList.remove('active');
+    } else {
+        body.classList.add('open');
+        icon.classList.add('rotated');
+        header.classList.add('active');
+    }
+}
+
+// Fungsi untuk update counter foto baru
+function updateNewPhotosCount() {
+    const container = document.getElementById('additional-images-container');
+    const count = container.querySelectorAll('.additional-image-item').length;
+    const badge = document.getElementById('new-photos-count');
+    if (badge) {
+        badge.textContent = count;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // PERBAIKAN: Set nilai deleted-temp-images dari old() saat halaman pertama kali dimuat
+    // Set nilai deleted-temp-images dari old()
     const deletedTempImages = '<?= old("deleted_temp_images", "") ?>';
     if (deletedTempImages) {
         document.getElementById('deleted-temp-images').value = deletedTempImages;
     }
     
-    // PERBAIKAN: Juga cek session storage untuk backup
     if (typeof(Storage) !== "undefined") {
         const sessionDeleted = JSON.parse(sessionStorage.getItem('deleted_temp_images') || '[]');
         if (sessionDeleted.length > 0) {
@@ -946,8 +1285,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('form-berita').onsubmit = function() {
         document.getElementById('content-hidden').value = quill1.root.innerHTML;
         document.getElementById('content2-hidden').value = quill2.root.innerHTML;
-        
-        // PERBAIKAN: Pastikan deleted_temp_images di-submit
         console.log('Submitting deleted_temp_images:', document.getElementById('deleted-temp-images').value);
     };
 
@@ -992,7 +1329,7 @@ document.addEventListener('DOMContentLoaded', function() {
         sisipan2Btn.removeAttribute('disabled');
     }
 
-    // 6. Kategori & Tags Dropdown Logic dengan ENTER support
+    // 6. Kategori & Tags Dropdown Logic
     function setupDropdownSearch(type) {
         const toggleBtn = document.getElementById(type + '-toggle');
         const dropdownMenu = toggleBtn.nextElementSibling;
@@ -1037,7 +1374,6 @@ document.addEventListener('DOMContentLoaded', function() {
             noResults.style.display = visibleCount === 0 ? 'block' : 'none';
         });
 
-        // Setup ENTER key functionality
         setupSearchEnter(type);
 
         checkboxes.forEach(cb => {
@@ -1079,7 +1415,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupDropdownSearch('kategori');
     setupDropdownSearch('tags');
 
-    // 7. Image Previews
+    // 7. Image Preview - Cover
     document.getElementById('cover-image').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -1093,30 +1429,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 8. Image Previews - Additional Images
-    document.getElementById('additional-images').addEventListener('change', function(e) {
-        const container = document.getElementById('additional-preview-new');
-        container.innerHTML = '';
-        
-        Array.from(e.target.files).forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                const div = document.createElement('div');
-                div.className = 'position-relative';
-                div.id = 'additional-preview-' + index;
-                div.innerHTML = `
-                    <img src="${ev.target.result}" class="img-fluid rounded">
-                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1" 
-                        onclick="deleteAdditionalPreview(${index})">
-                        <i class="bi bi-x"></i>
-                    </button>
-                    <input type="text" name="caption_new[]" class="form-control form-control-sm mt-1" placeholder="Caption...">
-                `;
-                container.appendChild(div);
-            }
-            reader.readAsDataURL(file);
-        });
+    // 8. NEW: Event listener untuk tombol tambah foto
+    document.getElementById('btn-add-additional-image').addEventListener('click', function() {
+        addAdditionalImageItem();
     });
+    
+    // Tambahkan 1 item foto tambahan secara default
+    addAdditionalImageItem();
 });
 </script>
 <?= $this->endSection() ?>

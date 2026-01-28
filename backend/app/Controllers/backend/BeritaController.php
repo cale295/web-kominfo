@@ -179,11 +179,7 @@ public function new()
         'title' => 'Tambah Berita',
         'kategori' => $this->kategoriModel->findAll(),
         'tags' => $this->beritaTagModel->findAll(),
-        'beritaAll' => $this->beritaModel
-            ->where('created_by_id', $currentUserId)
-            ->where('trash', '0')
-            ->orderBy('id_berita', 'DESC')
-            ->findAll(),
+        'beritaAll' => $this->beritaModel->orderBy('created_at', 'DESC')->findAll(),
         'tempCoverImage' => session()->get('temp_cover_image'),
         'tempAdditionalImages' => array_values($displayTempImages) // Gunakan yang sudah difilter
     ];
@@ -451,7 +447,7 @@ public function create()
         $status       = '5'; // Tidak Tayang
         $statusBerita = 2;   // Menunggu Verifikasi
     } else {
-        $status       = '1'; // Tayang
+        $status       = '5'; // Tidak Tayang
         $statusBerita = 4;   // Layak Tayang
     }
 
@@ -582,12 +578,7 @@ return redirect()->to('/berita')->with('success', $message);
         // --- PERUBAHAN DISINI ---
         $currentUserId = session()->get('id_user');
 
-        $beritaAll = $this->beritaModel
-            ->where('created_by_id', $currentUserId) // Hanya buatan sendiri
-            ->where('id_berita !=', $id)             // Jangan tampilkan berita yang sedang diedit
-            ->where('trash', '0')
-            ->orderBy('id_berita', 'DESC')
-            ->findAll();
+        $beritaAll = $this->beritaModel->orderBy('created_at', 'DESC')->findAll();
         // ------------------------
 
         return view('pages/berita/edit', [
@@ -840,7 +831,7 @@ public function update($id)
         $status       = '5'; // Tidak Tayang
         $statusBerita = 6;   // Revisi
     }   else {
-        $status       = '1'; // Tayang
+        $status       = '5'; // Tidak Tayang
         $statusBerita = 4;   // Layak Tayang
     }
 

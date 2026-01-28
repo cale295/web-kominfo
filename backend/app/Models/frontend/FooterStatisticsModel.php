@@ -61,18 +61,11 @@ class FooterStatisticsModel extends Model
             'rules'  => 'required|max_length[100]',
             'label'  => 'Label Tampilan'
         ],
-        'sorting' => [
-            'rules'  => 'required|numeric',
-            'label'  => 'Urutan'
-        ],
         'is_active' => [
             'rules'  => 'required|in_list[0,1]',
             'label'  => 'Status Aktif'
         ],
-        'auto_update' => [
-            'rules'  => 'required|in_list[0,1]',
-            'label'  => 'Auto Update'
-        ],
+
     ];
 
     // Custom Messages
@@ -81,9 +74,6 @@ class FooterStatisticsModel extends Model
             'required'  => '{field} wajib diisi.',
             'is_unique' => '{field} ini sudah digunakan, harap pilih tipe lain.'
         ],
-        'stat_value' => [
-            'numeric' => '{field} harus berupa angka.'
-        ]
     ];
 
         public function syncAutoStats()
