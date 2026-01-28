@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\backend;
+namespace App\Controllers\frontend;
 
 use App\Models\AccessRightsModel;
 use App\Controllers\BaseController;

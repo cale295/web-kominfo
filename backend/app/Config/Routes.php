@@ -25,8 +25,8 @@ $routes->resource('pejabat', ['controller' => 'frontend\PejabatController', 'exc
 $routes->post('pejabat/toggle-status', 'frontend\PejabatController::toggleStatus');
 
 // Berita Kategori Tema
-$routes->resource('tema', ['controller' => 'backend\TemaKategoriController', 'except' => ['show']]);
-$routes->post('tema/toggle-status', 'backend\TemaKategoriController::toggleStatus');
+$routes->resource('tema', ['controller' => 'frontend\TemaKategoriController', 'except' => ['show']]);
+$routes->post('tema/toggle-status', 'frontend\TemaKategoriController::toggleStatus');
 
 // User Management
 $routes->resource('manage_user', ['controller' => 'backend\UserController']);
@@ -46,20 +46,20 @@ $routes->resource('menu_profile', ['controller' => 'frontend\ProfileController',
 $routes->post('menu_profile/toggle-status', 'frontend\ProfileController::toggleStatus');
 
 // Agenda
-$routes->resource('agenda', ['controller' => 'backend\AgendaController','except' => ['show']]);
-$routes->post('agenda/toggle-status', 'backend\AgendaController::toggleStatus');
-$routes->post('agenda/delete/(:num)', 'backend\AgendaController::delete/$1');
+$routes->resource('agenda', ['controller' => 'frontend\AgendaController','except' => ['show']]);
+$routes->post('agenda/toggle-status', 'frontend\AgendaController::toggleStatus');
+$routes->post('agenda/delete/(:num)', 'frontend\AgendaController::delete/$1');
 
 // Profile (Backend)
 $routes->resource('profile', ['controller' => 'backend\ProfileController', 'except' => ['show']]);
 $routes->post('profile/toggle-status', 'backend\ProfileController::toggleStatus');
 
 // Kategori (General)
-$routes->resource('kategori', ['controller' => 'backend\KategoriController', 'except' => ['show']]);
-$routes->get('kategori/trash', 'backend\KategoriController::trash');
-$routes->get('kategori/(:num)/restore', 'backend\KategoriController::restore/$1');
-$routes->post('kategori/(:num)/destroyPermanent', 'backend\KategoriController::destroyPermanent/$1');
-$routes->post('kategori/toggle-status', 'backend\KategoriController::toggleStatus');
+$routes->resource('kategori', ['controller' => 'frontend\KategoriController', 'except' => ['show']]);
+$routes->get('kategori/trash', 'frontend\KategoriController::trash');
+$routes->get('kategori/(:num)/restore', 'frontend\KategoriController::restore/$1');
+$routes->post('kategori/(:num)/destroyPermanent', 'frontend\KategoriController::destroyPermanent/$1');
+$routes->post('kategori/toggle-status', 'frontend\KategoriController::toggleStatus');
 
 
 // =========================================================================
@@ -198,52 +198,52 @@ $routes->group('footer_opd', ['namespace' => 'App\Controllers\frontend'], functi
 // =========================================================================
 
 // Berita Tag
-$routes->resource('berita_tag', ['controller' => 'backend\BeritaTagController', 'except' => ['show']]);
-$routes->post('berita_tag/toggle-status', 'backend\BeritaTagController::toggleStatus');
+$routes->resource('berita_tag', ['controller' => 'frontend\BeritaTagController', 'except' => ['show']]);
+$routes->post('berita_tag/toggle-status', 'frontend\BeritaTagController::toggleStatus');
 
 // Dokumen Kategori & Dokumen
-$routes->resource('dokument_kategori', ['controller' => 'backend\DokumenKategoriController', 'except' => ['show']]);
-$routes->post('dokument_kategori/toggle-status', 'backend\DokumenKategoriController::toggleStatus');
-$routes->resource('dokument', ['controller' => 'backend\DokumenController', 'except' => ['show']]);
-$routes->post('dokument/toggle-status', 'backend\DokumenController::toggleStatus');
+$routes->resource('dokument_kategori', ['controller' => 'frontend\DokumenKategoriController', 'except' => ['show']]);
+$routes->post('dokument_kategori/toggle-status', 'frontend\DokumenKategoriController::toggleStatus');
+$routes->resource('dokument', ['controller' => 'frontend\DokumenController', 'except' => ['show']]);
+$routes->post('dokument/toggle-status', 'frontend\DokumenController::toggleStatus');
 
 // Berita Custom Routes
-$routes->get('berita', 'backend\BeritaController::index');
-$routes->get('berita/show/(:segment)', 'backend\BeritaController::show/$1');
-$routes->put('berita/(:num)', 'backend\BeritaController::update/$1');
-$routes->get('berita/new', 'backend\BeritaController::new');
-$routes->post('berita', 'backend\BeritaController::create');
-$routes->get('berita/(:num)/edit', 'backend\BeritaController::edit/$1');
-$routes->post('berita/(:num)/update', 'backend\BeritaController::update/$1');
-$routes->post('berita/(:num)/delete', 'backend\BeritaController::delete/$1'); 
-$routes->post('berita/(:num)/destroyPermanent', 'backend\BeritaController::destroyPermanent/$1');
-$routes->get('berita/trash', 'backend\BeritaController::trash');
-$routes->post('berita/(:num)/restore', 'backend\BeritaController::restore/$1');
-$routes->get('/berita/(:num)/log/', 'backend\BeritaController::log/$1');
-$routes->post('berita/toggle-status', 'backend\BeritaController::toggleStatus');
+$routes->get('berita', 'frontend\BeritaController::index');
+$routes->get('berita/show/(:segment)', 'frontend\BeritaController::show/$1');
+$routes->put('berita/(:num)', 'frontend\BeritaController::update/$1');
+$routes->get('berita/new', 'frontend\BeritaController::new');
+$routes->post('berita', 'frontend\BeritaController::create');
+$routes->get('berita/(:num)/edit', 'frontend\BeritaController::edit/$1');
+$routes->post('berita/(:num)/update', 'frontend\BeritaController::update/$1');
+$routes->post('berita/(:num)/delete', 'frontend\BeritaController::delete/$1'); 
+$routes->post('berita/(:num)/destroyPermanent', 'frontend\BeritaController::destroyPermanent/$1');
+$routes->get('berita/trash', 'frontend\BeritaController::trash');
+$routes->post('berita/(:num)/restore', 'frontend\BeritaController::restore/$1');
+$routes->get('/berita/(:num)/log/', 'frontend\BeritaController::log/$1');
+$routes->post('berita/toggle-status', 'frontend\BeritaController::toggleStatus');
 
 // Berita Utama
-$routes->resource('berita-utama', ['controller' => 'backend\BeritaUtamaController', 'except' => ['show']]);
-$routes->post('berita-utama/toggle-status', 'backend\BeritaUtamaController::toggleStatus');
+$routes->resource('berita-utama', ['controller' => 'frontend\BeritaUtamaController', 'except' => ['show']]);
+$routes->post('berita-utama/toggle-status', 'frontend\BeritaUtamaController::toggleStatus');
 
 // Album & Gallery
-$routes->resource('album', ['controller' => 'backend\PhotoAlbumController', 'except' => ['']]);
-$routes->get('album/get-photos/(:num)', 'backend\PhotoAlbumController::get_photos/$1');
-$routes->post('album/upload_store', 'backend\PhotoAlbumController::upload_store');
-$routes->post('album/toggle-status', 'backend\PhotoAlbumController::toggleStatus');
-$routes->get('album/(:num)', 'backend\PhotoAlbumController::show/$1');
-$routes->post('album/store', 'backend\PhotoAlbumController::store');
-$routes->post('photo/toggle/(:num)', 'backend\PhotoGalleryController::toggle/$1');
-$routes->delete('photo/delete/(:num)', 'backend\PhotoAlbumController::deletePhoto/$1');
+$routes->resource('album', ['controller' => 'frontend\PhotoAlbumController', 'except' => ['']]);
+$routes->get('album/get-photos/(:num)', 'frontend\PhotoAlbumController::get_photos/$1');
+$routes->post('album/upload_store', 'frontend\PhotoAlbumController::upload_store');
+$routes->post('album/toggle-status', 'frontend\PhotoAlbumController::toggleStatus');
+$routes->get('album/(:num)', 'frontend\PhotoAlbumController::show/$1');
+$routes->post('album/store', 'frontend\PhotoAlbumController::store');
+$routes->post('photo/toggle/(:num)', 'frontend\PhotoGalleryController::toggle/$1');
+$routes->delete('photo/delete/(:num)', 'frontend\PhotoAlbumController::deletePhoto/$1');
 
-$routes->resource('gallery', ['controller' => 'backend\PhotoGalleryController', 'except' => ['show']]);
-$routes->post('gallery/toggle-status', 'backend\PhotoGalleryController::toggleStatus');
+$routes->resource('gallery', ['controller' => 'frontend\PhotoGalleryController', 'except' => ['show']]);
+$routes->post('gallery/toggle-status', 'frontend\PhotoGalleryController::toggleStatus');
 
 // Banner
-$routes->resource('banner', ['controller' => 'backend\BannerController', 'except' => ['show']]);
-$routes->get('banner/view/(:num)', 'backend\BannerController::view/$1');
-$routes->post('banner/toggle-status', 'backend\BannerController::toggleStatus');
-$routes->get('banner/click/(:num)', 'backend\BannerController::click/$1');
+$routes->resource('banner', ['controller' => 'frontend\BannerController', 'except' => ['show']]);
+$routes->get('banner/view/(:num)', 'frontend\BannerController::view/$1');
+$routes->post('banner/toggle-status', 'frontend\BannerController::toggleStatus');
+$routes->get('banner/click/(:num)', 'frontend\BannerController::click/$1');
 
 // Menu
 $routes->resource('menu', ['controller' => 'backend\MenuController']);
