@@ -197,7 +197,7 @@
     }
 
     /* Status Toggle */
-.status-btn {
+    .status-btn {
         background: none;
         border: none;
         padding: 0;
@@ -386,8 +386,6 @@
     </div>
 </div>
 
-<?= $this->include('layouts/alerts') ?>
-
 <div class="card mb-3 shadow-sm border-0">
     <div class="card-body py-3">
         <div class="row align-items-center filter-section">
@@ -440,7 +438,6 @@
                         <th class="text-center">Dilihat</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Aksi</th>
-                        
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -454,55 +451,38 @@
                             </td>
                         </tr>
                     <?php else: ?>
-<?php foreach ($berita as $i => $row): ?>
-                    <?php 
-                        // ===========================================
-                        // LOGIKA PERMISSION FINAL
-                        // ===========================================
-                        
-                        $currentRole   = session()->get('role'); 
-                        $currentUserId = session()->get('id_user');
-                        
-                        // 1. Setting Default (Untuk Admin)
-                        // Admin ikut settingan controller ($can_update)
-                        $allowEdit   = !empty($can_update);
-                        $allowDelete = !empty($can_delete) && ($row['status'] != '1'); 
-                        $isLayakTayang = ($row['status_berita'] == '4');
-                        $disableToggle = false;
-
-                        // 2. Setting Khusus EDITOR
-                        if ($currentRole == 'editor') {
-                            // A. Matikan dulu semua izin editor (Default: Dilarang)
-                            $allowEdit   = false; 
-                            $allowDelete = false;
-                            $disableToggle = true; // Editor tidak boleh publish langsung
-
-                            // B. Cek Kepemilikan (Apakah ini berita buatannya?)
-                            $authorId = $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? null;
+                        <?php foreach ($berita as $i => $row): ?>
+                            <?php 
+                            $currentRole   = session()->get('role'); 
+                            $currentUserId = session()->get('id_user');
                             
-                            if ($authorId == $currentUserId) {
-                                // C. Cek Status Berita
-                                // 0 = Draft
-                                // 3 = Perbaikan
-                                // 6 = Revisi
-                                // Jika statusnya salah satu di atas => IZINKAN EDIT
-                                if (in_array($row['status_berita'], ['0', '3', '6'])) {
-                                    $allowEdit   = true;
-                                    $allowDelete = true;
+                            $allowEdit   = !empty($can_update);
+                            $allowDelete = !empty($can_delete) && ($row['status'] != '1'); 
+                            $isLayakTayang = ($row['status_berita'] == '4');
+                            $isCurrentlyActive = ($row['status'] == '1');
+                            $disableToggle = false;
+
+                            if ($currentRole == 'editor') {
+                                $disableToggle = true;
+                                $allowEdit = false;
+                                $allowDelete = false;
+                                
+                                $authorId = $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? null;
+                                
+                                if ($authorId == $currentUserId) {
+                                    if (in_array($row['status_berita'], ['0', '3', '6'])) {
+                                        $allowEdit = true;
+                                        $allowDelete = true;
+                                    }
                                 }
-                                // Catatan: Jika status '2' (Verifikasi) atau '4' (Layak Tayang),
-                                // maka kode masuk ke 'else' (tidak melakukan apa-apa), 
-                                // sehingga $allowEdit tetap FALSE.
+                            } else {
+                                if (!$isLayakTayang && !$isCurrentlyActive) {
+                                    $disableToggle = true;
+                                }
                             }
-                        }
+                            ?>
 
-                        // 3. Logika Toggle untuk Non-Editor (Admin)
-                        if (!$isLayakTayang && $currentRole != 'editor') {
-                            $disableToggle = true;
-                        }
-                    ?>
-
-                    <tr class="data-row" data-user-id="<?= $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? '' ?>">
+                            <tr class="data-row" data-user-id="<?= $row['created_by_id'] ?? $row['created_by'] ?? $row['id_user'] ?? '' ?>">
                                 <td class="text-center row-number"><?= $i + 1 ?></td>
 
                                 <td class="text-center">
@@ -519,7 +499,7 @@
                                     $hasValidImage = false;
                                     if (!empty($additional)):
                                         foreach ($additional as $img):
-                                            if (!$hasValidImage): // Hanya tampilkan satu gambar pertama
+                                            if (!$hasValidImage):
                                                 $pathGambar = is_array($img) ? ($img['path'] ?? '') : $img;
                                                 $captionTooltip = is_array($img) ? ($img['caption'] ?? '') : '';
                                                 if (!empty($pathGambar)):
@@ -541,7 +521,6 @@
                                 <td style="min-width: 180px;">
                                     <strong class="searchable"><?= esc($row['judul']) ?></strong>
                                 </td>
-
 
                                 <td>
                                     <div class="content-preview" title="<?= strip_tags($row['content']) ?>">
@@ -587,8 +566,6 @@
                                     <?php endif; ?>
                                 </td>
 
-
-
                                 <td class="text-center">
                                     <?php
                                     $statusBerita = [
@@ -607,23 +584,32 @@
                                     <?= !empty($row['created_at']) ? date('d/m/y', strtotime($row['created_at'])) : '-' ?>
                                 </td>
 
-                            <td class="text-center" style="min-width: 180px;">
+                                <td class="text-center" style="min-width: 180px;">
                                     <strong class="searchable"><?= esc($row['hit']) ?></strong>
                                 </td>
 
-                                
-                                
                                 <td class="text-center">
-                                    <button type="button" class="status-btn" 
-                                            data-id="<?= $row['id_berita'] ?>" 
-                                            data-url="<?= site_url('berita/toggle-status') ?>"
-                                            <?= $disableToggle ? 'disabled' : '' ?>
-                                            title="<?= $currentRole == 'editor' ? 'Editor tidak memiliki akses publish' : (!$isLayakTayang ? 'Status belum Layak Tayang' : '') ?>">
-                                        <div class="switch <?= ($row['status'] == '1' ? 'active' : '') ?>"></div>
-                                        <span class="switch-label"><?= ($row['status'] == '1' ? 'Aktif' : 'Non-Aktif') ?></span>
-                                    </button>
+                                    <div class="d-flex justify-content-center" 
+                                         data-bs-toggle="tooltip" 
+                                         title="<?= $disableToggle ? 'Hanya berita dengan status "Layak Tayang" yang bisa diaktifkan' : 'Klik untuk mengubah status' ?>">
+                                        <?php
+                                        $isActive = ($row['status'] == '1');
+                                        $switchClass = $isActive ? 'active' : '';
+                                        $labelText = $isActive ? 'Aktif' : 'Non-Aktif';
+                                        $disabledAttr = $disableToggle ? 'disabled' : '';
+                                        $disabledStyle = $disableToggle ? 'style="opacity: 0.5; cursor: not-allowed;"' : '';
+                                        ?>
+                                        <button class="status-btn" 
+                                                data-id="<?= $row['id_berita'] ?>" 
+                                                data-url="berita/toggle-status" 
+                                                <?= $disabledAttr ?>
+                                                <?= $disabledStyle ?>>
+                                            <span class="switch <?= $switchClass ?>"></span>
+                                            <span class="switch-label"><?= $labelText ?></span>
+                                        </button>
+                                    </div>
                                 </td>
-                                
+
                                 <td class="text-center" style="min-width: 110px;">
                                     <div class="d-flex flex-column gap-1">
                                         <?php if (!empty($can_read)): ?>
@@ -632,19 +618,13 @@
                                             </a>
                                         <?php endif; ?>
                                         
-                                        <?php 
-                                        // Tampilkan Tombol Edit jika Permission $allowEdit TRUE
-                                        if ($allowEdit): 
-                                        ?>
+                                        <?php if ($allowEdit): ?>
                                             <a href="<?= site_url('berita/' . $row['id_berita'] . '/edit') ?>" class="btn btn-warning btn-sm py-1" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                         <?php endif; ?>
 
-                                        <?php 
-                                        // Tampilkan Tombol Hapus jika Permission $allowDelete TRUE
-                                        if ($allowDelete): 
-                                        ?>
+                                        <?php if ($allowDelete): ?>
                                             <form action="<?= site_url('berita/' . $row['id_berita'] . '/delete') ?>" method="post" class="d-inline delete-form">
                                                 <?= csrf_field() ?>
                                                 <button type="submit" class="btn btn-danger btn-sm py-1 w-100" 
@@ -698,18 +678,11 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ==========================================
-    // 1. GLOBAL VARIABLES & CSRF HANDLING
-    // ==========================================
-    // Simpan token saat ini di variable global agar bisa diupdate via AJAX
     let currentCsrfName = '<?= csrf_token() ?>';
     let currentCsrfHash = '<?= csrf_hash() ?>';
-    
-    // Variabel untuk filter data user
     let currentUserId = '<?= session()->get('id_user') ?>';
     let showMyDataOnly = false;
 
-    // Fungsi helper untuk update token di semua form input yang ada di halaman
     function updateAllCsrfInputs(newHash) {
         currentCsrfHash = newHash;
         document.querySelectorAll('input[name="' + currentCsrfName + '"]').forEach(el => {
@@ -717,10 +690,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==========================================
-    // 2. BAGIAN FILTER DATA USER
-    // ==========================================
-    
     const filterMyDataBtn = document.getElementById('filterMyData');
     if (filterMyDataBtn) {
         filterMyDataBtn.addEventListener('click', function() {
@@ -742,30 +711,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==========================================
-    // 3. BAGIAN PAGINATION & SEARCH
-    // ==========================================
-    
-    // Elements
     const searchInput = document.getElementById('searchInput');
     const limitSelect = document.getElementById('limitSelect');
     const tableBody = document.getElementById('tableBody');
     const rows = tableBody ? Array.from(tableBody.querySelectorAll('tr.data-row')) : [];
     
-    // Pagination elements
     const showingStartSpan = document.getElementById('showingStart');
     const showingEndSpan = document.getElementById('showingEnd');
     const totalDataSpan = document.getElementById('totalData');
     const totalPagesSpan = document.getElementById('totalPages');
     const currentPageInput = document.getElementById('currentPageInput');
     
-    // Button elements
     const firstPageBtn = document.getElementById('firstPage');
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
     const lastPageBtn = document.getElementById('lastPage');
     
-    // State
     let currentPage = 1;
     let currentLimit = 10;
     let currentSearch = '';
@@ -776,7 +737,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initTable();
     }
 
-    // Search Logic
     if(searchInput) {
         searchInput.addEventListener('input', function() {
             currentSearch = this.value.toLowerCase();
@@ -786,7 +746,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Limit Logic
     if(limitSelect) {
         limitSelect.addEventListener('change', function() {
             currentLimit = this.value === '-1' ? rows.length : parseInt(this.value);
@@ -796,7 +755,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Pagination Button Clicks
     function addClick(elem, fn) { if(elem) elem.addEventListener('click', fn); }
 
     addClick(firstPageBtn, () => changePage(1));
@@ -830,7 +788,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function filterAndPaginate() {
         const filteredRows = rows.filter(row => {
-            // Filter berdasarkan data user sendiri
             if (showMyDataOnly && currentUserId) {
                 const rowUserId = row.dataset.userId;
                 if (rowUserId !== currentUserId) {
@@ -838,9 +795,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Filter berdasarkan pencarian
             if (currentSearch === '') return true;
-            // Cari hanya di elemen yang punya class 'searchable' atau text content umum
             const textContent = row.textContent.toLowerCase();
             return textContent.includes(currentSearch);
         });
@@ -875,7 +830,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         displayRows.forEach((row, index) => {
             row.style.display = '';
-            // Update nomor urut
             const rowNum = (currentLimit === -1) ? (index + 1) : ((currentPage - 1) * currentLimit + index + 1);
             const rowNumberCell = row.querySelector('.row-number');
             if (rowNumberCell) rowNumberCell.textContent = rowNum;
@@ -920,105 +874,70 @@ document.addEventListener('DOMContentLoaded', function() {
         lastPageBtn.disabled = currentPage === totalPages;
     }
 
-    // ==========================================
-// 4. TOGGLE STATUS (Publish/Unpublish) - FIXED
-// ==========================================
-const statusBtns = document.querySelectorAll('.status-btn');
+    const statusBtns = document.querySelectorAll('.status-btn:not([disabled])');
 
-statusBtns.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Cek jika disabled (misal role Editor)
-        if(this.hasAttribute('disabled')) return;
-        
-        const id = this.dataset.id;
-        const url = this.dataset.url;
-        const switchEl = this.querySelector('.switch');
-        const labelEl = this.querySelector('.switch-label');
-        const row = this.closest('tr');
-        const statusBadgeCell = row.querySelector('.status-badge-cell');
-        
-        // Konfirmasi sebelum toggle (opsional tapi direkomendasikan)
-        const currentStatus = switchEl.classList.contains('active') ? 'Aktif' : 'Non-Aktif';
-        const newStatus = currentStatus === 'Aktif' ? 'Non-Aktif' : 'Aktif';
-        
-        if(!confirm(`Ubah status dari ${currentStatus} ke ${newStatus}?`)) {
-            return;
-        }
-        
-        // Loading state
-        this.style.opacity = '0.5';
-        this.disabled = true;
-        
-        // Buat FormData untuk mengirim data
-        const formData = new FormData();
-        formData.append('id', id);
-        formData.append(currentCsrfName, currentCsrfHash);
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formData
-        })
-        .then(response => {
-            // Cek apakah response OK
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            this.style.opacity = '1';
-            this.disabled = false;
+    statusBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
             
-            // Update CSRF token
-            if(data.token && data.tokenName) {
-                currentCsrfHash = data.token;
-                currentCsrfName = data.tokenName;
-                updateAllCsrfInputs(data.token);
-            }
+            const id = this.dataset.id;
+            const url = this.dataset.url;
+            const switchEl = this.querySelector('.switch');
             
-            if (data.status === 'success') {
-                // Update Switch UI
-                if (data.new_status == '1') {
-                    switchEl.classList.add('active');
-                    labelEl.textContent = 'Aktif';
-                    if(statusBadgeCell) {
-                        statusBadgeCell.innerHTML = '<span class="badge bg-success">Tayang</span>';
-                    }
-                } else {
-                    switchEl.classList.remove('active');
-                    labelEl.textContent = 'Non-Aktif';
-                    if(statusBadgeCell) {
-                        statusBadgeCell.innerHTML = '<span class="badge bg-secondary">Tidak Tayang</span>';
-                    }
+            this.style.opacity = '0.5';
+            this.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append(currentCsrfName, currentCsrfHash);
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.style.opacity = '1';
+                this.disabled = false;
+                
+                if(data.token && data.tokenName) {
+                    currentCsrfHash = data.token;
+                    currentCsrfName = data.tokenName;
+                    updateAllCsrfInputs(data.token);
                 }
                 
-                // Optional: Tampilkan notifikasi sukses
-                showNotification('success', data.message || 'Status berhasil diubah');
-            } else {
-                alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            this.style.opacity = '1';
-            this.disabled = false;
-            console.error('Error:', error);
-            alert('Terjadi kesalahan: ' + error.message);
+                if (data.status === 'success') {
+                    if (data.new_status == '1') {
+                        switchEl.classList.add('active');
+                        this.querySelector('.switch-label').textContent = 'Aktif';
+                    } else {
+                        switchEl.classList.remove('active');
+                        this.querySelector('.switch-label').textContent = 'Non-Aktif';
+                    }
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                this.style.opacity = '1';
+                this.disabled = false;
+                console.error('Error:', error);
+                alert('Terjadi kesalahan: ' + error.message);
+            });
         });
     });
-});
-
-// Helper function untuk notifikasi (opsional)
-function showNotification(type, message) {
-    // Bisa menggunakan toast library atau alert sederhana
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    // Atau gunakan alert jika tidak ada toast library
-    // alert(message);
-}
 });
 </script>
 <?= $this->endSection() ?>
