@@ -14,7 +14,7 @@
     }
 
     .form-page {
-        max-width: 600px; /* Sedikit lebih lebar dari create folder karena ada file upload */
+        max-width: 600px;
         margin: 3rem auto;
         padding: 0 1rem;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -32,7 +32,6 @@
         margin-bottom: 0.5rem;
     }
 
-    /* Badge Folder Style */
     .folder-badge {
         display: inline-flex;
         align-items: center;
@@ -58,7 +57,6 @@
         padding: 2rem;
     }
 
-    /* Alert Styling */
     .alert-danger {
         background: #fef2f2;
         border: 1px solid #fecaca;
@@ -73,7 +71,6 @@
         padding-left: 1.25rem;
     }
 
-    /* Form Styles */
     .form-group {
         margin-bottom: 1.5rem;
     }
@@ -133,6 +130,11 @@
         background: #eff6ff;
     }
 
+    .file-upload-box.has-file {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+
     .file-upload-box input[type="file"] {
         position: absolute;
         width: 100%;
@@ -143,20 +145,39 @@
         cursor: pointer;
     }
 
+    .upload-icon-wrapper {
+        margin-bottom: 0.5rem;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .upload-icon {
         color: var(--primary);
-        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .upload-icon.has-file {
+        color: #10b981;
     }
 
     .upload-text {
         font-weight: 500;
         color: var(--text-main);
         margin-bottom: 0.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .upload-text.has-file {
+        color: #10b981;
+        font-weight: 600;
     }
 
     .upload-hint {
         font-size: 0.8rem;
         color: var(--text-muted);
+        margin-top: 0.5rem;
     }
 
     /* Buttons */
@@ -200,6 +221,11 @@
         background: #f8fafc;
         color: var(--text-main);
         border-color: #cbd5e1;
+    }
+
+    /* Success color for uploaded state */
+    .success-color {
+        color: #10b981;
     }
 </style>
 
@@ -278,7 +304,7 @@
 
                 <div class="form-group">
                     <label for="file_upload" class="form-label">File Dokumen</label>
-                    <div class="file-upload-box">
+                    <div class="file-upload-box" id="file-upload-container">
                         <input
                             type="file"
                             name="file_upload"
@@ -287,8 +313,15 @@
                             onchange="updateFileName(this)"
                             required
                         >
-                        <div class="upload-icon">
-                            <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <div class="upload-icon-wrapper">
+                            <!-- Default upload icon -->
+                            <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="upload-default-icon" class="upload-icon">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <!-- Success/check icon (hidden by default) -->
+                            <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="upload-success-icon" class="upload-icon" style="display: none;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
                         </div>
                         <div class="upload-text" id="file-label">Klik atau Tarik File ke Sini</div>
                         <div class="upload-hint">Format: PDF, Word, Excel (Maks. 5MB)</div>
@@ -297,6 +330,7 @@
 
                 <div class="form-actions">
                     <a href="<?= site_url("informasi-publik/$slug") ?>" class="btn btn-secondary">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         Batal
                     </a>
                     <button type="submit" class="btn btn-primary">
@@ -311,17 +345,85 @@
 </div>
 
 <script>
-    // Script sederhana untuk mengubah teks saat file dipilih
     function updateFileName(input) {
         const label = document.getElementById('file-label');
+        const uploadDefaultIcon = document.getElementById('upload-default-icon');
+        const uploadSuccessIcon = document.getElementById('upload-success-icon');
+        const container = document.getElementById('file-upload-container');
+        const uploadIconWrapper = container.querySelector('.upload-icon-wrapper');
+        
         if (input.files && input.files.length > 0) {
-            label.textContent = input.files[0].name;
-            label.style.color = '#2563eb'; // Ubah warna jadi biru
+            const fileName = input.files[0].name;
+            label.textContent = fileName;
+            label.classList.add('has-file');
+            uploadDefaultIcon.classList.add('has-file');
+            uploadSuccessIcon.classList.add('has-file');
+            container.classList.add('has-file');
+            
+            // Switch icons
+            uploadDefaultIcon.style.display = 'none';
+            uploadSuccessIcon.style.display = 'block';
+            
+            // Pastikan icon wrapper tetap terpusat
+            uploadIconWrapper.style.display = 'flex';
+            uploadIconWrapper.style.alignItems = 'center';
+            uploadIconWrapper.style.justifyContent = 'center';
+            
+            // Tambahkan info ukuran file jika tersedia
+            const fileSize = input.files[0].size;
+            const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+            
+            // Update hint dengan info file
+            const hintElement = container.querySelector('.upload-hint');
+            hintElement.innerHTML = `Format: PDF, Word, Excel (Maks. 5MB)<br><span style="font-size: 0.7rem; color: #10b981;">Ukuran: ${fileSizeMB} MB</span>`;
+            
         } else {
             label.textContent = 'Klik atau Tarik File ke Sini';
-            label.style.color = 'inherit';
+            label.classList.remove('has-file');
+            uploadDefaultIcon.classList.remove('has-file');
+            uploadSuccessIcon.classList.remove('has-file');
+            container.classList.remove('has-file');
+            
+            // Switch icons kembali
+            uploadDefaultIcon.style.display = 'block';
+            uploadSuccessIcon.style.display = 'none';
+            
+            // Reset hint
+            const hintElement = container.querySelector('.upload-hint');
+            hintElement.textContent = 'Format: PDF, Word, Excel (Maks. 5MB)';
         }
     }
+    
+    // Optional: Drag and drop functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('file_upload');
+        const container = document.getElementById('file-upload-container');
+        
+        // Highlight when dragging over
+        container.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            container.style.borderColor = 'var(--primary)';
+            container.style.background = '#eff6ff';
+        });
+        
+        // Remove highlight when not dragging
+        container.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            if (!container.classList.contains('has-file')) {
+                container.style.borderColor = '#cbd5e1';
+                container.style.background = '#f8fafc';
+            }
+        });
+        
+        // Handle drop
+        container.addEventListener('drop', function(e) {
+            e.preventDefault();
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileName(fileInput);
+            }
+        });
+    });
 </script>
 
 <?= $this->endSection() ?>

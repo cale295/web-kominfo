@@ -145,15 +145,9 @@
             </div>
             
             <?php if ($can_create): ?>
-                <?php if (count($services) >= 10): ?>
-                    <button type="button" class="btn btn-secondary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0" disabled data-bs-toggle="tooltip" title="Maksimal 10 layanan sudah tercapai">
-                        <i class="fas fa-lock me-2"></i>Batas Layanan Tercapai
-                    </button>
-                <?php else: ?>
-                    <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0" data-bs-toggle="modal" data-bs-target="#createServiceModal">
-                        <i class="fas fa-plus-circle me-2"></i>Tambah Layanan (<?= count($services) ?>/10)
-                    </button>
-                <?php endif; ?>
+                <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Layanan
+                </button>
             <?php endif; ?>
         </div>
 
@@ -285,9 +279,9 @@
                     <span>Gunakan kolom <strong>Urutan</strong> untuk mengatur posisi tampilan layanan di halaman utama.</span>
                 </div>
                 <div class="d-flex align-items-center">
-                    <span class="badge <?= count($services) >= 10 ? 'bg-danger' : 'bg-info' ?> px-3 py-2">
+                    <span class="badge bg-info px-3 py-2">
                         <i class="fas fa-th-large me-1"></i>
-                        Total Layanan: <?= count($services) ?>/10
+                        Total Layanan: <?= count($services) ?>
                     </span>
                 </div>
             </div>

@@ -31,10 +31,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
       rel="noopener noreferrer"
       className="service-card"
     >
-      <img
-        src={`${BASE_URL}/${icon_image}`}
-        alt={title}
-      />
+      <img src={`${BASE_URL}/${icon_image}`} alt={title} />
       <p className="title">{title}</p>
     </a>
   );
@@ -49,14 +46,11 @@ const Service: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-
       const response = await api.get("/home_service");
-
       if (response.data.status && response.data.data.length > 0) {
         const activeServices = response.data.data
           .filter((service: Layanan) => service.is_active === 1)
           .sort((a: Layanan, b: Layanan) => a.sorting - b.sorting);
-
         setServices(activeServices);
       } else {
         setServices([]);
@@ -73,15 +67,21 @@ const Service: React.FC = () => {
     fetchServices();
   }, []);
 
-  // Pisahkan services menjadi 2 baris
-  const getRows = () => {
+  // Pisahkan services berdasarkan layar
+  const getRows = (maxRows: number) => {
     const totalItems = services.length;
-    const itemsPerRow = Math.ceil(totalItems / 2);
+    const itemsPerRow = Math.ceil(totalItems / maxRows);
     
-    const row1 = services.slice(0, itemsPerRow);
-    const row2 = services.slice(itemsPerRow);
-    
-    return { row1, row2 };
+    const rows: Layanan[][] = [];
+    for (let i = 0; i < maxRows; i++) {
+      const start = i * itemsPerRow;
+      const end = start + itemsPerRow;
+      const rowItems = services.slice(start, end);
+      if (rowItems.length > 0) {
+        rows.push(rowItems);
+      }
+    }
+    return rows;
   };
 
   if (loading) {
@@ -96,40 +96,44 @@ const Service: React.FC = () => {
     return <div className="service-container">Tidak ada layanan aktif</div>;
   }
 
-  const { row1, row2 } = getRows();
-
   return (
     <div className="service-container">
       <div className="service-wrapper">
         <div className="service-scroll-wrapper">
-          <div className="service-grid-horizontal">
-            {/* Baris pertama */}
-            <div className="service-row">
-              {row1.map((service) => (
-                <div key={`row1-${service.id_service}`} className="service-item">
-                  <ServiceCard
-                    title={service.title}
-                    icon_image={service.icon_image}
-                    link={service.link}
-                  />
+          <div className="service-grid-horizontal" data-total={services.length}>
+            {/* Mobile: 5 baris */}
+            <div className="mobile-rows">
+              {getRows(5).map((row, rowIndex) => (
+                <div key={`mobile-row-${rowIndex}`} className="service-row">
+                  {row.map((service) => (
+                    <div key={`mobile-${service.id_service}`} className="service-item">
+                      <ServiceCard
+                        title={service.title}
+                        icon_image={service.icon_image}
+                        link={service.link}
+                      />
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
-            
-            {/* Baris kedua (jika ada) */}
-            {row2.length > 0 && (
-              <div className="service-row">
-                {row2.map((service) => (
-                  <div key={`row2-${service.id_service}`} className="service-item">
-                    <ServiceCard
-                      title={service.title}
-                      icon_image={service.icon_image}
-                      link={service.link}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+
+            {/* Desktop: 2 baris */}
+            <div className="desktop-rows">
+              {getRows(2).map((row, rowIndex) => (
+                <div key={`desktop-row-${rowIndex}`} className="service-row">
+                  {row.map((service) => (
+                    <div key={`desktop-${service.id_service}`} className="service-item">
+                      <ServiceCard
+                        title={service.title}
+                        icon_image={service.icon_image}
+                        link={service.link}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

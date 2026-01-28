@@ -169,9 +169,8 @@ const GalleryDetail: React.FC = () => {
         {/* Photo Caption */}
         <div className="photo-caption-box">
           <p className="caption-text">
-            {currentPhoto.photo_title}
             {currentPhoto.deskripsi && currentPhoto.deskripsi !== '-' && (
-              <span> - {currentPhoto.deskripsi}</span>
+              <span>{currentPhoto.deskripsi}</span>
             )}
           </p>
         </div>

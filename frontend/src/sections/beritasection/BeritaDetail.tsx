@@ -2,7 +2,17 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./css/beritadetail.css";
 import api from "../../services/api";
-import { ArrowLeft, Calendar, Eye, Share2, Triangle } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Eye,
+  Share2,
+  Triangle,
+  Copy,
+  Facebook,
+  Twitter,
+  MessageCircle,
+} from "lucide-react";
 
 interface AdditionalImage {
   url: string;
@@ -151,7 +161,7 @@ const BeritaTerkaitSisipan: React.FC<BeritaTerkaitSisipanProps> = ({
   onItemClick,
 }) => {
   return (
-    <div 
+    <div
       className="berita-sisipan-simple mt-4 mb-4 cursor-pointer"
       onClick={() => onItemClick(berita.slug)}
     >
@@ -169,22 +179,27 @@ const BeritaDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [berita, setBerita] = useState<BeritaDetail | null>(null);
-  const [beritaTerkaitSisipan1, setBeritaTerkaitSisipan1] = useState<BeritaTerkait | null>(null);
-  const [beritaTerkaitSisipan2, setBeritaTerkaitSisipan2] = useState<BeritaTerkait | null>(null);
+  const [beritaTerkaitSisipan1, setBeritaTerkaitSisipan1] =
+    useState<BeritaTerkait | null>(null);
+  const [beritaTerkaitSisipan2, setBeritaTerkaitSisipan2] =
+    useState<BeritaTerkait | null>(null);
   const [beritaPopuler, setBeritaPopuler] = useState<BeritaTerkait[]>([]);
   const [tagPopuler, setTagPopuler] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
       day: "numeric",
       month: "long",
-      year: "numeric"
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
-  
+
   const allImages = useMemo(() => {
     if (!berita) return [];
 
@@ -258,9 +273,14 @@ const BeritaDetail: React.FC = () => {
     };
   }, []);
 
-  const fetchBeritaManualTerkait = (idTerkait: string, semuaBerita: BeritaTerkait[]) => {
+  const fetchBeritaManualTerkait = (
+    idTerkait: string,
+    semuaBerita: BeritaTerkait[]
+  ) => {
     if (!idTerkait) return null;
-    return semuaBerita.find((item: BeritaTerkait) => item.id_berita === idTerkait);
+    return semuaBerita.find(
+      (item: BeritaTerkait) => item.id_berita === idTerkait
+    );
   };
 
   useEffect(() => {
@@ -283,21 +303,30 @@ const BeritaDetail: React.FC = () => {
           setBerita(data);
 
           const allBerita = allData?.berita || [];
-          
+
           // Ambil berita terkait sisipan
           if (data.id_berita_terkait) {
-            const terkait1 = fetchBeritaManualTerkait(data.id_berita_terkait, allBerita);
+            const terkait1 = fetchBeritaManualTerkait(
+              data.id_berita_terkait,
+              allBerita
+            );
             setBeritaTerkaitSisipan1(terkait1 || null);
           }
 
           if (data.id_berita_terkait2) {
-            const terkait2 = fetchBeritaManualTerkait(data.id_berita_terkait2, allBerita);
+            const terkait2 = fetchBeritaManualTerkait(
+              data.id_berita_terkait2,
+              allBerita
+            );
             setBeritaTerkaitSisipan2(terkait2 || null);
           }
 
           // Setup Berita Populer
           const populer = [...allBerita]
-            .sort((a: BeritaTerkait, b: BeritaTerkait) => Number(b.hit || 0) - Number(a.hit || 0))
+            .sort(
+              (a: BeritaTerkait, b: BeritaTerkait) =>
+                Number(b.hit || 0) - Number(a.hit || 0)
+            )
             .slice(0, 5);
           setBeritaPopuler(populer);
 
@@ -323,17 +352,73 @@ const BeritaDetail: React.FC = () => {
     fetchBeritaDetail();
   }, [id]);
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: berita?.judul,
-        text: berita?.intro,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link berhasil disalin!");
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Gagal menyalin:", err);
+      // Fallback untuk browser lama
+      const textArea = document.createElement("textarea");
+      textArea.value = window.location.href;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleFacebookShare = () => {
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      window.location.href
+    )}`;
+    const width = 600;
+    const height = 400;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+
+    window.open(
+      shareUrl,
+      "Share",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
+  };
+
+  const handleWhatsAppShare = () => {
+    const shareText = `${berita?.judul || ""} - ${window.location.href}`;
+    const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      shareText
+    )}`;
+    const width = 600;
+    const height = 700;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+
+    window.open(
+      shareUrl,
+      "Share",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
+  };
+
+  const handleTwitterShare = () => {
+    const shareText = `${berita?.judul || ""} ${window.location.href}`;
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      shareText
+    )}`;
+    const width = 600;
+    const height = 400;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+
+    window.open(
+      shareUrl,
+      "Share",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
   };
 
   const handleBeritaTerkaitClick = (slug: string) => {
@@ -396,10 +481,106 @@ const BeritaDetail: React.FC = () => {
                 <Eye size={16} />
                 {berita.hit}
               </span>
-              <button className="btn-share" onClick={handleShare}>
-                <Share2 size={16} />
-                Bagikan
-              </button>
+              {/* Share Buttons */}
+              <span className="btn-share d-flex align-items-center gap-2 my-3">
+                <span className="text-muted small me-2">Bagikan:</span>
+                <div className="d-flex align-items-center gap-2">
+                  <button
+                    className="share-icon-btn copy-btn d-flex align-items-center justify-content-center"
+                    onClick={handleCopyLink}
+                    title="Salin Link"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      border: "1px solid #dee2e6",
+                      background: "#fff",
+                      color: "#6c757d",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.background = "#f8f9fa")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.background = "#fff")
+                    }
+                  >
+                    {copied ? (
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                          color: "#28a745",
+                        }}
+                      >
+                        ✓
+                      </span>
+                    ) : (
+                      <Copy size={20} />
+                    )}
+                  </button>
+                  <button
+                    className="share-icon-btn facebook-btn d-flex align-items-center justify-content-center"
+                    onClick={handleFacebookShare}
+                    title="Bagikan ke Facebook"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "#1877F2",
+                      color: "white",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.opacity = "0.9")
+                    }
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                  >
+                    <Facebook size={20} fill="white" />
+                  </button>
+                  <button
+                    className="share-icon-btn whatsapp-btn d-flex align-items-center justify-content-center"
+                    onClick={handleWhatsAppShare}
+                    title="Bagikan ke WhatsApp"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "#25D366",
+                      color: "white",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.opacity = "0.9")
+                    }
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                  >
+                    <MessageCircle size={20} />
+                  </button>
+                  <button
+                    className="share-icon-btn twitter-btn d-flex align-items-center justify-content-center"
+                    onClick={handleTwitterShare}
+                    title="Bagikan ke Twitter"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "#1DA1F2",
+                      color: "white",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.opacity = "0.9")
+                    }
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                  >
+                    <Twitter size={20} fill="white" />
+                  </button>
+                </div>
+              </span>
             </div>
 
             <div className="article-image-section mt-4">
@@ -524,7 +705,8 @@ const BeritaDetail: React.FC = () => {
             {/* Tag Paling Dicari */}
             <div className="mb-4">
               <h5 className="sidebar-title">
-                <Triangle className="icon-triangle" size={16} /> Tag Paling Dicari
+                <Triangle className="icon-triangle" size={16} /> Tag Paling
+                Dicari
               </h5>
               <div className="tag-populer-card">
                 <ul className="list-unstyled tag-populer-list">

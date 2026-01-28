@@ -213,6 +213,32 @@
         transform: translateY(-1px);
     }
 
+    /* Add Submenu Button - NEW */
+    .btn-add-submenu {
+        background-color: var(--success-soft);
+        color: var(--success-text);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 50%;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow-sm);
+        width: 32px;
+        height: 32px;
+    }
+
+    .btn-add-submenu:hover {
+        background-color: var(--success);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
     .btn-action {
         width: 32px;
         height: 32px;
@@ -755,34 +781,6 @@
         gap: 0.5rem;
     }
 
-    .icon-preview-modal {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 70px;
-        height: 70px;
-        background: var(--primary-soft);
-        border-radius: 12px;
-        color: var(--primary);
-        font-size: 2rem;
-        box-shadow: var(--shadow-sm);
-        border: 2px dashed var(--primary-light);
-    }
-
-    /* Icon preview container from second code */
-    .icon-preview-container {
-        width: 150px;
-        height: 150px;
-        border: 2px dashed var(--gray-300);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: white;
-        overflow: hidden;
-        margin: 0 auto 1rem;
-    }
-
     /* Modal Buttons - Updated */
     .btn-modal-cancel {
         background: var(--gray-200);
@@ -1031,11 +1029,11 @@
                     <thead>
                         <tr>
                             <th class="text-center py-3 text-uppercase font-monospace" width="5%">#</th>
-                            <th class="py-3 text-uppercase" width="35%">Nama Menu</th>
+                            <th class="py-3 text-uppercase" width="30%">Nama Menu</th>
                             <th class="py-3 text-uppercase" width="20%">URL / Route</th>
                             <th class="py-3 text-uppercase" width="15%">Admin URL</th>
                             <th class="text-center py-3 text-uppercase" width="12%">Status</th>
-                            <th class="text-center py-3 text-uppercase" width="13%">Aksi</th>
+                            <th class="text-center py-3 text-uppercase" width="18%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1086,10 +1084,6 @@
                                             <?php if ($hasChild): ?>
                                                 <i class="bi bi-chevron-right toggle-icon"></i>
                                             <?php endif; ?>
-                                        </div>
-
-                                        <div class="menu-icon-box">
-                                            <i class="<?= esc($parent['menu_icon'] ?: 'bi bi-circle') ?>"></i>
                                         </div>
 
                                         <div class="menu-name-text">
@@ -1152,7 +1146,15 @@
                                 </td>
 
                                 <td class="text-center" onclick="event.stopPropagation()">
-                                    <div class="d-flex justify-content-center gap-2">
+                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                        <?php if ($can_create): ?>
+                                            <button type="button" class="btn-add-submenu"
+                                                data-bs-toggle="tooltip" title="Tambah Submenu"
+                                                onclick="openCreateSubmenuModal(<?= $parent['id_menu'] ?>, '<?= esc($parent['menu_name']) ?>')">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                        
                                         <?php if ($can_update): ?>
                                             <button type="button" class="btn-action"
                                                 data-bs-toggle="tooltip" title="Edit Menu"
@@ -1180,9 +1182,6 @@
                                         <td>
                                             <div class="d-flex align-items-center ps-4">
                                                 <div class="tree-line">
-                                                    <div class="menu-icon-small me-3">
-                                                        <i class="<?= esc($child['menu_icon'] ?: 'bi bi-circle') ?>"></i>
-                                                    </div>
                                                     <div>
                                                         <span style="color: var(--gray-800); font-weight: 600; font-size: 0.9rem;">
                                                             <?= esc($child['menu_name']) ?>
@@ -1302,14 +1301,14 @@
                     <input type="hidden" name="_method" id="formMethod" value="POST">
                     <input type="hidden" name="id_menu" id="id_menu" value="">
 
-                    <!-- Konten form Anda tetap sama di sini -->
+                    <!-- Informasi Dasar -->
                     <div class="mb-4">
                         <h6 class="text-primary fw-bold mb-3">
                             <i class="bi bi-info-circle"></i> Informasi Dasar
                         </h6>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 mb-3">
                                 <label for="menu_name" class="form-label-modal">
                                     <i class="bi bi-tag-fill"></i>
                                     Nama Menu <span class="required">*</span>
@@ -1322,92 +1321,29 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="menu_icon" class="form-label-modal">
-                                    <i class="bi bi-emoji-smile"></i>
-                                    Icon Menu
+                            <div class="col-12 mb-3">
+                                <label for="parent_id" class="form-label-modal">
+                                    <i class="bi bi-folder-symlink-fill"></i>
+                                    Parent Menu (Menu Induk)
                                 </label>
-                                <div class="d-flex gap-2">
-                                    <div class="flex-grow-1">
-                                        <div class="input-group-modal">
-                                            <i class="bi bi-grid input-icon-modal"></i>
-
-                                            <select class="form-select form-select-modal" id="menu_icon" name="menu_icon" required>
-                                                <option value="" selected disabled>Pilih Icon...</option>
-
-                                                <optgroup label="Dashboard & Home">
-                                                    <option value="bi-house">bi-house (Home)</option>
-                                                    <option value="bi-speedometer2">bi-speedometer2 (Dashboard)</option>
-                                                    <option value="bi-grid">bi-grid (App)</option>
-                                                    <option value="bi-window">bi-window (Interface)</option>
-                                                </optgroup>
-
-                                                <optgroup label="User & Management">
-                                                    <option value="bi-person">bi-person (User)</option>
-                                                    <option value="bi-people">bi-people (Users/Group)</option>
-                                                    <option value="bi-person-badge">bi-person-badge (Staff)</option>
-                                                    <option value="bi-shield-lock">bi-shield-lock (Security)</option>
-                                                    <option value="bi-key">bi-key (Password/Access)</option>
-                                                </optgroup>
-
-                                                <optgroup label="Data & Laporan">
-                                                    <option value="bi-file-earmark-text">bi-file-text (Dokumen)</option>
-                                                    <option value="bi-folder">bi-folder (Arsip)</option>
-                                                    <option value="bi-bar-chart">bi-bar-chart (Grafik)</option>
-                                                    <option value="bi-table">bi-table (Tabel)</option>
-                                                    <option value="bi-printer">bi-printer (Cetak)</option>
-                                                    <option value="bi-clipboard-data">bi-clipboard-data (Laporan)</option>
-                                                </optgroup>
-
-                                                <optgroup label="Bisnis & Produk">
-                                                    <option value="bi-cart">bi-cart (Keranjang)</option>
-                                                    <option value="bi-bag">bi-bag (Produk)</option>
-                                                    <option value="bi-shop">bi-shop (Toko)</option>
-                                                    <option value="bi-cash-coin">bi-cash-coin (Keuangan)</option>
-                                                    <option value="bi-tag">bi-tag (Kategori/Tag)</option>
-                                                    <option value="bi-box-seam">bi-box-seam (Stok/Inventory)</option>
-                                                </optgroup>
-
-                                                <optgroup label="Pengaturan">
-                                                    <option value="bi-gear">bi-gear (Setting)</option>
-                                                    <option value="bi-sliders">bi-sliders (Konfigurasi)</option>
-                                                    <option value="bi-bell">bi-bell (Notifikasi)</option>
-                                                    <option value="bi-envelope">bi-envelope (Pesan)</option>
-                                                    <option value="bi-globe">bi-globe (Website)</option>
-                                                </optgroup>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="icon-preview-modal" id="iconPreview">
-                                        <i class="bi bi-question-circle"></i>
-                                    </div>
+                                <div class="input-group-modal">
+                                    <i class="bi bi-diagram-3 input-icon-modal"></i>
+                                    <select class="form-select form-select-modal" id="parent_id" name="parent_id">
+                                        <option value="0">📌 Menu Utama (Tanpa Parent)</option>
+                                        <?php foreach ($menus as $m): ?>
+                                            <?php if ($m['parent_id'] == 0): ?>
+                                                <option value="<?= $m['id_menu'] ?>"
+                                                    data-is-infopublik="<?= (strtolower($m['menu_name']) === 'informasi publik') ? 'true' : 'false' ?>">
+                                                    📁 <?= esc($m['menu_name']) ?>
+                                                </option>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="parent_id" class="form-label-modal">
-                                <i class="bi bi-folder-symlink-fill"></i>
-                                Parent Menu (Menu Induk)
-                            </label>
-                            <div class="input-group-modal">
-                                <i class="bi bi-diagram-3 input-icon-modal"></i>
-                                <select class="form-select form-select-modal" id="parent_id" name="parent_id">
-                                    <option value="0">📌 Menu Utama (Tanpa Parent)</option>
-                                    <?php foreach ($menus as $m): ?>
-                                        <?php if ($m['parent_id'] == 0): ?>
-                                            <option value="<?= $m['id_menu'] ?>"
-                                                data-is-infopublik="<?= (strtolower($m['menu_name']) === 'informasi publik') ? 'true' : 'false' ?>">
-                                                📁 <?= esc($m['menu_name']) ?>
-                                            </option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="form-text-modal" id="urlHelperText">
-                                <i class="bi bi-lightbulb-fill text-warning"></i>
-                                <span>Pilih "Informasi Publik" untuk otomatis membuat kategori dokumen.</span>
+                                <div class="form-text-modal" id="urlHelperText">
+                                    <i class="bi bi-lightbulb-fill text-warning"></i>
+                                    <span>Pilih "Informasi Publik" untuk otomatis membuat kategori dokumen.</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1418,7 +1354,7 @@
                             <i class="bi bi-link-45deg"></i> URL & Routing
                         </h6>
 
-                        <!-- Toggle Auto Route (akan muncul hanya jika parent Informasi Publik) -->
+                        <!-- Toggle Auto Route (WAJIB MUNCUL untuk parent Informasi Publik) -->
                         <div class="row mb-3 d-none" id="autoRouteToggleContainer">
                             <div class="col-12">
                                 <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: var(--primary-soft); border: 2px dashed var(--primary-light);">
@@ -1485,23 +1421,6 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="allowed_roles" class="form-label-modal">
-                                    <i class="bi bi-person-badge-fill"></i>
-                                    Hak Akses (Roles)
-                                </label>
-                                <div class="input-group-modal">
-                                    <i class="bi bi-people-fill input-icon-modal"></i>
-                                    <input type="text" class="form-control form-control-modal"
-                                        id="allowed_roles" name="allowed_roles"
-                                        placeholder="superadmin, admin, editor">
-                                </div>
-                                <div class="form-text-modal">
-                                    <i class="bi bi-info-circle"></i>
-                                    Pisahkan dengan koma. Kosongkan untuk akses publik.
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
                                 <label for="order_number" class="form-label-modal">
                                     <i class="bi bi-sort-numeric-down"></i>
                                     Urutan Menu <span class="required">*</span>
@@ -1513,9 +1432,7 @@
                                         value="1" min="1" required>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="status" class="form-label-modal">
                                     <i class="bi bi-toggle2-on"></i>
@@ -1531,6 +1448,7 @@
                             </div>
                         </div>
                     </div>
+                </form>
             </div>
 
             <div class="modal-footer">
@@ -1633,16 +1551,6 @@
             });
         });
 
-        // Icon Preview
-        const iconInput = document.getElementById('menu_icon');
-        const iconPreview = document.getElementById('iconPreview');
-
-        iconInput.addEventListener('input', function() {
-            const iconClass = this.value.trim();
-            iconPreview.innerHTML = `<i class="${iconClass || 'bi bi-question-circle'}"></i>`;
-        });
-
-        // Parent Select Handler
         // Parent Select Handler
         const parentSelect = document.getElementById('parent_id');
         const urlInput = document.getElementById('menu_url');
@@ -1658,12 +1566,10 @@
             const isInfoPublik = selectedOption.getAttribute('data-is-infopublik') === 'true';
 
             if (isInfoPublik) {
-                // Tampilkan toggle auto route
+                // WAJIB MUNCUL untuk Informasi Publik
                 autoRouteContainer.classList.remove('d-none');
 
-                // Cek apakah auto route aktif
                 if (autoRouteToggle.checked) {
-                    // Auto route aktif
                     urlInput.value = "Akan digenerate otomatis";
                     urlInput.setAttribute('readonly', true);
                     urlInput.style.backgroundColor = "var(--success-soft)";
@@ -1676,7 +1582,6 @@
                     adminUrlInput.style.color = "var(--success-text)";
                     autoAdminUrlInfo.classList.remove('d-none');
                 } else {
-                    // Auto route tidak aktif
                     if (urlInput.value === "Akan digenerate otomatis") {
                         urlInput.value = "";
                     }
@@ -1695,13 +1600,12 @@
                 }
 
                 urlHelper.innerHTML = `
-            <i class="bi bi-lightbulb-fill text-primary"></i>
-            <span class="text-primary fw-bold">
-                Parent "Informasi Publik" terdeteksi. Aktifkan toggle untuk generate URL otomatis.
-            </span>
-        `;
+                    <i class="bi bi-lightbulb-fill text-primary"></i>
+                    <span class="text-primary fw-bold">
+                        Parent "Informasi Publik" terdeteksi. Aktifkan toggle untuk generate URL otomatis.
+                    </span>
+                `;
             } else {
-                // Sembunyikan toggle jika bukan Informasi Publik
                 autoRouteContainer.classList.add('d-none');
                 autoRouteToggle.checked = false;
 
@@ -1722,21 +1626,18 @@
                 autoAdminUrlInfo.classList.add('d-none');
 
                 urlHelper.innerHTML = `
-            <i class="bi bi-lightbulb-fill text-warning"></i>
-            <span>Pilih "Informasi Publik" untuk otomatis membuat kategori dokumen.</span>
-        `;
+                    <i class="bi bi-lightbulb-fill text-warning"></i>
+                    <span>Pilih "Informasi Publik" untuk otomatis membuat kategori dokumen.</span>
+                `;
             }
         }
 
-        // Toggle Auto Route Handler
         autoRouteToggle.addEventListener('change', function() {
             checkParentType();
 
-            // Jika auto route diaktifkan, generate URL preview
             if (this.checked) {
                 const menuName = document.getElementById('menu_name').value;
                 if (menuName) {
-                    // Generate slug sederhana untuk preview
                     const slug = menuName.toLowerCase()
                         .replace(/[^\w\s-]/g, '')
                         .replace(/\s+/g, '-')
@@ -1749,7 +1650,6 @@
             }
         });
 
-        // Real-time update URL preview saat nama menu berubah
         document.getElementById('menu_name').addEventListener('input', function() {
             if (autoRouteToggle.checked) {
                 const slug = this.value.toLowerCase()
@@ -1763,112 +1663,6 @@
             }
         });
 
-        // Update Open Create Modal function
-        function openCreateModal() {
-            document.getElementById('menuModalLabel').innerHTML = '<i class="bi bi-plus-square"></i> <span>Tambah Menu Baru</span>';
-            document.getElementById('formMethod').value = 'POST';
-            document.getElementById('id_menu').value = '';
-            document.getElementById('submitBtnText').textContent = 'Simpan Menu';
-            document.getElementById('btnDeleteModal').classList.add('d-none');
-
-            // Reset form
-            document.getElementById('menuForm').reset();
-            document.getElementById('menu_name').value = '';
-            document.getElementById('menu_icon').value = '';
-            document.getElementById('parent_id').value = '0';
-            document.getElementById('menu_url').value = '';
-            document.getElementById('admin_url').value = '';
-            document.getElementById('allowed_roles').value = '';
-            document.getElementById('order_number').value = '1';
-            document.getElementById('status').value = 'active';
-            document.getElementById('auto_route').checked = false; // Reset toggle
-
-            // Reset icon preview
-            document.getElementById('iconPreview').innerHTML = '<i class="bi bi-question-circle"></i>';
-
-            // Sembunyikan toggle container
-            autoRouteContainer.classList.add('d-none');
-            autoUrlInfo.classList.add('d-none');
-            autoAdminUrlInfo.classList.add('d-none');
-
-            // Reset input styles
-            urlInput.removeAttribute('readonly');
-            urlInput.style.backgroundColor = '';
-            urlInput.style.color = '';
-            adminUrlInput.removeAttribute('readonly');
-            adminUrlInput.style.backgroundColor = '';
-            adminUrlInput.style.color = '';
-        }
-
-        // Update Open Edit Modal function
-        function openEditModal(menuData) {
-            document.getElementById('menuModalLabel').innerHTML = '<i class="bi bi-pencil-square"></i> <span>Edit Menu</span>';
-            document.getElementById('formMethod').value = 'PUT';
-            document.getElementById('id_menu').value = menuData.id_menu;
-            document.getElementById('submitBtnText').textContent = 'Simpan Perubahan';
-            document.getElementById('btnDeleteModal').classList.remove('d-none');
-
-            // Fill form with data
-            document.getElementById('menu_name').value = menuData.menu_name || '';
-            document.getElementById('menu_icon').value = menuData.menu_icon || '';
-            document.getElementById('parent_id').value = menuData.parent_id || '0';
-            document.getElementById('menu_url').value = menuData.menu_url || '';
-            document.getElementById('admin_url').value = menuData.admin_url || '';
-            document.getElementById('allowed_roles').value = menuData.allowed_roles || '';
-            document.getElementById('order_number').value = menuData.order_number || '1';
-            document.getElementById('status').value = menuData.status || 'active';
-
-            // Cek apakah menu ini child dari Informasi Publik
-            const parentInfoPublik = document.querySelector(`option[value="${menuData.parent_id}"]`);
-            const isInfoPublik = parentInfoPublik && parentInfoPublik.getAttribute('data-is-infopublik') === 'true';
-
-            if (isInfoPublik) {
-                // Tampilkan toggle
-                autoRouteContainer.classList.remove('d-none');
-
-                // Cek apakah URL sudah dalam format otomatis
-                const isAutoUrl = menuData.menu_url && menuData.menu_url.startsWith('/informasi-publik/');
-                document.getElementById('auto_route').checked = isAutoUrl;
-
-                if (isAutoUrl) {
-                    // Auto route aktif
-                    urlInput.setAttribute('readonly', true);
-                    urlInput.style.backgroundColor = "var(--success-soft)";
-                    autoUrlInfo.classList.remove('d-none');
-
-                    adminUrlInput.setAttribute('readonly', true);
-                    adminUrlInput.style.backgroundColor = "var(--success-soft)";
-                    autoAdminUrlInfo.classList.remove('d-none');
-                } else {
-                    // Auto route tidak aktif
-                    urlInput.removeAttribute('readonly');
-                    urlInput.style.backgroundColor = "";
-                    autoUrlInfo.classList.add('d-none');
-
-                    adminUrlInput.removeAttribute('readonly');
-                    adminUrlInput.style.backgroundColor = "";
-                    autoAdminUrlInfo.classList.add('d-none');
-                }
-            } else {
-                autoRouteContainer.classList.add('d-none');
-                urlInput.removeAttribute('readonly');
-                urlInput.style.backgroundColor = "";
-                adminUrlInput.removeAttribute('readonly');
-                adminUrlInput.style.backgroundColor = "";
-            }
-
-            // Update icon preview
-            const iconClass = menuData.menu_icon || 'bi bi-question-circle';
-            document.getElementById('iconPreview').innerHTML = `<i class="${iconClass}"></i>`;
-
-            // Trigger check parent type
-            setTimeout(() => checkParentType(), 100);
-
-            // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('menuModal'));
-            modal.show();
-        }
-
         parentSelect.addEventListener('change', checkParentType);
 
         // Form Submit Handler
@@ -1880,9 +1674,7 @@
             const method = document.getElementById('formMethod').value;
             const idMenu = document.getElementById('id_menu').value;
 
-            // Jika auto route aktif, kosongkan nilai URL yang readonly
-            if (autoRouteToggle.checked && urlInput.hasAttribute('readonly')) {
-                // URL akan digenerate di controller
+            if (autoRouteToggle && autoRouteToggle.checked && urlInput.hasAttribute('readonly')) {
                 formData.set('menu_url', '');
                 formData.set('admin_url', '');
             }
@@ -1892,17 +1684,12 @@
                 url = '<?= site_url('menu') ?>/' + idMenu;
             }
 
-
-            // Remove readonly before submit to ensure values are included
-            const urlInput = document.getElementById('menu_url');
-            const adminUrlInput = document.getElementById('admin_url');
             const wasUrlReadonly = urlInput.hasAttribute('readonly');
             const wasAdminUrlReadonly = adminUrlInput.hasAttribute('readonly');
 
             urlInput.removeAttribute('readonly');
             adminUrlInput.removeAttribute('readonly');
 
-            // Show loading
             const submitBtn = document.querySelector('.btn-modal-submit');
             if (!submitBtn) {
                 console.error('Submit button not found');
@@ -1954,7 +1741,6 @@
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = originalText;
 
-                        // Restore readonly state
                         if (wasUrlReadonly) urlInput.setAttribute('readonly', true);
                         if (wasAdminUrlReadonly) adminUrlInput.setAttribute('readonly', true);
                     }
@@ -1972,7 +1758,6 @@
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
 
-                    // Restore readonly state
                     if (wasUrlReadonly) urlInput.setAttribute('readonly', true);
                     if (wasAdminUrlReadonly) adminUrlInput.setAttribute('readonly', true);
                 });
@@ -2006,25 +1791,84 @@
         document.getElementById('submitBtnText').textContent = 'Simpan Menu';
         document.getElementById('btnDeleteModal').classList.add('d-none');
 
-        // Reset form
         document.getElementById('menuForm').reset();
         document.getElementById('menu_name').value = '';
-        document.getElementById('menu_icon').value = '';
         document.getElementById('parent_id').value = '0';
         document.getElementById('menu_url').value = '';
         document.getElementById('admin_url').value = '';
-        document.getElementById('allowed_roles').value = '';
         document.getElementById('order_number').value = '1';
         document.getElementById('status').value = 'active';
+        document.getElementById('auto_route').checked = false;
 
-        // Reset icon preview
-        document.getElementById('iconPreview').innerHTML = '<i class="bi bi-question-circle"></i>';
+        const autoRouteContainer = document.getElementById('autoRouteToggleContainer');
+        const autoUrlInfo = document.getElementById('autoUrlInfo');
+        const autoAdminUrlInfo = document.getElementById('autoAdminUrlInfo');
+        const urlInput = document.getElementById('menu_url');
+        const adminUrlInput = document.getElementById('admin_url');
 
-        // Reset readonly states
-        document.getElementById('menu_url').removeAttribute('readonly');
-        document.getElementById('menu_url').style.backgroundColor = '';
-        document.getElementById('admin_url').removeAttribute('readonly');
-        document.getElementById('admin_url').style.backgroundColor = '';
+        autoRouteContainer.classList.add('d-none');
+        autoUrlInfo.classList.add('d-none');
+        autoAdminUrlInfo.classList.add('d-none');
+
+        urlInput.removeAttribute('readonly');
+        urlInput.style.backgroundColor = '';
+        urlInput.style.color = '';
+        adminUrlInput.removeAttribute('readonly');
+        adminUrlInput.style.backgroundColor = '';
+        adminUrlInput.style.color = '';
+    }
+
+    // NEW: Open Create Submenu Modal
+    function openCreateSubmenuModal(parentId, parentName) {
+        document.getElementById('menuModalLabel').innerHTML = '<i class="bi bi-node-plus"></i> <span>Tambah Submenu untuk "' + parentName + '"</span>';
+        document.getElementById('formMethod').value = 'POST';
+        document.getElementById('id_menu').value = '';
+        document.getElementById('submitBtnText').textContent = 'Simpan Submenu';
+        document.getElementById('btnDeleteModal').classList.add('d-none');
+
+        document.getElementById('menuForm').reset();
+        document.getElementById('menu_name').value = '';
+        document.getElementById('parent_id').value = parentId;
+        document.getElementById('menu_url').value = '';
+        document.getElementById('admin_url').value = '';
+        document.getElementById('order_number').value = '1';
+        document.getElementById('status').value = 'active';
+        document.getElementById('auto_route').checked = false;
+
+        // Trigger check untuk melihat apakah parent adalah Informasi Publik
+        const selectedOption = document.querySelector(`#parent_id option[value="${parentId}"]`);
+        const isInfoPublik = selectedOption && selectedOption.getAttribute('data-is-infopublik') === 'true';
+
+        const autoRouteContainer = document.getElementById('autoRouteToggleContainer');
+        const autoUrlInfo = document.getElementById('autoUrlInfo');
+        const autoAdminUrlInfo = document.getElementById('autoAdminUrlInfo');
+        const urlInput = document.getElementById('menu_url');
+        const adminUrlInput = document.getElementById('admin_url');
+
+        if (isInfoPublik) {
+            autoRouteContainer.classList.remove('d-none');
+            document.getElementById('urlHelperText').innerHTML = `
+                <i class="bi bi-lightbulb-fill text-primary"></i>
+                <span class="text-primary fw-bold">
+                    Parent "Informasi Publik" terdeteksi. Aktifkan toggle untuk generate URL otomatis.
+                </span>
+            `;
+        } else {
+            autoRouteContainer.classList.add('d-none');
+        }
+
+        autoUrlInfo.classList.add('d-none');
+        autoAdminUrlInfo.classList.add('d-none');
+
+        urlInput.removeAttribute('readonly');
+        urlInput.style.backgroundColor = '';
+        urlInput.style.color = '';
+        adminUrlInput.removeAttribute('readonly');
+        adminUrlInput.style.backgroundColor = '';
+        adminUrlInput.style.color = '';
+
+        const modal = new bootstrap.Modal(document.getElementById('menuModal'));
+        modal.show();
     }
 
     // Open Edit Modal
@@ -2035,21 +1879,54 @@
         document.getElementById('submitBtnText').textContent = 'Simpan Perubahan';
         document.getElementById('btnDeleteModal').classList.remove('d-none');
 
-        // Fill form with data
         document.getElementById('menu_name').value = menuData.menu_name || '';
-        document.getElementById('menu_icon').value = menuData.menu_icon || '';
         document.getElementById('parent_id').value = menuData.parent_id || '0';
         document.getElementById('menu_url').value = menuData.menu_url || '';
         document.getElementById('admin_url').value = menuData.admin_url || '';
-        document.getElementById('allowed_roles').value = menuData.allowed_roles || '';
         document.getElementById('order_number').value = menuData.order_number || '1';
         document.getElementById('status').value = menuData.status || 'active';
 
-        // Update icon preview
-        const iconClass = menuData.menu_icon || 'bi bi-question-circle';
-        document.getElementById('iconPreview').innerHTML = `<i class="${iconClass}"></i>`;
+        const parentInfoPublik = document.querySelector(`option[value="${menuData.parent_id}"]`);
+        const isInfoPublik = parentInfoPublik && parentInfoPublik.getAttribute('data-is-infopublik') === 'true';
 
-        // Show modal
+        const autoRouteContainer = document.getElementById('autoRouteToggleContainer');
+        const urlInput = document.getElementById('menu_url');
+        const adminUrlInput = document.getElementById('admin_url');
+        const autoUrlInfo = document.getElementById('autoUrlInfo');
+        const autoAdminUrlInfo = document.getElementById('autoAdminUrlInfo');
+
+        if (isInfoPublik) {
+            // WAJIB MUNCUL untuk Informasi Publik
+            autoRouteContainer.classList.remove('d-none');
+
+            const isAutoUrl = menuData.menu_url && menuData.menu_url.startsWith('/informasi-publik/');
+            document.getElementById('auto_route').checked = isAutoUrl;
+
+            if (isAutoUrl) {
+                urlInput.setAttribute('readonly', true);
+                urlInput.style.backgroundColor = "var(--success-soft)";
+                autoUrlInfo.classList.remove('d-none');
+
+                adminUrlInput.setAttribute('readonly', true);
+                adminUrlInput.style.backgroundColor = "var(--success-soft)";
+                autoAdminUrlInfo.classList.remove('d-none');
+            } else {
+                urlInput.removeAttribute('readonly');
+                urlInput.style.backgroundColor = "";
+                autoUrlInfo.classList.add('d-none');
+
+                adminUrlInput.removeAttribute('readonly');
+                adminUrlInput.style.backgroundColor = "";
+                autoAdminUrlInfo.classList.add('d-none');
+            }
+        } else {
+            autoRouteContainer.classList.add('d-none');
+            urlInput.removeAttribute('readonly');
+            urlInput.style.backgroundColor = "";
+            adminUrlInput.removeAttribute('readonly');
+            adminUrlInput.style.backgroundColor = "";
+        }
+
         const modal = new bootstrap.Modal(document.getElementById('menuModal'));
         modal.show();
     }
@@ -2097,11 +1974,9 @@
         const idMenu = document.getElementById('id_menu').value;
         const menuName = document.getElementById('menu_name').value;
 
-        // Close modal first
         const modal = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
         modal.hide();
 
-        // Then show delete confirmation
         setTimeout(() => {
             deleteMenu(idMenu, menuName);
         }, 300);

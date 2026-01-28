@@ -1,5 +1,4 @@
 /* Services.css */
-
 .service-container {
   padding: 30px 0;
   background: #f5f5f5;
@@ -22,24 +21,23 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
-  padding-bottom: 20px;
-  margin-right: -20px;
-  padding-right: 20px;
+  padding-bottom: 15px;
+  position: relative;
 }
 
-/* Grid 2 baris yang bisa di-scroll horizontal */
+/* Grid container */
 .service-grid-horizontal {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  min-width: min-content; /* Agar konten tidak mengecil */
+  min-width: min-content;
 }
 
 /* Setiap baris */
 .service-row {
   display: flex;
   gap: 22px;
-  flex-wrap: nowrap; /* Tidak wrap ke bawah, tetap sejajar */
+  flex-wrap: nowrap;
   min-width: min-content;
 }
 
@@ -48,68 +46,17 @@
   flex: 0 0 auto;
 }
 
-/* Desktop: grid biasa (tidak scroll) */
-@media (min-width: 768px) {
-  .service-scroll-wrapper {
-    overflow-x: visible;
-    margin-right: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-  }
-  
-  .service-grid-horizontal {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 22px;
-    min-width: auto;
-  }
-  
-  .service-row {
-    display: contents; /* Hancurkan baris, biar grid yang atur */
-  }
-  
-  .service-item {
-    width: auto !important;
-  }
-}
-
-/* Mobile: scroll horizontal dengan 2 baris */
-@media (max-width: 767.98px) {
-  .service-item {
-    width: 180px; /* Fixed width untuk mobile */
-  }
-}
-
-.service-scroll-wrapper::-webkit-scrollbar {
-  height: 6px;
-}
-
-.service-scroll-wrapper::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 10px;
-}
-
-.service-scroll-wrapper::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-}
-
-.service-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
-}
-
+/* Service Card */
 .service-card {
   background-color: #ffffff;
   border-radius: 16px;
   padding: 10px;
   min-height: 135px;
   width: 100%;
-  
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
   border: 1px solid #e8e8e8;
   transition: 0.2s ease;
   cursor: pointer;
@@ -137,14 +84,43 @@
   margin: 0;
 }
 
-/* Responsive untuk mobile */
-@media (max-width: 576px) {
+/* Scrollbar styling */
+.service-scroll-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.service-scroll-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.service-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.service-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+/* MOBILE: Maksimal 5 baris dengan scroll horizontal */
+@media (max-width: 767.98px) {
+  .desktop-rows {
+    display: none;
+  }
+  
+  .mobile-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  
   .service-item {
-    width: 160px; /* Lebih kecil untuk mobile */
+    width: 160px;
   }
   
   .service-card {
-    min-height: 150px;
+    min-height: 100px;
     padding: 14px 10px;
   }
   
@@ -156,12 +132,25 @@
   .service-card .title {
     font-size: 13px;
   }
+
+  /* Gradient indicator di kanan */
+  .service-scroll-wrapper::after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 20px;
+    width: 40px;
+    background: linear-gradient(to right, transparent, rgba(245, 245, 245, 0.95));
+    pointer-events: none;
+  }
 }
 
-/* Tablet: lebar sedikit lebih besar */
-@media (min-width: 577px) and (max-width: 767px) {
+/* TABLET: Masih mobile layout tapi lebih besar */
+@media (min-width: 577px) and (max-width: 767.98px) {
   .service-item {
-    width: 200px;
+    width: 180px;
   }
   
   .service-card {
@@ -169,25 +158,39 @@
   }
 }
 
-/* Optional: indicator bahwa ada lebih banyak konten di kanan */
-.service-scroll-wrapper:after {
-  content: "";
-  display: none;
-}
+/* DESKTOP/LAPTOP: Maksimal 2 baris dengan scroll horizontal */
+@media (min-width: 768px) {
+  .mobile-rows {
+    display: none;
+  }
+  
+  .desktop-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  
+  .service-item {
+    width: 220px;
+  }
 
-@media (max-width: 767.98px) {
-  .service-scroll-wrapper:after {
+  /* Gradient indicator di kanan untuk desktop */
+  .service-scroll-wrapper::after {
+    content: "";
     display: block;
     position: absolute;
     right: 0;
     top: 0;
-    bottom: 0;
-    width: 30px;
-    background: linear-gradient(to right, transparent, rgba(245, 245, 245, 0.9));
+    bottom: 20px;
+    width: 50px;
+    background: linear-gradient(to right, transparent, rgba(245, 245, 245, 0.95));
     pointer-events: none;
   }
-  
-  .service-scroll-wrapper {
-    position: relative;
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+  .service-item {
+    width: 240px;
   }
 }

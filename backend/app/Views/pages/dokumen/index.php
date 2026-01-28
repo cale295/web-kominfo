@@ -52,7 +52,7 @@
         font-weight: 500;
         transition: all 0.2s ease;
         border: 1px solid transparent;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
     .btn:hover {
@@ -134,7 +134,7 @@
         transition: transform 0.3s ease;
         color: #94a3b8;
     }
-    
+
     .folder-card.active .chevron {
         transform: rotate(180deg);
         color: var(--primary);
@@ -153,8 +153,15 @@
     }
 
     @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     /* Table Styling */
@@ -222,14 +229,32 @@
         transform: scale(1.05);
     }
 
-    .btn-view { background: #3b82f6; } /* Blue */
-    .btn-view:hover { background: #2563eb; }
+    .btn-view {
+        background: #3b82f6;
+    }
 
-    .btn-edit { background: #f59e0b; } /* Amber */
-    .btn-edit:hover { background: #d97706; }
+    /* Blue */
+    .btn-view:hover {
+        background: #2563eb;
+    }
 
-    .btn-del { background: #ef4444; } /* Red */
-    .btn-del:hover { background: #dc2626; }
+    .btn-edit {
+        background: #f59e0b;
+    }
+
+    /* Amber */
+    .btn-edit:hover {
+        background: #d97706;
+    }
+
+    .btn-del {
+        background: #ef4444;
+    }
+
+    /* Red */
+    .btn-del:hover {
+        background: #dc2626;
+    }
 
     /* Empty States */
     .empty-state {
@@ -250,14 +275,17 @@
     }
 
     /* Utilities */
-    .mb-3 { margin-bottom: 1rem; }
-    
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
     @media (max-width: 768px) {
         .top {
             flex-direction: column;
             align-items: flex-start;
             gap: 1rem;
         }
+
         .folder-header {
             padding: 1rem;
         }
@@ -269,14 +297,18 @@
     <div class="top">
         <h3>📂 Manajemen Dokumen</h3>
         <a href="<?= site_url("informasi-publik/$slug/folder/create") ?>" class="btn">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
             Tambah Folder
         </a>
     </div>
 
     <?php if (session()->getFlashdata('pesan')) : ?>
         <div class="msg">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
             <?= session()->getFlashdata('pesan') ?>
         </div>
     <?php endif; ?>
@@ -284,39 +316,47 @@
     <?php if ($folders) : ?>
         <?php foreach ($folders as $i => $folder) : ?>
             <?php
-                $folderId = 'folder-' . $i;
-                $namaFolder = esc($folder['nama_folder']);
-                $jumlah = count($folder['dokumen'] ?? []);
+            $folderId = 'folder-' . $i;
+            $namaFolder = esc($folder['nama_folder']);
+            $jumlah = count($folder['dokumen'] ?? []);
             ?>
 
             <div class="folder-card" id="<?= $folderId ?>">
                 <!-- GANTI bagian folder-header menjadi: -->
-<div class="folder-header" onclick="toggleFolder('<?= $folderId ?>')">
-    <div class="folder-icon">
-        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-    </div>
-    <div class="folder-info">
-        <h5 class="folder-title"><?= $namaFolder ?></h5>
-        <div class="folder-meta"><?= $jumlah ?> Dokumen tersimpan</div>
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <a href="<?= site_url("informasi-publik/$slug/folder/delete/" . urlencode($namaFolder)) ?>" 
-           class="btn-icon btn-del" 
-           onclick="return confirm('Hapus folder <?= esc($namaFolder) ?> dan semua dokumen didalamnya?')"
-           title="Hapus Folder"
-           style="margin-right: 1rem;">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-        </a>
-        <div class="chevron">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
-    </div>
-</div>
+                <div class="folder-header" onclick="toggleFolder('<?= $folderId ?>')">
+                    <div class="folder-icon">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="folder-info">
+                        <h5 class="folder-title"><?= $namaFolder ?></h5>
+                        <div class="folder-meta"><?= $jumlah ?> Dokumen tersimpan</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <a href="<?= site_url("informasi-publik/$slug/folder/delete/" . urlencode($namaFolder)) ?>"
+                            class="btn-icon btn-del"
+                            onclick="return confirm('Hapus folder <?= esc($namaFolder) ?> dan semua dokumen didalamnya?')"
+                            title="Hapus Folder"
+                            style="margin-right: 1rem;">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </a>
+                        <div class="chevron">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="folder-body">
                     <div class="mb-3">
                         <a href="<?= site_url("informasi-publik/$slug/dokumen/create/" . urlencode($namaFolder)) ?>" class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: #475569;">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
                             Upload Dokumen
                         </a>
                     </div>
@@ -333,25 +373,33 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php $no = 1; foreach ($folder['dokumen'] as $d) : ?>
+                                    <?php $no = 1;
+                                    foreach ($folder['dokumen'] as $d) : ?>
                                         <tr>
                                             <td style="text-align: center; color: #94a3b8;"><?= $no++ ?></td>
                                             <td style="font-weight: 500;"><?= esc($d['nama_dokumen']) ?></td>
                                             <td>
-                                                <span style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">
+                                                <span style="background: #fee0e0ff; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">
                                                     <?= esc($d['tahun']) ?>
                                                 </span>
                                             </td>
                                             <td>
                                                 <div class="action-group">
                                                     <a href="<?= base_url('uploads/dokumen/' . $d['file_path']) ?>" target="_blank" class="btn-icon btn-view" title="Lihat File">
-                                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                        </svg>
                                                     </a>
                                                     <a href="<?= site_url("informasi-publik/$slug/edit/" . $d['id_document']) ?>" class="btn-icon btn-edit" title="Edit Data">
-                                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
                                                     </a>
                                                     <a href="<?= site_url("informasi-publik/$slug/delete/" . $d['id_document']) ?>" class="btn-icon btn-del" onclick="return confirm('Yakin hapus dokumen ini?')" title="Hapus">
-                                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
                                                     </a>
                                                 </div>
                                             </td>
@@ -362,7 +410,9 @@
                         </div>
                     <?php else : ?>
                         <div class="empty-folder">
-                            <svg width="40" height="40" style="color: #cbd5e1; margin-bottom: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <svg width="40" height="40" style="color: #cbd5e1; margin-bottom: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
                             <p>Belum ada dokumen di folder ini</p>
                         </div>
                     <?php endif; ?>
@@ -372,7 +422,9 @@
         <?php endforeach; ?>
     <?php else : ?>
         <div class="empty-state">
-            <svg width="60" height="60" style="color: #cbd5e1; margin-bottom: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path></svg>
+            <svg width="60" height="60" style="color: #cbd5e1; margin-bottom: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path>
+            </svg>
             <p>Belum ada folder dokumen tersedia.</p>
             <p style="font-size: 0.85rem; margin-top: 0.5rem;">Silakan buat folder baru untuk memulai.</p>
         </div>
@@ -381,11 +433,11 @@
 </div>
 
 <script>
-function toggleFolder(id) {
-    const el = document.getElementById(id);
-    
-    el.classList.toggle('active');
-}
+    function toggleFolder(id) {
+        const el = document.getElementById(id);
+
+        el.classList.toggle('active');
+    }
 </script>
 
 <?= $this->endSection() ?>

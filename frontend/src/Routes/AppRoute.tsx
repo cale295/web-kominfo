@@ -23,8 +23,6 @@ import ModalProfil from "../sections/profilsection/modalprofil/ModalProfil";
 import Gallery from "../sections/gallerysection/Gallery";
 import GalleryDetail from "../sections/gallerysection/GalleryDetail";
 import Perencanaan from "../sections/informasipubliksection/perencanaan/Perencanaan";
-import Keuangan from "../sections/informasipubliksection/laporankeuangan/LaporanKeuangan";
-import Kinerja from "../sections/informasipubliksection/laporankinerja/LaporanKinerja";
 import SBU from "../sections/profilsection/sbu/SBU";
 import BannerPopupComponent from "../components/bannerpopup/BannerPopup";
 import DaftarInformasiPublik from "../sections/informasipubliksection/daftarinformasipublik/Daftar_Informasi_publik";
@@ -139,10 +137,8 @@ const AppRouter: React.FC = () => {
         <Route path="/program" element={<ProgramPage />} />
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/gallery/:id" element={<GalleryDetailPage />} />
-        <Route path="/perencanaan" element={<Perencanaan />} />
+        <Route path="/informasi_perencanaan" element={<Perencanaan />} />
         <Route path="/pengadaan_barang_jasa" element={<PengadaanBarangJasa />} />
-        <Route path="/laporan_keuangan" element={<Keuangan />} />
-        <Route path="/laporan_kinerja" element={<Kinerja />} />
         <Route path="/daftar_informasi_publik" element={<DaftarInformasiPublik />} />
         <Route path="/agenda_pelatihan" element={<PendidikanPelatihan />} />
         <Route path="/kerjasama_daerah" element={<KerjasamaDaerah />} />

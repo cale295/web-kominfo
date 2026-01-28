@@ -55,19 +55,12 @@
   align-items: center;
   gap: 0.5rem;
   background: none;
-  border: 1px solid #e5e7eb;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  color: #1e40af;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
   margin-left: auto;
-}
-
-.btn-share:hover {
-  background: #f3f4f6;
-  border-color: #1e40af;
 }
 
 .unified-carousel-section {
