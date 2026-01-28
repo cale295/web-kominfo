@@ -166,6 +166,13 @@
         width: 3rem;
         height: 3rem;
     }
+    
+    /* Status badge */
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+    }
 </style>
 
 <!-- Loading Overlay -->
@@ -241,7 +248,11 @@
                 </div>
                 <div class="fw-medium">
                     <strong>Perhatian:</strong> Batas maksimal 10 kategori aktif telah tercapai (<span class="fw-bold"><?= $activeCount ?>/10</span>). 
-                    Nonaktifkan kategori lain untuk mengaktifkan kategori baru.
+                    <span class="d-block mt-1 small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Anda masih dapat <strong>menonaktifkan</strong> kategori yang aktif, 
+                        tetapi <strong>tidak dapat mengaktifkan</strong> kategori baru/nonaktif hingga ada slot yang tersedia.
+                    </span>
                 </div>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -256,13 +267,20 @@
             </div>
             
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-<?= $remainingSlots > 0 ? 'primary' : 'danger' ?> rounded-pill px-3 py-2">
-                    <i class="fas fa-layer-group me-1"></i> 
-                    Aktif: <?= $activeCount ?>/10 
-                    <?php if($remainingSlots > 0): ?>
-                        <span class="ms-1">(Tersisa: <?= $remainingSlots ?>)</span>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="badge bg-<?= $remainingSlots > 0 ? 'primary' : 'danger' ?> rounded-pill px-3 py-2 mb-1">
+                        <i class="fas fa-layer-group me-1"></i> 
+                        Aktif: <?= $activeCount ?>/10 
+                        <?php if($remainingSlots > 0): ?>
+                            <span class="ms-1">(Tersisa: <?= $remainingSlots ?>)</span>
+                        <?php endif; ?>
+                    </span>
+                    <?php if($activeCount >= 10): ?>
+                        <span class="text-danger small fw-bold">
+                            <i class="fas fa-lock me-1"></i>Limit tercapai
+                        </span>
                     <?php endif; ?>
-                </span>
+                </div>
                 <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold mt-3 mt-md-0 hover-scale" data-bs-toggle="modal" data-bs-target="#modalCreate">
                     <i class="fas fa-plus-circle me-2"></i> Tambah Kategori
                 </button>
@@ -295,6 +313,12 @@
                         </thead>
                         <tbody>
                             <?php foreach ($kategori as $i => $row): ?>
+                                <?php 
+                                $isCurrentlyActive = ($row['is_show_nav'] == '1');
+                                $canDeactivate = $isCurrentlyActive; // Selalu bisa menonaktifkan
+                                $canActivate = (!$isCurrentlyActive && $activeCount < 10); // Hanya bisa mengaktifkan jika kurang dari 10
+                                $isLocked = (!$isCurrentlyActive && $activeCount >= 10); // Terkunci jika tidak aktif dan sudah 10 aktif
+                                ?>
                                 <tr>
                                     <td class="text-center fw-bold text-muted"><?= $i + 1 ?></td>
                                     
@@ -306,7 +330,8 @@
                                             </div>
                                         <?php endif; ?>
                                     </td>
-    <td class="text-center">
+                                    
+                                    <td class="text-center">
                                         <span class="badge-sorting"><?= $row['sorting_nav'] ?? '-' ?></span>
                                     </td>
 
@@ -326,33 +351,40 @@
                                     </td>
 
                                     <td class="text-center">
-                                        <?php 
-                                        $isLocked = ($row['is_show_nav'] == '1' && $activeCount >= 10);
-                                        ?>
-                                        
-                                        <div class="d-flex justify-content-center">
+                                        <div class="d-flex justify-content-center align-items-center">
                                             <?php if ($isLocked): ?>
-                                                <!-- Toggle terkunci -->
-                                                <div class="position-relative">
+                                                <!-- Toggle terkunci untuk kategori nonaktif -->
+                                                <div class="position-relative" data-bs-toggle="tooltip" 
+                                                     title="Tidak dapat diaktifkan. Batas 10 kategori aktif tercapai. Nonaktifkan kategori lain terlebih dahulu.">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input" 
                                                                type="checkbox" 
                                                                disabled
                                                                id="toggle-locked-<?= $row['id_kategori'] ?>">
                                                         <label class="form-check-label small text-muted ms-2" 
-                                                               for="toggle-locked-<?= $row['id_kategori'] ?>"
-                                                               data-bs-toggle="tooltip" 
-                                                               data-bs-placement="top"
-                                                               title="Tidak dapat diaktifkan. Batas 10 kategori aktif tercapai. Nonaktifkan kategori lain terlebih dahulu.">
+                                                               for="toggle-locked-<?= $row['id_kategori'] ?>">
                                                             <i class="fas fa-lock fa-xs"></i>
                                                         </label>
                                                     </div>
                                                 </div>
+                                                <span class="badge bg-secondary status-badge ms-2">Terkunci</span>
                                             <?php else: ?>
                                                 <!-- Toggle normal -->
-                                                <div data-bs-toggle="tooltip" title="Klik untuk mengubah status">
-                                                    <?= btn_toggle($row['id_kategori'], $row['is_show_nav'], 'kategori/toggle-status') ?>
+                                                <div data-bs-toggle="tooltip" 
+                                                     title="<?= $isCurrentlyActive ? 'Klik untuk menonaktifkan' : 'Klik untuk mengaktifkan' ?>">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input toggle-status" 
+                                                               type="checkbox" 
+                                                               data-id="<?= $row['id_kategori'] ?>"
+                                                               data-current="<?= $isCurrentlyActive ? '1' : '0' ?>"
+                                                               data-url="kategori/toggle-status"
+                                                               id="toggle-<?= $row['id_kategori'] ?>"
+                                                               <?= $isCurrentlyActive ? 'checked' : '' ?>>
+                                                    </div>
                                                 </div>
+                                                <span class="badge bg-<?= $isCurrentlyActive ? 'success' : 'secondary' ?> status-badge ms-2">
+                                                    <?= $isCurrentlyActive ? 'Aktif' : 'Nonaktif' ?>
+                                                </span>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -387,7 +419,13 @@
         <div class="card-footer bg-white border-top-0 py-3">
             <div class="d-flex align-items-center text-muted small">
                 <i class="fas fa-info-circle me-2 text-primary"></i>
-                <span>Maksimal <strong>10 kategori aktif</strong> yang dapat ditampilkan. Urutkan dengan kolom <strong>Urutan</strong> untuk navigasi.</span>
+                <span>Maksimal <strong>10 kategori aktif</strong> yang dapat ditampilkan. 
+                <?php if($activeCount >= 10): ?>
+                    <strong class="text-danger">Limit tercapai!</strong> Nonaktifkan kategori aktif untuk mengaktifkan yang lain.
+                <?php else: ?>
+                    Tersisa <strong><?= $remainingSlots ?> slot</strong> aktif.
+                <?php endif; ?>
+                </span>
             </div>
         </div>
     </div>
@@ -415,14 +453,15 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Status</label>
-                            <select name="is_show_nav" class="form-select" id="createStatus" <?= $activeCount >= 10 ? 'disabled' : '' ?>>
-                                <option value="1" <?= $activeCount < 10 ? 'selected' : '' ?>>
-                                    Aktif <?= $activeCount >= 10 ? '(Batas 10 tercapai)' : '' ?>
-                                </option>
-                                <option value="0" <?= $activeCount >= 10 ? 'selected' : '' ?>>
-                                    Nonaktif
-                                </option>
+                            <label class="form-label fw-bold">Tampilkan di Navigasi?</label>
+                            <select name="is_show_nav" class="form-select" id="createIsShowNav" <?= $activeCount >= 10 ? 'disabled' : '' ?>>
+                                <?php if($activeCount >= 10): ?>
+                                    <option value="0" selected>Nonaktif (wajib)</option>
+                                    <option value="1" disabled>Aktif (limit tercapai)</option>
+                                <?php else: ?>
+                                    <option value="1" selected>Ya (Aktif)</option>
+                                    <option value="0">Tidak (Nonaktif)</option>
+                                <?php endif; ?>
                             </select>
                             <?php if ($activeCount >= 10): ?>
                                 <input type="hidden" name="is_show_nav" value="0">
@@ -443,17 +482,8 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Tampilkan di Navigasi?</label>
-                            <select name="is_show_nav" class="form-select">
-                                <option value="0" selected>Tidak</option>
-                                <option value="1">Ya</option>
-                            </select>
-                            <div class="form-text small">Apakah kategori ini ditampilkan di menu navigasi?</div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Urutan Navigasi</label>
-                            <input type="number" name="sorting_nav" class="form-control" placeholder="Contoh: 1, 2, 3" min="0">
+                            <input type="number" name="sorting_nav" class="form-control" placeholder="Contoh: 1, 2, 3" min="0" value="0">
                             <div class="form-text small">Urutan tampilan di menu (angka kecil = lebih dulu)</div>
                         </div>
                     </div>
@@ -484,7 +514,7 @@
             <form id="formEdit" method="post">
                 <?= csrf_field() ?>
                 <input type="hidden" name="_method" value="PUT">
-                <input type="hidden" id="edit_current_status" value="">
+                <input type="hidden" id="edit_id_kategori" name="id_kategori">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -495,31 +525,21 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Status</label>
-                            <select name="status" id="edit_status" class="form-select" <?= $activeCount >= 10 ? 'disabled' : '' ?>>
-                                <option value="1">Aktif</option>
-                                <option value="0">Nonaktif</option>
-                            </select>
-                            <?php if ($activeCount >= 10): ?>
-                                <input type="hidden" name="status" id="edit_status_hidden" value="0">
-                                <div class="form-text text-danger small">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>
-                                    Batas 10 kategori aktif telah tercapai. Kategori baru harus dibuat sebagai nonaktif.
-                                </div>
-                            <?php endif; ?>
+                            <label class="form-label fw-bold">Tampilkan di Navigasi?</label>
+                            <div id="editIsShowNavContainer">
+                                <!-- Akan diisi oleh JavaScript -->
+                            </div>
+                            <div class="form-text text-muted small mt-1">
+                                <?php if($activeCount >= 10): ?>
+                                    <i class="fas fa-info-circle me-1 text-danger"></i>
+                                    Limit 10 kategori aktif tercapai. Hanya bisa mengubah dari aktif ke nonaktif.
+                                <?php endif; ?>
+                            </div>
                         </div>
 
                         <div class="col-12 mb-3">
                             <label class="form-label fw-bold">Keterangan</label>
                             <textarea name="keterangan" id="edit_keterangan" class="form-control" rows="3"></textarea>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Tampilkan di Navigasi?</label>
-                            <select name="is_show_nav" id="edit_is_show_nav" class="form-select">
-                                <option value="0">Tidak</option>
-                                <option value="1">Ya</option>
-                            </select>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -541,11 +561,13 @@
     </div>
 </div>
 
-<!-- Form untuk delete satuan -->
+<!-- Form untuk delete -->
 <form id="deleteSingleForm" action="" method="post" style="display: none;">
     <?= csrf_field() ?>
     <input type="hidden" name="_method" value="DELETE">
 </form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -560,7 +582,7 @@
         });
 
         // --- 2. TOGGLE STATUS AJAX LOGIC dengan validasi batas ---
-        const toggles = document.querySelectorAll('.form-check-input[type="checkbox"]:not(:disabled)');
+        const toggles = document.querySelectorAll('.toggle-status');
         const base_url = "<?= base_url() ?>";
 
         toggles.forEach(toggle => {
@@ -568,109 +590,129 @@
                 const id = this.dataset.id;
                 const url = this.dataset.url;
                 const isChecked = this.checked ? 1 : 0;
-                const currentStatus = isChecked ? 0 : 1; // Status saat ini (sebelum toggle)
+                const currentStatus = parseInt(this.dataset.current);
                 
                 // Validasi: jika mencoba mengaktifkan (dari 0 ke 1) dan sudah mencapai batas
                 if (currentStatus === 0 && isChecked === 1 && activeCount >= maxActive) {
-                    // Tampilkan SweetAlert atau alert biasa
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Batas Maksimal',
-                            text: 'Tidak dapat mengaktifkan kategori. Batas maksimal 10 kategori aktif telah tercapai.',
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#d33',
-                        });
-                    } else {
-                        alert('Tidak dapat mengaktifkan kategori. Batas maksimal 10 kategori aktif telah tercapai.');
-                    }
+                    // Tampilkan SweetAlert
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Batas Maksimal',
+                        html: `<div class="text-start">
+                            <p>Tidak dapat mengaktifkan kategori.</p>
+                            <p class="mb-0">Batas maksimal <strong>10 kategori aktif</strong> telah tercapai (${activeCount}/10).</p>
+                            <p class="mt-2">Silakan nonaktifkan kategori lain terlebih dahulu.</p>
+                        </div>`,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#d33',
+                    });
                     this.checked = false;
                     return;
                 }
 
-                // Tampilkan loading overlay
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                loadingOverlay.style.display = 'flex';
-                
-                // Kunci toggle sementara
-                this.disabled = true;
+                // Validasi: jika mencoba menonaktifkan (dari 1 ke 0), selalu boleh
+                if (currentStatus === 1 && isChecked === 0) {
+                    // Lanjutkan proses
+                }
 
-                const csrfName = '<?= csrf_token() ?>';
-                const csrfHash = '<?= csrf_hash() ?>';
-
-                let formData = new FormData();
-                formData.append('id', id);
-                formData.append('status', isChecked);
-                formData.append(csrfName, csrfHash);
-
-                fetch(base_url + '/' + url, {
-                    method: 'POST',
-                    headers: { 
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfHash
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Auto-refresh halaman setelah 500ms
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 500);
-                    } else {
-                        // Sembunyikan loading
-                        loadingOverlay.style.display = 'none';
-                        this.disabled = false;
-                        this.checked = !isChecked; // Kembalikan ke state sebelumnya
+                // Tampilkan konfirmasi
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: isChecked === 1 ? 'Aktifkan kategori ini?' : 'Nonaktifkan kategori ini?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Tampilkan loading overlay
+                        const loadingOverlay = document.getElementById('loadingOverlay');
+                        loadingOverlay.style.display = 'flex';
                         
-                        if (typeof Swal !== 'undefined') {
+                        // Kunci toggle sementara
+                        this.disabled = true;
+
+                        const csrfName = '<?= csrf_token() ?>';
+                        const csrfHash = '<?= csrf_hash() ?>';
+
+                        let formData = new FormData();
+                        formData.append('id', id);
+                        formData.append('status', isChecked);
+                        formData.append(csrfName, csrfHash);
+
+                        fetch(base_url + '/' + url, {
+                            method: 'POST',
+                            headers: { 
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfHash
+                            },
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Auto-refresh halaman setelah 500ms
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: 'Status kategori berhasil diubah',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                // Sembunyikan loading
+                                loadingOverlay.style.display = 'none';
+                                this.disabled = false;
+                                this.checked = !isChecked; // Kembalikan ke state sebelumnya
+                                
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: data.message || 'Terjadi kesalahan saat mengubah status.',
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#d33',
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Sembunyikan loading
+                            loadingOverlay.style.display = 'none';
+                            this.disabled = false;
+                            this.checked = !isChecked; // Kembalikan ke state sebelumnya
+                            
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Gagal',
-                                text: data.message || 'Terjadi kesalahan saat mengubah status.',
+                                title: 'Error',
+                                text: 'Terjadi kesalahan jaringan. Silakan coba lagi.',
                                 confirmButtonText: 'OK',
                                 confirmButtonColor: '#d33',
                             });
-                        } else {
-                            alert('Gagal update: ' + (data.message || 'Error'));
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Sembunyikan loading
-                    loadingOverlay.style.display = 'none';
-                    this.disabled = false;
-                    this.checked = !isChecked; // Kembalikan ke state sebelumnya
-                    
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Terjadi kesalahan jaringan. Silakan coba lagi.',
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#d33',
                         });
                     } else {
-                        alert('Terjadi kesalahan jaringan. Silakan coba lagi.');
+                        // Jika dibatalkan, kembalikan ke state sebelumnya
+                        this.checked = !isChecked;
                     }
                 });
             });
         });
 
         // --- 3. VALIDASI REAL-TIME UNTUK TOGGLE ---
-        document.querySelectorAll('.form-check-input:not(:disabled)').forEach(toggle => {
+        document.querySelectorAll('.toggle-status').forEach(toggle => {
             toggle.addEventListener('click', function(e) {
-                const id = this.dataset.id;
-                const currentChecked = this.checked;
-                const newStatus = currentChecked ? 1 : 0; // Status yang akan diubah
-                const currentStatus = currentChecked ? 0 : 1; // Status saat ini
+                const currentStatus = parseInt(this.dataset.current);
+                const newStatus = this.checked ? 1 : 0;
                 
                 // Jika mencoba mengaktifkan (dari 0 ke 1) dan sudah ada 10 aktif
                 if (currentStatus === 0 && newStatus === 1 && activeCount >= maxActive) {
@@ -678,17 +720,17 @@
                     e.stopPropagation();
                     
                     // Tampilkan alert
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Batas Maksimal',
-                            text: 'Tidak dapat mengaktifkan kategori. Batas maksimal 10 kategori aktif telah tercapai.',
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#d33',
-                        });
-                    } else {
-                        alert('Tidak dapat mengaktifkan kategori. Batas maksimal 10 kategori aktif telah tercapai.');
-                    }
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Batas Maksimal',
+                        html: `<div class="text-start">
+                            <p>Tidak dapat mengaktifkan kategori.</p>
+                            <p class="mb-0">Batas maksimal <strong>10 kategori aktif</strong> telah tercapai (${activeCount}/10).</p>
+                            <p class="mt-2">Silakan nonaktifkan kategori lain terlebih dahulu.</p>
+                        </div>`,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#d33',
+                    });
                     
                     return false;
                 }
@@ -712,37 +754,42 @@
     function openEditModal(data) {
         const activeCount = <?= $activeCount ?>;
         const maxActive = 10;
+        const isCurrentlyActive = data.is_show_nav == '1';
         
-        // Reset nilai terlebih dahulu
+        // Isi form dengan data
+        document.getElementById('edit_id_kategori').value = data.id_kategori;
         document.getElementById('edit_kategori').value = data.kategori || '';
         document.getElementById('edit_keterangan').value = data.keterangan || '';
-        document.getElementById('edit_current_status').value = data.status || '0';
-        document.getElementById('edit_is_show_nav').value = data.is_show_nav || '0';
         document.getElementById('edit_sorting_nav').value = data.sorting_nav || '';
         
-        // Jika sudah mencapai batas maksimal, lock ke nonaktif jika kategori nonaktif
-        if (activeCount >= maxActive && data.status == '0') {
-            document.getElementById('edit_status').value = '0';
-            document.getElementById('edit_status').disabled = true;
-            // Pastikan hidden value ada
-            if (!document.getElementById('edit_status_hidden')) {
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'status';
-                hiddenInput.id = 'edit_status_hidden';
-                hiddenInput.value = '0';
-                document.getElementById('edit_status').parentNode.appendChild(hiddenInput);
-            } else {
-                document.getElementById('edit_status_hidden').value = '0';
-            }
+        // Handle is_show_nav dengan logika limit
+        const container = document.getElementById('editIsShowNavContainer');
+        
+        if (activeCount >= maxActive && !isCurrentlyActive) {
+            // Jika sudah 10 aktif dan kategori ini nonaktif, lock ke nonaktif
+            container.innerHTML = `
+                <select name="is_show_nav" class="form-select" disabled>
+                    <option value="0" selected>Nonaktif</option>
+                    <option value="1" disabled>Aktif (limit tercapai)</option>
+                </select>
+                <input type="hidden" name="is_show_nav" value="0">
+            `;
+        } else if (activeCount >= maxActive && isCurrentlyActive) {
+            // Jika sudah 10 aktif dan kategori ini aktif, bisa nonaktifkan tapi tidak bisa mengaktifkan yang lain
+            container.innerHTML = `
+                <select name="is_show_nav" class="form-select">
+                    <option value="1" selected>Aktif</option>
+                    <option value="0">Nonaktif</option>
+                </select>
+            `;
         } else {
-            document.getElementById('edit_status').value = data.status || '1';
-            document.getElementById('edit_status').disabled = false;
-            // Hapus hidden input jika ada
-            const hiddenInput = document.getElementById('edit_status_hidden');
-            if (hiddenInput) {
-                hiddenInput.remove();
-            }
+            // Bebas mengubah
+            container.innerHTML = `
+                <select name="is_show_nav" class="form-select">
+                    <option value="1" ${isCurrentlyActive ? 'selected' : ''}>Aktif</option>
+                    <option value="0" ${!isCurrentlyActive ? 'selected' : ''}>Nonaktif</option>
+                </select>
+            `;
         }
         
         document.getElementById('formEdit').action = '<?= site_url('kategori/') ?>' + data.id_kategori;
@@ -751,33 +798,20 @@
         modalEdit.show();
     }
 
-    // --- 6. HELPER DELETE SATUAN ---
+    // --- 6. HELPER DELETE ---
     function confirmDelete(url) {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Data kategori akan dihapus permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const form = document.getElementById('deleteSingleForm');
-                    form.action = url;
-                    
-                    // Tampilkan loading
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    loadingOverlay.style.display = 'flex';
-                    
-                    // Submit form
-                    form.submit();
-                }
-            });
-        } else {
-            if(confirm('Apakah Anda yakin ingin menghapus kategori ini?')) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data kategori dan semua berita didalamnya akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
                 const form = document.getElementById('deleteSingleForm');
                 form.action = url;
                 
@@ -785,9 +819,10 @@
                 const loadingOverlay = document.getElementById('loadingOverlay');
                 loadingOverlay.style.display = 'flex';
                 
+                // Submit form
                 form.submit();
             }
-        }
+        });
     }
 
     // --- 7. RESET FORM KETIKA MODAL DITUTUP ---
@@ -797,9 +832,31 @@
 
     document.getElementById('modalEdit').addEventListener('hidden.bs.modal', function () {
         this.querySelector('form').reset();
-        const hiddenInput = document.getElementById('edit_status_hidden');
-        if (hiddenInput) {
-            hiddenInput.remove();
+    });
+
+    // --- 8. VALIDASI FORM EDIT SAAT SUBMIT ---
+    document.getElementById('formEdit').addEventListener('submit', function(e) {
+        const activeCount = <?= $activeCount ?>;
+        const maxActive = 10;
+        const formData = new FormData(this);
+        const isShowNav = formData.get('is_show_nav');
+        const currentIsActive = document.querySelector('input[name="is_show_nav"]:checked')?.value || 
+                               document.querySelector('select[name="is_show_nav"]')?.value;
+        
+        // Jika mencoba mengubah dari nonaktif ke aktif dan sudah mencapai limit
+        if (isShowNav == '1' && currentIsActive == '0' && activeCount >= maxActive) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Batas Maksimal',
+                html: `<div class="text-start">
+                    <p>Tidak dapat mengaktifkan kategori.</p>
+                    <p class="mb-0">Batas maksimal <strong>10 kategori aktif</strong> telah tercapai (${activeCount}/10).</p>
+                    <p class="mt-2">Silakan nonaktifkan kategori lain terlebih dahulu.</p>
+                </div>`,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33',
+            });
         }
     });
 
